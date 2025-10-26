@@ -1,0 +1,11 @@
+{
+  "domain": "english",
+  "version": "0.1",
+  "description": "Small placeholder of pretrained weights/hyperparams for English domain (seed).",
+  "vocabSize": 16384,
+  "embeddingDim": 64,
+  "seedWeights": {
+    "the": [0.12, 0.03, -0.05],
+    "be": [0.1, 0.02, -0.04]
+  }
+}

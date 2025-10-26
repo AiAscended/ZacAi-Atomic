@@ -18,15 +18,16 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    
+
     /* Path mapping for atomic modules */
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@atoms/*": ["src/atoms/*"],
-      "@molecules/*": ["src/molecules/*"],
-      "@organisms/*": ["src/organisms/*"],
-      "@utils/*": ["src/utils/*"]
+      "@ai/*": ["src/ai/*"],
+      "@ui/*": ["src/ui/*"],
+      "@components/*": ["src/ui/components/*"],
+      "@utils/*": ["src/utils/*"],
+      "@styles/*": ["src/ui/styles/*"]
     }
   },
   "include": ["src"]

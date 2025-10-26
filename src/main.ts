@@ -1,9 +1,26 @@
-import { querySelector } from '@atoms/dom';
+import { querySelector } from '@utils/dom';
 import { Router } from '@utils/router';
-import { createNavigation, updateActiveLink } from '@molecules/navigation';
-import { renderChatPage } from './pages/chatPage';
-import { renderAdminPage } from './pages/adminPage';
-import './styles/main.css';
+import { createNavigation, updateActiveLink } from '@components/Navigation';
+import { renderChatPage } from '@ui/pages/index';
+import { renderAdminPage } from '@ui/pages/admin';
+import '@styles/global.css';
+// Start small orchestration listeners (data change notifications)
+import '@ai/orchestration/dataChangeListener';
+// Ensure domain integration modules are imported so they auto-register with the data registry
+import '@ai/data/english/english_integrationAPI';
+import '@ai/data/mathematics/mathematics_integrationAPI';
+import '@ai/data/typescript/typescript_integrationAPI';
+import '@ai/data/general/general_integrationAPI';
+import '@ai/data/internet_search/internet_search_integrationAPI';
+import { registerModule } from '@ai/orchestration/moduleRegistry';
+import DocumentCache from '@ai/knowledge_retrieval/documentCache';
+
+// Register the document cache as a module so orchestrator listeners can find it and call hooks
+try {
+  registerModule('documentCache', () => DocumentCache);
+} catch (e) {
+  // ignore registration failure
+}
 
 /**
  * Main Application Entry Point
@@ -92,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     new App();
     console.log('✨ ZacAi-Atomic initialized successfully!');
-    console.log('🔬 Atomic architecture: Atoms → Molecules → Organisms → Pages');
+    console.log('🔬 Atomic architecture: AI modules → UI → Utils');
   } catch (error) {
     console.error('Failed to initialize application:', error);
   }

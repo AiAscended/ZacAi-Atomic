@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "domain": "typescript",
+  "terms": [
+    "function",
+    "const",
+    "let",
+    "interface",
+    "type",
+    "class",
+    "async",
+    "await",
+    "Promise",
+    "ts"
+  ]
+}

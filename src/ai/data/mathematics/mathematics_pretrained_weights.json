@@ -1,0 +1,12 @@
+{
+  "domain": "mathematics",
+  "version": "0.1",
+  "description": "Small seed pretrained weights for mathematics domain (illustrative numeric vectors).",
+  "vocabSize": 8192,
+  "embeddingDim": 64,
+  "seedWeights": {
+    "function": [0.21, -0.03, 0.11, 0.07],
+    "derivative": [0.18, 0.02, -0.05, 0.12],
+    "integral": [0.19, 0.01, 0.04, 0.09]
+  }
+}

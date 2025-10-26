@@ -5,10 +5,11 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@atoms': resolve(__dirname, './src/atoms'),
-      '@molecules': resolve(__dirname, './src/molecules'),
-      '@organisms': resolve(__dirname, './src/organisms'),
+      '@ai': resolve(__dirname, './src/ai'),
+      '@ui': resolve(__dirname, './src/ui'),
+      '@components': resolve(__dirname, './src/ui/components'),
       '@utils': resolve(__dirname, './src/utils'),
+      '@styles': resolve(__dirname, './src/ui/styles'),
     },
   },
   server: {

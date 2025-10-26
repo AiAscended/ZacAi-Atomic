@@ -1,0 +1,12 @@
+{
+  "domain": "typescript",
+  "version": "0.1",
+  "description": "Small seed pretrained weights for TypeScript domain.",
+  "vocabSize": 4096,
+  "embeddingDim": 64,
+  "seedWeights": {
+    "function": [0.11, 0.05, -0.02],
+    "interface": [0.09, 0.02, 0.03],
+    "Promise": [0.12, -0.01, 0.04]
+  }
+}
