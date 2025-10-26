@@ -1,0 +1,34 @@
+{
+  "name": "zacai-atomic",
+  "version": "1.0.0",
+  "description": "Full Modularity of every single AI Model function required",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,html}\""
+  },
+  "dependencies": {
+    "markdown-it": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "@types/markdown-it": "^13.0.7",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10"
+  },
+  "keywords": [
+    "ai",
+    "atomic",
+    "modular",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT"
+}
