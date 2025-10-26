@@ -12,7 +12,7 @@ export const formatDate = (date: Date): string => {
  * Generate unique ID - Atomic function
  */
 export const generateId = (): string => {
-  return `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `id-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 };
 
 /**

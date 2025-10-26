@@ -77,7 +77,6 @@ export class Router {
    * Initialize router with current path
    */
   public init(): void {
-    const initialPath = window.location.pathname;
-    this.handleRoute(initialPath === '/' ? '/' : initialPath);
+    this.handleRoute(window.location.pathname);
   }
 }
