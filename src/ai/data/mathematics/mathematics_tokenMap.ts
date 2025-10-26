@@ -1,19 +1,42 @@
 import MATHEMATICS_CORE_TOKENS from './mathematics_tokens';
 
 /**
- * Build a token -> id map for mathematics domain. Includes core tokens and synthetic filler tokens.
- * Default vocab size: 512 (core tokens + synthetic tokens math_tok_0001...).
+ * Build a stable token -> id map for Mathematics.
+ * Reserve small integer ids for special tokens: [PAD]=0, [UNK]=1, [CLS]=2, [SEP]=3, [MASK]=4
  */
 export const buildMathematicsTokenMap = (vocabSize = 512) => {
   const map = new Map<string, number>();
-  let idx = 1;
-  for (const t of MATHEMATICS_CORE_TOKENS) map.set(t, idx++);
-  while (idx <= vocabSize) {
+  const reserved = ['[PAD]', '[UNK]', '[CLS]', '[SEP]', '[MASK]'];
+  reserved.forEach((t, i) => map.set(t, i));
+
+  let idx = reserved.length;
+  for (const t of MATHEMATICS_CORE_TOKENS) {
+    if (map.has(t)) continue;
+    map.set(t, idx++);
+  }
+
+  while (idx < vocabSize) {
     map.set(`math_tok_${String(idx).padStart(4, '0')}`, idx++);
   }
+
   return map;
 };
 
 export const mathematicsTokenMap = buildMathematicsTokenMap();
 
-export default mathematicsTokenMap;
+export const getMathematicsTokenId = (token: string): number =>
+  mathematicsTokenMap.get(token) ?? mathematicsTokenMap.get('[UNK]')!;
+
+export const getMathematicsTokenById = (id: number): string | undefined => {
+  for (const [k, v] of mathematicsTokenMap.entries()) if (v === id) return k;
+  return undefined;
+};
+
+export const mathematicsTokenCount = () => mathematicsTokenMap.size;
+
+export default {
+  mathematicsTokenMap,
+  getMathematicsTokenId,
+  getMathematicsTokenById,
+  mathematicsTokenCount,
+};
