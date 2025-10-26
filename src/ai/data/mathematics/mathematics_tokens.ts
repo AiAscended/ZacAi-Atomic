@@ -4,6 +4,14 @@
  */
 
 export const MATHEMATICS_CORE_TOKENS = [
+  // reserved special tokens
+  '[PAD]',
+  '[UNK]',
+  '[CLS]',
+  '[SEP]',
+  '[MASK]',
+
+  '<SYS_MATHEMATICS>',
   'function',
   'variable',
   'limit',
@@ -14,6 +22,16 @@ export const MATHEMATICS_CORE_TOKENS = [
   'theorem',
   'proof',
   'equation',
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
 ];
 
 export default MATHEMATICS_CORE_TOKENS;
