@@ -1,0 +1,13 @@
+{
+  "name": "english",
+  "version": "0.1",
+  "description": "English language knowledge domain (tokens, simple grammar, seed vocab).",
+  "author": "auto-generated",
+  "files": [
+    "english_seedVocabulary.json",
+    "english_learnedData.json",
+    "english_webDocReferences.json",
+    "english_trainingWeights.bin",
+    "src/ai/data/english/*"
+  ]
+}

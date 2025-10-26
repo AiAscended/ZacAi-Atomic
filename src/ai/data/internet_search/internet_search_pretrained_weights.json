@@ -1,0 +1,12 @@
+{
+  "domain": "internet_search",
+  "version": "0.1",
+  "description": "Seed weights for internet search ranking/query understanding.",
+  "vocabSize": 8192,
+  "embeddingDim": 64,
+  "seedWeights": {
+    "search": [0.2, 0.01, -0.03],
+    "rank": [0.15, 0.02, 0.01],
+    "snippet": [0.12, -0.01, 0.02]
+  }
+}

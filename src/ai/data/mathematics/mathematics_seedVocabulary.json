@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "domain": "mathematics",
+  "terms": [
+    "add",
+    "subtract",
+    "multiply",
+    "divide",
+    "integral",
+    "derivative",
+    "matrix",
+    "vector",
+    "prime",
+    "factor"
+  ]
+}

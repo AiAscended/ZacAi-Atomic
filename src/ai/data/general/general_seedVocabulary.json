@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "domain": "general",
+  "terms": [
+    "who",
+    "what",
+    "when",
+    "where",
+    "why",
+    "how",
+    "definition",
+    "example",
+    "summary",
+    "overview"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "domain": "internet_search",
+  "terms": [
+    "search",
+    "query",
+    "crawl",
+    "index",
+    "snippet",
+    "rank",
+    "url",
+    "domain",
+    "crawl_date",
+    "source"
+  ]
+}
