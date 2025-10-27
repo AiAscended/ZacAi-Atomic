@@ -1,43 +1,11 @@
 import { NextResponse } from "next/server"
-// Import scientific calculator (this one is safe, no fs dependencies)
-import { ScientificCalculator } from "@/src/ai/scientific-calculator"
+import { simplePromptHandler } from "@/src/ai/orchestration/simplePromptHandler"
 
 // Session storage
 const sessions = new Map<string, { history: Array<{ role: string; content: string }> }>()
 
 function generateSessionId(): string {
   return `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-}
-
-interface AIResponse {
-  text: string
-  domains: string[]
-  confidence: number
-  sources?: string[]
-  metadata?: Record<string, any>
-}
-
-const calculator = new ScientificCalculator()
-
-let promptHandlerInstance: any = null
-
-async function getPromptHandler() {
-  if (!promptHandlerInstance) {
-    try {
-      console.log("[v0] Dynamically importing promptHandler...")
-      const module = await import("@/src/ai/orchestration/promptHandler")
-      console.log("[v0] promptHandler module loaded, creating instance...")
-      promptHandlerInstance = module.promptHandler
-      console.log("[v0] promptHandler loaded successfully")
-    } catch (error) {
-      console.error("[v0] CRITICAL: Failed to import promptHandler")
-      console.error("[v0] Error type:", error?.constructor?.name)
-      console.error("[v0] Error message:", error instanceof Error ? error.message : String(error))
-      console.error("[v0] Error stack:", error instanceof Error ? error.stack : "No stack")
-      throw new Error(`Failed to load AI system: ${error instanceof Error ? error.message : String(error)}`)
-    }
-  }
-  return promptHandlerInstance
 }
 
 export async function POST(request: Request) {
@@ -57,21 +25,15 @@ export async function POST(request: Request) {
       sessions.set(newSessionId, { history: [] })
 
       try {
-        console.log("[v0] Getting promptHandler instance...")
-        const promptHandler = await getPromptHandler()
-        console.log("[v0] Calling promptHandler.initialize()...")
-        await promptHandler.initialize()
+        console.log("[v0] Initializing simple prompt handler...")
+        await simplePromptHandler.initialize()
         console.log("[v0] AI system initialized successfully")
       } catch (error) {
         console.error("[v0] Failed to initialize AI system:", error)
-        console.error("[v0] Error type:", error?.constructor?.name)
-        console.error("[v0] Error details:", error instanceof Error ? error.message : String(error))
-        console.error("[v0] Error stack:", error instanceof Error ? error.stack : "No stack trace")
         return NextResponse.json(
           {
             error: "Failed to initialize AI system",
             details: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
           },
           { status: 500 },
         )
@@ -106,9 +68,8 @@ export async function POST(request: Request) {
       }
 
       try {
-        console.log("[v0] Calling promptHandler.handlePrompt...")
-        const promptHandler = await getPromptHandler()
-        const response = await promptHandler.handlePrompt(message, sessionId, {
+        console.log("[v0] Calling simplePromptHandler.handlePrompt...")
+        const response = await simplePromptHandler.handlePrompt(message, sessionId, {
           history: session.history,
         })
 
@@ -131,7 +92,6 @@ export async function POST(request: Request) {
         })
       } catch (error) {
         console.error("[v0] Error in AI processing:", error)
-        console.error("[v0] Error stack:", error instanceof Error ? error.stack : "No stack trace")
         return NextResponse.json({
           text: "I'm having trouble processing your request right now. The AI system encountered an error.",
           domains: ["general"],
@@ -146,7 +106,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 })
   } catch (error) {
     console.error("[v0] API error:", error)
-    console.error("[v0] Error stack:", error instanceof Error ? error.stack : "No stack trace")
     return NextResponse.json(
       {
         error: "Internal server error",
