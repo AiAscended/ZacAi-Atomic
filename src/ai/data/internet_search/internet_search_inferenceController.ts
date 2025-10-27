@@ -6,22 +6,39 @@
 import { findSources } from "../url_lookup"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 
-export async function internetSearchRunInference(input: string): Promise<{ response: string }> {
+export async function internetSearchRunInference(
+  input: string,
+  context?: any,
+): Promise<{ response: string; confidence?: number }> {
   const lowerInput = input.toLowerCase()
+
+  const inferenceResults = context?.inferenceResults
+  const tokens = context?.tokens || []
+  const searchResults = context?.searchResults || []
+  const confidence = inferenceResults?.confidence || 0.5
+
+  if (searchResults.length > 0 && !searchResults[0].includes("simulated")) {
+    return {
+      response: `Based on internet search results:\n\n${searchResults.slice(0, 3).join("\n\n")}\n\n(Confidence: ${(confidence * 100).toFixed(1)}%)`,
+      confidence,
+    }
+  }
 
   // Check for questions about AI and neurons
   if (lowerInput.includes("ai") && lowerInput.includes("neuron")) {
     return {
-      response: `In artificial intelligence, "neurons" refer to artificial neurons or nodes in a neural network. Unlike biological neurons, AI neurons are mathematical functions that:
-
-1. **Receive inputs**: Take in data from previous layers or input data
-2. **Apply weights**: Multiply inputs by learned weight values
-3. **Sum and activate**: Add weighted inputs and pass through an activation function
-4. **Output**: Send the result to the next layer
-
-In deep learning models like GPT or neural networks, there can be millions or billions of these artificial neurons organized in layers. For example, GPT-3 has 175 billion parameters (weights between neurons). Each "neuron" is essentially a mathematical operation, not a physical component like in biological brains.
-
-The term "neuron" in AI is inspired by biological neurons, but they work very differently - AI neurons are mathematical abstractions running on computer hardware, while biological neurons are living cells that use electrochemical signals.`,
+      response:
+        `In artificial intelligence, "neurons" refer to artificial neurons or nodes in a neural network. Unlike biological neurons, AI neurons are mathematical functions that:\n\n` +
+        `1. **Receive inputs**: Take in data from previous layers or input data\n` +
+        `2. **Apply weights**: Multiply inputs by learned weight values\n` +
+        `3. **Sum and activate**: Add weighted inputs and pass through an activation function\n` +
+        `4. **Output**: Send the result to the next layer\n\n` +
+        `In deep learning models like GPT or neural networks, there can be millions or billions of these artificial neurons organized in layers. ` +
+        `For example, GPT-3 has 175 billion parameters (weights between neurons). Each "neuron" is essentially a mathematical operation, not a physical component like in biological brains.\n\n` +
+        `The term "neuron" in AI is inspired by biological neurons, but they work very differently - AI neurons are mathematical abstractions running on computer hardware, ` +
+        `while biological neurons are living cells that use electrochemical signals.\n\n` +
+        `(Processed ${tokens.length} tokens, neural inference confidence: ${(confidence * 100).toFixed(1)}%)`,
+      confidence,
     }
   }
 
@@ -40,25 +57,60 @@ The term "neuron" in AI is inspired by biological neurons, but they work very di
         .join("\n")
       return {
         response: `I have access to the following reference sources:\n${sourceList}\n\nI can look up information from these trusted sources to provide accurate answers.`,
+        confidence,
       }
     }
   }
 
-  // Check for general knowledge or fact requests
-  if (lowerInput.includes("fact") || lowerInput.includes("interesting") || lowerInput.includes("knowledge")) {
+  if (lowerInput.includes("fact") || lowerInput.includes("interesting") || lowerInput.includes("random")) {
+    const facts = [
+      "The Great Wall of China is not visible from space with the naked eye, despite popular belief. This myth has been debunked by astronauts.",
+      "Honey never spoils. Archaeologists have found 3000-year-old honey in Egyptian tombs that was still perfectly edible!",
+      "The shortest war in history was between Britain and Zanzibar on August 27, 1896. Zanzibar surrendered after 38 minutes.",
+      "A group of flamingos is called a 'flamboyance'. These pink birds get their color from the carotenoids in their diet of algae and crustaceans.",
+      "The human brain uses about 20% of the body's energy despite being only 2% of body weight. It consumes roughly 20 watts of power.",
+      "Octopuses have three hearts and blue blood. Two hearts pump blood to the gills, while the third pumps it to the rest of the body.",
+      "The world's oldest known living tree is over 5,000 years old. It's a bristlecone pine named Methuselah located in California.",
+      "A day on Venus is longer than its year. Venus takes 243 Earth days to rotate once, but only 225 Earth days to orbit the Sun.",
+    ]
+    const randomFact = facts[Math.floor(Math.random() * facts.length)]
     return {
-      response: `Here's an interesting fact: The human brain contains approximately 86 billion neurons, each forming thousands of connections with other neurons. This creates a network more complex than any computer system we've built. The internet itself, which connects billions of devices worldwide, was inspired by how neurons communicate in the brain!`,
+      response: `Here's an interesting fact: ${randomFact}\n\n(Neural inference confidence: ${(confidence * 100).toFixed(1)}%)`,
+      confidence,
+    }
+  }
+
+  // Check for general knowledge or top fact requests
+  if (
+    lowerInput.includes("knowledge") ||
+    lowerInput.includes("top") ||
+    lowerInput.includes("number") ||
+    lowerInput.includes("#1")
+  ) {
+    return {
+      response:
+        `Here's a fascinating piece of knowledge: The internet processes over 2.5 quintillion bytes of data every single day. ` +
+        `That's 2,500,000,000,000,000,000 bytes! This includes emails, social media posts, videos, searches, and all online activity. ` +
+        `To put it in perspective, if you tried to download all the data created in one day, it would take over 181 million years at typical broadband speeds!\n\n` +
+        `(Processed with ${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
+      confidence,
     }
   }
 
   // Default response - try to answer based on context
   if (lowerInput.includes("internet") || lowerInput.includes("search") || lowerInput.includes("look up")) {
     return {
-      response: `I can help you find information from trusted sources. I have access to reference materials including Wikipedia, MDN Web Docs, and other authoritative sources. What specific information are you looking for?`,
+      response:
+        `I can help you find information from trusted sources. I have access to reference materials including Wikipedia, MDN Web Docs, and other authoritative sources. ` +
+        `What specific information are you looking for?\n\n(Neural inference confidence: ${(confidence * 100).toFixed(1)}%)`,
+      confidence,
     }
   }
 
   return {
-    response: `I can search for information and provide facts from trusted knowledge bases. Try asking me about specific topics, interesting facts, or general knowledge questions!`,
+    response:
+      `I can search for information and provide facts from trusted knowledge bases. Try asking me about specific topics, interesting facts, or general knowledge questions! ` +
+      `(Processed ${tokens.length} tokens)`,
+    confidence,
   }
 }
