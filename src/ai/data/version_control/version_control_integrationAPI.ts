@@ -6,7 +6,8 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-const { registerDomain, registerDomainFiles, watchDomainFiles } = require("../registry")
+import { registerDomain } from "../registry"
+import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
 import { VERSION_CONTROL_DOMAIN } from "./version_control_constants"
 import { loadVersionControlSeedVocabulary } from "./version_control_vocabularyManager"
 import { versionControlRunInference } from "./version_control_inferenceController"

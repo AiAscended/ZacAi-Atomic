@@ -6,7 +6,8 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-const { registerDomain, registerDomainFiles, watchDomainFiles } = require("../registry")
+import { registerDomain } from "../registry"
+import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
 import { DATA_STRUCTURES_DOMAIN } from "./data_structures_constants"
 import { loadDataStructuresSeedVocabulary } from "./data_structures_vocabularyManager"
 import { dataStructuresRunInference } from "./data_structures_inferenceController"
