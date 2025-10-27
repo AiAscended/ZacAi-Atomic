@@ -1,13 +1,19 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 
+interface Message {
+  role: "user" | "assistant"
+  content: string
+}
+
 export default function HomePage() {
-  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [systemStatus, setSystemStatus] = useState<string>("Initializing AI system...")
@@ -29,13 +35,12 @@ export default function HomePage() {
 
         const data = await response.json()
         setSessionId(data.sessionId)
-        setSystemStatus(`Ready - ${data.domainCount} knowledge domains loaded`)
         setAiReady(true)
-
+        setSystemStatus("AI system ready")
         console.log("[v0] AI system initialized via API")
       } catch (error) {
         console.error("[v0] Failed to initialize AI:", error)
-        setSystemStatus("Error: AI system unavailable")
+        setSystemStatus("Failed to initialize AI system")
       }
     }
 
@@ -44,7 +49,7 @@ export default function HomePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim() || isLoading || !aiReady) return
+    if (!input.trim() || !aiReady || isLoading) return
 
     const userMessage = input.trim()
     setInput("")
@@ -53,7 +58,6 @@ export default function HomePage() {
 
     try {
       console.log("[v0] Sending prompt to API...")
-
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -61,33 +65,21 @@ export default function HomePage() {
           action: "chat",
           message: userMessage,
           sessionId,
+          context: { history: messages },
         }),
       })
 
-      if (!response.ok) throw new Error("API request failed")
+      if (!response.ok) throw new Error("Failed to get response")
 
       const data = await response.json()
+      console.log("[v0] AI response received:", { domains: data.domains, confidence: data.confidence })
 
-      console.log("[v0] AI response received:", {
-        domains: data.domains,
-        confidence: data.confidence,
-      })
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: data.text,
-        },
-      ])
+      setMessages((prev) => [...prev, { role: "assistant", content: data.text }])
     } catch (error) {
-      console.error("[v0] Error processing prompt:", error)
+      console.error("[v0] Error processing message:", error)
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content: "Sorry, I encountered an error processing your request. Please try again.",
-        },
+        { role: "assistant", content: "Sorry, I encountered an error processing your request." },
       ])
     } finally {
       setIsLoading(false)
@@ -95,63 +87,62 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-8 bg-background">
-      <div className="w-full max-w-4xl space-y-4">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold">ZacAi-Atomic</h1>
-          <p className="text-muted-foreground">Hybrid Modular AI Assistant</p>
-          <p className={`text-sm ${aiReady ? "text-green-600" : "text-yellow-600"}`}>{systemStatus}</p>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4 dark:from-slate-950 dark:to-slate-900">
+      <Card className="w-full max-w-4xl p-6 shadow-xl">
+        <div className="mb-6 border-b pb-4">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">ZacAi Atomic</h1>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Hybrid Multi-Domain Modular AI Assistant</p>
+          <div className="mt-2 flex items-center gap-2">
+            <div className={`h-2 w-2 rounded-full ${aiReady ? "bg-green-500" : "bg-yellow-500"}`} />
+            <span className="text-xs text-slate-500">{systemStatus}</span>
+          </div>
         </div>
 
-        <Card className="p-6 space-y-4">
-          <div className="space-y-4 min-h-[400px] max-h-[600px] overflow-y-auto">
-            {messages.length === 0 ? (
-              <div className="text-center text-muted-foreground py-20">
-                <p>Start a conversation with the AI assistant</p>
-                <p className="text-sm mt-2">
-                  Try asking about mathematics, programming, TypeScript, science, grammar, or any topic!
-                </p>
-              </div>
-            ) : (
-              messages.map((message, index) => (
+        <div className="mb-4 h-[500px] space-y-4 overflow-y-auto rounded-lg bg-slate-50 p-4 dark:bg-slate-900">
+          {messages.length === 0 ? (
+            <div className="flex h-full items-center justify-center text-slate-400">
+              <p>Start a conversation with the AI assistant...</p>
+            </div>
+          ) : (
+            messages.map((msg, idx) => (
+              <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
-                  key={index}
-                  className={`p-4 rounded-lg ${
-                    message.role === "user" ? "bg-primary text-primary-foreground ml-12" : "bg-muted mr-12"
+                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                    msg.role === "user"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-slate-900 dark:bg-slate-800 dark:text-slate-100"
                   }`}
                 >
-                  <p className="text-sm font-semibold mb-1">{message.role === "user" ? "You" : "AI Assistant"}</p>
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <div className="mb-1 text-xs font-semibold opacity-70">
+                    {msg.role === "user" ? "You" : "AI Assistant"}
+                  </div>
+                  <div className="text-sm">{msg.content}</div>
                 </div>
-              ))
-            )}
-            {isLoading && (
-              <div className="bg-muted p-4 rounded-lg mr-12">
-                <p className="text-sm font-semibold mb-1">AI Assistant</p>
-                <p className="text-muted-foreground">Processing with neural inference...</p>
               </div>
-            )}
-          </div>
-
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask me anything..."
-              disabled={isLoading || !aiReady}
-              className="flex-1"
-            />
-            <Button type="submit" disabled={isLoading || !input.trim() || !aiReady}>
-              Send
-            </Button>
-          </form>
-        </Card>
-
-        <div className="text-center text-xs text-muted-foreground">
-          <p>Powered by atomic modular AI architecture</p>
-          <p>16 knowledge domains • Neural inference • Context-aware responses • Real-time learning</p>
+            ))
+          )}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="max-w-[80%] rounded-lg bg-white px-4 py-2 dark:bg-slate-800">
+                <div className="text-sm text-slate-500">AI is thinking...</div>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask me anything..."
+            disabled={!aiReady || isLoading}
+            className="flex-1"
+          />
+          <Button type="submit" disabled={!aiReady || isLoading || !input.trim()}>
+            Send
+          </Button>
+        </form>
+      </Card>
     </div>
   )
 }
