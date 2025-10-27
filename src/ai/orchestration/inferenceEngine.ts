@@ -25,7 +25,7 @@ import { layerNorm } from "../core_reasoning/layerNormalization"
 import { relu } from "../core_reasoning/activationFunctions"
 import { generateContextualEmbeddings } from "../embedding/contextualEmbeddingsGenerator"
 import { addPositionalEncoding } from "../embedding/positionalEncoding"
-import { InferenceCache } from "../inference/cacheManager"
+import { CacheManager } from "../inference/cacheManager"
 
 /**
  * Inference configuration
@@ -64,12 +64,12 @@ export interface InferenceOutput {
  */
 export class InferenceEngine {
   private config: InferenceConfig
-  private cache: InferenceCache
+  private cache: CacheManager<InferenceOutput>
   private ffnWeights: { weights: number[][][]; biases: number[][] }
 
   constructor(config: InferenceConfig) {
     this.config = config
-    this.cache = new InferenceCache(1000)
+    this.cache = new CacheManager<InferenceOutput>()
 
     this.ffnWeights = this.initializeWeights()
   }
