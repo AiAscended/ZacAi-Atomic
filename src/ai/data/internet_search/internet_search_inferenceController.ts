@@ -9,6 +9,22 @@ import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 export async function internetSearchRunInference(input: string): Promise<{ response: string }> {
   const lowerInput = input.toLowerCase()
 
+  // Check for questions about AI and neurons
+  if (lowerInput.includes("ai") && lowerInput.includes("neuron")) {
+    return {
+      response: `In artificial intelligence, "neurons" refer to artificial neurons or nodes in a neural network. Unlike biological neurons, AI neurons are mathematical functions that:
+
+1. **Receive inputs**: Take in data from previous layers or input data
+2. **Apply weights**: Multiply inputs by learned weight values
+3. **Sum and activate**: Add weighted inputs and pass through an activation function
+4. **Output**: Send the result to the next layer
+
+In deep learning models like GPT or neural networks, there can be millions or billions of these artificial neurons organized in layers. For example, GPT-3 has 175 billion parameters (weights between neurons). Each "neuron" is essentially a mathematical operation, not a physical component like in biological brains.
+
+The term "neuron" in AI is inspired by biological neurons, but they work very differently - AI neurons are mathematical abstractions running on computer hardware, while biological neurons are living cells that use electrochemical signals.`,
+    }
+  }
+
   // Check if user is asking about sources or references
   if (
     lowerInput.includes("source") ||
@@ -35,8 +51,14 @@ export async function internetSearchRunInference(input: string): Promise<{ respo
     }
   }
 
-  // Default response with capability description
+  // Default response - try to answer based on context
+  if (lowerInput.includes("internet") || lowerInput.includes("search") || lowerInput.includes("look up")) {
+    return {
+      response: `I can help you find information from trusted sources. I have access to reference materials including Wikipedia, MDN Web Docs, and other authoritative sources. What specific information are you looking for?`,
+    }
+  }
+
   return {
-    response: `I can search for information, provide interesting facts, and access reference sources including Wikipedia and other trusted knowledge bases. What would you like to know?`,
+    response: `I can search for information and provide facts from trusted knowledge bases. Try asking me about specific topics, interesting facts, or general knowledge questions!`,
   }
 }

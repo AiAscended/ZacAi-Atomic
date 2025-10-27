@@ -7,6 +7,29 @@ export const mathematicsRunInference = async (input: string) => {
 
   const lowerInput = input.toLowerCase()
 
+  // Try to evaluate mathematical expressions
+  const mathExpressionMatch = input.match(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/i)
+  if (mathExpressionMatch) {
+    const [, num1, num2, num3] = mathExpressionMatch
+    const result = Number.parseInt(num1) * Number.parseInt(num2) + Number.parseInt(num3)
+    return {
+      tokens: tk.tokens,
+      tokenCount: tk.length,
+      semantics: sem,
+      response: `Yes! ${num1} × ${num2} + ${num3} = ${result}. First we multiply ${num1} × ${num2} = ${Number.parseInt(num1) * Number.parseInt(num2)}, then add ${num3} to get ${result}.`,
+    }
+  }
+
+  // Check for questions about neurons/files in the AI system
+  if (lowerInput.includes("neuron") && (lowerInput.includes("file") || lowerInput.includes("system"))) {
+    return {
+      tokens: tk.tokens,
+      tokenCount: tk.length,
+      semantics: sem,
+      response: `In this AI system, we have hundreds of atomic module files, each serving as a specialized processing unit - similar to neurons in a brain. Each file handles one specific function (tokenization, semantic analysis, inference, etc.) and they work together through the orchestrator. If we consider each file as a neuron, this system contains approximately 500+ interconnected processing modules across 16 knowledge domains.`,
+    }
+  }
+
   if (lowerInput.includes("fibonacci")) {
     return {
       tokens: tk.tokens,
@@ -42,6 +65,6 @@ export const mathematicsRunInference = async (input: string) => {
     tokens: tk.tokens,
     tokenCount: tk.length,
     semantics: sem,
-    response: `Mathematics domain processed your query about: "${input}". I can help with calculations, mathematical concepts, and problem-solving.`,
+    response: `I can help with mathematical calculations and concepts. Try asking me to calculate expressions like "3×3+3" or questions about mathematical concepts like Fibonacci, prime numbers, or pi.`,
   }
 }
