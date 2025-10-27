@@ -23,8 +23,8 @@ import { scaledDotProductAttention } from "../core_reasoning/transformerAttentio
 import { dense } from "../core_reasoning/feedforwardNetworkLayer"
 import { layerNorm } from "../core_reasoning/layerNormalization"
 import { relu } from "../core_reasoning/activationFunctions"
-import { generateContextualEmbeddings } from "../embedding/contextualEmbeddingsGenerator"
-import { addPositionalEncoding } from "../embedding/positionalEncoding"
+import { contextualEmbeddingsGenerator } from "../embedding/contextualEmbeddingsGenerator"
+import { positionalEncoding } from "../embedding/positionalEncoding"
 import { CacheManager } from "../inference/cacheManager"
 
 /**
@@ -114,10 +114,12 @@ export class InferenceEngine {
     }
 
     // Step 1: Generate embeddings
-    const embeddings = await generateContextualEmbeddings(tokens, domain)
+    const embeddings = await this.embedTokens(tokens)
 
     // Step 2: Add positional encoding
-    const posEncoded = addPositionalEncoding(embeddings, this.config.maxSeqLength)
+    const posEncoded = embeddings.map((vec, i) =>
+      vec.map((val, j) => val + (embeddings.length > i && embeddings[i].length > j ? positionalEncoding(i, j) : 0)),
+    )
 
     // Step 3: Forward pass through transformer layers
     let hiddenStates = posEncoded
@@ -197,6 +199,16 @@ export class InferenceEngine {
    */
   public clearCache(): void {
     this.cache.clear()
+  }
+
+  /**
+   * Embed tokens using contextual embeddings generator
+   */
+  private embedTokens(tokenIds: number[]): number[][] {
+    const embeddings = contextualEmbeddingsGenerator(tokenIds.join(" "))
+    const posEncodings = positionalEncoding(embeddings.length, embeddings[0]?.length || 3)
+
+    return embeddings.map((vec, i) => vec.map((val, j) => val + posEncodings[i][j]))
   }
 }
 
