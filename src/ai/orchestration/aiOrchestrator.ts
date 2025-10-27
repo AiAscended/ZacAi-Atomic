@@ -30,7 +30,7 @@ import { publish, subscribe } from "./eventBus"
 import dataRegistry from "../data/dataRegistry"
 import { textNormalizer } from "../input_processing/textNormalizer"
 import { wordTokenizer } from "../input_processing/wordTokenizer"
-import { sentenceBoundaryDetector } from "../input_processing/sentenceBoundaryDetector"
+import { detectSentences } from "../input_processing/sentenceBoundaryDetector"
 import { postProcess } from "../output_generation/responsePostProcessor"
 
 /**
@@ -119,7 +119,7 @@ export class AIOrchestrator {
 
     const normalizedText = textNormalizer(prompt.text)
     const tokens = wordTokenizer(normalizedText)
-    const sentences = sentenceBoundaryDetector(normalizedText)
+    const sentences = detectSentences(normalizedText)
 
     console.log(`[AIOrchestrator] Processed input: ${tokens.length} tokens, ${sentences.length} sentences`)
 
