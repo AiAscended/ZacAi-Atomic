@@ -40,7 +40,10 @@ export const internetSearchInit = async () => {
     initialize: async () => {
       await loadInternetSearchSeedVocabulary()
     },
-    query: async (input: string) => internetSearchRunInference(input),
+    query: async (input: string) => {
+      const result = await internetSearchRunInference(input)
+      return { text: result.response }
+    },
   })
 }
 
