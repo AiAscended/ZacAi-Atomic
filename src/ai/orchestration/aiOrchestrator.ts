@@ -160,10 +160,20 @@ export class AIOrchestrator {
       const tokenIds = tokens.map((token, idx) => (token.charCodeAt(0) % 1000) + idx)
       const paddedTokens = padOrTruncate(tokenIds, 512, 0)
 
-      // Get or create session
-      const sessionId = prompt.sessionId || this.createSession()
-      const session = this.sessionManager.get(sessionId)
+      let sessionId = prompt.sessionId
+      if (!sessionId) {
+        sessionId = this.createSession()
+      } else {
+        // Check if session exists, if not create it with the provided ID
+        const existingSession = this.sessionManager.get(sessionId)
+        if (!existingSession) {
+          // Create session with the provided ID
+          this.sessionManager.create(sessionId)
+          logger.debug("AIOrchestrator", `Created new session with provided ID: ${sessionId}`)
+        }
+      }
 
+      const session = this.sessionManager.get(sessionId)
       if (!session) {
         throw new Error("Failed to create or retrieve session")
       }
