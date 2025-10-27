@@ -315,6 +315,7 @@ export class AIOrchestrator {
               this.thinkingTracker.addStep(`query_${domain.name}`, `${domain.name} provided response`)
             } else {
               this.thinkingTracker.addStep(`query_${domain.name}`, `${domain.name} returned no response`)
+              logger.debug("AIOrchestrator", `Domain ${domain.name} returned null - skipping`)
             }
           } catch (error) {
             logger.error("AIOrchestrator", `Domain ${domain.name} query failed`, error)

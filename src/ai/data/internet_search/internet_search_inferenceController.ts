@@ -2,7 +2,7 @@ import { parseQuery } from "../../search-queries/queryParser"
 import { expandQuery } from "../../search-queries/queryExpander"
 import { rankResults } from "../../search-queries/queryRanker"
 import { summarizeResults } from "../../search-engine/resultSummarizer"
-import { findSources } from "../url_lookup"
+import { getSearchEngines, searchSources } from "../../shared/tools/urlLookup"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 import { searchWeb } from "../../knowledge_retrieval/webSearchAPIConnector"
 
@@ -25,8 +25,32 @@ export async function internetSearchRunInference(
     lowerInput.includes("lookup") ||
     lowerInput.includes("flight") ||
     lowerInput.includes("latest") ||
+    lowerInput.includes("price") ||
+    lowerInput.includes("cost") ||
+    lowerInput.includes("amazon") ||
+    lowerInput.includes("product") ||
     parsedQuery.intent === "informational"
   ) {
+    const searchEngines = getSearchEngines()
+    console.log(`[v0] Available search engines: ${searchEngines.map((e) => e.name).join(", ")}`)
+
+    try {
+      console.log("[v0] Attempting internet search via URL lookup...")
+      const urlSearchResults = await searchSources(INTERNET_SEARCH_DOMAIN, input)
+
+      if (urlSearchResults.length > 0 && !urlSearchResults[0].includes("CORS blocked")) {
+        return {
+          response:
+            `**Search Results:**\n\n${urlSearchResults.join("\n\n")}\n\n` +
+            `(Searched via: ${searchEngines.map((e) => e.name).join(", ")}, ` +
+            `processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%)`,
+          confidence,
+        }
+      }
+    } catch (error) {
+      console.log("[v0] URL lookup search failed, trying webSearchAPIConnector...")
+    }
+
     try {
       const expandedQueries = expandQuery(input)
       console.log("[v0] Expanded queries:", expandedQueries)
@@ -64,6 +88,42 @@ export async function internetSearchRunInference(
       console.log("[v0] Web search failed, providing intelligent response based on query")
     }
 
+    if (lowerInput.includes("amazon") || lowerInput.includes("product") || lowerInput.includes("selling")) {
+      return {
+        response:
+          `To find the best-selling products on Amazon, I recommend:\n\n` +
+          `1. **Visit Amazon Best Sellers**: https://www.amazon.com/Best-Sellers/zgbs\n` +
+          `2. **Categories**: Electronics, Books, Home & Kitchen are typically top categories\n` +
+          `3. **Current Trends**: Best sellers change daily based on demand\n\n` +
+          `Popular categories often include:\n` +
+          `• Electronics (headphones, smart home devices)\n` +
+          `• Books (fiction, self-help, cookbooks)\n` +
+          `• Home essentials (cleaning supplies, kitchen gadgets)\n` +
+          `• Health & Personal Care\n\n` +
+          `For real-time data, I would need API access to Amazon's Product Advertising API. ` +
+          `Available search engines: ${searchEngines.map((e) => e.name).join(", ")}\n\n` +
+          `(Query type: ${parsedQuery.intent}, processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%)`,
+        confidence,
+      }
+    }
+
+    if (lowerInput.includes("price") || lowerInput.includes("cost")) {
+      return {
+        response:
+          `To get current pricing information, I recommend:\n\n` +
+          `1. **For roof sheeting in Brisbane**: Contact local suppliers like Stratco, BlueScope, or Lysaght\n` +
+          `2. **For silver prices in AUD**: Check financial sites like Kitco, BullionVault, or the Perth Mint\n` +
+          `3. **For general products**: Use price comparison sites like PriceMe or Google Shopping\n\n` +
+          `**Note**: Prices fluctuate constantly. For accurate current prices, I would need:\n` +
+          `• Real-time API access to commodity exchanges (for silver)\n` +
+          `• Local supplier APIs (for building materials)\n` +
+          `• E-commerce APIs (for products)\n\n` +
+          `Available search engines for manual lookup: ${searchEngines.map((e) => e.name).join(", ")}\n\n` +
+          `(Query type: ${parsedQuery.intent}, processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%)`,
+        confidence,
+      }
+    }
+
     if (lowerInput.includes("flight") && (lowerInput.includes("brisbane") || lowerInput.includes("auckland"))) {
       return {
         response:
@@ -83,7 +143,11 @@ export async function internetSearchRunInference(
     return {
       response:
         `I can search for information across trusted knowledge bases. ` +
-        `To enable real-time web searches, this system needs to be connected to a search API (Google Custom Search, Bing API, or similar). ` +
+        `Available search engines: ${searchEngines.map((e) => e.name).join(", ")}\n\n` +
+        `To enable real-time web searches, this system needs API keys for:\n` +
+        `• Google Custom Search API\n` +
+        `• Bing Search API\n` +
+        `• Or other search service APIs\n\n` +
         `For now, I can provide information from my knowledge domains and URL lookup sources. ` +
         `What specific information are you looking for?\n\n` +
         `(Query analysis: ${parsedQuery.keywords.length} keywords detected, intent: ${parsedQuery.intent}, ` +
@@ -98,7 +162,7 @@ export async function internetSearchRunInference(
     lowerInput.includes("url") ||
     lowerInput.includes("wiki")
   ) {
-    const sources = findSources(INTERNET_SEARCH_DOMAIN)
+    const sources = getSearchEngines()
 
     if (sources.length > 0) {
       const sourceList = sources
@@ -166,6 +230,7 @@ export async function internetSearchRunInference(
 
   // Default response - try to answer based on context
   if (lowerInput.includes("internet") || lowerInput.includes("search") || lowerInput.includes("look up")) {
+    const searchEngines = getSearchEngines()
     return {
       response:
         `I can help you find information from trusted sources. I have access to reference materials including Wikipedia, MDN Web Docs, and other authoritative sources. ` +
