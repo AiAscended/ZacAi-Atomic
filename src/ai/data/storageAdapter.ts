@@ -155,3 +155,6 @@ export const storage = {
     return (instance as any).files.has(path) || (instance as any).directories.has(path)
   },
 }
+
+export const storageAdapter = storage
+export default storage
