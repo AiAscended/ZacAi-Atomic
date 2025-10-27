@@ -23,10 +23,19 @@ let promptHandlerInstance: any = null
 
 async function getPromptHandler() {
   if (!promptHandlerInstance) {
-    console.log("[v0] Dynamically importing promptHandler...")
-    const module = await import("@/src/ai/orchestration/promptHandler")
-    promptHandlerInstance = module.promptHandler
-    console.log("[v0] promptHandler loaded successfully")
+    try {
+      console.log("[v0] Dynamically importing promptHandler...")
+      const module = await import("@/src/ai/orchestration/promptHandler")
+      console.log("[v0] promptHandler module loaded, creating instance...")
+      promptHandlerInstance = module.promptHandler
+      console.log("[v0] promptHandler loaded successfully")
+    } catch (error) {
+      console.error("[v0] CRITICAL: Failed to import promptHandler")
+      console.error("[v0] Error type:", error?.constructor?.name)
+      console.error("[v0] Error message:", error instanceof Error ? error.message : String(error))
+      console.error("[v0] Error stack:", error instanceof Error ? error.stack : "No stack")
+      throw new Error(`Failed to load AI system: ${error instanceof Error ? error.message : String(error)}`)
+    }
   }
   return promptHandlerInstance
 }
@@ -48,17 +57,21 @@ export async function POST(request: Request) {
       sessions.set(newSessionId, { history: [] })
 
       try {
+        console.log("[v0] Getting promptHandler instance...")
         const promptHandler = await getPromptHandler()
+        console.log("[v0] Calling promptHandler.initialize()...")
         await promptHandler.initialize()
         console.log("[v0] AI system initialized successfully")
       } catch (error) {
         console.error("[v0] Failed to initialize AI system:", error)
+        console.error("[v0] Error type:", error?.constructor?.name)
         console.error("[v0] Error details:", error instanceof Error ? error.message : String(error))
         console.error("[v0] Error stack:", error instanceof Error ? error.stack : "No stack trace")
         return NextResponse.json(
           {
             error: "Failed to initialize AI system",
             details: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
           },
           { status: 500 },
         )
