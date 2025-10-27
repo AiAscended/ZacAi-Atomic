@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 // Import scientific calculator (this one is safe, no fs dependencies)
 import { ScientificCalculator } from "@/src/ai/scientific-calculator"
+import { previewPromptHandler } from "@/src/ai/orchestration/previewPromptHandler"
 
 // Session storage
 const sessions = new Map<string, { history: Array<{ role: string; content: string }> }>()
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
       sessions.set(newSessionId, { history: [] })
 
       try {
-        await getPromptHandler()
+        await previewPromptHandler.initialize()
         console.log("[v0] AI system initialized successfully")
       } catch (error) {
         console.error("[v0] Failed to initialize AI system:", error)
@@ -92,11 +93,8 @@ export async function POST(request: Request) {
       }
 
       try {
-        console.log("[v0] Getting promptHandler...")
-        const promptHandler = await getPromptHandler()
-
-        console.log("[v0] Calling promptHandler.handlePrompt...")
-        const response = await promptHandler.handlePrompt(message, sessionId, {
+        console.log("[v0] Calling previewPromptHandler.handlePrompt...")
+        const response = await previewPromptHandler.handlePrompt(message, sessionId, {
           history: session.history,
         })
 
