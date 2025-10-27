@@ -358,7 +358,12 @@ export class AIOrchestrator {
       if (tsDomain) selected.push(tsDomain)
     }
 
-    if (text.match(/\b(math|calculate|equation|number|sum|multiply)\b/)) {
+    if (
+      text.match(/\b(math|calculate|equation|number|sum|multiply|add|subtract|divide|plus|minus|times|equals)\b/) ||
+      text.match(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/) ||
+      text.match(/\d+\s*[+\-*/×÷]\s*\d+/) ||
+      text.match(/\b(squared|cubed|power|root|percent)\b/)
+    ) {
       const mathDomain = allDomains.find((d) => d.name === "mathematics")
       if (mathDomain) selected.push(mathDomain)
     }
