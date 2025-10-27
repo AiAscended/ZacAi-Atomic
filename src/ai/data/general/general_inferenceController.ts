@@ -13,9 +13,9 @@ export const generalRunInference = async (input: string, context?: any) => {
   }
 
   // Check for identity questions
-  if (input.match(/\b(who are you|what are you|your name)\b/i)) {
+  if (input.match(/\b(who are you|what are you|your name|tell me about you)\b/i)) {
     responseText +=
-      "I'm a comprehensive AI system with specialized knowledge across 16 different domains including mathematics, programming, science, and more. "
+      "I'm ZacAi Atomic - a comprehensive hybrid modular AI system with specialized knowledge across 16 different domains including mathematics, programming, science, language analysis, and more. Each domain operates as an independent atomic module that collaborates through a central orchestrator. "
   }
 
   // Check for capability questions
@@ -30,7 +30,7 @@ export const generalRunInference = async (input: string, context?: any) => {
   }
 
   // Check for general knowledge request
-  if (input.match(/\b(general knowledge|common|most common)\b/i)) {
+  if (input.match(/\b(general knowledge|common|most common|top.*fact)\b/i)) {
     responseText +=
       "A fascinating piece of general knowledge: The human brain processes information at approximately 120 meters per second, which is about 268 miles per hour! "
   }
@@ -41,7 +41,7 @@ export const generalRunInference = async (input: string, context?: any) => {
   }
 
   return {
-    text: responseText.trim(),
+    response: responseText.trim(),
     tokens: t.tokens,
     tokenCount: t.length,
     semantics: sem,
