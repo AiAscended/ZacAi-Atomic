@@ -1,5 +1,65 @@
 import { mathematicsTokenizer } from "./mathematics_tokenizer"
 import { mathematicsSemanticAnalyzer } from "./mathematics_semanticAnalyzer"
+import { add } from "../../scientific-calculator/arithmetic/addition"
+import { multiply } from "../../scientific-calculator/arithmetic/multiplication"
+
+const wordToNumber: Record<string, number> = {
+  zero: 0,
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+  eleven: 11,
+  twelve: 12,
+  thirteen: 13,
+  fourteen: 14,
+  fifteen: 15,
+  sixteen: 16,
+  seventeen: 17,
+  eighteen: 18,
+  nineteen: 19,
+  twenty: 20,
+  thirty: 30,
+  forty: 40,
+  fifty: 50,
+  sixty: 60,
+  seventy: 70,
+  eighty: 80,
+  ninety: 90,
+  hundred: 100,
+  thousand: 1000,
+  million: 1000000,
+}
+
+function convertWordsToNumbers(input: string): string {
+  let converted = input.toLowerCase()
+
+  // Replace operation words with symbols
+  converted = converted
+    .replace(/\btimes\s+by\b/gi, "×")
+    .replace(/\bmultiplied\s+by\b/gi, "×")
+    .replace(/\btimes\b/gi, "×")
+    .replace(/\bplus\b/gi, "+")
+    .replace(/\bminus\b/gi, "-")
+    .replace(/\bdivided\s+by\b/gi, "÷")
+    .replace(/\bequals?\b/gi, "=")
+    .replace(/\bhow\s+much\??/gi, "")
+    .replace(/\bwhat\s+is\b/gi, "")
+
+  // Replace number words with digits
+  for (const [word, num] of Object.entries(wordToNumber)) {
+    const regex = new RegExp(`\\b${word}\\b`, "gi")
+    converted = converted.replace(regex, num.toString())
+  }
+
+  return converted.trim()
+}
 
 export const mathematicsRunInference = async (input: string, context?: any) => {
   const tk = mathematicsTokenizer(input)
@@ -9,15 +69,19 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
   const tokens = context?.tokens || []
   const confidence = inferenceResults?.confidence || 0.5
 
-  const lowerInput = input.toLowerCase()
+  const numericInput = convertWordsToNumbers(input)
+  const lowerInput = numericInput.toLowerCase()
+
+  console.log("[v0] Mathematics inference - Original:", input)
+  console.log("[v0] Mathematics inference - Converted:", numericInput)
 
   // Handle expressions like "3+3×3" or "5+6×5" (addition + multiplication)
-  const addMultMatch = input.match(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)/i)
+  const addMultMatch = numericInput.match(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)/i)
   if (addMultMatch) {
     const [, num1, num2, num3] = addMultMatch
-    // Order of operations: multiply first, then add
-    const multiplyResult = Number.parseInt(num2) * Number.parseInt(num3)
-    const finalResult = Number.parseInt(num1) + multiplyResult
+    const multiplyResult = multiply(Number.parseInt(num2), Number.parseInt(num3))
+    const finalResult = add(Number.parseInt(num1), multiplyResult)
+
     return {
       tokens: tk.tokens,
       tokenCount: tk.length,
@@ -31,11 +95,11 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
   }
 
   // Handle expressions like "3×3+3" (multiplication + addition)
-  const multAddMatch = input.match(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/i)
+  const multAddMatch = numericInput.match(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/i)
   if (multAddMatch) {
     const [, num1, num2, num3] = multAddMatch
-    const multiplyResult = Number.parseInt(num1) * Number.parseInt(num2)
-    const finalResult = multiplyResult + Number.parseInt(num3)
+    const multiplyResult = multiply(Number.parseInt(num1), Number.parseInt(num2))
+    const finalResult = add(multiplyResult, Number.parseInt(num3))
     return {
       tokens: tk.tokens,
       tokenCount: tk.length,
@@ -48,26 +112,28 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     }
   }
 
-  const mathExpressionMatch = input.match(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/i)
+  // Handle expressions like "3×3+3" (multiplication + addition)
+  const mathExpressionMatch = numericInput.match(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/i)
   if (mathExpressionMatch) {
     const [, num1, num2, num3] = mathExpressionMatch
-    const result = Number.parseInt(num1) * Number.parseInt(num2) + Number.parseInt(num3)
+    const result = multiply(Number.parseInt(num1), Number.parseInt(num2)) + Number.parseInt(num3)
     return {
       tokens: tk.tokens,
       tokenCount: tk.length,
       semantics: sem,
       response:
         `Yes! ${num1} × ${num2} + ${num3} = ${result}. ` +
-        `First we multiply ${num1} × ${num2} = ${Number.parseInt(num1) * Number.parseInt(num2)}, then add ${num3} to get ${result}. ` +
+        `First we multiply ${num1} × ${num2} = ${multiply(Number.parseInt(num1), Number.parseInt(num2))}, then add ${num3} to get ${result}. ` +
         `(Processed with ${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
       confidence,
     }
   }
 
-  const simpleAddMatch = input.match(/(\d+)\s*\+\s*(\d+)/i)
+  // Handle simple addition expressions like "3+3"
+  const simpleAddMatch = numericInput.match(/(\d+)\s*\+\s*(\d+)/i)
   if (simpleAddMatch) {
     const [, num1, num2] = simpleAddMatch
-    const result = Number.parseInt(num1) + Number.parseInt(num2)
+    const result = add(Number.parseInt(num1), Number.parseInt(num2))
     return {
       tokens: tk.tokens,
       tokenCount: tk.length,
@@ -77,10 +143,11 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     }
   }
 
-  const simpleMultiplyMatch = input.match(/(\d+)\s*[×x*]\s*(\d+)/i)
+  // Handle simple multiplication expressions like "3×3"
+  const simpleMultiplyMatch = numericInput.match(/(\d+)\s*[×x*]\s*(\d+)/i)
   if (simpleMultiplyMatch) {
     const [, num1, num2] = simpleMultiplyMatch
-    const result = Number.parseInt(num1) * Number.parseInt(num2)
+    const result = multiply(Number.parseInt(num1), Number.parseInt(num2))
     return {
       tokens: tk.tokens,
       tokenCount: tk.length,
@@ -151,7 +218,7 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     tokenCount: tk.length,
     semantics: sem,
     response:
-      `I can help with mathematical calculations and concepts. Try asking me to calculate expressions like "3×3+3" or "5+7", ` +
+      `I can help with mathematical calculations and concepts. Try asking me to calculate expressions like "three times three plus three" or "five plus seven", ` +
       `or questions about mathematical concepts like Fibonacci, prime numbers, or pi. ` +
       `(Processed ${tokens.length} tokens with ${(confidence * 100).toFixed(1)}% confidence)`,
     confidence,
