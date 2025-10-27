@@ -1,123 +1,140 @@
 /**
  * File: src/ai/monitoring/metricsCollector.ts
- * Purpose: Collects and aggregates performance metrics for AI system monitoring
- * Depends on: None (atomic module)
+ * Purpose: Collects and tracks performance metrics for AI system
+ * Depends on: src/ai/monitoring/logger.ts
  * Depended on by: src/ai/orchestration/aiOrchestrator.ts
  * Creator: Vercel v0 Coding Assistant
  */
 
-interface Metric {
+import { logger } from "./logger"
+
+export interface Metric {
   name: string
   value: number
-  timestamp: number
+  timestamp: Date
   tags?: Record<string, string>
 }
 
+export interface PerformanceMetrics {
+  totalRequests: number
+  successfulRequests: number
+  failedRequests: number
+  averageLatency: number
+  minLatency: number
+  maxLatency: number
+  p95Latency: number
+  p99Latency: number
+}
+
+/**
+ * Collects and analyzes system metrics
+ */
 class MetricsCollector {
   private metrics: Metric[] = []
-  private aggregates: Map<string, { sum: number; count: number; min: number; max: number }> = new Map()
+  private latencies: number[] = []
+  private maxMetrics = 10000
 
   /**
-   * Record a metric value
+   * Record a metric
    */
-  public record(name: string, value: number, tags?: Record<string, string>): void {
+  record(name: string, value: number, tags?: Record<string, string>): void {
     const metric: Metric = {
       name,
       value,
-      timestamp: Date.now(),
+      timestamp: new Date(),
       tags,
     }
 
     this.metrics.push(metric)
 
-    // Update aggregates
-    const key = this.getAggregateKey(name, tags)
-    const existing = this.aggregates.get(key)
-
-    if (existing) {
-      existing.sum += value
-      existing.count += 1
-      existing.min = Math.min(existing.min, value)
-      existing.max = Math.max(existing.max, value)
-    } else {
-      this.aggregates.set(key, {
-        sum: value,
-        count: 1,
-        min: value,
-        max: value,
-      })
+    // Track latencies separately for performance analysis
+    if (name === "request_latency") {
+      this.latencies.push(value)
+      if (this.latencies.length > this.maxMetrics) {
+        this.latencies.shift()
+      }
     }
 
-    // Keep only last 1000 metrics
-    if (this.metrics.length > 1000) {
-      this.metrics = this.metrics.slice(-1000)
+    // Keep only recent metrics
+    if (this.metrics.length > this.maxMetrics) {
+      this.metrics.shift()
+    }
+
+    logger.debug("MetricsCollector", `Recorded metric: ${name} = ${value}`, tags)
+  }
+
+  /**
+   * Get performance metrics
+   */
+  getPerformanceMetrics(): PerformanceMetrics {
+    const totalRequests = this.metrics.filter((m) => m.name === "request_total").length
+    const successfulRequests = this.metrics.filter((m) => m.name === "request_success").length
+    const failedRequests = this.metrics.filter((m) => m.name === "request_failure").length
+
+    const sortedLatencies = [...this.latencies].sort((a, b) => a - b)
+    const averageLatency =
+      sortedLatencies.length > 0 ? sortedLatencies.reduce((sum, val) => sum + val, 0) / sortedLatencies.length : 0
+
+    const p95Index = Math.floor(sortedLatencies.length * 0.95)
+    const p99Index = Math.floor(sortedLatencies.length * 0.99)
+
+    return {
+      totalRequests,
+      successfulRequests,
+      failedRequests,
+      averageLatency,
+      minLatency: sortedLatencies[0] || 0,
+      maxLatency: sortedLatencies[sortedLatencies.length - 1] || 0,
+      p95Latency: sortedLatencies[p95Index] || 0,
+      p99Latency: sortedLatencies[p99Index] || 0,
     }
   }
 
   /**
-   * Get average value for a metric
+   * Get metrics by name
    */
-  public getAverage(name: string, tags?: Record<string, string>): number | null {
-    const key = this.getAggregateKey(name, tags)
-    const agg = this.aggregates.get(key)
-    return agg ? agg.sum / agg.count : null
-  }
-
-  /**
-   * Get all metrics for a name
-   */
-  public getMetrics(name: string): Metric[] {
+  getMetricsByName(name: string): Metric[] {
     return this.metrics.filter((m) => m.name === name)
   }
 
   /**
-   * Get summary statistics
+   * Get metrics by tag
    */
-  public getSummary(
-    name: string,
-    tags?: Record<string, string>,
-  ): {
-    avg: number
-    min: number
-    max: number
-    count: number
-  } | null {
-    const key = this.getAggregateKey(name, tags)
-    const agg = this.aggregates.get(key)
+  getMetricsByTag(tagKey: string, tagValue: string): Metric[] {
+    return this.metrics.filter((m) => m.tags && m.tags[tagKey] === tagValue)
+  }
 
-    if (!agg) return null
-
-    return {
-      avg: agg.sum / agg.count,
-      min: agg.min,
-      max: agg.max,
-      count: agg.count,
-    }
+  /**
+   * Get recent metrics
+   */
+  getRecentMetrics(count: number): Metric[] {
+    return this.metrics.slice(-count)
   }
 
   /**
    * Clear all metrics
    */
-  public clear(): void {
+  clear(): void {
     this.metrics = []
-    this.aggregates.clear()
+    this.latencies = []
   }
 
-  private getAggregateKey(name: string, tags?: Record<string, string>): string {
-    if (!tags) return name
-    const tagStr = Object.entries(tags)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([k, v]) => `${k}:${v}`)
-      .join(",")
-    return `${name}|${tagStr}`
+  /**
+   * Get summary statistics
+   */
+  getSummary() {
+    const perfMetrics = this.getPerformanceMetrics()
+    const uniqueMetricNames = new Set(this.metrics.map((m) => m.name))
+
+    return {
+      totalMetrics: this.metrics.length,
+      uniqueMetricTypes: uniqueMetricNames.size,
+      performance: perfMetrics,
+      oldestMetric: this.metrics[0]?.timestamp,
+      newestMetric: this.metrics[this.metrics.length - 1]?.timestamp,
+    }
   }
 }
 
 // Singleton instance
-const metricsCollector = new MetricsCollector()
-
-export { metricsCollector, type Metric }
-export const recordMetric = (name: string, value: number, tags?: Record<string, string>) =>
-  metricsCollector.record(name, value, tags)
-export const getMetricAverage = (name: string, tags?: Record<string, string>) => metricsCollector.getAverage(name, tags)
-export const getMetricSummary = (name: string, tags?: Record<string, string>) => metricsCollector.getSummary(name, tags)
+export const metricsCollector = new MetricsCollector()

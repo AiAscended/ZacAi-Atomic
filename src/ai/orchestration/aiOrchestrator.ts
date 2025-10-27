@@ -23,7 +23,8 @@
  * - src/ai/context_management/slotFiller.ts (slot extraction)
  * - src/ai/context_management/userProfileHandler.ts (user profile management)
  * - src/ai/context_management/dialogueFlowController.ts (dialogue flow control)
- * - src/monitoring/metricsCollector.ts (metrics collection)
+ * - src/ai/monitoring/logger.ts (centralized logging)
+ * - src/ai/monitoring/metricsCollector.ts (metrics collection)
  *
  * Depended on by:
  * - src/main.ts (application entry point)
@@ -47,7 +48,8 @@ import { detectSentiment } from "../context_management/sentimentEmotionDetector"
 import { extractSlots } from "../context_management/slotFiller"
 import { getProfile, setProfile } from "../context_management/userProfileHandler"
 import { handleTurn } from "../context_management/dialogueFlowController"
-import { recordMetric } from "../monitoring/metricsCollector"
+import { logger } from "../monitoring/logger"
+import { metricsCollector } from "../monitoring/metricsCollector"
 
 /**
  * Represents a user prompt with metadata
@@ -107,25 +109,26 @@ export class AIOrchestrator {
   public async initialize(): Promise<void> {
     if (this.initialized) return
 
-    console.log("[AIOrchestrator] Initializing...")
+    logger.info("AIOrchestrator", "Initializing orchestrator...")
 
     const domains = listDomains()
-    console.log(`[AIOrchestrator] Found ${domains.length} registered domains`)
+    logger.info("AIOrchestrator", `Found ${domains.length} registered domains`)
 
     // Initialize each domain that has an initialize method
     for (const domain of domains) {
       if (domain.initialize) {
         try {
           await domain.initialize()
-          console.log(`[AIOrchestrator] Initialized domain: ${domain.name}`)
+          logger.info("AIOrchestrator", `Initialized domain: ${domain.name}`)
         } catch (error) {
-          console.error(`[AIOrchestrator] Failed to initialize domain ${domain.name}:`, error)
+          logger.error("AIOrchestrator", `Failed to initialize domain ${domain.name}`, error)
         }
       }
     }
 
     this.initialized = true
     publish("orchestrator:initialized", { domains: domains.map((d) => d.name) })
+    logger.info("AIOrchestrator", "Orchestrator initialization complete")
   }
 
   /**
@@ -135,189 +138,196 @@ export class AIOrchestrator {
   public async processPrompt(prompt: Prompt): Promise<Response> {
     const startTime = Date.now()
 
-    const normalizedText = textNormalizer(prompt.text)
-    const tokens = wordTokenizer(normalizedText)
-    const sentences = detectSentences(normalizedText)
+    metricsCollector.record("request_total", 1)
+    logger.info("AIOrchestrator", "Processing prompt", { sessionId: prompt.sessionId })
 
-    console.log(`[AIOrchestrator] Processed input: ${tokens.length} tokens, ${sentences.length} sentences`)
+    try {
+      const normalizedText = textNormalizer(prompt.text)
+      const tokens = wordTokenizer(normalizedText)
+      const sentences = detectSentences(normalizedText)
 
-    const sentiment = detectSentiment(normalizedText)
-    console.log(`[AIOrchestrator] Sentiment: ${sentiment.sentiment} (score: ${sentiment.score.toFixed(2)})`)
+      logger.debug("AIOrchestrator", `Processed input: ${tokens.length} tokens, ${sentences.length} sentences`)
 
-    const slots = extractSlots(normalizedText, ["name", "email", "date", "location", "task", "priority"])
-    const extractedSlots = Object.entries(slots).filter(([_, v]) => v !== null)
-    if (extractedSlots.length > 0) {
-      console.log(`[AIOrchestrator] Extracted slots:`, Object.fromEntries(extractedSlots))
-    }
+      const sentiment = detectSentiment(normalizedText)
+      logger.debug("AIOrchestrator", `Sentiment: ${sentiment.sentiment} (score: ${sentiment.score.toFixed(2)})`)
 
-    const tokenIds = tokens.map((token, idx) => (token.charCodeAt(0) % 1000) + idx)
-    const paddedTokens = padOrTruncate(tokenIds, 512, 0)
+      const slots = extractSlots(normalizedText, ["name", "email", "date", "location", "task", "priority"])
+      const extractedSlots = Object.entries(slots).filter(([_, v]) => v !== null)
+      if (extractedSlots.length > 0) {
+        logger.debug("AIOrchestrator", "Extracted slots", Object.fromEntries(extractedSlots))
+      }
 
-    // Get or create session
-    const sessionId = prompt.sessionId || this.createSession()
-    const session = this.sessionManager.get(sessionId)
+      const tokenIds = tokens.map((token, idx) => (token.charCodeAt(0) % 1000) + idx)
+      const paddedTokens = padOrTruncate(tokenIds, 512, 0)
 
-    if (!session) {
-      throw new Error("Failed to create or retrieve session")
-    }
+      // Get or create session
+      const sessionId = prompt.sessionId || this.createSession()
+      const session = this.sessionManager.get(sessionId)
 
-    const userProfile = getProfile(sessionId)
-    if (extractedSlots.length > 0) {
-      setProfile(sessionId, {
-        ...userProfile,
-        ...Object.fromEntries(extractedSlots),
-        lastSentiment: sentiment.sentiment,
-      })
-      console.log(`[AIOrchestrator] Updated user profile for session ${sessionId}`)
-    }
+      if (!session) {
+        throw new Error("Failed to create or retrieve session")
+      }
 
-    // Get or create context window for this session
-    let contextWindow = this.contextManagers.get(sessionId)
-    if (!contextWindow) {
-      contextWindow = new ContextWindowManager(2048)
-      this.contextManagers.set(sessionId, contextWindow)
-    }
-
-    // Add prompt to context
-    contextWindow.add(prompt.text)
-
-    // Classify intent
-    const intent = classifyIntent(normalizedText)
-    console.log(`[AIOrchestrator] Intent: ${intent.intent} (confidence: ${intent.confidence})`)
-
-    const dialogueResult = await handleTurn(normalizedText, {
-      sessionId,
-      userProfile,
-      sentiment,
-      slots,
-      contextWindow: contextWindow.getWindow(),
-    })
-    console.log(`[AIOrchestrator] Dialogue flow: ${dialogueResult.status}`)
-
-    // Select relevant domains based on intent and prompt content
-    const relevantDomains = this.selectDomains(normalizedText, intent.intent)
-    console.log(
-      `[AIOrchestrator] Selected domains:`,
-      relevantDomains.map((d) => d.name),
-    )
-
-    const inferenceResults: Array<{ domain: string; confidence: number; logits: number[][] }> = []
-
-    for (const domain of relevantDomains) {
-      try {
-        const inferenceInput: InferenceInput = {
-          tokens: paddedTokens,
-          domain: domain.name,
-          context: contextWindow.getWindow().map((text) => [text.length]),
-        }
-
-        const inferenceOutput = await this.inferenceEngine.infer(inferenceInput)
-        inferenceResults.push({
-          domain: domain.name,
-          confidence: inferenceOutput.confidence,
-          logits: inferenceOutput.logits,
+      const userProfile = getProfile(sessionId)
+      if (extractedSlots.length > 0) {
+        setProfile(sessionId, {
+          ...userProfile,
+          ...Object.fromEntries(extractedSlots),
+          lastSentiment: sentiment.sentiment,
         })
-
-        console.log(
-          `[AIOrchestrator] Inference for ${domain.name}: confidence=${inferenceOutput.confidence.toFixed(3)}`,
-        )
-      } catch (error) {
-        console.error(`[AIOrchestrator] Inference failed for ${domain.name}:`, error)
+        logger.debug("AIOrchestrator", `Updated user profile for session ${sessionId}`)
       }
-    }
 
-    // Check if internet search is needed
-    const needsSearch = this.needsInternetSearch(normalizedText)
-    let searchResults: string[] = []
-
-    if (needsSearch) {
-      console.log("[AIOrchestrator] Performing internet search...")
-      try {
-        const results = await searchWeb(normalizedText)
-        searchResults = results.map((r) => r.snippet || r.title)
-        console.log(`[AIOrchestrator] Found ${searchResults.length} search results`)
-      } catch (error) {
-        console.error("[AIOrchestrator] Search failed:", error)
+      // Get or create context window for this session
+      let contextWindow = this.contextManagers.get(sessionId)
+      if (!contextWindow) {
+        contextWindow = new ContextWindowManager(2048)
+        this.contextManagers.set(sessionId, contextWindow)
       }
-    }
 
-    // Query each relevant domain
-    const domainResponses: Array<{ domain: string; result: unknown }> = []
+      // Add prompt to context
+      contextWindow.add(prompt.text)
 
-    for (const domain of relevantDomains) {
-      if (domain.query) {
+      // Classify intent
+      const intent = classifyIntent(normalizedText)
+      logger.debug("AIOrchestrator", `Intent: ${intent.intent} (confidence: ${intent.confidence})`)
+
+      const dialogueResult = await handleTurn(normalizedText, {
+        sessionId,
+        userProfile,
+        sentiment,
+        slots,
+        contextWindow: contextWindow.getWindow(),
+      })
+      logger.debug("AIOrchestrator", `Dialogue flow: ${dialogueResult.status}`)
+
+      // Select relevant domains based on intent and prompt content
+      const relevantDomains = this.selectDomains(normalizedText, intent.intent)
+      logger.info("AIOrchestrator", `Selected ${relevantDomains.length} domains`, {
+        domains: relevantDomains.map((d) => d.name),
+      })
+
+      const inferenceResults: Array<{ domain: string; confidence: number; logits: number[][] }> = []
+
+      for (const domain of relevantDomains) {
         try {
-          const result = await domain.query(normalizedText, {
-            context: contextWindow.getWindow(),
-            searchResults,
-            intent: intent.intent,
-            tokens,
-            sentences,
-            inferenceResults: inferenceResults.find((r) => r.domain === domain.name),
-            sentiment,
-            slots,
-            userProfile,
-            dialogueState: dialogueResult,
+          const inferenceInput: InferenceInput = {
+            tokens: paddedTokens,
+            domain: domain.name,
+            context: contextWindow.getWindow().map((text) => [text.length]),
+          }
+
+          const inferenceOutput = await this.inferenceEngine.infer(inferenceInput)
+          inferenceResults.push({
+            domain: domain.name,
+            confidence: inferenceOutput.confidence,
+            logits: inferenceOutput.logits,
           })
-          domainResponses.push({ domain: domain.name, result })
+
+          logger.debug(
+            "AIOrchestrator",
+            `Inference for ${domain.name}: confidence=${inferenceOutput.confidence.toFixed(3)}`,
+          )
         } catch (error) {
-          console.error(`[AIOrchestrator] Domain ${domain.name} query failed:`, error)
+          logger.error("AIOrchestrator", `Inference failed for ${domain.name}`, error)
         }
       }
+
+      // Check if internet search is needed
+      const needsSearch = this.needsInternetSearch(normalizedText)
+      let searchResults: string[] = []
+
+      if (needsSearch) {
+        logger.info("AIOrchestrator", "Performing internet search...")
+        try {
+          const results = await searchWeb(normalizedText)
+          searchResults = results.map((r) => r.snippet || r.title)
+          logger.info("AIOrchestrator", `Found ${searchResults.length} search results`)
+        } catch (error) {
+          logger.error("AIOrchestrator", "Search failed", error)
+        }
+      }
+
+      // Query each relevant domain
+      const domainResponses: Array<{ domain: string; result: unknown }> = []
+
+      for (const domain of relevantDomains) {
+        if (domain.query) {
+          try {
+            const result = await domain.query(normalizedText, {
+              context: contextWindow.getWindow(),
+              searchResults,
+              intent: intent.intent,
+              tokens,
+              sentences,
+              inferenceResults: inferenceResults.find((r) => r.domain === domain.name),
+              sentiment,
+              slots,
+              userProfile,
+              dialogueState: dialogueResult,
+            })
+            domainResponses.push({ domain: domain.name, result })
+          } catch (error) {
+            logger.error("AIOrchestrator", `Domain ${domain.name} query failed`, error)
+          }
+        }
+      }
+
+      // Synthesize response from domain outputs
+      const response = this.synthesizeResponse(
+        normalizedText,
+        domainResponses,
+        searchResults,
+        relevantDomains.map((d) => d.name),
+        inferenceResults.reduce((sum, r) => sum + r.confidence, 0) / (inferenceResults.length || 1),
+      )
+
+      response.text = postProcess(response.text)
+
+      // Add response to context
+      contextWindow.add(response.text)
+
+      response.metadata = {
+        sentiment: sentiment.sentiment,
+        sentimentScore: sentiment.score,
+        extractedSlots: Object.fromEntries(extractedSlots),
+        userProfile: Object.keys(userProfile).length > 0 ? userProfile : undefined,
+        dialogueState: dialogueResult.status,
+      }
+
+      // Save interaction for learning
+      await this.saveInteraction(sessionId, prompt, response)
+
+      const latency = Date.now() - startTime
+      metricsCollector.record("request_success", 1)
+      metricsCollector.record("request_latency", latency)
+      logger.info("AIOrchestrator", `Request completed in ${latency}ms`, {
+        sessionId,
+        domains: response.domains.length,
+        confidence: response.confidence.toFixed(3),
+      })
+
+      // Publish event for monitoring
+      publish("orchestrator:response", {
+        sessionId,
+        prompt: prompt.text,
+        response: response.text,
+        domains: response.domains,
+        duration: latency,
+        inferenceMetrics: {
+          avgConfidence: inferenceResults.reduce((sum, r) => sum + r.confidence, 0) / (inferenceResults.length || 1),
+          domainsProcessed: inferenceResults.length,
+        },
+      })
+
+      return response
+    } catch (error) {
+      const latency = Date.now() - startTime
+      metricsCollector.record("request_failure", 1)
+      metricsCollector.record("request_latency", latency)
+      logger.error("AIOrchestrator", "Request failed", error)
+      throw error
     }
-
-    // Synthesize response from domain outputs
-    const response = this.synthesizeResponse(
-      normalizedText,
-      domainResponses,
-      searchResults,
-      relevantDomains.map((d) => d.name),
-      inferenceResults.reduce((sum, r) => sum + r.confidence, 0) / (inferenceResults.length || 1),
-    )
-
-    response.text = postProcess(response.text)
-
-    // Add response to context
-    contextWindow.add(response.text)
-
-    response.metadata = {
-      sentiment: sentiment.sentiment,
-      sentimentScore: sentiment.score,
-      extractedSlots: Object.fromEntries(extractedSlots),
-      userProfile: Object.keys(userProfile).length > 0 ? userProfile : undefined,
-      dialogueState: dialogueResult.status,
-    }
-
-    recordMetric("prompt.tokens", tokens.length, { sessionId })
-    recordMetric("prompt.sentences", sentences.length, { sessionId })
-    recordMetric("sentiment.score", sentiment.score, { sentiment: sentiment.sentiment })
-
-    for (const result of inferenceResults) {
-      recordMetric("inference.confidence", result.confidence, { domain: result.domain })
-    }
-
-    const duration = Date.now() - startTime
-    recordMetric("response.duration", duration, { sessionId })
-    recordMetric("response.confidence", response.confidence, { sessionId })
-    recordMetric("response.domains", response.domains.length, { sessionId })
-
-    // Save interaction for learning
-    await this.saveInteraction(sessionId, prompt, response)
-
-    // Publish event for monitoring
-    publish("orchestrator:response", {
-      sessionId,
-      prompt: prompt.text,
-      response: response.text,
-      domains: response.domains,
-      duration: Date.now() - startTime,
-      inferenceMetrics: {
-        avgConfidence: inferenceResults.reduce((sum, r) => sum + r.confidence, 0) / (inferenceResults.length || 1),
-        domainsProcessed: inferenceResults.length,
-      },
-    })
-
-    return response
   }
 
   /**
@@ -506,8 +516,9 @@ export class AIOrchestrator {
           }
 
           dataRegistry.updateFile(domainName, learnedDataPath, JSON.stringify(learned, null, 2))
+          logger.debug("AIOrchestrator", `Saved interaction to ${domainName}`)
         } catch (error) {
-          console.error(`[AIOrchestrator] Failed to save to ${domainName}:`, error)
+          logger.error("AIOrchestrator", `Failed to save to ${domainName}`, error)
         }
       }
 
@@ -517,7 +528,7 @@ export class AIOrchestrator {
         timestamp: Date.now(),
       })
     } catch (error) {
-      console.error("[AIOrchestrator] Failed to save interaction:", error)
+      logger.error("AIOrchestrator", "Failed to save interaction", error)
     }
   }
 
@@ -525,7 +536,7 @@ export class AIOrchestrator {
    * Handle domain data changes
    */
   private handleDataChange(payload: unknown): void {
-    console.log("[AIOrchestrator] Domain data changed:", payload)
+    logger.debug("AIOrchestrator", "Domain data changed", payload)
     // Future: trigger retraining or cache invalidation
   }
 
@@ -558,9 +569,22 @@ export class AIOrchestrator {
       throw new Error(`Domain ${domainName} does not support training`)
     }
 
-    console.log(`[AIOrchestrator] Training domain: ${domainName}`)
-    await domain.train(options)
+    logger.info("AIOrchestrator", `Starting training for domain: ${domainName}`)
+    const startTime = Date.now()
 
-    publish("orchestrator:trained", { domain: domainName, timestamp: Date.now() })
+    try {
+      await domain.train(options)
+      const duration = Date.now() - startTime
+
+      metricsCollector.record("training_success", 1, { domain: domainName })
+      metricsCollector.record("training_duration", duration, { domain: domainName })
+      logger.info("AIOrchestrator", `Training completed for ${domainName} in ${duration}ms`)
+
+      publish("orchestrator:trained", { domain: domainName, timestamp: Date.now(), duration })
+    } catch (error) {
+      metricsCollector.record("training_failure", 1, { domain: domainName })
+      logger.error("AIOrchestrator", `Training failed for ${domainName}`, error)
+      throw error
+    }
   }
 }
