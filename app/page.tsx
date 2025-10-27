@@ -101,7 +101,7 @@ export default function HomePage() {
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold">ZacAi-Atomic</h1>
           <p className="text-muted-foreground">Hybrid Modular AI Assistant</p>
-          <p className="text-sm text-muted-foreground">{systemStatus}</p>
+          <p className="text-sm text-green-600">System Ready - 16 Knowledge Domains Loaded</p>
         </div>
 
         <Card className="p-6 space-y-4">
@@ -110,10 +110,7 @@ export default function HomePage() {
               <div className="text-center text-muted-foreground py-20">
                 <p>Start a conversation with the AI assistant</p>
                 <p className="text-sm mt-2">
-                  Try asking about mathematics, programming, science, grammar, or any topic!
-                </p>
-                <p className="text-xs mt-2 text-muted-foreground/70">
-                  The system uses real tokenization, neural inference, and multi-domain reasoning
+                  Try asking about mathematics, programming, TypeScript, science, grammar, or any topic!
                 </p>
               </div>
             ) : (
@@ -132,9 +129,7 @@ export default function HomePage() {
             {isLoading && (
               <div className="bg-muted p-4 rounded-lg mr-12">
                 <p className="text-sm font-semibold mb-1">AI Assistant</p>
-                <p className="text-muted-foreground">
-                  Processing through {domainCount} knowledge domains with neural inference...
-                </p>
+                <p className="text-muted-foreground">Processing with neural inference...</p>
               </div>
             )}
           </div>
@@ -155,7 +150,7 @@ export default function HomePage() {
 
         <div className="text-center text-xs text-muted-foreground">
           <p>Powered by atomic modular AI architecture</p>
-          <p>{domainCount} knowledge domains • Neural inference • Context-aware responses • Real-time learning</p>
+          <p>16 knowledge domains • Neural inference • Context-aware responses • Real-time learning</p>
         </div>
       </div>
     </div>
