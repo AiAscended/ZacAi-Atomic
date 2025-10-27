@@ -12,7 +12,7 @@ Based on the entire chat and best practices for modular AI architecture and doma
 
 ## Example Complete Folder & File List for Single Knowledge Domain (E.g., `english`)
 
-```
+\`\`\`
 data/
   domains/
       english/
@@ -39,7 +39,7 @@ data/
                                                                                                                                           utils.ts                      # Utilities (normalization, helpers)
                                                                                                                                                   constants.ts                  # Domain constants, regexp, etc.
                                                                                                                                                           meta.json                    # Metadata describing domain info
-                                                                                                                                                          ```
+                                                                                                                                                          \`\`\`
 
                                                                                                                                                           ***
 
@@ -101,4 +101,3 @@ data/
                                                                                                                                                           [6] What is the better approach for creating folder structure on ... https://stackoverflow.com/questions/75805314/what-is-the-better-approach-for-creating-folder-structure-on-a-ddd-project
                                                                                                                                                           [7] The AI Knowledgebase Architecture Design Center https://www.linkedin.com/pulse/ai-knowledgebase-architecture-design-center-assem-hijazi-naxaf
                                                                                                                                                           [8] kgrzybek/modular-monolith-with-ddd https://github.com/kgrzybek/modular-monolith-with-ddd
-                                                                                                                                                          
