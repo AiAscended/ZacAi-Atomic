@@ -43,20 +43,23 @@ export default function HomePage() {
         const data = await response.json()
         console.log("[v0] Initialize data:", data)
 
-        setSessionId(data.sessionId)
-        setAiReady(true)
-        setSystemStatus("AI system ready")
-        console.log("[v0] AI system initialized successfully")
+        if (data && data.sessionId) {
+          setSessionId(data.sessionId)
+          setAiReady(true)
+          setSystemStatus("AI system ready")
+          console.log("[v0] AI system initialized successfully")
+        }
       } catch (error) {
         console.error("[v0] Failed to initialize AI:", error)
-        setSystemStatus(`Failed to initialize: ${error instanceof Error ? error.message : "Unknown error"}`)
+        const errorMessage = error instanceof Error ? error.message : "Unknown error"
+        setSystemStatus(`Failed to initialize: ${errorMessage}`)
       }
     }
 
     initializeSession()
   }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     console.log("[v0] Form submitted, input:", input)
 
@@ -94,18 +97,15 @@ export default function HomePage() {
       const data = await response.json()
       console.log("[v0] AI response data:", data)
 
-      if (!data || !data.text) {
-        console.error("[v0] Invalid response data:", data)
+      if (data && data.text) {
+        setMessages((prev) => [...prev, { role: "assistant", content: data.text }])
+      } else {
         throw new Error("Invalid response from AI")
       }
-
-      setMessages((prev) => [...prev, { role: "assistant", content: data.text }])
     } catch (error) {
       console.error("[v0] Error processing message:", error)
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: `Error: ${error instanceof Error ? error.message : "Unknown error occurred"}` },
-      ])
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+      setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${errorMessage}` }])
     } finally {
       setIsLoading(false)
     }
