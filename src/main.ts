@@ -28,6 +28,7 @@ import { registerModule } from "@ai/orchestration/moduleRegistry"
 import DocumentCache from "@ai/knowledge_retrieval/documentCache"
 
 import { AIOrchestrator } from "@ai/orchestration/aiOrchestrator"
+import { promptHandler } from "@ai/orchestration/promptHandler"
 
 // Register the document cache as a module so orchestrator listeners can find it and call hooks
 try {
@@ -130,9 +131,10 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✨ ZacAi-Atomic initialized successfully!")
     console.log("🔬 Atomic architecture: AI modules → UI → Utils")
     console.log("🧠 AI Orchestrator: Ready with", aiOrchestrator.getRegisteredDomains().length, "domains")
+    console.log("🎯 Prompt Handler: Integrated with complete AI pipeline")
   } catch (error) {
     console.error("Failed to initialize application:", error)
   }
 })
 
-export { aiOrchestrator }
+export { aiOrchestrator, promptHandler }

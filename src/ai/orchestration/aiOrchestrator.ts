@@ -11,6 +11,10 @@
  * - src/ai/context_management/intentClassifier.ts (intent classification)
  * - src/ai/knowledge_retrieval/webSearchAPIConnector.ts (internet search)
  * - src/ai/orchestration/eventBus.ts (event communication)
+ * - src/input_processing/textNormalizer.ts (text normalization)
+ * - src/input_processing/wordTokenizer.ts (word tokenization)
+ * - src/input_processing/sentenceBoundaryDetector.ts (sentence boundary detection)
+ * - src/output_generation/responsePostProcessor.ts (response post-processing)
  *
  * Depended on by:
  * - src/main.ts (application entry point)
@@ -24,6 +28,10 @@ import { classifyIntent } from "../context_management/intentClassifier"
 import { searchWeb } from "../knowledge_retrieval/webSearchAPIConnector"
 import { publish, subscribe } from "./eventBus"
 import dataRegistry from "../data/dataRegistry"
+import { textNormalizer } from "../input_processing/textNormalizer"
+import { wordTokenizer } from "../input_processing/wordTokenizer"
+import { sentenceBoundaryDetector } from "../input_processing/sentenceBoundaryDetector"
+import { postProcess } from "../output_generation/responsePostProcessor"
 
 /**
  * Represents a user prompt with metadata
@@ -109,6 +117,12 @@ export class AIOrchestrator {
   public async processPrompt(prompt: Prompt): Promise<Response> {
     const startTime = Date.now()
 
+    const normalizedText = textNormalizer(prompt.text)
+    const tokens = wordTokenizer(normalizedText)
+    const sentences = sentenceBoundaryDetector(normalizedText)
+
+    console.log(`[AIOrchestrator] Processed input: ${tokens.length} tokens, ${sentences.length} sentences`)
+
     // Get or create session
     const sessionId = prompt.sessionId || this.createSession()
     const session = this.sessionManager.get(sessionId)
@@ -128,24 +142,24 @@ export class AIOrchestrator {
     contextWindow.add(prompt.text)
 
     // Classify intent
-    const intent = classifyIntent(prompt.text)
+    const intent = classifyIntent(normalizedText)
     console.log(`[AIOrchestrator] Intent: ${intent.intent} (confidence: ${intent.confidence})`)
 
     // Select relevant domains based on intent and prompt content
-    const relevantDomains = this.selectDomains(prompt.text, intent.intent)
+    const relevantDomains = this.selectDomains(normalizedText, intent.intent)
     console.log(
       `[AIOrchestrator] Selected domains:`,
       relevantDomains.map((d) => d.name),
     )
 
     // Check if internet search is needed
-    const needsSearch = this.needsInternetSearch(prompt.text)
+    const needsSearch = this.needsInternetSearch(normalizedText)
     let searchResults: string[] = []
 
     if (needsSearch) {
       console.log("[AIOrchestrator] Performing internet search...")
       try {
-        const results = await searchWeb(prompt.text)
+        const results = await searchWeb(normalizedText)
         searchResults = results.map((r) => r.snippet || r.title)
         console.log(`[AIOrchestrator] Found ${searchResults.length} search results`)
       } catch (error) {
@@ -159,10 +173,12 @@ export class AIOrchestrator {
     for (const domain of relevantDomains) {
       if (domain.query) {
         try {
-          const result = await domain.query(prompt.text, {
+          const result = await domain.query(normalizedText, {
             context: contextWindow.getWindow(),
             searchResults,
             intent: intent.intent,
+            tokens,
+            sentences,
           })
           domainResponses.push({ domain: domain.name, result })
         } catch (error) {
@@ -173,11 +189,13 @@ export class AIOrchestrator {
 
     // Synthesize response from domain outputs
     const response = this.synthesizeResponse(
-      prompt.text,
+      normalizedText,
       domainResponses,
       searchResults,
       relevantDomains.map((d) => d.name),
     )
+
+    response.text = postProcess(response.text)
 
     // Add response to context
     contextWindow.add(response.text)
