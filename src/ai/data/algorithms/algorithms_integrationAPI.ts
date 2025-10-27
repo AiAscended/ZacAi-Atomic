@@ -6,7 +6,8 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-const { registerDomain, registerDomainFiles, watchDomainFiles } = require("../registry")
+import { registerDomain } from "../registry"
+import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
 import { ALGORITHMS_DOMAIN } from "./algorithms_constants"
 import { loadAlgorithmsSeedVocabulary } from "./algorithms_vocabularyManager"
 import { algorithmsRunInference } from "./algorithms_inferenceController"

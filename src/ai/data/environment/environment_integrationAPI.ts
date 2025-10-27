@@ -6,7 +6,8 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-const { registerDomain, registerDomainFiles, watchDomainFiles } = require("../registry")
+import { registerDomain } from "../registry"
+import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
 import { ENVIRONMENT_DOMAIN } from "./environment_constants"
 import { loadEnvironmentSeedVocabulary } from "./environment_vocabularyManager"
 import { environmentRunInference } from "./environment_inferenceController"
