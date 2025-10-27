@@ -4,7 +4,8 @@
       "name": "Wikipedia",
       "url": "https://en.wikipedia.org",
       "description": "General knowledge encyclopedia",
-      "searchPath": "/w/index.php?search="
+      "searchPath": "/w/index.php?search=",
+      "apiPath": "/w/api.php?action=query&format=json&list=search&srsearch="
     }
   ],
   "mathematics": [
@@ -51,10 +52,26 @@
   ],
   "internet_search": [
     {
+      "name": "Google",
+      "url": "https://www.google.com",
+      "description": "Google search engine",
+      "searchPath": "/search?q=",
+      "apiPath": "/customsearch/v1?key=YOUR_API_KEY&cx=YOUR_CX&q="
+    },
+    {
+      "name": "Bing",
+      "url": "https://www.bing.com",
+      "description": "Microsoft Bing search engine",
+      "searchPath": "/search?q=",
+      "apiPath": "/v7.0/search?q="
+    },
+    {
       "name": "DuckDuckGo",
       "url": "https://duckduckgo.com",
       "description": "Privacy-focused search engine",
-      "searchPath": "/?q="
+      "searchPath": "/?q=",
+      "apiPath": "/?q=",
+      "format": "json"
     }
   ]
 }

@@ -3,15 +3,19 @@
  * Purpose: Shared URL lookup tool for fetching content from reference URLs
  * Used by all domains to access their specific knowledge sources
  *
- * Dependencies: None (atomic module)
+ * Dependencies: urlSources.json
  * Depended on by: All domain inference controllers
  */
+
+import urlSourcesData from "./urlSources.json"
 
 export interface URLSource {
   name: string
   url: string
   description: string
-  domain: string
+  searchPath?: string
+  apiPath?: string
+  format?: string
 }
 
 /**
@@ -20,13 +24,26 @@ export interface URLSource {
  */
 export async function fetchURL(url: string): Promise<string> {
   try {
-    // In browser environment, we can't make arbitrary HTTP requests due to CORS
-    // This would need to be proxied through an API route in production
-    console.log(`[v0] URL lookup: Would fetch ${url}`)
-    return `Content from ${url} (simulated in preview environment)`
+    // Note: This will be blocked by CORS for most external sites
+    // In production, this should be proxied through an API route
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "User-Agent": "ZacAi-Atomic/1.0",
+      },
+    })
+
+    if (response.ok) {
+      const content = await response.text()
+      console.log(`[v0] Successfully fetched ${url}`)
+      return content
+    } else {
+      console.log(`[v0] Failed to fetch ${url}: ${response.status}`)
+      return `Content from ${url} (fetch failed: ${response.status})`
+    }
   } catch (error) {
     console.error(`[v0] Failed to fetch ${url}:`, error)
-    return ""
+    return `Content from ${url} (CORS blocked - needs API proxy in production)`
   }
 }
 
@@ -34,35 +51,8 @@ export async function fetchURL(url: string): Promise<string> {
  * Find URL sources for a specific domain
  */
 export function findSources(domain: string): URLSource[] {
-  // This would load from domain-specific JSON/YAML files in production
-  const allSources: URLSource[] = [
-    {
-      name: "Wikipedia",
-      url: "https://en.wikipedia.org",
-      description: "General knowledge encyclopedia",
-      domain: "general",
-    },
-    {
-      name: "MDN Web Docs",
-      url: "https://developer.mozilla.org",
-      description: "Web development documentation",
-      domain: "typescript",
-    },
-    {
-      name: "Math is Fun",
-      url: "https://www.mathsisfun.com",
-      description: "Mathematics tutorials and explanations",
-      domain: "mathematics",
-    },
-    {
-      name: "Merriam-Webster Dictionary",
-      url: "https://www.merriam-webster.com",
-      description: "English dictionary and thesaurus",
-      domain: "english",
-    },
-  ]
-
-  return allSources.filter((s) => s.domain === domain)
+  const sources = urlSourcesData[domain as keyof typeof urlSourcesData] || []
+  return sources as URLSource[]
 }
 
 /**
@@ -73,11 +63,26 @@ export async function searchSources(domain: string, query: string): Promise<stri
   const results: string[] = []
 
   for (const source of sources) {
-    const content = await fetchURL(`${source.url}/search?q=${encodeURIComponent(query)}`)
-    if (content) {
-      results.push(`From ${source.name}: ${content}`)
+    const searchUrl = source.searchPath
+      ? `${source.url}${source.searchPath}${encodeURIComponent(query)}`
+      : `${source.url}/search?q=${encodeURIComponent(query)}`
+
+    console.log(`[v0] Searching ${source.name} at: ${searchUrl}`)
+
+    const content = await fetchURL(searchUrl)
+    if (content && !content.includes("CORS blocked")) {
+      results.push(`From ${source.name}: ${content.substring(0, 500)}...`)
+    } else {
+      results.push(`From ${source.name}: (Search available at ${searchUrl})`)
     }
   }
 
   return results
+}
+
+/**
+ * Get search engine URLs for internet search domain
+ */
+export function getSearchEngines(): URLSource[] {
+  return findSources("internet_search")
 }
