@@ -6,10 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 
-// Import the real AI system
-import { AIOrchestrator } from "@/src/ai/orchestration/aiOrchestrator"
-import { promptHandler } from "@/src/ai/orchestration/promptHandler"
-
 export default function HomePage() {
   const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [input, setInput] = useState("")
@@ -17,41 +13,33 @@ export default function HomePage() {
   const [systemStatus, setSystemStatus] = useState<string>("Initializing AI system...")
   const [aiReady, setAiReady] = useState(false)
   const [sessionId, setSessionId] = useState<string>("")
-  const [domainCount, setDomainCount] = useState(0)
 
   useEffect(() => {
-    const initializeAI = async () => {
+    const initializeSession = async () => {
       try {
-        setSystemStatus("Loading AI modules...")
+        setSystemStatus("Connecting to AI system...")
 
-        // Get orchestrator instance
-        const orchestrator = AIOrchestrator.getInstance()
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "initialize" }),
+        })
 
-        // Initialize all domains
-        await orchestrator.initialize()
+        if (!response.ok) throw new Error("Failed to initialize")
 
-        // Create session
-        const newSessionId = orchestrator.createSession()
-        setSessionId(newSessionId)
-
-        // Get registered domains
-        const domains = orchestrator.getRegisteredDomains()
-        setDomainCount(domains.length)
-
-        setSystemStatus(`Ready - ${domains.length} knowledge domains loaded`)
+        const data = await response.json()
+        setSessionId(data.sessionId)
+        setSystemStatus(`Ready - ${data.domainCount} knowledge domains loaded`)
         setAiReady(true)
 
-        console.log(
-          "[v0] AI system initialized with domains:",
-          domains.map((d) => d.name),
-        )
+        console.log("[v0] AI system initialized via API")
       } catch (error) {
         console.error("[v0] Failed to initialize AI:", error)
         setSystemStatus("Error: AI system unavailable")
       }
     }
 
-    initializeAI()
+    initializeSession()
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,21 +52,32 @@ export default function HomePage() {
     setIsLoading(true)
 
     try {
-      console.log("[v0] Processing prompt through AI orchestrator...")
+      console.log("[v0] Sending prompt to API...")
 
-      const response = await promptHandler.handlePrompt(userMessage, sessionId)
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "chat",
+          message: userMessage,
+          sessionId,
+        }),
+      })
+
+      if (!response.ok) throw new Error("API request failed")
+
+      const data = await response.json()
 
       console.log("[v0] AI response received:", {
-        domains: response.domains,
-        confidence: response.confidence,
-        sources: response.sources.length,
+        domains: data.domains,
+        confidence: data.confidence,
       })
 
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: response.text,
+          content: data.text,
         },
       ])
     } catch (error) {
@@ -101,7 +100,7 @@ export default function HomePage() {
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold">ZacAi-Atomic</h1>
           <p className="text-muted-foreground">Hybrid Modular AI Assistant</p>
-          <p className="text-sm text-green-600">System Ready - 16 Knowledge Domains Loaded</p>
+          <p className={`text-sm ${aiReady ? "text-green-600" : "text-yellow-600"}`}>{systemStatus}</p>
         </div>
 
         <Card className="p-6 space-y-4">
