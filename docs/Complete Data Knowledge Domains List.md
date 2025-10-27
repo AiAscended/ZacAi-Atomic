@@ -119,4 +119,3 @@ These domains represent plug-and-play knowledge ecosystems for your hybrid AI.
          [7] AI Knowledge Base: A Complete Guide to All You Need for ... https://www.vonage.com/resources/articles/ai-knowledge-base/
          [8] Expert Systems in AI https://www.geeksforgeeks.org/artificial-intelligence/expert-systems/
          [9] Exploring The Major Domains of AI (Artificial Intelligence) https://www.almabetter.com/bytes/articles/domains-of-ai
-         

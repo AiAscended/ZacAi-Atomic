@@ -19,7 +19,7 @@ The configs allow domain-specific customization while maintaining schema uniform
 
 ## 2. Example YAML Pipeline Config for a Domain (e.g., `english`)
 
-```yaml
+\`\`\`yaml
 # src/ai/data/english/englishPipelineConfig.yaml
 
 version: "1.0"
@@ -69,7 +69,7 @@ pipeline:
                                                                                                                                                                         - dataBatchGenerator
                                                                                                                                                                               - fineTuneModel
                                                                                                                                                                                     - saveUpdatedWeights
-                                                                                                                                                                                    ```
+                                                                                                                                                                                    \`\`\`
 
                                                                                                                                                                                     ***
 
@@ -87,7 +87,7 @@ pipeline:
 
                                                                                                                                                                                     Each domain plugin contains a `pipelineConfig.yaml` placed like:
 
-                                                                                                                                                                                    ```
+                                                                                                                                                                                    \`\`\`
                                                                                                                                                                                     src/
                                                                                                                                                                                       ai/
                                                                                                                                                                                           data/
@@ -101,7 +101,7 @@ pipeline:
                                                                                                                                                                                                                                                   externalSearchPipelineConfig.yaml
                                                                                                                                                                                                                                                         ethicsAndSafety/
                                                                                                                                                                                                                                                                 ethicsAndSafetyPipelineConfig.yaml
-                                                                                                                                                                                                                                                                ```
+                                                                                                                                                                                                                                                                \`\`\`
 
                                                                                                                                                                                                                                                                 ***
 
@@ -139,4 +139,3 @@ pipeline:
                                                                                                                                                                                                                                                                 [6] Building Scalable Data Pipelines with Python, SQL & Cloud https://www.mage.ai/blog/etl-pipeline-architecture-101-building-scalable-data-pipelines-with-python-sql-cloud
                                                                                                                                                                                                                                                                 [7] Build a Video Search and Summarization Agent ... https://developer.nvidia.com/blog/build-a-video-search-and-summarization-agent-with-nvidia-ai-blueprint/
                                                                                                                                                                                                                                                                 [8] How to Design Customizable Data Indexing Pipelines https://hackernoon.com/how-to-design-customizable-data-indexing-pipelines
-                                                                                                                                                                                                                                                                
