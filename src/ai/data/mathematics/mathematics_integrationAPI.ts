@@ -31,8 +31,8 @@ export const mathematicsInit = async () => {
     initialize: async () => {
       await loadMathematicsSeedVocabulary()
     },
-    query: async (input: string) => {
-      const result = await mathematicsRunInference(input)
+    query: async (input: string, context?: any) => {
+      const result = await mathematicsRunInference(input, context)
       return { text: result.response }
     },
     train: async (opts?: Record<string, unknown>) => mathematicsRunTrainingEpoch(opts as { epochs?: number }),

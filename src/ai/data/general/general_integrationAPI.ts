@@ -28,8 +28,8 @@ export const generalInit = async () => {
     initialize: async () => {
       await loadGeneralSeedVocabulary()
     },
-    query: async (input: string) => {
-      const result = await generalRunInference(input)
+    query: async (input: string, context?: any) => {
+      const result = await generalRunInference(input, context)
       return { text: result.response }
     },
     train: async (opts?: Record<string, unknown>) => generalRunTrainingEpoch(opts as { epochs?: number }),
