@@ -2,6 +2,7 @@ import { registerDomain } from "../registry"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 import { loadInternetSearchSeedVocabulary } from "./internet_search_vocabularyManager"
 import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
+import { internetSearchRunInference } from "./internet_search_inferenceController"
 
 const internetSearchQuery = async (input: string, context?: any) => {
   const searchResults = context?.searchResults || []
@@ -39,7 +40,7 @@ export const internetSearchInit = async () => {
     initialize: async () => {
       await loadInternetSearchSeedVocabulary()
     },
-    query: internetSearchQuery,
+    query: async (input: string) => internetSearchRunInference(input),
   })
 }
 
