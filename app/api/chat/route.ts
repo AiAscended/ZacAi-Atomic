@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { simplePromptHandler } from "@/src/ai/orchestration/simplePromptHandler"
+import { promptHandler } from "@/src/ai/orchestration/promptHandler"
 
 // Session storage
 const sessions = new Map<string, { history: Array<{ role: string; content: string }> }>()
@@ -25,9 +25,9 @@ export async function POST(request: Request) {
       sessions.set(newSessionId, { history: [] })
 
       try {
-        console.log("[v0] Initializing simple prompt handler...")
-        await simplePromptHandler.initialize()
-        console.log("[v0] AI system initialized successfully")
+        console.log("[v0] Initializing full AI orchestrator with all domains...")
+        await promptHandler.initialize()
+        console.log("[v0] Full AI system initialized successfully")
       } catch (error) {
         console.error("[v0] Failed to initialize AI system:", error)
         return NextResponse.json(
@@ -68,8 +68,8 @@ export async function POST(request: Request) {
       }
 
       try {
-        console.log("[v0] Calling simplePromptHandler.handlePrompt...")
-        const response = await simplePromptHandler.handlePrompt(message, sessionId, {
+        console.log("[v0] Calling real promptHandler.handlePrompt with full AI pipeline...")
+        const response = await promptHandler.handlePrompt(message, sessionId, {
           history: session.history,
         })
 
