@@ -23,6 +23,7 @@
  * - src/ai/context_management/slotFiller.ts (slot extraction)
  * - src/ai/context_management/userProfileHandler.ts (user profile management)
  * - src/ai/context_management/dialogueFlowController.ts (dialogue flow control)
+ * - src/monitoring/metricsCollector.ts (metrics collection)
  *
  * Depended on by:
  * - src/main.ts (application entry point)
@@ -46,6 +47,7 @@ import { detectSentiment } from "../context_management/sentimentEmotionDetector"
 import { extractSlots } from "../context_management/slotFiller"
 import { getProfile, setProfile } from "../context_management/userProfileHandler"
 import { handleTurn } from "../context_management/dialogueFlowController"
+import { recordMetric } from "../monitoring/metricsCollector"
 
 /**
  * Represents a user prompt with metadata
@@ -285,6 +287,19 @@ export class AIOrchestrator {
       userProfile: Object.keys(userProfile).length > 0 ? userProfile : undefined,
       dialogueState: dialogueResult.status,
     }
+
+    recordMetric("prompt.tokens", tokens.length, { sessionId })
+    recordMetric("prompt.sentences", sentences.length, { sessionId })
+    recordMetric("sentiment.score", sentiment.score, { sentiment: sentiment.sentiment })
+
+    for (const result of inferenceResults) {
+      recordMetric("inference.confidence", result.confidence, { domain: result.domain })
+    }
+
+    const duration = Date.now() - startTime
+    recordMetric("response.duration", duration, { sessionId })
+    recordMetric("response.confidence", response.confidence, { sessionId })
+    recordMetric("response.domains", response.domains.length, { sessionId })
 
     // Save interaction for learning
     await this.saveInteraction(sessionId, prompt, response)
