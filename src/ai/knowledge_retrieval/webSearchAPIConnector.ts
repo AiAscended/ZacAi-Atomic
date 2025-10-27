@@ -4,10 +4,10 @@
  */
 
 export interface WebResult {
-  id: string;
-  title: string;
-  snippet: string;
-  url?: string;
+  id: string
+  title: string
+  snippet: string
+  url?: string
 }
 
 export const webSearch = async (query: string, limit = 5): Promise<WebResult[]> => {
@@ -17,5 +17,7 @@ export const webSearch = async (query: string, limit = 5): Promise<WebResult[]> 
     title: `Search result ${i} for ${query}`,
     snippet: `This is a simulated snippet for '${query}' (#${i}).`,
     url: `https://example.com/search/${encodeURIComponent(query)}/${i}`,
-  }));
-};
+  }))
+}
+
+export const searchWeb = webSearch
