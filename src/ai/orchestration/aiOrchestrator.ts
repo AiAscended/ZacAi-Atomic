@@ -464,19 +464,62 @@ export class AIOrchestrator {
     const responseParts: string[] = []
     const sources: string[] = []
 
-    // Add domain responses
+    // Priority: specific domains > general domain
+    let bestResponse: string | null = null
+    let bestDomain: string | null = null
+
+    // First, try to find a specific domain response (not general)
     for (const { domain, result } of domainResponses) {
-      if (result && typeof result === "object" && "text" in result) {
-        responseParts.push((result as { text: string }).text)
-        sources.push(`Domain: ${domain}`)
-      } else if (typeof result === "string") {
-        responseParts.push(result)
-        sources.push(`Domain: ${domain}`)
+      if (domain !== "general" && domain !== "english") {
+        if (result && typeof result === "object" && "text" in result) {
+          const text = (result as { text: string }).text
+          // Skip generic capability descriptions
+          if (!text.includes("I can help with") && !text.includes("Try asking me")) {
+            bestResponse = text
+            bestDomain = domain
+            break
+          }
+        }
       }
     }
 
-    // Add search results if available
-    if (searchResults.length > 0) {
+    // If no specific domain had a good response, use general domain
+    if (!bestResponse) {
+      for (const { domain, result } of domainResponses) {
+        if (domain === "general") {
+          if (result && typeof result === "object" && "text" in result) {
+            bestResponse = (result as { text: string }).text
+            bestDomain = domain
+            break
+          }
+        }
+      }
+    }
+
+    // If still no response, use any available response
+    if (!bestResponse) {
+      for (const { domain, result } of domainResponses) {
+        if (result && typeof result === "object" && "text" in result) {
+          bestResponse = (result as { text: string }).text
+          bestDomain = domain
+          break
+        } else if (typeof result === "string") {
+          bestResponse = result
+          bestDomain = domain
+          break
+        }
+      }
+    }
+
+    if (bestResponse) {
+      responseParts.push(bestResponse)
+      if (bestDomain) {
+        sources.push(`Domain: ${bestDomain}`)
+      }
+    }
+
+    // Only add search results if they're not simulated/mock data
+    if (searchResults.length > 0 && !searchResults[0].includes("simulated snippet")) {
       responseParts.push(`\n\nSearch results:\n${searchResults.slice(0, 3).join("\n")}`)
       sources.push("Internet Search")
     }

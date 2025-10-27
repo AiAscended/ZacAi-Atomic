@@ -1,6 +1,7 @@
 /**
  * File: src/ai/knowledge_retrieval/webSearchAPIConnector.ts
- * Purpose: Minimal web-search connector that returns simulated search results for MVP.
+ * Purpose: Web search connector - returns empty results in preview environment
+ * In production, this would connect to a real search API
  */
 
 export interface WebResult {
@@ -11,13 +12,9 @@ export interface WebResult {
 }
 
 export const webSearch = async (query: string, limit = 5): Promise<WebResult[]> => {
-  // In a prod system this would call an external search API; here we return simulated results.
-  return Array.from({ length: limit }).map((_, i) => ({
-    id: `web-${i}`,
-    title: `Search result ${i} for ${query}`,
-    snippet: `This is a simulated snippet for '${query}' (#${i}).`,
-    url: `https://example.com/search/${encodeURIComponent(query)}/${i}`,
-  }))
+  // In preview environment, return empty results
+  // In production, this would call an external search API (Google, Bing, etc.)
+  return []
 }
 
 export const searchWeb = webSearch
