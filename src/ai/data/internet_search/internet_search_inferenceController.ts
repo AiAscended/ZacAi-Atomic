@@ -1,5 +1,7 @@
-import { parseQuery, expandQuery, rankResults } from "../../search-queries"
-import { summarizeResults } from "../../search-engine"
+import { parseQuery } from "../../search-queries/queryParser"
+import { expandQuery } from "../../search-queries/queryExpander"
+import { rankResults } from "../../search-queries/queryRanker"
+import { summarizeResults } from "../../search-engine/resultSummarizer"
 import { findSources } from "../url_lookup"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 import { searchWeb } from "../../knowledge_retrieval/webSearchAPIConnector"
@@ -124,26 +126,6 @@ export async function internetSearchRunInference(
         `while biological neurons are living cells that use electrochemical signals.\n\n` +
         `(Processed ${tokens.length} tokens, neural inference confidence: ${(confidence * 100).toFixed(1)}%)`,
       confidence,
-    }
-  }
-
-  // Check if user is asking about sources or references
-  if (
-    lowerInput.includes("source") ||
-    lowerInput.includes("reference") ||
-    lowerInput.includes("url") ||
-    lowerInput.includes("wiki")
-  ) {
-    const sources = findSources(INTERNET_SEARCH_DOMAIN)
-
-    if (sources.length > 0) {
-      const sourceList = sources
-        .map((s) => `${s.name}: ${s.url}${s.description ? ` - ${s.description}` : ""}`)
-        .join("\n")
-      return {
-        response: `I have access to the following reference sources:\n${sourceList}\n\nI can look up information from these trusted sources to provide accurate answers.`,
-        confidence,
-      }
     }
   }
 
