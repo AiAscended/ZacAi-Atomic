@@ -143,17 +143,21 @@ async function processWithAI(message: string, sessionId: string, context: any): 
 
 export async function POST(request: Request) {
   try {
+    console.log("[v0] API route called")
+
     const body = await request.json()
+    console.log("[v0] Request body parsed:", { action: body.action, hasMessage: !!body.message })
+
     const { action, message, sessionId } = body
 
-    console.log("[v0] API received action:", action)
+    console.log("[v0] API received action:", action, "sessionId:", sessionId)
 
     // Handle initialization
     if (action === "initialize") {
       const newSessionId = generateSessionId()
       sessions.set(newSessionId, { history: [] })
 
-      console.log("[v0] Initialized session:", newSessionId)
+      console.log("[v0] Initialized session:", newSessionId, "Total sessions:", sessions.size)
 
       return NextResponse.json({
         sessionId: newSessionId,
@@ -165,24 +169,29 @@ export async function POST(request: Request) {
     // Handle chat
     if (action === "chat") {
       if (!message || typeof message !== "string") {
+        console.error("[v0] Invalid message:", message)
         return NextResponse.json({ error: "Invalid message" }, { status: 400 })
       }
 
-      console.log("[v0] Processing message:", message)
+      console.log("[v0] Processing message:", message, "for session:", sessionId)
 
       // Get or create session
       let session = sessions.get(sessionId)
       if (!session) {
+        console.log("[v0] Creating new session for:", sessionId)
         session = { history: [] }
         sessions.set(sessionId, session)
+      } else {
+        console.log("[v0] Using existing session with", session.history.length, "messages")
       }
 
       try {
+        console.log("[v0] Calling processWithAI...")
         const response = await processWithAI(message, sessionId, {
           history: session.history,
         })
 
-        console.log("[v0] AI response generated:", {
+        console.log("[v0] AI response generated successfully:", {
           domains: response.domains,
           confidence: response.confidence,
           textLength: response.text.length,
@@ -190,6 +199,7 @@ export async function POST(request: Request) {
 
         // Store in session history
         session.history.push({ role: "user", content: message }, { role: "assistant", content: response.text })
+        console.log("[v0] Session history updated, total messages:", session.history.length)
 
         return NextResponse.json({
           text: response.text,
@@ -200,6 +210,7 @@ export async function POST(request: Request) {
         })
       } catch (error) {
         console.error("[v0] Error in AI processing:", error)
+        console.error("[v0] Error stack:", error instanceof Error ? error.stack : "No stack trace")
         return NextResponse.json({
           text: "I'm having trouble processing your request right now. The AI system encountered an error.",
           domains: ["general"],
@@ -210,9 +221,11 @@ export async function POST(request: Request) {
       }
     }
 
+    console.error("[v0] Invalid action received:", action)
     return NextResponse.json({ error: "Invalid action" }, { status: 400 })
   } catch (error) {
     console.error("[v0] API error:", error)
+    console.error("[v0] Error stack:", error instanceof Error ? error.stack : "No stack trace")
     return NextResponse.json(
       {
         error: "Internal server error",

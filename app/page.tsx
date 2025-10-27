@@ -23,6 +23,7 @@ export default function HomePage() {
   useEffect(() => {
     const initializeSession = async () => {
       try {
+        console.log("[v0] Starting AI initialization...")
         setSystemStatus("Connecting to AI system...")
 
         const response = await fetch("/api/chat", {
@@ -31,16 +32,24 @@ export default function HomePage() {
           body: JSON.stringify({ action: "initialize" }),
         })
 
-        if (!response.ok) throw new Error("Failed to initialize")
+        console.log("[v0] Initialize response status:", response.status)
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          console.error("[v0] Initialize failed:", errorText)
+          throw new Error(`Failed to initialize: ${response.status}`)
+        }
 
         const data = await response.json()
+        console.log("[v0] Initialize data:", data)
+
         setSessionId(data.sessionId)
         setAiReady(true)
         setSystemStatus("AI system ready")
-        console.log("[v0] AI system initialized via API")
+        console.log("[v0] AI system initialized successfully")
       } catch (error) {
         console.error("[v0] Failed to initialize AI:", error)
-        setSystemStatus("Failed to initialize AI system")
+        setSystemStatus(`Failed to initialize: ${error instanceof Error ? error.message : "Unknown error"}`)
       }
     }
 
@@ -49,7 +58,12 @@ export default function HomePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim() || !aiReady || isLoading) return
+    console.log("[v0] Form submitted, input:", input)
+
+    if (!input.trim() || !aiReady || isLoading) {
+      console.log("[v0] Submit blocked - input:", input.trim(), "aiReady:", aiReady, "isLoading:", isLoading)
+      return
+    }
 
     const userMessage = input.trim()
     setInput("")
@@ -57,7 +71,7 @@ export default function HomePage() {
     setIsLoading(true)
 
     try {
-      console.log("[v0] Sending prompt to API...")
+      console.log("[v0] Sending prompt to API:", userMessage)
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -69,17 +83,28 @@ export default function HomePage() {
         }),
       })
 
-      if (!response.ok) throw new Error("Failed to get response")
+      console.log("[v0] Chat response status:", response.status)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error("[v0] Chat failed:", errorText)
+        throw new Error(`Failed to get response: ${response.status}`)
+      }
 
       const data = await response.json()
-      console.log("[v0] AI response received:", { domains: data.domains, confidence: data.confidence })
+      console.log("[v0] AI response data:", data)
+
+      if (!data || !data.text) {
+        console.error("[v0] Invalid response data:", data)
+        throw new Error("Invalid response from AI")
+      }
 
       setMessages((prev) => [...prev, { role: "assistant", content: data.text }])
     } catch (error) {
       console.error("[v0] Error processing message:", error)
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, I encountered an error processing your request." },
+        { role: "assistant", content: `Error: ${error instanceof Error ? error.message : "Unknown error occurred"}` },
       ])
     } finally {
       setIsLoading(false)
