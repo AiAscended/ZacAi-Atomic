@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 // Import scientific calculator (this one is safe, no fs dependencies)
 import { ScientificCalculator } from "@/src/ai/scientific-calculator"
-import { previewPromptHandler } from "@/src/ai/orchestration/previewPromptHandler"
+import { promptHandler } from "@/src/ai/orchestration/promptHandler"
 
 // Session storage
 const sessions = new Map<string, { history: Array<{ role: string; content: string }> }>()
@@ -20,20 +20,6 @@ interface AIResponse {
 
 const calculator = new ScientificCalculator()
 
-let promptHandlerModule: any = null
-async function getPromptHandler() {
-  if (!promptHandlerModule) {
-    try {
-      promptHandlerModule = await import("@/src/ai/orchestration/promptHandler")
-      console.log("[v0] Successfully loaded promptHandler module")
-    } catch (error) {
-      console.error("[v0] Failed to load promptHandler:", error)
-      throw new Error("Failed to initialize AI system")
-    }
-  }
-  return promptHandlerModule.promptHandler
-}
-
 export async function POST(request: Request) {
   try {
     console.log("[v0] API route called")
@@ -51,7 +37,7 @@ export async function POST(request: Request) {
       sessions.set(newSessionId, { history: [] })
 
       try {
-        await previewPromptHandler.initialize()
+        await promptHandler.initialize()
         console.log("[v0] AI system initialized successfully")
       } catch (error) {
         console.error("[v0] Failed to initialize AI system:", error)
@@ -93,8 +79,8 @@ export async function POST(request: Request) {
       }
 
       try {
-        console.log("[v0] Calling previewPromptHandler.handlePrompt...")
-        const response = await previewPromptHandler.handlePrompt(message, sessionId, {
+        console.log("[v0] Calling promptHandler.handlePrompt...")
+        const response = await promptHandler.handlePrompt(message, sessionId, {
           history: session.history,
         })
 
