@@ -7,11 +7,11 @@
  */
 
 import { safeParseJSON } from "./grammar_utils"
+import { storageAdapter } from "../storageAdapter"
 
 export const loadGrammarSeedVocabulary = async (path = "/src/ai/data/grammar/grammar_seedVocabulary.json") => {
   try {
-    const fs = require("fs")
-    const raw = fs.readFileSync(path, "utf-8")
+    const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { rules: [] }) as { rules: string[] }
   } catch (e) {
     return { rules: [] }

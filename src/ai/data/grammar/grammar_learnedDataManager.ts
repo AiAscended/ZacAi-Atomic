@@ -7,11 +7,11 @@
  */
 
 import { safeParseJSON } from "./grammar_utils"
+import { storageAdapter } from "../storageAdapter"
 
 export const loadGrammarLearnedData = async (path = "/src/ai/data/grammar/grammar_learnedData.json") => {
   try {
-    const fs = require("fs")
-    const raw = fs.readFileSync(path, "utf-8")
+    const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { notes: [], concepts: {} })
   } catch (e) {
     return { notes: [], concepts: {} }
@@ -20,8 +20,7 @@ export const loadGrammarLearnedData = async (path = "/src/ai/data/grammar/gramma
 
 export const saveGrammarLearnedData = async (data: unknown, path = "/src/ai/data/grammar/grammar_learnedData.json") => {
   try {
-    const fs = require("fs")
-    fs.writeFileSync(path, JSON.stringify(data, null, 2), "utf-8")
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2), "utf-8")
     return true
   } catch (e) {
     return false
