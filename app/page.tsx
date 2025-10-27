@@ -6,10 +6,17 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
+import { ChevronDown, ChevronUp } from "lucide-react"
 
 interface Message {
   role: "user" | "assistant"
   content: string
+  thinkingSteps?: Array<{
+    step: string
+    description: string
+    timestamp: number
+    data?: Record<string, unknown>
+  }>
 }
 
 export default function HomePage() {
@@ -19,6 +26,7 @@ export default function HomePage() {
   const [systemStatus, setSystemStatus] = useState<string>("Initializing AI system...")
   const [aiReady, setAiReady] = useState(false)
   const [sessionId, setSessionId] = useState<string>("")
+  const [expandedThinking, setExpandedThinking] = useState<number | null>(null)
 
   useEffect(() => {
     const initializeSession = async () => {
@@ -98,7 +106,14 @@ export default function HomePage() {
       console.log("[v0] AI response data:", data)
 
       if (data && data.text) {
-        setMessages((prev) => [...prev, { role: "assistant", content: data.text }])
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: data.text,
+            thinkingSteps: data.metadata?.thinkingSteps,
+          },
+        ])
       } else {
         throw new Error("Invalid response from AI")
       }
@@ -142,6 +157,40 @@ export default function HomePage() {
                     {msg.role === "user" ? "You" : "AI Assistant"}
                   </div>
                   <div className="text-sm">{msg.content}</div>
+
+                  {msg.role === "assistant" && msg.thinkingSteps && msg.thinkingSteps.length > 0 && (
+                    <div className="mt-3 border-t border-slate-200 pt-2 dark:border-slate-700">
+                      <button
+                        onClick={() => setExpandedThinking(expandedThinking === idx ? null : idx)}
+                        className="flex w-full items-center justify-between text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                      >
+                        <span className="font-medium">AI Thinking Process ({msg.thinkingSteps.length} steps)</span>
+                        {expandedThinking === idx ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </button>
+
+                      {expandedThinking === idx && (
+                        <div className="mt-2 space-y-2 rounded bg-slate-50 p-2 dark:bg-slate-900">
+                          {msg.thinkingSteps.map((step, stepIdx) => (
+                            <div key={stepIdx} className="border-l-2 border-blue-500 pl-2">
+                              <div className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                                {step.description}
+                              </div>
+                              <div className="text-xs text-slate-500 dark:text-slate-400">{step.timestamp}ms</div>
+                              {step.data && (
+                                <div className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+                                  {JSON.stringify(step.data, null, 2)}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))
