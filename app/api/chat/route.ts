@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 // Import scientific calculator (this one is safe, no fs dependencies)
 import { ScientificCalculator } from "@/src/ai/scientific-calculator"
-import { promptHandler } from "@/src/ai/orchestration/promptHandler"
 
 // Session storage
 const sessions = new Map<string, { history: Array<{ role: string; content: string }> }>()
@@ -20,6 +19,18 @@ interface AIResponse {
 
 const calculator = new ScientificCalculator()
 
+let promptHandlerInstance: any = null
+
+async function getPromptHandler() {
+  if (!promptHandlerInstance) {
+    console.log("[v0] Dynamically importing promptHandler...")
+    const module = await import("@/src/ai/orchestration/promptHandler")
+    promptHandlerInstance = module.promptHandler
+    console.log("[v0] promptHandler loaded successfully")
+  }
+  return promptHandlerInstance
+}
+
 export async function POST(request: Request) {
   try {
     console.log("[v0] API route called")
@@ -37,14 +48,17 @@ export async function POST(request: Request) {
       sessions.set(newSessionId, { history: [] })
 
       try {
+        const promptHandler = await getPromptHandler()
         await promptHandler.initialize()
         console.log("[v0] AI system initialized successfully")
       } catch (error) {
         console.error("[v0] Failed to initialize AI system:", error)
+        console.error("[v0] Error details:", error instanceof Error ? error.message : String(error))
+        console.error("[v0] Error stack:", error instanceof Error ? error.stack : "No stack trace")
         return NextResponse.json(
           {
             error: "Failed to initialize AI system",
-            details: String(error),
+            details: error instanceof Error ? error.message : String(error),
           },
           { status: 500 },
         )
@@ -80,6 +94,7 @@ export async function POST(request: Request) {
 
       try {
         console.log("[v0] Calling promptHandler.handlePrompt...")
+        const promptHandler = await getPromptHandler()
         const response = await promptHandler.handlePrompt(message, sessionId, {
           history: session.history,
         })
