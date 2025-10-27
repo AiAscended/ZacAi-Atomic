@@ -15,6 +15,14 @@
  * - src/input_processing/wordTokenizer.ts (word tokenization)
  * - src/input_processing/sentenceBoundaryDetector.ts (sentence boundary detection)
  * - src/output_generation/responsePostProcessor.ts (response post-processing)
+ * - src/ai/orchestration/inferenceEngine.ts (neural network inference)
+ * - src/inference/batchAssembler.ts (batch assembly)
+ * - src/inference/latencyOptimizer.ts (latency optimization)
+ * - src/inference/sequencePaddingManager.ts (sequence padding)
+ * - src/ai/context_management/sentimentEmotionDetector.ts (sentiment detection)
+ * - src/ai/context_management/slotFiller.ts (slot extraction)
+ * - src/ai/context_management/userProfileHandler.ts (user profile management)
+ * - src/ai/context_management/dialogueFlowController.ts (dialogue flow control)
  *
  * Depended on by:
  * - src/main.ts (application entry point)
@@ -32,6 +40,12 @@ import { textNormalizer } from "../input_processing/textNormalizer"
 import { wordTokenizer } from "../input_processing/wordTokenizer"
 import { detectSentences } from "../input_processing/sentenceBoundaryDetector"
 import { postProcess } from "../output_generation/responsePostProcessor"
+import { InferenceEngine, defaultInferenceConfig, type InferenceInput } from "./inferenceEngine"
+import { padOrTruncate } from "../inference/sequencePaddingManager"
+import { detectSentiment } from "../context_management/sentimentEmotionDetector"
+import { extractSlots } from "../context_management/slotFiller"
+import { getProfile, setProfile } from "../context_management/userProfileHandler"
+import { handleTurn } from "../context_management/dialogueFlowController"
 
 /**
  * Represents a user prompt with metadata
@@ -64,10 +78,12 @@ export class AIOrchestrator {
   private sessionManager: SessionManager
   private contextManagers: Map<string, ContextWindowManager>
   private initialized = false
+  private inferenceEngine: InferenceEngine
 
   private constructor() {
     this.sessionManager = new SessionManager()
     this.contextManagers = new Map()
+    this.inferenceEngine = new InferenceEngine(defaultInferenceConfig)
 
     // Subscribe to domain data changes for learning
     subscribe("data:changed", (payload) => this.handleDataChange(payload))
@@ -123,12 +139,34 @@ export class AIOrchestrator {
 
     console.log(`[AIOrchestrator] Processed input: ${tokens.length} tokens, ${sentences.length} sentences`)
 
+    const sentiment = detectSentiment(normalizedText)
+    console.log(`[AIOrchestrator] Sentiment: ${sentiment.sentiment} (score: ${sentiment.score.toFixed(2)})`)
+
+    const slots = extractSlots(normalizedText, ["name", "email", "date", "location", "task", "priority"])
+    const extractedSlots = Object.entries(slots).filter(([_, v]) => v !== null)
+    if (extractedSlots.length > 0) {
+      console.log(`[AIOrchestrator] Extracted slots:`, Object.fromEntries(extractedSlots))
+    }
+
+    const tokenIds = tokens.map((token, idx) => (token.charCodeAt(0) % 1000) + idx)
+    const paddedTokens = padOrTruncate(tokenIds, 512, 0)
+
     // Get or create session
     const sessionId = prompt.sessionId || this.createSession()
     const session = this.sessionManager.get(sessionId)
 
     if (!session) {
       throw new Error("Failed to create or retrieve session")
+    }
+
+    const userProfile = getProfile(sessionId)
+    if (extractedSlots.length > 0) {
+      setProfile(sessionId, {
+        ...userProfile,
+        ...Object.fromEntries(extractedSlots),
+        lastSentiment: sentiment.sentiment,
+      })
+      console.log(`[AIOrchestrator] Updated user profile for session ${sessionId}`)
     }
 
     // Get or create context window for this session
@@ -145,12 +183,46 @@ export class AIOrchestrator {
     const intent = classifyIntent(normalizedText)
     console.log(`[AIOrchestrator] Intent: ${intent.intent} (confidence: ${intent.confidence})`)
 
+    const dialogueResult = await handleTurn(normalizedText, {
+      sessionId,
+      userProfile,
+      sentiment,
+      slots,
+      contextWindow: contextWindow.getWindow(),
+    })
+    console.log(`[AIOrchestrator] Dialogue flow: ${dialogueResult.status}`)
+
     // Select relevant domains based on intent and prompt content
     const relevantDomains = this.selectDomains(normalizedText, intent.intent)
     console.log(
       `[AIOrchestrator] Selected domains:`,
       relevantDomains.map((d) => d.name),
     )
+
+    const inferenceResults: Array<{ domain: string; confidence: number; logits: number[][] }> = []
+
+    for (const domain of relevantDomains) {
+      try {
+        const inferenceInput: InferenceInput = {
+          tokens: paddedTokens,
+          domain: domain.name,
+          context: contextWindow.getWindow().map((text) => [text.length]),
+        }
+
+        const inferenceOutput = await this.inferenceEngine.infer(inferenceInput)
+        inferenceResults.push({
+          domain: domain.name,
+          confidence: inferenceOutput.confidence,
+          logits: inferenceOutput.logits,
+        })
+
+        console.log(
+          `[AIOrchestrator] Inference for ${domain.name}: confidence=${inferenceOutput.confidence.toFixed(3)}`,
+        )
+      } catch (error) {
+        console.error(`[AIOrchestrator] Inference failed for ${domain.name}:`, error)
+      }
+    }
 
     // Check if internet search is needed
     const needsSearch = this.needsInternetSearch(normalizedText)
@@ -179,6 +251,11 @@ export class AIOrchestrator {
             intent: intent.intent,
             tokens,
             sentences,
+            inferenceResults: inferenceResults.find((r) => r.domain === domain.name),
+            sentiment,
+            slots,
+            userProfile,
+            dialogueState: dialogueResult,
           })
           domainResponses.push({ domain: domain.name, result })
         } catch (error) {
@@ -193,12 +270,21 @@ export class AIOrchestrator {
       domainResponses,
       searchResults,
       relevantDomains.map((d) => d.name),
+      inferenceResults.reduce((sum, r) => sum + r.confidence, 0) / (inferenceResults.length || 1),
     )
 
     response.text = postProcess(response.text)
 
     // Add response to context
     contextWindow.add(response.text)
+
+    response.metadata = {
+      sentiment: sentiment.sentiment,
+      sentimentScore: sentiment.score,
+      extractedSlots: Object.fromEntries(extractedSlots),
+      userProfile: Object.keys(userProfile).length > 0 ? userProfile : undefined,
+      dialogueState: dialogueResult.status,
+    }
 
     // Save interaction for learning
     await this.saveInteraction(sessionId, prompt, response)
@@ -210,6 +296,10 @@ export class AIOrchestrator {
       response: response.text,
       domains: response.domains,
       duration: Date.now() - startTime,
+      inferenceMetrics: {
+        avgConfidence: inferenceResults.reduce((sum, r) => sum + r.confidence, 0) / (inferenceResults.length || 1),
+        domainsProcessed: inferenceResults.length,
+      },
     })
 
     return response
@@ -334,6 +424,7 @@ export class AIOrchestrator {
     domainResponses: Array<{ domain: string; result: unknown }>,
     searchResults: string[],
     domains: string[],
+    inferenceConfidence: number,
   ): Response {
     const responseParts: string[] = []
     const sources: string[] = []
@@ -366,7 +457,7 @@ export class AIOrchestrator {
     return {
       text: responseParts.join("\n\n"),
       sources,
-      confidence: domainResponses.length > 0 ? 0.8 : 0.5,
+      confidence: domainResponses.length > 0 ? (0.8 + inferenceConfidence) / 2 : 0.5,
       domains,
       timestamp: Date.now(),
     }

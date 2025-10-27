@@ -19,12 +19,12 @@
  * - src/ai/orchestration/aiOrchestrator.ts
  */
 
-import { TransformerAttentionHead } from "../core_reasoning/transformerAttentionHead"
-import { FeedforwardNetworkLayer } from "../core_reasoning/feedforwardNetworkLayer"
+import { scaledDotProductAttention } from "../core_reasoning/transformerAttentionHead"
+import { dense } from "../core_reasoning/feedforwardNetworkLayer"
 import { layerNorm } from "../core_reasoning/layerNormalization"
+import { relu } from "../core_reasoning/activationFunctions"
 import { generateContextualEmbeddings } from "../embedding/contextualEmbeddingsGenerator"
 import { addPositionalEncoding } from "../embedding/positionalEncoding"
-import { generateAttentionMask } from "../inference/attentionMaskGenerator"
 import { InferenceCache } from "../inference/cacheManager"
 
 /**
@@ -64,25 +64,38 @@ export interface InferenceOutput {
  */
 export class InferenceEngine {
   private config: InferenceConfig
-  private attentionHeads: TransformerAttentionHead[]
-  private ffnLayers: FeedforwardNetworkLayer[]
   private cache: InferenceCache
+  private ffnWeights: { weights: number[][][]; biases: number[][] }
 
   constructor(config: InferenceConfig) {
     this.config = config
     this.cache = new InferenceCache(1000)
 
-    // Initialize attention heads for each layer
-    this.attentionHeads = []
-    for (let i = 0; i < config.numLayers; i++) {
-      this.attentionHeads.push(new TransformerAttentionHead(config.modelDim, config.numHeads, config.dropoutRate))
+    this.ffnWeights = this.initializeWeights()
+  }
+
+  /**
+   * Initialize random weights for feedforward networks
+   */
+  private initializeWeights(): { weights: number[][][]; biases: number[][] } {
+    const weights: number[][][] = []
+    const biases: number[][] = []
+
+    for (let layer = 0; layer < this.config.numLayers; layer++) {
+      // First FFN layer: modelDim -> ffnDim
+      const w1: number[][] = []
+      for (let i = 0; i < this.config.ffnDim; i++) {
+        const row: number[] = []
+        for (let j = 0; j < this.config.modelDim; j++) {
+          row.push((Math.random() - 0.5) * 0.02)
+        }
+        w1.push(row)
+      }
+      weights.push(w1)
+      biases.push(new Array(this.config.ffnDim).fill(0))
     }
 
-    // Initialize feedforward layers
-    this.ffnLayers = []
-    for (let i = 0; i < config.numLayers; i++) {
-      this.ffnLayers.push(new FeedforwardNetworkLayer(config.modelDim, config.ffnDim, config.dropoutRate))
-    }
+    return { weights, biases }
   }
 
   /**
@@ -106,38 +119,31 @@ export class InferenceEngine {
     // Step 2: Add positional encoding
     const posEncoded = addPositionalEncoding(embeddings, this.config.maxSeqLength)
 
-    // Step 3: Generate attention mask
-    const attentionMask = generateAttentionMask(tokens.length, tokens.length)
-
-    // Step 4: Forward pass through transformer layers
+    // Step 3: Forward pass through transformer layers
     let hiddenStates = posEncoded
     const allAttentionWeights: number[][][] = []
 
     for (let layer = 0; layer < this.config.numLayers; layer++) {
-      // Multi-head attention
-      const attentionOutput = this.attentionHeads[layer].forward(
-        hiddenStates,
-        hiddenStates,
-        hiddenStates,
-        attentionMask,
+      const attentionOutput = scaledDotProductAttention(hiddenStates, hiddenStates, hiddenStates)
+
+      // Store attention weights (simplified - in production, extract from multi-head)
+      allAttentionWeights.push([attentionOutput])
+
+      // Add & Norm (residual connection)
+      const attended = this.addAndNorm(hiddenStates, attentionOutput)
+
+      const ffnOutput = attended.map((vec) =>
+        dense(vec, this.ffnWeights.weights[layer], this.ffnWeights.biases[layer], relu),
       )
-
-      allAttentionWeights.push(attentionOutput.weights)
-
-      // Add & Norm
-      const attended = this.addAndNorm(hiddenStates, attentionOutput.output)
-
-      // Feedforward network
-      const ffnOutput = this.ffnLayers[layer].forward(attended)
 
       // Add & Norm
       hiddenStates = this.addAndNorm(attended, ffnOutput)
     }
 
-    // Step 5: Generate logits (final linear projection)
+    // Step 4: Generate logits (final linear projection)
     const logits = this.projectToVocab(hiddenStates)
 
-    // Step 6: Calculate confidence
+    // Step 5: Calculate confidence
     const confidence = this.calculateConfidence(logits)
 
     const output: InferenceOutput = {
@@ -159,9 +165,9 @@ export class InferenceEngine {
    * Add and normalize (residual connection + layer norm)
    */
   private addAndNorm(input: number[][], residual: number[][]): number[][] {
-    const added = input.map((row, i) => row.map((val, j) => val + residual[i][j]))
+    const added = input.map((row, i) => row.map((val, j) => val + (residual[i]?.[j] || 0)))
 
-    return layerNorm(added, this.config.modelDim)
+    return added.map((vec) => layerNorm(vec))
   }
 
   /**
