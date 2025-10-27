@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import "@/src/ai/data/registerAllDomains"
 import { promptHandler } from "@/src/ai/orchestration/promptHandler"
 
 // Session storage
