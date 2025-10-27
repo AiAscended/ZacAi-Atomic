@@ -4,7 +4,7 @@
  * This file must be imported before using the AI orchestrator
  */
 
-import "./registerAllUrlLookups"
+// import "./registerAllUrlLookups"
 
 // Import all domain integration APIs to trigger registration
 import "./english/english_integrationAPI"
