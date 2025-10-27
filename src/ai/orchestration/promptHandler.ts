@@ -47,6 +47,13 @@ export class PromptHandler {
   }
 
   /**
+   * Initialize the prompt handler and AI orchestrator
+   */
+  public async initialize(): Promise<void> {
+    await this.orchestrator.initialize()
+  }
+
+  /**
    * Process a raw user prompt through the complete AI pipeline
    */
   public async handlePrompt(
