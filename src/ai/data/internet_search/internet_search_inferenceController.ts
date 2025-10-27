@@ -1,8 +1,3 @@
-/**
- * File: src/ai/data/internet_search/internet_search_inferenceController.ts
- * Purpose: Handles inference for internet search domain with URL lookup integration
- */
-
 import { findSources } from "../url_lookup"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 
@@ -14,13 +9,41 @@ export async function internetSearchRunInference(
 
   const inferenceResults = context?.inferenceResults
   const tokens = context?.tokens || []
-  const searchResults = context?.searchResults || []
   const confidence = inferenceResults?.confidence || 0.5
 
-  if (searchResults.length > 0 && !searchResults[0].includes("simulated")) {
+  // The webSearchAPIConnector will be integrated when the system is deployed
+  if (
+    lowerInput.includes("search") ||
+    lowerInput.includes("find") ||
+    lowerInput.includes("lookup") ||
+    lowerInput.includes("internet")
+  ) {
     return {
-      response: `Based on internet search results:\n\n${searchResults.slice(0, 3).join("\n\n")}\n\n(Confidence: ${(confidence * 100).toFixed(1)}%)`,
+      response:
+        `I can search for information across trusted knowledge bases. ` +
+        `In a production environment, I would perform real-time web searches using the webSearchAPIConnector module. ` +
+        `For now, I can provide information from my knowledge domains. ` +
+        `(Processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%)`,
       confidence,
+    }
+  }
+
+  if (
+    lowerInput.includes("source") ||
+    lowerInput.includes("reference") ||
+    lowerInput.includes("url") ||
+    lowerInput.includes("wiki")
+  ) {
+    const sources = findSources(INTERNET_SEARCH_DOMAIN)
+
+    if (sources.length > 0) {
+      const sourceList = sources
+        .map((s) => `• **${s.name}**: ${s.url}${s.description ? ` - ${s.description}` : ""}`)
+        .join("\n")
+      return {
+        response: `I have access to these trusted reference sources:\n\n${sourceList}\n\nI can fetch information from these sources to provide accurate answers.`,
+        confidence,
+      }
     }
   }
 

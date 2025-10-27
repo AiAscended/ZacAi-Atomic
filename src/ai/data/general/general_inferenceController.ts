@@ -1,5 +1,7 @@
 import { generalTokenizer } from "./general_tokenizer"
 import { generalSemanticAnalyzer } from "./general_semanticAnalyzer"
+import { findSources } from "../url_lookup"
+import { GENERAL_DOMAIN } from "./general_constants"
 
 export const generalRunInference = async (input: string, context?: any) => {
   const t = generalTokenizer(input)
@@ -56,6 +58,14 @@ export const generalRunInference = async (input: string, context?: any) => {
     responseText +=
       `Here's a top fact: Water covers about 71% of Earth's surface, and approximately 96.5% of all Earth's water is contained in the oceans. ` +
       `Only 2.5% is freshwater, and most of that is frozen in glaciers and ice caps! `
+  }
+
+  if (input.match(/\b(wikipedia|reference|source|lookup)\b/i)) {
+    const sources = findSources(GENERAL_DOMAIN)
+    if (sources.length > 0) {
+      const sourceList = sources.map((s) => `• **${s.name}**: ${s.url}`).join("\n")
+      responseText += `I can access these knowledge sources:\n\n${sourceList}\n\n`
+    }
   }
 
   if (sentiment?.sentiment === "negative" && sentiment.score < 0.3) {
