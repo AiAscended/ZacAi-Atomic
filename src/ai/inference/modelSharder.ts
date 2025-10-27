@@ -41,11 +41,11 @@ export interface ShardedModel<T> {
  * @param parts - Number of parts to split into
  * @returns Array of sharded arrays
  */
-export const shardArray = <T>(arr: T[], parts = 2): T[][] => {\
-  const out: T[][] = Array.from({ length: parts }, () => []);\
-  for (let i = 0; i < arr.length; i++) out[i % parts].push(arr[i]);
-  return out;
-};
+export function shardArray<T>(arr: T[], parts = 2): T[][] {
+  const out: T[][] = Array.from({ length: parts }, () => [])
+  for (let i = 0; i < arr.length; i++) out[i % parts].push(arr[i])
+  return out
+}
 
 /**
  * Shard model layers for pipeline parallelism
@@ -53,31 +53,28 @@ export const shardArray = <T>(arr: T[], parts = 2): T[][] => {\
  * @param config - Sharding configuration
  * @returns Sharded model with metadata
  */
-export function shardModelLayers<T>(
-  layers: T[],
-  config: ShardConfig
-): ShardedModel<T> {\
-  const { numShards, balanceLoad } = config;
-  const layersPerShard = Math.ceil(layers.length / numShards);
-  
-  const shards: T[][] = [];
-  const metadata: ShardMetadata[] = [];
-  \
-  for (let i = 0; i < numShards; i++) {\
-    const start = i * layersPerShard;\
-    const end = Math.min(start + layersPerShard, layers.length);
-    \
-    if (start < layers.length) {\
-      shards.push(layers.slice(start, end));\
-      metadata.push({\
-        shardId: i,\
-        totalShards: numShards,\
+export function shardModelLayers<T>(layers: T[], config: ShardConfig): ShardedModel<T> {
+  const { numShards, balanceLoad } = config
+  const layersPerShard = Math.ceil(layers.length / numShards)
+
+  const shards: T[][] = []
+  const metadata: ShardMetadata[] = []
+
+  for (let i = 0; i < numShards; i++) {
+    const start = i * layersPerShard
+    const end = Math.min(start + layersPerShard, layers.length)
+
+    if (start < layers.length) {
+      shards.push(layers.slice(start, end))
+      metadata.push({
+        shardId: i,
+        totalShards: numShards,
         layerRange: [start, end - 1],
-      });
+      })
     }
   }
-  
-  return { shards, metadata, config };
+
+  return { shards, metadata, config }
 }
 
 /**
@@ -86,34 +83,29 @@ export function shardModelLayers<T>(
  * @param config - Sharding configuration
  * @returns Sharded model with metadata
  */
-export function shardModelTensors(
-  tensors: number[][],
-  config: ShardConfig\
-): ShardedModel<number[]> {\
-  const { numShards } = config;\
-  const shards: number[][][] = Array.from({ length: numShards }, () => []);
-  const metadata: ShardMetadata[] = [];
-  
+export function shardModelTensors(tensors: number[][], config: ShardConfig): ShardedModel<number[]> {
+  const { numShards } = config
+  const shards: number[][][] = Array.from({ length: numShards }, () => [])
+  const metadata: ShardMetadata[] = []
+
   // Distribute tensors across shards
-  tensors.forEach((tensor, idx) => {\
-    const shardId = idx % numShards;
-    shards[shardId].push(tensor);
-  });
-  
-  // Create metadata for each shard\
-  for (let i = 0; i < numShards; i++) {\
-    const tensorIndices = tensors\
-      .map((_, idx) => idx)\
-      .filter((idx) => idx % numShards === i);
-    \
-    metadata.push({\
-      shardId: i,\
-      totalShards: numShards,\
+  tensors.forEach((tensor, idx) => {
+    const shardId = idx % numShards
+    shards[shardId].push(tensor)
+  })
+
+  // Create metadata for each shard
+  for (let i = 0; i < numShards; i++) {
+    const tensorIndices = tensors.map((_, idx) => idx).filter((idx) => idx % numShards === i)
+
+    metadata.push({
+      shardId: i,
+      totalShards: numShards,
       tensorIndices,
-    });
+    })
   }
-  
-  return { shards, metadata, config };
+
+  return { shards, metadata, config }
 }
 
 /**
@@ -122,43 +114,40 @@ export function shardModelTensors(
  * @param config - Sharding configuration
  * @returns Sharded data with metadata
  */
-export function shardDataBatch<T>(
-  data: T[],
-  config: ShardConfig
-): ShardedModel<T> {\
-  const { numShards, balanceLoad } = config;
-  
+export function shardDataBatch<T>(data: T[], config: ShardConfig): ShardedModel<T> {
+  const { numShards, balanceLoad } = config
+
   if (balanceLoad) {
-    // Round-robin distribution for balanced load\
-    return {\
-      shards: shardArray(data, numShards),\
-      metadata: Array.from({ length: numShards }, (_, i) => ({\
+    // Round-robin distribution for balanced load
+    return {
+      shards: shardArray(data, numShards),
+      metadata: Array.from({ length: numShards }, (_, i) => ({
         shardId: i,
         totalShards: numShards,
       })),
       config,
-    };
+    }
   } else {
-    // Contiguous chunks\
-    const chunkSize = Math.ceil(data.length / numShards);
-    const shards: T[][] = [];
-    const metadata: ShardMetadata[] = [];
-    
+    // Contiguous chunks
+    const chunkSize = Math.ceil(data.length / numShards)
+    const shards: T[][] = []
+    const metadata: ShardMetadata[] = []
+
     for (let i = 0; i < numShards; i++) {
-      const start = i * chunkSize;
-      const end = Math.min(start + chunkSize, data.length);
-      
+      const start = i * chunkSize
+      const end = Math.min(start + chunkSize, data.length)
+
       if (start < data.length) {
-        shards.push(data.slice(start, end));
+        shards.push(data.slice(start, end))
         metadata.push({
           shardId: i,
           totalShards: numShards,
           dataRange: [start, end - 1],
-        });
+        })
       }
     }
-    
-    return { shards, metadata, config };
+
+    return { shards, metadata, config }
   }
 }
 
@@ -168,23 +157,20 @@ export function shardDataBatch<T>(
  * @param metadata - Shard metadata for proper ordering
  * @returns Merged result array
  */
-export function mergeShardedResults<T>(
-  shardedResults: T[][],
-  metadata: ShardMetadata[]
-): T[] {
-  const merged: T[] = [];
-  
+export function mergeShardedResults<T>(shardedResults: T[][], metadata: ShardMetadata[]): T[] {
+  const merged: T[] = []
+
   // Sort by shard ID to maintain order
   const sortedResults = shardedResults
     .map((result, idx) => ({ result, metadata: metadata[idx] }))
-    .sort((a, b) => a.metadata.shardId - b.metadata.shardId);
-  
+    .sort((a, b) => a.metadata.shardId - b.metadata.shardId)
+
   // Flatten results
   sortedResults.forEach(({ result }) => {
-    merged.push(...result);
-  });
-  
-  return merged;
+    merged.push(...result)
+  })
+
+  return merged
 }
 
 /**
@@ -197,16 +183,16 @@ export function mergeShardedResults<T>(
 export function calculateOptimalShards(
   modelSize: number,
   availableMemory: number,
-  targetMemoryPerShard: number = 1024 * 1024 * 1024 // 1GB default
+  targetMemoryPerShard: number = 1024 * 1024 * 1024, // 1GB default
 ): number {
-  const bytesPerParam = 4; // Float32
-  const modelMemory = modelSize * bytesPerParam;
-  
+  const bytesPerParam = 4 // Float32
+  const modelMemory = modelSize * bytesPerParam
+
   // Calculate minimum shards needed
-  const minShards = Math.ceil(modelMemory / availableMemory);
-  
+  const minShards = Math.ceil(modelMemory / availableMemory)
+
   // Calculate optimal shards for target memory
-  const optimalShards = Math.ceil(modelMemory / targetMemoryPerShard);
-  
-  return Math.max(minShards, optimalShards);
+  const optimalShards = Math.ceil(modelMemory / targetMemoryPerShard)
+
+  return Math.max(minShards, optimalShards)
 }
