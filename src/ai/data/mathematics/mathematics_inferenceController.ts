@@ -11,6 +11,43 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
 
   const lowerInput = input.toLowerCase()
 
+  // Handle expressions like "3+3×3" or "5+6×5" (addition + multiplication)
+  const addMultMatch = input.match(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)/i)
+  if (addMultMatch) {
+    const [, num1, num2, num3] = addMultMatch
+    // Order of operations: multiply first, then add
+    const multiplyResult = Number.parseInt(num2) * Number.parseInt(num3)
+    const finalResult = Number.parseInt(num1) + multiplyResult
+    return {
+      tokens: tk.tokens,
+      tokenCount: tk.length,
+      semantics: sem,
+      response:
+        `${num1} + ${num2} × ${num3} = ${finalResult}. ` +
+        `Following order of operations (PEMDAS), we first multiply ${num2} × ${num3} = ${multiplyResult}, then add ${num1} + ${multiplyResult} = ${finalResult}. ` +
+        `(Processed ${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
+      confidence,
+    }
+  }
+
+  // Handle expressions like "3×3+3" (multiplication + addition)
+  const multAddMatch = input.match(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/i)
+  if (multAddMatch) {
+    const [, num1, num2, num3] = multAddMatch
+    const multiplyResult = Number.parseInt(num1) * Number.parseInt(num2)
+    const finalResult = multiplyResult + Number.parseInt(num3)
+    return {
+      tokens: tk.tokens,
+      tokenCount: tk.length,
+      semantics: sem,
+      response:
+        `${num1} × ${num2} + ${num3} = ${finalResult}. ` +
+        `First we multiply ${num1} × ${num2} = ${multiplyResult}, then add ${num3} to get ${finalResult}. ` +
+        `(Processed ${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
+      confidence,
+    }
+  }
+
   const mathExpressionMatch = input.match(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/i)
   if (mathExpressionMatch) {
     const [, num1, num2, num3] = mathExpressionMatch
