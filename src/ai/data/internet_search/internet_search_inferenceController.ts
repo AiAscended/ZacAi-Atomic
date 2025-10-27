@@ -1,3 +1,5 @@
+import { parseQuery, expandQuery, rankResults } from "../../search-queries"
+import { summarizeResults } from "../../search-engine"
 import { findSources } from "../url_lookup"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 import { searchWeb } from "../../knowledge_retrieval/webSearchAPIConnector"
@@ -12,27 +14,48 @@ export async function internetSearchRunInference(
   const tokens = context?.tokens || []
   const confidence = inferenceResults?.confidence || 0.5
 
+  const parsedQuery = parseQuery(input)
+  console.log("[v0] Parsed query:", parsedQuery)
+
   if (
     lowerInput.includes("search") ||
     lowerInput.includes("find") ||
     lowerInput.includes("lookup") ||
     lowerInput.includes("flight") ||
-    lowerInput.includes("latest")
+    lowerInput.includes("latest") ||
+    parsedQuery.intent === "informational"
   ) {
-    // Try to perform actual web search
     try {
-      const results = await searchWeb(input, 3)
+      const expandedQueries = expandQuery(input)
+      console.log("[v0] Expanded queries:", expandedQueries)
+
+      const results = await searchWeb(expandedQueries[0], 5)
 
       if (results && results.length > 0) {
-        const resultText = results
-          .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}${r.url ? `\n   Source: ${r.url}` : ""}`)
+        const rankedResults = rankResults(results, parsedQuery)
+        console.log(
+          "[v0] Ranked results:",
+          rankedResults.map((r) => ({ title: r.title, score: r.score })),
+        )
+
+        const snippets = rankedResults.slice(0, 3).map((r) => r.snippet)
+        const summary = summarizeResults(snippets, input)
+
+        const resultText = rankedResults
+          .slice(0, 3)
+          .map(
+            (r, i) =>
+              `${i + 1}. **${r.title}** (relevance: ${r.score?.toFixed(1)})\n   ${r.snippet}${r.url ? `\n   Source: ${r.url}` : ""}`,
+          )
           .join("\n\n")
 
         return {
           response:
-            `I searched the internet for "${input}" and found:\n\n${resultText}\n\n` +
-            `(Processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%)`,
-          confidence,
+            `**Summary**: ${summary.summary}\n\n` +
+            `**Detailed Results**:\n${resultText}\n\n` +
+            `(Processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%, ` +
+            `query intent: ${parsedQuery.intent})`,
+          confidence: Math.max(confidence, summary.confidence),
         }
       }
     } catch (error) {
@@ -49,7 +72,8 @@ export async function internetSearchRunInference(
           `4. **Frequency**: Multiple daily flights are usually available\n\n` +
           `For real-time availability and pricing, I'd need to connect to a live flight API. ` +
           `In a production environment with API access, I could fetch current flight schedules, prices, and availability.\n\n` +
-          `(Processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%)`,
+          `(Query type: ${parsedQuery.intent}, keywords: ${parsedQuery.keywords.join(", ")}, ` +
+          `processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%)`,
         confidence,
       }
     }
@@ -60,7 +84,8 @@ export async function internetSearchRunInference(
         `To enable real-time web searches, this system needs to be connected to a search API (Google Custom Search, Bing API, or similar). ` +
         `For now, I can provide information from my knowledge domains and URL lookup sources. ` +
         `What specific information are you looking for?\n\n` +
-        `(Processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%)`,
+        `(Query analysis: ${parsedQuery.keywords.length} keywords detected, intent: ${parsedQuery.intent}, ` +
+        `processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%)`,
       confidence,
     }
   }
