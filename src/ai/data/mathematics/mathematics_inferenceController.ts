@@ -75,7 +75,6 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
   console.log("[v0] Mathematics inference - Original:", input)
   console.log("[v0] Mathematics inference - Converted:", numericInput)
 
-  // Handle expressions like "3+3×3" or "5+6×5" (addition + multiplication)
   const addMultMatch = numericInput.match(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)/i)
   if (addMultMatch) {
     const [, num1, num2, num3] = addMultMatch
@@ -87,7 +86,7 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
       tokenCount: tk.length,
       semantics: sem,
       response:
-        `${num1} + ${num2} × ${num3} = ${finalResult}. ` +
+        `**${num1} + ${num2} × ${num3} = ${finalResult}**\n\n` +
         `Following order of operations (PEMDAS), we first multiply ${num2} × ${num3} = ${multiplyResult}, then add ${num1} + ${multiplyResult} = ${finalResult}. ` +
         `(Processed ${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
       confidence,
@@ -106,24 +105,7 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
       semantics: sem,
       response:
         `${num1} × ${num2} + ${num3} = ${finalResult}. ` +
-        `First we multiply ${num1} × ${num2} = ${multiplyResult}, then add ${num3} to get ${finalResult}. ` +
-        `(Processed ${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
-      confidence,
-    }
-  }
-
-  // Handle expressions like "3×3+3" (multiplication + addition)
-  const mathExpressionMatch = numericInput.match(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/i)
-  if (mathExpressionMatch) {
-    const [, num1, num2, num3] = mathExpressionMatch
-    const result = multiply(Number.parseInt(num1), Number.parseInt(num2)) + Number.parseInt(num3)
-    return {
-      tokens: tk.tokens,
-      tokenCount: tk.length,
-      semantics: sem,
-      response:
-        `Yes! ${num1} × ${num2} + ${num3} = ${result}. ` +
-        `First we multiply ${num1} × ${num2} = ${multiply(Number.parseInt(num1), Number.parseInt(num2))}, then add ${num3} to get ${result}. ` +
+        `First we multiply ${num1} × ${num2} = ${multiply(Number.parseInt(num1), Number.parseInt(num2))}, then add ${num3} to get ${finalResult}. ` +
         `(Processed with ${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
       confidence,
     }

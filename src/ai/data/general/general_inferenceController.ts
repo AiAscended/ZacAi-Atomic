@@ -17,16 +17,39 @@ export const generalRunInference = async (input: string, context?: any) => {
 
   const confidenceLevel = confidence > 0.7 ? "high" : confidence > 0.5 ? "moderate" : "low"
 
+  const nameMatch = input.match(/\b(?:i'm|i am|my name is|call me|this is)\s+([a-z]+)\b/i)
+  if (nameMatch && nameMatch[1]) {
+    const userName = nameMatch[1].charAt(0).toUpperCase() + nameMatch[1].slice(1)
+    responseText = `Nice to meet you, ${userName}! `
+  }
+
   // Check for greetings
   if (input.match(/\b(hi|hello|hey|greetings)\b/i)) {
-    responseText = `Hello${userProfile.name ? ` ${userProfile.name}` : ""}! I'm an AI assistant powered by a hybrid modular system. `
+    if (!responseText) {
+      responseText = `Hello${userProfile.name ? ` ${userProfile.name}` : ""}! `
+    }
+    responseText += `I'm ZacAi Atomic, a hybrid modular AI assistant. `
     if (sentiment?.sentiment === "positive") {
       responseText += "I'm glad to chat with you! "
     }
   }
 
+  if (input.match(/\b(your name|what.*name|who are you|tell me about.*name|meaning.*name|where.*name.*from)\b/i)) {
+    if (input.match(/\b(zac|meaning|where.*from)\b/i)) {
+      responseText +=
+        `My name is **ZacAi Atomic**. The name "Zac" is derived from Zachary, which comes from the Hebrew name Zechariah meaning "God has remembered" or "the Lord recalled". ` +
+        `It's a name with ancient origins, popular in English-speaking countries. The "Ai" represents Artificial Intelligence, and "Atomic" reflects my modular architecture where each component is an independent atomic unit. ` +
+        `I'm a comprehensive hybrid modular AI system with specialized knowledge across 16 different domains. `
+    } else {
+      responseText +=
+        `I'm **ZacAi Atomic** - a comprehensive hybrid modular AI system with specialized knowledge across 16 different domains. ` +
+        `Each domain operates as an independent atomic module that collaborates through a central orchestrator using neural inference. `
+    }
+    responseText += `I'm currently processing your input with ${tokens.length} tokens and ${confidenceLevel} confidence (${(confidence * 100).toFixed(1)}%). `
+  }
+
   // Check for identity questions
-  if (input.match(/\b(who are you|what are you|your name|tell me about you)\b/i)) {
+  if (!responseText && input.match(/\b(who are you|what are you|tell me about you|introduce yourself)\b/i)) {
     responseText +=
       `I'm ZacAi Atomic - a comprehensive hybrid modular AI system with specialized knowledge across 16 different domains. ` +
       `I'm currently processing your input with ${tokens.length} tokens and ${confidenceLevel} confidence (${(confidence * 100).toFixed(1)}%). ` +
