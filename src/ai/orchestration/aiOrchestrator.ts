@@ -50,6 +50,7 @@ import { getProfile, setProfile } from "../context_management/userProfileHandler
 import { handleTurn } from "../context_management/dialogueFlowController"
 import { logger } from "../monitoring/logger"
 import { metricsCollector } from "../monitoring/metricsCollector"
+import { ThinkingTracker } from "./thinkingTracker"
 
 /**
  * Represents a user prompt with metadata
@@ -83,11 +84,13 @@ export class AIOrchestrator {
   private contextManagers: Map<string, ContextWindowManager>
   private initialized = false
   private inferenceEngine: InferenceEngine
+  private thinkingTracker: ThinkingTracker
 
   private constructor() {
     this.sessionManager = new SessionManager()
     this.contextManagers = new Map()
     this.inferenceEngine = new InferenceEngine(defaultInferenceConfig)
+    this.thinkingTracker = new ThinkingTracker()
 
     // Subscribe to domain data changes for learning
     subscribe("data:changed", (payload) => this.handleDataChange(payload))
@@ -137,23 +140,45 @@ export class AIOrchestrator {
    */
   public async processPrompt(prompt: Prompt): Promise<Response> {
     const startTime = Date.now()
+    this.thinkingTracker.start()
+    this.thinkingTracker.addStep("initialization", "Starting prompt processing")
 
     metricsCollector.record("request_total", 1)
     logger.info("AIOrchestrator", "Processing prompt", { sessionId: prompt.sessionId })
 
     try {
+      this.thinkingTracker.addStep("normalization", "Normalizing input text")
       const normalizedText = textNormalizer(prompt.text)
+
+      this.thinkingTracker.addStep("tokenization", "Tokenizing input")
       const tokens = wordTokenizer(normalizedText)
       const sentences = detectSentences(normalizedText)
+      this.thinkingTracker.addStep(
+        "tokenization_complete",
+        `Processed ${tokens.length} tokens, ${sentences.length} sentences`,
+        {
+          tokenCount: tokens.length,
+          sentenceCount: sentences.length,
+        },
+      )
 
       logger.debug("AIOrchestrator", `Processed input: ${tokens.length} tokens, ${sentences.length} sentences`)
 
+      this.thinkingTracker.addStep("sentiment", "Analyzing sentiment")
       const sentiment = detectSentiment(normalizedText)
+      this.thinkingTracker.addStep("sentiment_complete", `Detected ${sentiment.sentiment} sentiment`, {
+        sentiment: sentiment.sentiment,
+        score: sentiment.score,
+      })
       logger.debug("AIOrchestrator", `Sentiment: ${sentiment.sentiment} (score: ${sentiment.score.toFixed(2)})`)
 
+      this.thinkingTracker.addStep("slot_extraction", "Extracting entities and slots")
       const slots = extractSlots(normalizedText, ["name", "email", "date", "location", "task", "priority"])
       const extractedSlots = Object.entries(slots).filter(([_, v]) => v !== null)
       if (extractedSlots.length > 0) {
+        this.thinkingTracker.addStep("slots_found", `Found ${extractedSlots.length} entities`, {
+          slots: Object.fromEntries(extractedSlots),
+        })
         logger.debug("AIOrchestrator", "Extracted slots", Object.fromEntries(extractedSlots))
       }
 
@@ -164,10 +189,8 @@ export class AIOrchestrator {
       if (!sessionId) {
         sessionId = this.createSession()
       } else {
-        // Check if session exists, if not create it with the provided ID
         const existingSession = this.sessionManager.get(sessionId)
         if (!existingSession) {
-          // Create session with the provided ID
           this.sessionManager.create(sessionId)
           logger.debug("AIOrchestrator", `Created new session with provided ID: ${sessionId}`)
         }
@@ -188,18 +211,20 @@ export class AIOrchestrator {
         logger.debug("AIOrchestrator", `Updated user profile for session ${sessionId}`)
       }
 
-      // Get or create context window for this session
       let contextWindow = this.contextManagers.get(sessionId)
       if (!contextWindow) {
         contextWindow = new ContextWindowManager(2048)
         this.contextManagers.set(sessionId, contextWindow)
       }
 
-      // Add prompt to context
       contextWindow.add(prompt.text)
 
-      // Classify intent
+      this.thinkingTracker.addStep("intent", "Classifying user intent")
       const intent = classifyIntent(normalizedText)
+      this.thinkingTracker.addStep("intent_complete", `Classified as ${intent.intent}`, {
+        intent: intent.intent,
+        confidence: intent.confidence,
+      })
       logger.debug("AIOrchestrator", `Intent: ${intent.intent} (confidence: ${intent.confidence})`)
 
       const dialogueResult = await handleTurn(normalizedText, {
@@ -211,12 +236,16 @@ export class AIOrchestrator {
       })
       logger.debug("AIOrchestrator", `Dialogue flow: ${dialogueResult.status}`)
 
-      // Select relevant domains based on intent and prompt content
+      this.thinkingTracker.addStep("domain_selection", "Selecting relevant knowledge domains")
       const relevantDomains = this.selectDomains(normalizedText, intent.intent)
+      this.thinkingTracker.addStep("domains_selected", `Selected ${relevantDomains.length} domains`, {
+        domains: relevantDomains.map((d) => d.name),
+      })
       logger.info("AIOrchestrator", `Selected ${relevantDomains.length} domains`, {
         domains: relevantDomains.map((d) => d.name),
       })
 
+      this.thinkingTracker.addStep("inference", "Running neural network inference")
       const inferenceResults: Array<{ domain: string; confidence: number; logits: number[][] }> = []
 
       for (const domain of relevantDomains) {
@@ -234,6 +263,10 @@ export class AIOrchestrator {
             logits: inferenceOutput.logits,
           })
 
+          this.thinkingTracker.addStep(`inference_${domain.name}`, `Inference for ${domain.name}`, {
+            confidence: inferenceOutput.confidence,
+          })
+
           logger.debug(
             "AIOrchestrator",
             `Inference for ${domain.name}: confidence=${inferenceOutput.confidence.toFixed(3)}`,
@@ -243,22 +276,23 @@ export class AIOrchestrator {
         }
       }
 
-      // Check if internet search is needed
       const needsSearch = this.needsInternetSearch(normalizedText)
       let searchResults: string[] = []
 
       if (needsSearch) {
+        this.thinkingTracker.addStep("search", "Performing internet search")
         logger.info("AIOrchestrator", "Performing internet search...")
         try {
           const results = await searchWeb(normalizedText)
           searchResults = results.map((r) => r.snippet || r.title)
+          this.thinkingTracker.addStep("search_complete", `Found ${searchResults.length} search results`)
           logger.info("AIOrchestrator", `Found ${searchResults.length} search results`)
         } catch (error) {
           logger.error("AIOrchestrator", "Search failed", error)
         }
       }
 
-      // Query each relevant domain
+      this.thinkingTracker.addStep("domain_queries", "Querying knowledge domains")
       const domainResponses: Array<{ domain: string; result: unknown }> = []
 
       for (const domain of relevantDomains) {
@@ -276,14 +310,20 @@ export class AIOrchestrator {
               userProfile,
               dialogueState: dialogueResult,
             })
-            domainResponses.push({ domain: domain.name, result })
+            if (result !== null && result !== undefined) {
+              domainResponses.push({ domain: domain.name, result })
+              this.thinkingTracker.addStep(`query_${domain.name}`, `${domain.name} provided response`)
+            } else {
+              this.thinkingTracker.addStep(`query_${domain.name}`, `${domain.name} returned no response`)
+            }
           } catch (error) {
             logger.error("AIOrchestrator", `Domain ${domain.name} query failed`, error)
+            this.thinkingTracker.addStep(`query_${domain.name}_error`, `${domain.name} query failed`)
           }
         }
       }
 
-      // Synthesize response from domain outputs
+      this.thinkingTracker.addStep("synthesis", "Synthesizing final response")
       const response = this.synthesizeResponse(
         normalizedText,
         domainResponses,
@@ -294,7 +334,6 @@ export class AIOrchestrator {
 
       response.text = postProcess(response.text)
 
-      // Add response to context
       contextWindow.add(response.text)
 
       response.metadata = {
@@ -303,12 +342,14 @@ export class AIOrchestrator {
         extractedSlots: Object.fromEntries(extractedSlots),
         userProfile: Object.keys(userProfile).length > 0 ? userProfile : undefined,
         dialogueState: dialogueResult.status,
+        thinkingSteps: this.thinkingTracker.getSteps(),
       }
 
-      // Save interaction for learning
       await this.saveInteraction(sessionId, prompt, response)
 
       const latency = Date.now() - startTime
+      this.thinkingTracker.addStep("complete", `Request completed in ${latency}ms`, { latency })
+
       metricsCollector.record("request_success", 1)
       metricsCollector.record("request_latency", latency)
       logger.info("AIOrchestrator", `Request completed in ${latency}ms`, {
@@ -317,7 +358,6 @@ export class AIOrchestrator {
         confidence: response.confidence.toFixed(3),
       })
 
-      // Publish event for monitoring
       publish("orchestrator:response", {
         sessionId,
         prompt: prompt.text,
