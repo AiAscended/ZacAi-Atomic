@@ -21,7 +21,7 @@ import { AIOrchestrator, type Prompt, type Response } from "./aiOrchestrator"
 import { textNormalizer } from "../input_processing/textNormalizer"
 import { detectLanguage } from "../input_processing/languageDetector"
 import { noiseFilter } from "../input_processing/noiseFilter"
-import { sentenceBoundaryDetector } from "../input_processing/sentenceBoundaryDetector"
+import { detectSentences } from "../input_processing/sentenceBoundaryDetector"
 import { wordTokenizer } from "../input_processing/wordTokenizer"
 import { publish } from "./eventBus"
 
@@ -103,7 +103,7 @@ export class PromptHandler {
     const tokens = wordTokenizer(normalized)
 
     // Detect sentence boundaries
-    const sentences = sentenceBoundaryDetector(normalized)
+    const sentences = detectSentences(normalized)
 
     // Check if input is clean
     const isClean = tokens.length > 0 && normalized.length > 0
