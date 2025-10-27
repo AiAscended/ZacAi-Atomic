@@ -7,11 +7,11 @@
  */
 
 import { safeParseJSON } from "./code_review_utils"
+import { storageAdapter } from "../storageAdapter"
 
 export const loadCodeReviewLearnedData = async (path = "/src/ai/data/code_review/code_review_learnedData.json") => {
   try {
-    const fs = require("fs")
-    const raw = fs.readFileSync(path, "utf-8")
+    const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { notes: [], concepts: {} })
   } catch (e) {
     return { notes: [], concepts: {} }
@@ -23,8 +23,7 @@ export const saveCodeReviewLearnedData = async (
   path = "/src/ai/data/code_review/code_review_learnedData.json",
 ) => {
   try {
-    const fs = require("fs")
-    fs.writeFileSync(path, JSON.stringify(data, null, 2), "utf-8")
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2), "utf-8")
     return true
   } catch (e) {
     return false

@@ -7,11 +7,11 @@
  */
 
 import { safeParseJSON } from "./science_utils"
+import { storageAdapter } from "../storageAdapter"
 
 export const loadScienceSeedVocabulary = async (path = "/src/ai/data/science/science_seedVocabulary.json") => {
   try {
-    const fs = require("fs")
-    const raw = fs.readFileSync(path, "utf-8")
+    const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { concepts: [] }) as { concepts: string[] }
   } catch (e) {
     return { concepts: [] }

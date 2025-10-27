@@ -6,10 +6,11 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
+import { storageAdapter } from "../storageAdapter"
+
 export const grammarLoadWeights = async (path = "/src/ai/data/grammar/grammar_trainingWeights.bin") => {
   try {
-    const fs = require("fs")
-    const raw = fs.readFileSync(path)
+    const raw = await storageAdapter.readFile(path)
     return raw
   } catch (e) {
     return null

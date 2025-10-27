@@ -7,13 +7,13 @@
  */
 
 import { safeParseJSON } from "./code_review_utils"
+import { storageAdapter } from "../storageAdapter"
 
 export const loadCodeReviewSeedVocabulary = async (
   path = "/src/ai/data/code_review/code_review_seedVocabulary.json",
 ) => {
   try {
-    const fs = require("fs")
-    const raw = fs.readFileSync(path, "utf-8")
+    const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { patterns: [] }) as { patterns: string[] }
   } catch (e) {
     return { patterns: [] }
