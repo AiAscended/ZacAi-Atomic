@@ -26,6 +26,9 @@ import "@ai/data/environment/environment_integrationAPI"
 
 import { registerModule } from "@ai/orchestration/moduleRegistry"
 import DocumentCache from "@ai/knowledge_retrieval/documentCache"
+import { loadAllDomains } from "@ai/data/domainLoader"
+import { logger } from "@ai/monitoring/logger"
+import { metricsCollector } from "@ai/monitoring/metricsCollector"
 
 import { AIOrchestrator } from "@ai/orchestration/aiOrchestrator"
 import { promptHandler } from "@ai/orchestration/promptHandler"
@@ -69,7 +72,15 @@ class App {
     this.setupNavigation()
     this.setupRoutes()
 
+    logger.info("App", "Loading knowledge domains...")
+    await loadAllDomains()
+
     await aiOrchestrator.initialize()
+
+    logger.info("App", "AI system initialized", {
+      domains: aiOrchestrator.getRegisteredDomains().length,
+      metrics: metricsCollector.getSummary(),
+    })
 
     this.router.init()
   }
@@ -137,4 +148,4 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 })
 
-export { aiOrchestrator, promptHandler }
+export { aiOrchestrator, promptHandler, logger, metricsCollector }
