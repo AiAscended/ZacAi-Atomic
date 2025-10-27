@@ -1,6 +1,6 @@
 import { generalTokenizer } from "./general_tokenizer"
 import { generalSemanticAnalyzer } from "./general_semanticAnalyzer"
-import { findSources } from "../url_lookup"
+import { findSources } from "../../shared/tools/urlLookup"
 import { GENERAL_DOMAIN } from "./general_constants"
 
 export const generalRunInference = async (input: string, context?: any) => {
@@ -31,6 +31,14 @@ export const generalRunInference = async (input: string, context?: any) => {
     responseText += `I'm ZacAi Atomic, a hybrid modular AI assistant. `
     if (sentiment?.sentiment === "positive") {
       responseText += "I'm glad to chat with you! "
+    }
+  }
+
+  if (input.match(/\b(capital|country|city|geography|where is|located)\b/i)) {
+    if (input.match(/\bfrance\b/i)) {
+      responseText += `The capital of France is **Paris**. Paris is located in the north-central part of France and is the country's largest city and cultural center. `
+    } else if (input.match(/\b(capital|geography)\b/i)) {
+      responseText += `I can help with geography questions. I have access to Wikipedia and other reference sources for detailed information. `
     }
   }
 

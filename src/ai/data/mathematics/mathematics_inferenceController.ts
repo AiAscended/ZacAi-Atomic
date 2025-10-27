@@ -75,6 +75,17 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
   console.log("[v0] Mathematics inference - Original:", input)
   console.log("[v0] Mathematics inference - Converted:", numericInput)
 
+  // If no math patterns matched, return null so orchestrator uses other domains
+  if (
+    !lowerInput.match(
+      /\b(math|calculate|equation|number|sum|multiply|add|subtract|divide|plus|minus|times|equals|fibonacci|prime|pi)\b/,
+    ) &&
+    !lowerInput.match(/\d+/) &&
+    !lowerInput.match(/\b(one|two|three|four|five|six|seven|eight|nine|ten)\b/)
+  ) {
+    return null // Not a mathematics query, let other domains handle it
+  }
+
   const addMultMatch = numericInput.match(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)/i)
   if (addMultMatch) {
     const [, num1, num2, num3] = addMultMatch
@@ -194,7 +205,7 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     }
   }
 
-  // Default mathematics response
+  // Default mathematics response - only shown for math-related queries
   return {
     tokens: tk.tokens,
     tokenCount: tk.length,
