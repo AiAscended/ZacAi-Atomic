@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "name": "Git Documentation",
+      "url": "https://git-scm.com/doc",
+      "description": "Official Git documentation and reference"
+    },
+    {
+      "name": "GitHub Guides",
+      "url": "https://guides.github.com/",
+      "description": "GitHub workflow and best practices guides"
+    }
+  ]
+}
