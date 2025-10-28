@@ -293,41 +293,24 @@ export class AIOrchestrator {
       }
 
       this.thinkingTracker.addStep("domain_queries", "Querying knowledge domains")
-      const domainResponses: Array<{ domain: string; result: unknown }> = []
-
-      for (const domain of relevantDomains) {
-        if (domain.query) {
-          try {
-            const result = await domain.query(normalizedText, {
-              context: contextWindow.getWindow(),
-              searchResults,
-              intent: intent.intent,
-              tokens,
-              sentences,
-              inferenceResults: inferenceResults.find((r) => r.domain === domain.name),
-              sentiment,
-              slots,
-              userProfile,
-              dialogueState: dialogueResult,
-            })
-            if (result !== null && result !== undefined) {
-              domainResponses.push({ domain: domain.name, result })
-              this.thinkingTracker.addStep(`query_${domain.name}`, `${domain.name} provided response`)
-            } else {
-              this.thinkingTracker.addStep(`query_${domain.name}`, `${domain.name} returned no response`)
-              logger.debug("AIOrchestrator", `Domain ${domain.name} returned null - skipping`)
-            }
-          } catch (error) {
-            logger.error("AIOrchestrator", `Domain ${domain.name} query failed`, error)
-            this.thinkingTracker.addStep(`query_${domain.name}_error`, `${domain.name} query failed`)
-          }
-        }
+      const context = {
+        tokens: tokens,
+        inferenceResults: inferenceResults,
+        sentiment: sentiment,
+        slots: slots,
+        userProfile: userProfile,
+        dialogueState: dialogueResult,
       }
+      const domainResponses = await this.queryDomains(
+        normalizedText,
+        relevantDomains.map((d) => d.name),
+        context,
+      )
 
       this.thinkingTracker.addStep("synthesis", "Synthesizing final response")
       const response = this.synthesizeResponse(
         normalizedText,
-        domainResponses,
+        Array.from(domainResponses.entries()).map(([domain, result]) => ({ domain, result })),
         searchResults,
         relevantDomains.map((d) => d.name),
         inferenceResults.reduce((sum, r) => sum + r.confidence, 0) / (inferenceResults.length || 1),
@@ -685,5 +668,57 @@ export class AIOrchestrator {
       logger.error("AIOrchestrator", `Training failed for ${domainName}`, error)
       throw error
     }
+  }
+
+  private async queryDomains(
+    input: string,
+    selectedDomains: string[],
+    context: {
+      tokens: string[]
+      inferenceResults: any
+      sentiment: any
+      slots: any
+      userProfile: any
+      dialogueState: any
+    },
+  ): Promise<Map<string, any>> {
+    const domainResponses = new Map<string, any>()
+    const domainApis = listDomains()
+
+    for (const domainName of selectedDomains) {
+      try {
+        this.thinkingTracker.addStep(`Inference for ${domainName}`, {})
+        const startTime = Date.now()
+
+        const domainApi = domainApis.find((d) => d.name === domainName)
+        if (!domainApi) {
+          logger.warn(`Domain ${domainName} not found in registry`)
+          continue
+        }
+
+        const result = await domainApi.query(input, context)
+
+        const endTime = Date.now()
+        this.thinkingTracker.addStep(`Inference for ${domainName}`, {
+          confidence: result?.confidence || null,
+        })
+
+        if (result && result.response) {
+          domainResponses.set(domainName, result)
+          logger.info(`Domain ${domainName} query succeeded`, {
+            confidence: result.confidence,
+            responseLength: result.response?.length || 0,
+            duration: endTime - startTime,
+          })
+        } else {
+          logger.info(`Domain ${domainName} returned null (not applicable for this query)`)
+        }
+      } catch (error) {
+        logger.error(`Domain ${domainName} query failed`, error)
+        this.thinkingTracker.addStep(`${domainName} query failed`, {})
+      }
+    }
+
+    return domainResponses
   }
 }
