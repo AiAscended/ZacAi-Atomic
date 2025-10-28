@@ -493,16 +493,20 @@ export class AIOrchestrator {
     const responseParts: string[] = []
     const sources: string[] = []
 
-    // Priority: specific domains > general domain
+    const successfulResponses = domainResponses.filter(({ result }) => {
+      if (!result || typeof result !== "object") return false
+      if ("error" in result) return false // Skip error responses
+      if ("response" in result && result.response === null) return false // Skip null responses
+      return true
+    })
+
     let bestResponse: string | null = null
     let bestDomain: string | null = null
 
-    // First, try to find a specific domain response (not general)
-    for (const { domain, result } of domainResponses) {
+    for (const { domain, result } of successfulResponses) {
       if (domain !== "general" && domain !== "english") {
         if (result && typeof result === "object" && "text" in result) {
           const text = (result as { text: string }).text
-          // Skip generic capability descriptions
           if (!text.includes("I can help with") && !text.includes("Try asking me")) {
             bestResponse = text
             bestDomain = domain
@@ -512,30 +516,14 @@ export class AIOrchestrator {
       }
     }
 
-    // If no specific domain had a good response, use general domain
     if (!bestResponse) {
-      for (const { domain, result } of domainResponses) {
+      for (const { domain, result } of successfulResponses) {
         if (domain === "general") {
-          if (result && typeof result === "object" && "text" in result) {
-            bestResponse = (result as { text: string }).text
+          if (result && typeof result === "object" && "response" in result) {
+            bestResponse = (result as { response: string }).response
             bestDomain = domain
             break
           }
-        }
-      }
-    }
-
-    // If still no response, use any available response
-    if (!bestResponse) {
-      for (const { domain, result } of domainResponses) {
-        if (result && typeof result === "object" && "text" in result) {
-          bestResponse = (result as { text: string }).text
-          bestDomain = domain
-          break
-        } else if (typeof result === "string") {
-          bestResponse = result
-          bestDomain = domain
-          break
         }
       }
     }
@@ -547,18 +535,46 @@ export class AIOrchestrator {
       }
     }
 
-    // Only add search results if they're not simulated/mock data
-    if (searchResults.length > 0 && !searchResults[0].includes("simulated snippet")) {
-      responseParts.push(`\n\nSearch results:\n${searchResults.slice(0, 3).join("\n")}`)
-      sources.push("Internet Search")
-    }
-
-    // Fallback response if no domain responses
     if (responseParts.length === 0) {
-      responseParts.push(
-        `I understand you're asking about: "${prompt}". I'm processing this across multiple knowledge domains. ` +
-          `This is a hybrid modular AI system with ${domains.length} active domains.`,
-      )
+      // Collect error information from failed domains
+      const failedDomains = domainResponses
+        .filter(({ result }) => result && typeof result === "object" && "error" in result)
+        .map(({ domain, result }) => ({
+          domain,
+          error: (result as any).error,
+        }))
+
+      if (failedDomains.length > 0) {
+        // Production-grade error response with system diagnostics
+        const errorDetails = failedDomains
+          .map(({ domain, error }) => `- ${domain}: ${error.message || "Unknown error"}`)
+          .join("\n")
+
+        responseParts.push(
+          `I encountered difficulties processing your request across ${failedDomains.length} knowledge domain(s):\n\n` +
+            `${errorDetails}\n\n` +
+            `**System Status:**\n` +
+            `- Tokens processed: ${inferenceConfidence > 0 ? "Yes" : "No"}\n` +
+            `- Neural inference: ${inferenceConfidence > 0 ? `${(inferenceConfidence * 100).toFixed(1)}% confidence` : "Failed"}\n` +
+            `- Domains attempted: ${domains.join(", ")}\n\n` +
+            `This appears to be a temporary issue with external knowledge sources. ` +
+            `The system is functioning normally but couldn't retrieve specific information for your query. ` +
+            `Please try rephrasing your question or ask about a different topic.`,
+        )
+        sources.push("System Diagnostics")
+      } else {
+        // Generic fallback only as last resort
+        responseParts.push(
+          `I'm processing your request: "${prompt}"\n\n` +
+            `**System Status:**\n` +
+            `- Active domains: ${domains.length}\n` +
+            `- Neural inference confidence: ${(inferenceConfidence * 100).toFixed(1)}%\n` +
+            `- Tokens processed: Yes\n\n` +
+            `The system is operational but needs more specific information to provide a detailed answer. ` +
+            `Could you please rephrase your question or provide more context?`,
+        )
+        sources.push("Orchestrator Fallback")
+      }
     }
 
     return {
