@@ -29,6 +29,19 @@ const stopWords = [
   "has",
   "been",
   "since",
+  "can",
+  "tell",
+  "me",
+  "about",
+  "also",
+  "please",
+  "could",
+  "would",
+  "should",
+  "i'm",
+  "i",
+  "my",
+  "your",
 ]
 
 export const generalRunInference = async (input: string, context?: any) => {
@@ -47,17 +60,21 @@ export const generalRunInference = async (input: string, context?: any) => {
   let inferenceSucceeded = false
 
   try {
-    const queryKeywords = tokens.filter((t: string) => !stopWords.includes(t.toLowerCase()) && t.length > 2)
+    const queryKeywords = tokens
+      .filter((t: string) => {
+        const token = t.toLowerCase()
+        return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token)
+      })
+      .slice(0, 5)
 
     console.log("[v0] Query keywords extracted:", queryKeywords)
 
-    // Check if we have trained knowledge about this topic
-    const hasTrainedKnowledge = confidence > 0.3 // Lower threshold for trained data
+    const hasTrainedKnowledge = confidence > 0.4
 
     if (hasTrainedKnowledge && queryKeywords.length > 0) {
-      // Use AI inference to generate response from trained weights
       responseText = `Based on my trained knowledge (confidence: ${(confidence * 100).toFixed(1)}%), `
       responseText += `regarding ${queryKeywords.slice(0, 3).join(", ")}: `
+      responseText += `I can provide information about these topics. `
       sources.push("Domain Inference (Trained Weights)")
       inferenceSucceeded = true
     }
@@ -65,10 +82,16 @@ export const generalRunInference = async (input: string, context?: any) => {
     console.error("[v0] Domain inference failed:", error)
   }
 
-  if (!inferenceSucceeded || confidence < 0.3) {
+  if (!inferenceSucceeded || confidence < 0.4) {
     try {
-      const queryKeywords = tokens.filter((t: string) => !stopWords.includes(t.toLowerCase()) && t.length > 2) // Declare queryKeywords here
-      const searchQuery = queryKeywords.slice(0, 3).join(" ") || input.split(" ").slice(0, 5).join(" ")
+      const queryKeywords = tokens
+        .filter((t: string) => {
+          const token = t.toLowerCase()
+          return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token)
+        })
+        .slice(0, 5)
+
+      const searchQuery = queryKeywords.join(" ") || input.split(" ").slice(0, 5).join(" ")
       console.log("[v0] Searching Wikipedia for:", searchQuery)
 
       const sourcesFromLookup = await searchSources("general", searchQuery)
