@@ -33,7 +33,19 @@ export const mathematicsInit = async () => {
     },
     query: async (input: string, context?: any) => {
       const result = await mathematicsRunInference(input, context)
-      return { text: result.response }
+
+      // If mathematics domain returns null, it means the query isn't about math
+      // Return null so orchestrator knows this domain doesn't apply
+      if (!result) {
+        return null
+      }
+
+      return {
+        response: result.response,
+        confidence: result.confidence,
+        tokens: result.tokens,
+        tokenCount: result.tokenCount,
+      }
     },
     train: async (opts?: Record<string, unknown>) => mathematicsRunTrainingEpoch(opts as { epochs?: number }),
   })
