@@ -687,7 +687,7 @@ export class AIOrchestrator {
 
     for (const domainName of selectedDomains) {
       try {
-        this.thinkingTracker.addStep(`Inference for ${domainName}`, {})
+        this.thinkingTracker.addStep(`query_${domainName}`, `Querying ${domainName} domain`)
         const startTime = Date.now()
 
         const domainApi = domainApis.find((d) => d.name === domainName)
@@ -699,8 +699,9 @@ export class AIOrchestrator {
         const result = await domainApi.query(input, context)
 
         const endTime = Date.now()
-        this.thinkingTracker.addStep(`Inference for ${domainName}`, {
+        this.thinkingTracker.addStep(`query_${domainName}_complete`, `${domainName} query complete`, {
           confidence: result?.confidence || null,
+          duration: endTime - startTime,
         })
 
         if (result && result.response) {
@@ -715,7 +716,9 @@ export class AIOrchestrator {
         }
       } catch (error) {
         logger.error(`Domain ${domainName} query failed`, error)
-        this.thinkingTracker.addStep(`${domainName} query failed`, {})
+        this.thinkingTracker.addStep(`query_${domainName}_error`, `${domainName} query failed`, {
+          error: error instanceof Error ? error.message : String(error),
+        })
       }
     }
 

@@ -7,7 +7,9 @@ export const generalRunInference = async (input: string, context?: any) => {
   const inferenceResults = context?.inferenceResults
   const sentiment = context?.sentiment
   const userProfile = context?.userProfile || {}
-  const confidence = inferenceResults?.confidence || 0.5
+  const confidence = Array.isArray(inferenceResults)
+    ? inferenceResults.reduce((sum, r) => sum + (r.confidence || 0), 0) / (inferenceResults.length || 1)
+    : inferenceResults?.confidence || 0.5
 
   let responseText = ""
   const sources: string[] = []
