@@ -1,397 +1,368 @@
 /**
  * File: src/ai/shared/tools/shared-CodeLinter.ts
- * Purpose: Code linting and validation for multiple languages
- * Depends on: None (standalone utility)
- * Depended on by: src/ai/data/typescript/typescript_integrationAPI.ts, src/ai/data/code_review/code_review_integrationAPI.ts
+ * Purpose: Provides code linting and quality analysis across programming domains
+ * Depends on: None (standalone linting logic)
+ * Depended on by: src/ai/data/typescript/*, src/ai/data/code_review/*
  * Creator: Vercel v0 Coding Assistant
  */
 
 /**
- * Represents a linting issue found in code
+ * Severity level for lint issues
+ */
+export enum LintSeverity {
+  ERROR = "error",
+  WARNING = "warning",
+  INFO = "info",
+}
+
+/**
+ * Represents a single lint issue
  */
 export interface LintIssue {
   line: number
   column: number
-  severity: "error" | "warning" | "info"
+  severity: LintSeverity
   message: string
   rule: string
   suggestion?: string
 }
 
 /**
- * Linting result containing all issues found
+ * Result of linting operation
  */
 export interface LintResult {
-  valid: boolean
   issues: LintIssue[]
-  summary: {
-    errors: number
-    warnings: number
-    info: number
-  }
+  errorCount: number
+  warningCount: number
+  infoCount: number
+  score: number // 0-100, higher is better
+  summary: string
 }
 
 /**
- * Code Linter - Validates and analyzes code for common issues
- *
- * Features:
- * - Syntax validation
- * - Style checking
- * - Best practice enforcement
- * - Security vulnerability detection
- * - Performance anti-pattern detection
- *
- * Supports: TypeScript, JavaScript, Python, and more
+ * Code Linter - Analyzes code quality and style
+ * Supports TypeScript, JavaScript, and general programming patterns
  */
 export class CodeLinter {
+  private static readonly RULES = {
+    // Naming conventions
+    CAMEL_CASE_VARS: /^[a-z][a-zA-Z0-9]*$/,
+    PASCAL_CASE_CLASSES: /^[A-Z][a-zA-Z0-9]*$/,
+    UPPER_CASE_CONSTANTS: /^[A-Z][A-Z0-9_]*$/,
+
+    // Code patterns
+    MAX_LINE_LENGTH: 120,
+    MAX_FUNCTION_LENGTH: 50,
+    MAX_COMPLEXITY: 10,
+  }
+
   /**
-   * Lints TypeScript/JavaScript code
-   * @param code - Source code to lint
-   * @param language - Language type ('typescript' or 'javascript')
-   * @returns Linting result with issues
+   * Lint TypeScript/JavaScript code
    */
-  public static lintTypeScript(code: string, language: "typescript" | "javascript" = "typescript"): LintResult {
+  public static lintCode(code: string, language: "typescript" | "javascript" = "typescript"): LintResult {
     const issues: LintIssue[] = []
     const lines = code.split("\n")
 
+    // Check each line
     lines.forEach((line, index) => {
       const lineNumber = index + 1
 
-      // Check for console.log statements
-      if (line.includes("console.log") && !line.trim().startsWith("//")) {
+      // Check line length
+      if (line.length > this.RULES.MAX_LINE_LENGTH) {
         issues.push({
           line: lineNumber,
-          column: line.indexOf("console.log") + 1,
-          severity: "warning",
-          message: "Avoid using console.log in production code",
-          rule: "no-console",
-          suggestion: "Use a proper logging library instead",
+          column: this.RULES.MAX_LINE_LENGTH,
+          severity: LintSeverity.WARNING,
+          message: `Line exceeds maximum length of ${this.RULES.MAX_LINE_LENGTH} characters`,
+          rule: "max-line-length",
+          suggestion: "Consider breaking this line into multiple lines",
         })
       }
 
-      // Check for var usage
-      if (/\bvar\s+/.test(line) && !line.trim().startsWith("//")) {
+      // Check for console.log (should use proper logging)
+      if (line.includes("console.log") && !line.includes("[v0]")) {
         issues.push({
           line: lineNumber,
-          column: line.indexOf("var") + 1,
-          severity: "error",
-          message: "Use let or const instead of var",
+          column: line.indexOf("console.log"),
+          severity: LintSeverity.INFO,
+          message: "Consider using a proper logging library instead of console.log",
+          rule: "no-console",
+          suggestion: 'Use logger.info() or add "[v0]" prefix for debugging',
+        })
+      }
+
+      // Check for var usage (should use let/const)
+      if (/\bvar\s+/.test(line)) {
+        issues.push({
+          line: lineNumber,
+          column: line.indexOf("var"),
+          severity: LintSeverity.ERROR,
+          message: "Use 'let' or 'const' instead of 'var'",
           rule: "no-var",
-          suggestion: "Replace var with let or const",
+          suggestion: "Replace 'var' with 'const' for immutable values or 'let' for mutable values",
         })
       }
 
       // Check for == instead of ===
-      if (/[^=!]==[^=]/.test(line) && !line.trim().startsWith("//")) {
+      if (/[^=!]==[^=]/.test(line)) {
         issues.push({
           line: lineNumber,
-          column: line.indexOf("==") + 1,
-          severity: "warning",
-          message: "Use === instead of == for comparison",
+          column: line.indexOf("=="),
+          severity: LintSeverity.ERROR,
+          message: "Use '===' instead of '=='",
           rule: "eqeqeq",
-          suggestion: "Replace == with ===",
+          suggestion: "Use strict equality (===) to avoid type coercion issues",
         })
       }
 
-      // Check for missing semicolons (simple check)
-      if (
-        line.trim() &&
-        !line.trim().startsWith("//") &&
-        !line.trim().startsWith("*") &&
-        /^[^{}[\]()]*[a-zA-Z0-9_\])]$/.test(line.trim()) &&
-        !line.trim().endsWith(";") &&
-        !line.trim().endsWith(",") &&
-        !line.trim().endsWith("{") &&
-        !line.trim().endsWith("}")
-      ) {
+      // Check for trailing whitespace
+      if (/\s+$/.test(line)) {
         issues.push({
           line: lineNumber,
           column: line.length,
-          severity: "info",
-          message: "Missing semicolon",
-          rule: "semi",
-          suggestion: "Add semicolon at end of statement",
+          severity: LintSeverity.INFO,
+          message: "Trailing whitespace detected",
+          rule: "no-trailing-spaces",
+          suggestion: "Remove trailing whitespace",
         })
       }
 
-      // Check for any usage
-      if (language === "typescript" && /:\s*any\b/.test(line) && !line.trim().startsWith("//")) {
-        issues.push({
-          line: lineNumber,
-          column: line.indexOf("any") + 1,
-          severity: "warning",
-          message: "Avoid using any type",
-          rule: "no-explicit-any",
-          suggestion: "Use a specific type instead",
-        })
-      }
-
-      // Check for eval usage
-      if (/\beval\s*\(/.test(line) && !line.trim().startsWith("//")) {
-        issues.push({
-          line: lineNumber,
-          column: line.indexOf("eval") + 1,
-          severity: "error",
-          message: "eval() is dangerous and should be avoided",
-          rule: "no-eval",
-          suggestion: "Find an alternative approach",
-        })
-      }
-
-      // Check for long lines (>120 characters)
-      if (line.length > 120) {
-        issues.push({
-          line: lineNumber,
-          column: 121,
-          severity: "info",
-          message: "Line exceeds 120 characters",
-          rule: "max-len",
-          suggestion: "Break line into multiple lines",
-        })
-      }
-
-      // Check for TODO comments
-      if (/\/\/\s*TODO/i.test(line)) {
-        issues.push({
-          line: lineNumber,
-          column: line.indexOf("TODO") + 1,
-          severity: "info",
-          message: "TODO comment found",
-          rule: "no-warning-comments",
-          suggestion: "Complete or remove TODO",
-        })
-      }
-
-      // Check for debugger statements
-      if (/\bdebugger\b/.test(line) && !line.trim().startsWith("//")) {
-        issues.push({
-          line: lineNumber,
-          column: line.indexOf("debugger") + 1,
-          severity: "error",
-          message: "debugger statement should not be in production code",
-          rule: "no-debugger",
-          suggestion: "Remove debugger statement",
-        })
-      }
-
-      // Check for unused variables (simple heuristic)
-      const varMatch = line.match(/(?:const|let)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=/)
-      if (varMatch && varMatch[1]) {
-        const varName = varMatch[1]
-        const restOfCode = lines.slice(index + 1).join("\n")
-        if (!restOfCode.includes(varName) && varName !== "_") {
+      // Check for missing semicolons (TypeScript)
+      if (
+        language === "typescript" &&
+        /^[^/]*[a-zA-Z0-9)\]}"]$/.test(line.trim()) &&
+        !line.trim().endsWith("{") &&
+        !line.trim().endsWith(",")
+      ) {
+        const trimmed = line.trim()
+        if (
+          !trimmed.startsWith("//") &&
+          !trimmed.startsWith("*") &&
+          !trimmed.startsWith("if") &&
+          !trimmed.startsWith("for") &&
+          !trimmed.startsWith("while") &&
+          !trimmed.startsWith("function") &&
+          !trimmed.startsWith("class") &&
+          !trimmed.startsWith("interface") &&
+          !trimmed.startsWith("type") &&
+          !trimmed.startsWith("export") &&
+          !trimmed.startsWith("import")
+        ) {
           issues.push({
             line: lineNumber,
-            column: line.indexOf(varName) + 1,
-            severity: "warning",
-            message: `Variable '${varName}' is declared but never used`,
-            rule: "no-unused-vars",
-            suggestion: "Remove unused variable or prefix with underscore",
+            column: line.length,
+            severity: LintSeverity.WARNING,
+            message: "Missing semicolon",
+            rule: "semi",
+            suggestion: "Add semicolon at end of statement",
           })
         }
       }
+
+      // Check for TODO/FIXME comments
+      if (/\/\/\s*(TODO|FIXME)/i.test(line)) {
+        issues.push({
+          line: lineNumber,
+          column: line.indexOf("//"),
+          severity: LintSeverity.INFO,
+          message: "TODO/FIXME comment found",
+          rule: "no-warning-comments",
+          suggestion: "Address this comment or create a tracking issue",
+        })
+      }
     })
 
-    // Calculate summary
-    const summary = {
-      errors: issues.filter((i) => i.severity === "error").length,
-      warnings: issues.filter((i) => i.severity === "warning").length,
-      info: issues.filter((i) => i.severity === "info").length,
-    }
+    // Check for missing JSDoc on exported functions
+    this.checkMissingDocumentation(code, issues)
+
+    // Check function complexity
+    this.checkFunctionComplexity(code, issues)
+
+    // Calculate counts
+    const errorCount = issues.filter((i) => i.severity === LintSeverity.ERROR).length
+    const warningCount = issues.filter((i) => i.severity === LintSeverity.WARNING).length
+    const infoCount = issues.filter((i) => i.severity === LintSeverity.INFO).length
+
+    // Calculate quality score (0-100)
+    const totalIssues = errorCount * 3 + warningCount * 2 + infoCount
+    const maxPenalty = lines.length * 2 // Assume max 2 points penalty per line
+    const score = Math.max(0, Math.min(100, 100 - (totalIssues / maxPenalty) * 100))
 
     return {
-      valid: summary.errors === 0,
       issues,
-      summary,
+      errorCount,
+      warningCount,
+      infoCount,
+      score: Math.round(score),
+      summary: this.generateSummary(errorCount, warningCount, infoCount, score),
     }
   }
 
   /**
-   * Lints Python code
-   * @param code - Python source code
-   * @returns Linting result with issues
+   * Check for missing documentation on exported functions/classes
    */
-  public static lintPython(code: string): LintResult {
-    const issues: LintIssue[] = []
+  private static checkMissingDocumentation(code: string, issues: LintIssue[]): void {
     const lines = code.split("\n")
+    let previousLineWasDoc = false
 
     lines.forEach((line, index) => {
-      const lineNumber = index + 1
+      const trimmed = line.trim()
 
-      // Check for print statements (Python 2 style)
-      if (/\bprint\s+[^(]/.test(line) && !line.trim().startsWith("#")) {
-        issues.push({
-          line: lineNumber,
-          column: line.indexOf("print") + 1,
-          severity: "error",
-          message: "Use print() function instead of print statement",
-          rule: "print-statement",
-          suggestion: "Add parentheses: print()",
-        })
+      // Check if this line is a JSDoc comment
+      if (trimmed.startsWith("/**") || trimmed.startsWith("*") || trimmed.endsWith("*/")) {
+        previousLineWasDoc = true
+        return
       }
 
-      // Check for line length
-      if (line.length > 79) {
-        issues.push({
-          line: lineNumber,
-          column: 80,
-          severity: "info",
-          message: "Line exceeds 79 characters (PEP 8)",
-          rule: "line-too-long",
-          suggestion: "Break line into multiple lines",
-        })
+      // Check if this is an exported function/class without documentation
+      if (/^export\s+(function|class|interface|type|const|let)/.test(trimmed)) {
+        if (!previousLineWasDoc) {
+          issues.push({
+            line: index + 1,
+            column: 0,
+            severity: LintSeverity.WARNING,
+            message: "Exported declaration missing JSDoc documentation",
+            rule: "require-jsdoc",
+            suggestion: "Add JSDoc comment describing purpose, parameters, and return value",
+          })
+        }
       }
 
-      // Check for multiple statements on one line
-      if (line.includes(";") && !line.trim().startsWith("#")) {
-        issues.push({
-          line: lineNumber,
-          column: line.indexOf(";") + 1,
-          severity: "warning",
-          message: "Multiple statements on one line",
-          rule: "multiple-statements",
-          suggestion: "Put each statement on its own line",
-        })
-      }
-
-      // Check for bare except
-      if (/except\s*:/.test(line) && !line.trim().startsWith("#")) {
-        issues.push({
-          line: lineNumber,
-          column: line.indexOf("except") + 1,
-          severity: "warning",
-          message: "Bare except clause",
-          rule: "bare-except",
-          suggestion: "Specify exception type: except Exception:",
-        })
-      }
+      previousLineWasDoc = false
     })
-
-    const summary = {
-      errors: issues.filter((i) => i.severity === "error").length,
-      warnings: issues.filter((i) => i.severity === "warning").length,
-      info: issues.filter((i) => i.severity === "info").length,
-    }
-
-    return {
-      valid: summary.errors === 0,
-      issues,
-      summary,
-    }
   }
 
   /**
-   * Validates code syntax for a given language
-   * @param code - Source code
-   * @param language - Programming language
-   * @returns True if syntax is valid
+   * Check function complexity (cyclomatic complexity)
    */
-  public static validateSyntax(code: string, language: string): boolean {
-    try {
-      switch (language.toLowerCase()) {
-        case "typescript":
-        case "javascript":
-          // Basic bracket matching
-          return this.validateBrackets(code)
+  private static checkFunctionComplexity(code: string, issues: LintIssue[]): void {
+    const functionRegex = /function\s+(\w+)|const\s+(\w+)\s*=\s*(?:async\s+)?$$[^)]*$$\s*=>/g
+    let match
 
-        case "python":
-          // Basic indentation check
-          return this.validatePythonIndentation(code)
+    while ((match = functionRegex.exec(code)) !== null) {
+      const functionName = match[1] || match[2]
+      const startIndex = match.index
+      const lineNumber = code.substring(0, startIndex).split("\n").length
 
-        default:
-          return true // Unknown language, assume valid
+      // Find function body
+      const afterFunction = code.substring(startIndex)
+      const braceIndex = afterFunction.indexOf("{")
+      if (braceIndex === -1) continue
+
+      // Count complexity indicators
+      const functionBody = this.extractFunctionBody(afterFunction.substring(braceIndex))
+      const complexity = this.calculateComplexity(functionBody)
+
+      if (complexity > this.RULES.MAX_COMPLEXITY) {
+        issues.push({
+          line: lineNumber,
+          column: 0,
+          severity: LintSeverity.WARNING,
+          message: `Function '${functionName}' has complexity of ${complexity} (max: ${this.RULES.MAX_COMPLEXITY})`,
+          rule: "complexity",
+          suggestion: "Consider breaking this function into smaller functions",
+        })
       }
-    } catch {
-      return false
+
+      // Check function length
+      const functionLines = functionBody.split("\n").length
+      if (functionLines > this.RULES.MAX_FUNCTION_LENGTH) {
+        issues.push({
+          line: lineNumber,
+          column: 0,
+          severity: LintSeverity.INFO,
+          message: `Function '${functionName}' is ${functionLines} lines (max: ${this.RULES.MAX_FUNCTION_LENGTH})`,
+          rule: "max-lines-per-function",
+          suggestion: "Consider breaking this function into smaller functions",
+        })
+      }
     }
   }
 
   /**
-   * Validates bracket matching in code
-   * @param code - Source code
-   * @returns True if brackets are balanced
+   * Extract function body from code
    */
-  private static validateBrackets(code: string): boolean {
-    const stack: string[] = []
-    const pairs: Record<string, string> = {
-      "(": ")",
-      "[": "]",
-      "{": "}",
-    }
+  private static extractFunctionBody(code: string): string {
+    let braceCount = 0
+    let inString = false
+    let stringChar = ""
 
-    for (const char of code) {
-      if (char in pairs) {
-        stack.push(char)
-      } else if (Object.values(pairs).includes(char)) {
-        const last = stack.pop()
-        if (!last || pairs[last] !== char) {
-          return false
+    for (let i = 0; i < code.length; i++) {
+      const char = code[i]
+
+      if ((char === '"' || char === "'" || char === "`") && code[i - 1] !== "\\") {
+        if (!inString) {
+          inString = true
+          stringChar = char
+        } else if (char === stringChar) {
+          inString = false
+        }
+      }
+
+      if (!inString) {
+        if (char === "{") braceCount++
+        if (char === "}") braceCount--
+        if (braceCount === 0 && char === "}") {
+          return code.substring(0, i + 1)
         }
       }
     }
 
-    return stack.length === 0
+    return code
   }
 
   /**
-   * Validates Python indentation
-   * @param code - Python source code
-   * @returns True if indentation is valid
+   * Calculate cyclomatic complexity
    */
-  private static validatePythonIndentation(code: string): boolean {
-    const lines = code.split("\n")
-    let expectedIndent = 0
+  private static calculateComplexity(code: string): number {
+    let complexity = 1 // Base complexity
 
-    for (const line of lines) {
-      const trimmed = line.trim()
-      if (!trimmed || trimmed.startsWith("#")) continue
+    // Count decision points
+    const patterns = [
+      /\bif\b/g,
+      /\belse\s+if\b/g,
+      /\bfor\b/g,
+      /\bwhile\b/g,
+      /\bcase\b/g,
+      /\bcatch\b/g,
+      /&&/g,
+      /\|\|/g,
+      /\?/g, // Ternary operator
+    ]
 
-      const indent = line.length - line.trimStart().length
-
-      // Check if indent is multiple of 4
-      if (indent % 4 !== 0) {
-        return false
-      }
-
-      // Update expected indent for next line
-      if (trimmed.endsWith(":")) {
-        expectedIndent = indent + 4
-      } else if (indent < expectedIndent) {
-        expectedIndent = indent
-      }
-    }
-
-    return true
-  }
-
-  /**
-   * Formats linting result as human-readable string
-   * @param result - Linting result
-   * @returns Formatted string
-   */
-  public static formatResult(result: LintResult): string {
-    if (result.issues.length === 0) {
-      return "✓ No issues found"
-    }
-
-    const lines: string[] = []
-    lines.push(`Found ${result.issues.length} issue(s):`)
-    lines.push(`  Errors: ${result.summary.errors}`)
-    lines.push(`  Warnings: ${result.summary.warnings}`)
-    lines.push(`  Info: ${result.summary.info}`)
-    lines.push("")
-
-    result.issues.forEach((issue) => {
-      const icon = issue.severity === "error" ? "✗" : issue.severity === "warning" ? "⚠" : "ℹ"
-      lines.push(`${icon} Line ${issue.line}:${issue.column} - ${issue.message} [${issue.rule}]`)
-      if (issue.suggestion) {
-        lines.push(`  Suggestion: ${issue.suggestion}`)
-      }
+    patterns.forEach((pattern) => {
+      const matches = code.match(pattern)
+      if (matches) complexity += matches.length
     })
 
-    return lines.join("\n")
+    return complexity
+  }
+
+  /**
+   * Generate summary message
+   */
+  private static generateSummary(errors: number, warnings: number, info: number, score: number): string {
+    const parts: string[] = []
+
+    if (errors > 0) parts.push(`${errors} error${errors !== 1 ? "s" : ""}`)
+    if (warnings > 0) parts.push(`${warnings} warning${warnings !== 1 ? "s" : ""}`)
+    if (info > 0) parts.push(`${info} info`)
+
+    const issueText = parts.length > 0 ? parts.join(", ") : "No issues found"
+    const scoreText = score >= 90 ? "Excellent" : score >= 70 ? "Good" : score >= 50 ? "Fair" : "Needs improvement"
+
+    return `${issueText}. Code quality: ${scoreText} (${score}/100)`
   }
 }
 
-// Export singleton instance
+/**
+ * Convenience function for quick linting
+ */
+export function lintCode(code: string, language: "typescript" | "javascript" = "typescript"): LintResult {
+  return CodeLinter.lintCode(code, language)
+}
+
+/**
+ * Export linter instance
+ */
 export const linter = CodeLinter
