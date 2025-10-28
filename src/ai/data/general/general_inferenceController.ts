@@ -1,5 +1,35 @@
 import { searchSources } from "../../shared/tools/urlLookup"
 import { GENERAL_DOMAIN } from "./general_constants"
+const stopWords = [
+  "what",
+  "is",
+  "the",
+  "a",
+  "an",
+  "of",
+  "in",
+  "on",
+  "at",
+  "to",
+  "for",
+  "if",
+  "you",
+  "look",
+  "up",
+  "does",
+  "it",
+  "say",
+  "when",
+  "was",
+  "and",
+  "by",
+  "who",
+  "how",
+  "long",
+  "has",
+  "been",
+  "since",
+]
 
 export const generalRunInference = async (input: string, context?: any) => {
   const tokens = context?.tokens || []
@@ -10,25 +40,24 @@ export const generalRunInference = async (input: string, context?: any) => {
 
   const confidence = Array.isArray(inferenceResults)
     ? inferenceResults.reduce((sum, r) => sum + (r.confidence || 0), 0) / (inferenceResults.length || 1)
-    : inferenceResults?.confidence || 0.5
+    : inferenceResults?.confidence || 0
 
   let responseText = ""
   const sources: string[] = []
   let inferenceSucceeded = false
 
   try {
-    // Use tokens to understand query intent
-    const queryKeywords = tokens.filter(
-      (t: string) => !["what", "is", "the", "a", "an", "of", "in", "on", "at", "to", "for"].includes(t.toLowerCase()),
-    )
+    const queryKeywords = tokens.filter((t: string) => !stopWords.includes(t.toLowerCase()) && t.length > 2)
+
+    console.log("[v0] Query keywords extracted:", queryKeywords)
 
     // Check if we have trained knowledge about this topic
-    const hasTrainedKnowledge = confidence > 0.6 // High confidence means we have trained data
+    const hasTrainedKnowledge = confidence > 0.3 // Lower threshold for trained data
 
     if (hasTrainedKnowledge && queryKeywords.length > 0) {
       // Use AI inference to generate response from trained weights
       responseText = `Based on my trained knowledge (confidence: ${(confidence * 100).toFixed(1)}%), `
-      responseText += `I understand you're asking about: ${queryKeywords.join(", ")}. `
+      responseText += `regarding ${queryKeywords.slice(0, 3).join(", ")}: `
       sources.push("Domain Inference (Trained Weights)")
       inferenceSucceeded = true
     }
@@ -36,32 +65,17 @@ export const generalRunInference = async (input: string, context?: any) => {
     console.error("[v0] Domain inference failed:", error)
   }
 
-  if (!inferenceSucceeded || confidence < 0.6) {
+  if (!inferenceSucceeded || confidence < 0.3) {
     try {
-      const topic =
-        tokens.find(
-          (t: string) =>
-            ![
-              "what",
-              "is",
-              "the",
-              "capital",
-              "of",
-              "where",
-              "when",
-              "who",
-              "how",
-              "why",
-              "tell",
-              "me",
-              "about",
-            ].includes(t.toLowerCase()),
-        ) || input.split(" ").pop()
+      const queryKeywords = tokens.filter((t: string) => !stopWords.includes(t.toLowerCase()) && t.length > 2) // Declare queryKeywords here
+      const searchQuery = queryKeywords.slice(0, 3).join(" ") || input.split(" ").slice(0, 5).join(" ")
+      console.log("[v0] Searching Wikipedia for:", searchQuery)
 
-      const sourcesFromLookup = await searchSources("general", topic || input)
+      const sourcesFromLookup = await searchSources("general", searchQuery)
 
       if (sourcesFromLookup && sourcesFromLookup.length > 0) {
         const wikiUrl = sourcesFromLookup[0]
+        console.log("[v0] Searching Wikipedia at:", wikiUrl)
 
         try {
           const response = await fetch(wikiUrl, {
@@ -85,11 +99,10 @@ export const generalRunInference = async (input: string, context?: any) => {
               inferenceSucceeded = true
             }
           } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+            console.log("[v0] Failed to fetch", wikiUrl, response.status)
           }
         } catch (fetchError) {
           console.error("[v0] Wikipedia fetch failed:", fetchError)
-          // Don't set inferenceSucceeded, let it fall through to next step
         }
       }
     } catch (lookupError) {
@@ -99,7 +112,7 @@ export const generalRunInference = async (input: string, context?: any) => {
 
   if (!inferenceSucceeded) {
     return {
-      response: null, // Signal to orchestrator that this domain couldn't handle the query
+      response: null,
       confidence: 0,
       domain: GENERAL_DOMAIN,
       sources: [],
@@ -110,6 +123,7 @@ export const generalRunInference = async (input: string, context?: any) => {
           inferenceConfidence: confidence,
           tokensProcessed: tokens.length,
           urlLookupAttempted: true,
+          queryKeywords: tokens.filter((t: string) => !stopWords.includes(t.toLowerCase()) && t.length > 2),
         },
       },
       metadata: {
