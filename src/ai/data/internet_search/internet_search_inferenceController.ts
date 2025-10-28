@@ -1,3 +1,17 @@
+/**
+ * File: src/ai/data/internet_search/internet_search_inferenceController.ts
+ * Purpose: Main inference controller for internet search domain - orchestrates query parsing, expansion, ranking, and result summarization
+ * Depends on:
+ *   - src/ai/search-queries/queryParser.ts
+ *   - src/ai/search-queries/queryExpander.ts
+ *   - src/ai/search-queries/queryRanker.ts
+ *   - src/ai/search-engine/resultSummarizer.ts
+ *   - src/ai/shared/tools/urlLookup.ts
+ *   - src/ai/knowledge_retrieval/webSearchAPIConnector.ts
+ * Depended on by: src/ai/orchestrator/orchestrator.ts
+ * Creator: Vercel v0 Coding Assistant
+ */
+
 import { parseQuery } from "../../search-queries/queryParser"
 import { expandQuery } from "../../search-queries/queryExpander"
 import { rankResults } from "../../search-queries/queryRanker"
@@ -6,16 +20,37 @@ import { getSearchEngines, searchSources } from "../../shared/tools/urlLookup"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 import { searchWeb } from "../../knowledge_retrieval/webSearchAPIConnector"
 
+/**
+ * Main inference function for internet search domain
+ *
+ * @param input - The user's search query or question
+ * @param context - Optional context object containing inference results, tokens, and other metadata
+ * @returns Promise resolving to response string and confidence score
+ *
+ * @description
+ * This function orchestrates the complete internet search inference pipeline:
+ * 1. Parses the input query to extract intent and keywords
+ * 2. Attempts URL-based lookup for fast results
+ * 3. Falls back to web search API with query expansion
+ * 4. Ranks and summarizes results
+ * 5. Provides intelligent fallback responses for common query types
+ *
+ * @example
+ * const result = await internetSearchRunInference("What are the best selling products on Amazon?", { tokens: [], inferenceResults: { confidence: 0.8 } })
+ * console.log(result.response) // Returns formatted search results or guidance
+ */
 export async function internetSearchRunInference(
   input: string,
   context?: any,
 ): Promise<{ response: string; confidence?: number }> {
   const lowerInput = input.toLowerCase()
 
+  // Extract context data with safe defaults
   const inferenceResults = context?.inferenceResults
   const tokens = context?.tokens || []
   const confidence = inferenceResults?.confidence || 0.5
 
+  // Parse query to understand intent and extract keywords
   const parsedQuery = parseQuery(input)
   console.log("[v0] Parsed query:", parsedQuery)
 
@@ -29,11 +64,17 @@ export async function internetSearchRunInference(
     lowerInput.includes("cost") ||
     lowerInput.includes("amazon") ||
     lowerInput.includes("product") ||
+    lowerInput.includes("what is") ||
+    lowerInput.includes("who is") ||
+    lowerInput.includes("where is") ||
+    lowerInput.includes("when is") ||
+    lowerInput.includes("how to") ||
     parsedQuery.intent === "informational"
   ) {
     const searchEngines = getSearchEngines()
     console.log(`[v0] Available search engines: ${searchEngines.map((e) => e.name).join(", ")}`)
 
+    // First attempt: Fast URL-based lookup
     try {
       console.log("[v0] Attempting internet search via URL lookup...")
       const urlSearchResults = await searchSources(INTERNET_SEARCH_DOMAIN, input)
@@ -51,6 +92,7 @@ export async function internetSearchRunInference(
       console.log("[v0] URL lookup search failed, trying webSearchAPIConnector...")
     }
 
+    // Second attempt: Web search API with query expansion
     try {
       const expandedQueries = expandQuery(input)
       console.log("[v0] Expanded queries:", expandedQueries)
@@ -88,6 +130,7 @@ export async function internetSearchRunInference(
       console.log("[v0] Web search failed, providing intelligent response based on query")
     }
 
+    // Fallback responses for specific query types
     if (lowerInput.includes("amazon") || lowerInput.includes("product") || lowerInput.includes("selling")) {
       return {
         response:
@@ -140,6 +183,7 @@ export async function internetSearchRunInference(
       }
     }
 
+    // Generic search capability response
     return {
       response:
         `I can search for information across trusted knowledge bases. ` +
@@ -156,6 +200,7 @@ export async function internetSearchRunInference(
     }
   }
 
+  // Handle source/reference queries
   if (
     lowerInput.includes("source") ||
     lowerInput.includes("reference") ||
@@ -175,7 +220,7 @@ export async function internetSearchRunInference(
     }
   }
 
-  // Check for questions about AI and neurons
+  // Handle AI and neuron questions
   if (lowerInput.includes("ai") && lowerInput.includes("neuron")) {
     return {
       response:
@@ -193,6 +238,7 @@ export async function internetSearchRunInference(
     }
   }
 
+  // Handle random fact requests
   if (lowerInput.includes("fact") || lowerInput.includes("interesting") || lowerInput.includes("random")) {
     const facts = [
       "The Great Wall of China is not visible from space with the naked eye, despite popular belief. This myth has been debunked by astronauts.",
@@ -211,7 +257,7 @@ export async function internetSearchRunInference(
     }
   }
 
-  // Check for general knowledge or top fact requests
+  // Handle general knowledge requests
   if (
     lowerInput.includes("knowledge") ||
     lowerInput.includes("top") ||
@@ -228,7 +274,7 @@ export async function internetSearchRunInference(
     }
   }
 
-  // Default response - try to answer based on context
+  // Handle general internet/search mentions
   if (lowerInput.includes("internet") || lowerInput.includes("search") || lowerInput.includes("look up")) {
     const searchEngines = getSearchEngines()
     return {
@@ -239,6 +285,7 @@ export async function internetSearchRunInference(
     }
   }
 
+  // Default fallback response
   return {
     response:
       `I can search for information and provide facts from trusted knowledge bases. Try asking me about specific topics, interesting facts, or general knowledge questions! ` +
