@@ -1,7 +1,7 @@
 import { mathematicsTokenizer } from "./mathematics_tokenizer"
 import { mathematicsSemanticAnalyzer } from "./mathematics_semanticAnalyzer"
-import { add } from "../../scientific-calculator/arithmetic/addition"
-import { multiply } from "../../scientific-calculator/arithmetic/multiplication"
+import { ScientificCalculator } from "../../shared/tools/shared-ScientificCalculator"
+import { UnitConverter } from "../../shared/tools/shared-UnitConverter"
 
 const wordToNumber: Record<string, number> = {
   zero: 0,
@@ -80,7 +80,7 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
   // If no math patterns matched, return null so orchestrator uses other domains
   if (
     !lowerInput.match(
-      /\b(math|calculate|equation|number|sum|multiply|add|subtract|divide|plus|minus|times|equals|fibonacci|prime|pi)\b/,
+      /\b(math|calculate|equation|number|sum|multiply|add|subtract|divide|plus|minus|times|equals|fibonacci|prime|pi|sqrt|sin|cos|tan|log|convert)\b/,
     ) &&
     !lowerInput.match(/\d+/) &&
     !lowerInput.match(/\b(one|two|three|four|five|six|seven|eight|nine|ten)\b/)
@@ -88,11 +88,124 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     return null // Not a mathematics query, let other domains handle it
   }
 
+  try {
+    // Check if input looks like a mathematical expression
+    if (/[\d+\-*/()^%]/.test(numericInput) && !/\b(what|how|why|when|where|who)\b/i.test(lowerInput)) {
+      const result = ScientificCalculator.evaluate(numericInput)
+      return {
+        tokens: tk.tokens,
+        tokenCount: tk.length,
+        semantics: sem,
+        response: `**${numericInput} = ${result}**\n\nCalculated using advanced scientific calculator. (${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
+        confidence: Math.max(confidence, 0.9),
+      }
+    }
+  } catch (error) {
+    // If evaluation fails, continue with pattern matching
+    console.log("[v0] Expression evaluation failed, trying pattern matching")
+  }
+
+  const conversionMatch = lowerInput.match(/convert\s+(\d+\.?\d*)\s*(\w+)\s+(?:to|into)\s+(\w+)/i)
+  if (conversionMatch) {
+    try {
+      const [, value, fromUnit, toUnit] = conversionMatch
+      const result = UnitConverter.convert(Number.parseFloat(value), fromUnit, toUnit)
+      return {
+        tokens: tk.tokens,
+        tokenCount: tk.length,
+        semantics: sem,
+        response:
+          `**${value} ${fromUnit} = ${result.value.toFixed(4)} ${toUnit}**\n\n` +
+          `Conversion category: ${result.category}\n` +
+          `(Processed ${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
+        confidence: Math.max(confidence, 0.95),
+      }
+    } catch (error) {
+      return {
+        tokens: tk.tokens,
+        tokenCount: tk.length,
+        semantics: sem,
+        response: `I couldn't convert those units. ${error instanceof Error ? error.message : "Unknown error"}`,
+        confidence: 0.3,
+      }
+    }
+  }
+
+  if (lowerInput.includes("sqrt") || lowerInput.includes("square root")) {
+    const numMatch = numericInput.match(/(\d+\.?\d*)/)
+    if (numMatch) {
+      const num = Number.parseFloat(numMatch[1])
+      const result = ScientificCalculator.sqrt(num)
+      return {
+        tokens: tk.tokens,
+        tokenCount: tk.length,
+        semantics: sem,
+        response: `**√${num} = ${result.toFixed(6)}**\n\nSquare root calculated using scientific calculator.`,
+        confidence: Math.max(confidence, 0.95),
+      }
+    }
+  }
+
+  if (lowerInput.includes("factorial")) {
+    const numMatch = numericInput.match(/(\d+)/)
+    if (numMatch) {
+      try {
+        const num = Number.parseInt(numMatch[1])
+        const result = ScientificCalculator.factorial(num)
+        return {
+          tokens: tk.tokens,
+          tokenCount: tk.length,
+          semantics: sem,
+          response: `**${num}! = ${result}**\n\nFactorial calculated: ${num}! = ${num} × ${num - 1} × ... × 2 × 1 = ${result}`,
+          confidence: Math.max(confidence, 0.95),
+        }
+      } catch (error) {
+        return {
+          tokens: tk.tokens,
+          tokenCount: tk.length,
+          semantics: sem,
+          response: `Error calculating factorial: ${error instanceof Error ? error.message : "Unknown error"}`,
+          confidence: 0.3,
+        }
+      }
+    }
+  }
+
+  if (lowerInput.includes("percent") || lowerInput.includes("%")) {
+    const percentMatch = numericInput.match(/(\d+\.?\d*)\s*%\s*of\s*(\d+\.?\d*)/i)
+    if (percentMatch) {
+      const [, percent, whole] = percentMatch
+      const result = (Number.parseFloat(percent) / 100) * Number.parseFloat(whole)
+      return {
+        tokens: tk.tokens,
+        tokenCount: tk.length,
+        semantics: sem,
+        response: `**${percent}% of ${whole} = ${result}**\n\nCalculated: (${percent} ÷ 100) × ${whole} = ${result}`,
+        confidence: Math.max(confidence, 0.95),
+      }
+    }
+  }
+
+  if (lowerInput.includes("average") || lowerInput.includes("mean")) {
+    const numbers = numericInput.match(/\d+\.?\d*/g)
+    if (numbers && numbers.length > 1) {
+      const nums = numbers.map((n) => Number.parseFloat(n))
+      const result = ScientificCalculator.mean(nums)
+      return {
+        tokens: tk.tokens,
+        tokenCount: tk.length,
+        semantics: sem,
+        response: `**Average of [${nums.join(", ")}] = ${result.toFixed(2)}**\n\nSum: ${ScientificCalculator.add(...nums).toFixed(2)}, Count: ${nums.length}`,
+        confidence: Math.max(confidence, 0.9),
+      }
+    }
+  }
+
   const addMultMatch = numericInput.match(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)/i)
   if (addMultMatch) {
     const [, num1, num2, num3] = addMultMatch
-    const multiplyResult = multiply(Number.parseInt(num2), Number.parseInt(num3))
-    const finalResult = add(Number.parseInt(num1), multiplyResult)
+    const multiplyResult = ScientificCalculator.multiply(Number.parseInt(num2), Number.parseInt(num3))
+    const finalResult = ScientificCalculator.add(Number.parseInt(num1), multiplyResult)
 
     return {
       tokens: tk.tokens,
@@ -106,29 +219,27 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     }
   }
 
-  // Handle expressions like "3×3+3" (multiplication + addition)
   const multAddMatch = numericInput.match(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/i)
   if (multAddMatch) {
     const [, num1, num2, num3] = multAddMatch
-    const multiplyResult = multiply(Number.parseInt(num1), Number.parseInt(num2))
-    const finalResult = add(multiplyResult, Number.parseInt(num3))
+    const multiplyResult = ScientificCalculator.multiply(Number.parseInt(num1), Number.parseInt(num2))
+    const finalResult = ScientificCalculator.add(multiplyResult, Number.parseInt(num3))
     return {
       tokens: tk.tokens,
       tokenCount: tk.length,
       semantics: sem,
       response:
         `${num1} × ${num2} + ${num3} = ${finalResult}. ` +
-        `First we multiply ${num1} × ${num2} = ${multiply(Number.parseInt(num1), Number.parseInt(num2))}, then add ${num3} to get ${finalResult}. ` +
+        `First we multiply ${num1} × ${num2} = ${multiplyResult}, then add ${num3} to get ${finalResult}. ` +
         `(Processed with ${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
       confidence,
     }
   }
 
-  // Handle simple addition expressions like "3+3"
   const simpleAddMatch = numericInput.match(/(\d+)\s*\+\s*(\d+)/i)
   if (simpleAddMatch) {
     const [, num1, num2] = simpleAddMatch
-    const result = add(Number.parseInt(num1), Number.parseInt(num2))
+    const result = ScientificCalculator.add(Number.parseInt(num1), Number.parseInt(num2))
     return {
       tokens: tk.tokens,
       tokenCount: tk.length,
@@ -138,11 +249,10 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     }
   }
 
-  // Handle simple multiplication expressions like "3×3"
   const simpleMultiplyMatch = numericInput.match(/(\d+)\s*[×x*]\s*(\d+)/i)
   if (simpleMultiplyMatch) {
     const [, num1, num2] = simpleMultiplyMatch
-    const result = multiply(Number.parseInt(num1), Number.parseInt(num2))
+    const result = ScientificCalculator.multiply(Number.parseInt(num1), Number.parseInt(num2))
     return {
       tokens: tk.tokens,
       tokenCount: tk.length,
@@ -201,20 +311,23 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
       tokens: tk.tokens,
       tokenCount: tk.length,
       semantics: sem,
-      response:
-        "Pi (π) is approximately 3.14159265359. It represents the ratio of a circle's circumference to its diameter and is an irrational number (never-ending, non-repeating decimal).",
+      response: `Pi (π) is approximately ${ScientificCalculator.PI}. It represents the ratio of a circle's circumference to its diameter and is an irrational number (never-ending, non-repeating decimal).`,
       confidence,
     }
   }
 
-  // Default mathematics response - only shown for math-related queries
   return {
     tokens: tk.tokens,
     tokenCount: tk.length,
     semantics: sem,
     response:
-      `I can help with mathematical calculations and concepts. Try asking me to calculate expressions like "three times three plus three" or "five plus seven", ` +
-      `or questions about mathematical concepts like Fibonacci, prime numbers, or pi. ` +
+      `I can help with mathematical calculations and concepts:\n\n` +
+      `**Basic Operations**: "3 + 5", "12 × 7", "100 - 45"\n` +
+      `**Scientific**: "sqrt(16)", "5 factorial", "sin(45)"\n` +
+      `**Statistics**: "average of 10, 20, 30, 40"\n` +
+      `**Conversions**: "convert 5 km to miles", "convert 100 celsius to fahrenheit"\n` +
+      `**Percentages**: "25% of 200"\n` +
+      `**Concepts**: Fibonacci, prime numbers, pi\n\n` +
       `(Processed ${tokens.length} tokens with ${(confidence * 100).toFixed(1)}% confidence)`,
     confidence,
   }
