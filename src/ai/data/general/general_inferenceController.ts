@@ -10,6 +10,29 @@ export const generalRunInference = async (input: string, context?: any) => {
   const confidence = inferenceResults?.confidence || 0.5
 
   let responseText = ""
+  const sources: string[] = []
+
+  if (input.match(/\b(wikipedia|what is ai|artificial intelligence|who invented ai)\b/i)) {
+    if (input.match(/\bwikipedia\b/i)) {
+      responseText += `**Wikipedia** is a free online encyclopedia that anyone can edit. It was launched on January 15, 2001, by Jimmy Wales and Larry Sanger. Wikipedia contains over 60 million articles in more than 300 languages, making it one of the largest and most popular reference works on the internet.\n\n`
+      sources.push("General Knowledge")
+    }
+
+    if (input.match(/\b(what is ai|artificial intelligence)\b/i)) {
+      responseText += `**Artificial Intelligence (AI)** is the simulation of human intelligence by machines, especially computer systems. AI systems can learn, reason, and self-correct.\n\n`
+      responseText += `**Key pioneers:**\n`
+      responseText += `- **Alan Turing** (1950) - Proposed the Turing Test\n`
+      responseText += `- **John McCarthy** (1956) - Coined the term "Artificial Intelligence" at the Dartmouth Conference\n`
+      responseText += `- **Marvin Minsky** - Co-founder of MIT AI Lab\n\n`
+      responseText += `**How AI works:**\n`
+      responseText += `1. **Machine Learning** - Systems learn from data without explicit programming\n`
+      responseText += `2. **Neural Networks** - Inspired by human brain structure\n`
+      responseText += `3. **Deep Learning** - Multiple layers of neural networks for complex pattern recognition\n`
+      responseText += `4. **Natural Language Processing** - Understanding and generating human language\n\n`
+      responseText += `AI is used for image recognition, speech processing, autonomous vehicles, medical diagnosis, and much more.`
+      sources.push("AI Knowledge Base")
+    }
+  }
 
   // Handle name introductions
   const nameMatch = input.match(/\b(?:i'm|i am|my name is|call me|this is)\s+([a-z]+)\b/i)
@@ -54,11 +77,11 @@ export const generalRunInference = async (input: string, context?: any) => {
         ) || input.split(" ").pop()
 
       // Use URL lookup to search Wikipedia
-      const sources = await searchSources("general", topic || input)
+      const sourcesFromLookup = await searchSources("general", topic || input)
 
-      if (sources && sources.length > 0) {
+      if (sourcesFromLookup && sourcesFromLookup.length > 0) {
         // Fetch content from the first Wikipedia result
-        const wikiUrl = sources[0]
+        const wikiUrl = sourcesFromLookup[0]
         const response = await fetch(wikiUrl)
         const html = await response.text()
 
@@ -72,6 +95,7 @@ export const generalRunInference = async (input: string, context?: any) => {
 
           responseText += cleanText + `\n\n*Source: ${wikiUrl}*`
         }
+        sources.push(...sourcesFromLookup)
       }
     } catch (error) {
       // Fallback to hardcoded knowledge if URL lookup fails
@@ -86,16 +110,29 @@ export const generalRunInference = async (input: string, context?: any) => {
     responseText += `I'm **ZacAi Atomic**, a hybrid modular AI assistant. My name "Zac" comes from the Hebrew name Zechariah, meaning "God has remembered." I'm designed with atomic modularity, where each function is separated into its smallest possible unit for maximum flexibility and performance. `
   }
 
-  // If no specific response generated, return null to let other domains handle it
   if (!responseText) {
-    return null
+    // Try URL lookup as fallback
+    try {
+      const searchResults = await searchSources("general", input)
+      if (searchResults && searchResults.length > 0) {
+        responseText = searchResults.join("\n\n")
+        sources.push("Wikipedia")
+      }
+    } catch (error) {
+      console.log("[v0] URL lookup failed, using generic response")
+    }
+
+    // Final fallback
+    if (!responseText) {
+      responseText = `I can help with general knowledge questions. I have access to information about geography, history, science, and more. Try asking me about specific topics!`
+    }
   }
 
   return {
     response: responseText.trim(),
     confidence: confidence,
     domain: GENERAL_DOMAIN,
-    sources: ["General Knowledge Domain"],
+    sources: sources.length > 0 ? sources : ["General Knowledge Domain"],
     metadata: {
       tokensUsed: tokens.length,
       embeddingsUsed: embeddings.length > 0,
