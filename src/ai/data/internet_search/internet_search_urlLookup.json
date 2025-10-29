@@ -1,0 +1,47 @@
+{
+  "searchEngines": [
+    {
+      "name": "Google Search",
+      "url": "https://www.google.com/search",
+      "apiEndpoint": "https://www.googleapis.com/customsearch/v1",
+      "description": "Google web search engine",
+      "parameters": {
+        "q": "search query",
+        "key": "API key",
+        "cx": "Custom search engine ID"
+      }
+    },
+    {
+      "name": "Bing Search",
+      "url": "https://www.bing.com/search",
+      "apiEndpoint": "https://api.bing.microsoft.com/v7.0/search",
+      "description": "Microsoft Bing search engine",
+      "parameters": {
+        "q": "search query",
+        "Ocp-Apim-Subscription-Key": "API key"
+      }
+    },
+    {
+      "name": "DuckDuckGo",
+      "url": "https://duckduckgo.com",
+      "apiEndpoint": "https://api.duckduckgo.com",
+      "description": "Privacy-focused search engine",
+      "parameters": {
+        "q": "search query",
+        "format": "json"
+      }
+    }
+  ],
+  "tools": [
+    {
+      "name": "Web Scraper",
+      "description": "Extract data from web pages",
+      "libraries": ["cheerio", "puppeteer", "playwright"]
+    },
+    {
+      "name": "Web Crawler",
+      "description": "Systematically browse and index web pages",
+      "libraries": ["crawler", "node-crawler"]
+    }
+  ]
+}
