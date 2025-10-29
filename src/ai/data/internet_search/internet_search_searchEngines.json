@@ -1,0 +1,42 @@
+{
+  "engines": [
+    {
+      "name": "google",
+      "displayName": "Google",
+      "baseUrl": "https://www.google.com/search",
+      "queryParam": "q",
+      "enabled": true,
+      "priority": 1,
+      "rateLimit": {
+        "requestsPerMinute": 10,
+        "requestsPerHour": 100
+      }
+    },
+    {
+      "name": "bing",
+      "displayName": "Bing",
+      "baseUrl": "https://www.bing.com/search",
+      "queryParam": "q",
+      "enabled": true,
+      "priority": 2,
+      "rateLimit": {
+        "requestsPerMinute": 10,
+        "requestsPerHour": 100
+      }
+    },
+    {
+      "name": "duckduckgo",
+      "displayName": "DuckDuckGo",
+      "baseUrl": "https://duckduckgo.com/",
+      "queryParam": "q",
+      "enabled": true,
+      "priority": 3,
+      "rateLimit": {
+        "requestsPerMinute": 10,
+        "requestsPerHour": 100
+      }
+    }
+  ],
+  "defaultEngine": "google",
+  "fallbackOrder": ["google", "bing", "duckduckgo"]
+}
