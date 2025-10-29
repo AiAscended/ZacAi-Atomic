@@ -40,8 +40,8 @@ const wordToNumber: Record<string, number> = {
 function convertWordsToNumbers(input: string): string {
   let converted = input.toLowerCase()
 
-  // Replace operation words with symbols
   converted = converted
+    .replace(/\btime\s+/gi, "× ") // "108 time 9" -> "108 × 9"
     .replace(/\btimes\s+by\b/gi, "×")
     .replace(/\bmultiplied\s+by\b/gi, "×")
     .replace(/\btimes\b/gi, "×")
@@ -182,6 +182,27 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
 
   const calculations: string[] = []
 
+  const goesIntoPattern = /how\s+many\s+times\s+(?:does\s+)?(\w+)\s+goes?\s+into\s+(\w+)/gi
+  const goesIntoMatches = Array.from(input.matchAll(goesIntoPattern))
+
+  for (const match of goesIntoMatches) {
+    const [, divisorWord, dividendWord] = match
+    // Convert words to numbers first
+    const divisorConverted = convertWordsToNumbers(divisorWord)
+    const dividendConverted = convertWordsToNumbers(dividendWord)
+
+    const divisor = Number.parseInt(divisorConverted)
+    const dividend = Number.parseInt(dividendConverted)
+
+    if (!isNaN(divisor) && !isNaN(dividend) && divisor !== 0) {
+      const result = dividend / divisor
+      const isWholeNumber = result % 1 === 0
+      calculations.push(
+        `${divisor} goes into ${dividend} exactly ${isWholeNumber ? result : result.toFixed(2)} times (${dividend} ÷ ${divisor} = ${isWholeNumber ? result : result.toFixed(2)})`,
+      )
+    }
+  }
+
   const squareMatch = numericInput.match(/(\d+)\s+times\s+by\s+itself/i)
   if (squareMatch) {
     const num = Number.parseInt(squareMatch[1])
@@ -258,17 +279,6 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
       const result = multiply(Number.parseInt(num1), Number.parseInt(num2))
       calculations.push(`${num1} × ${num2} = ${result}`)
     }
-  }
-
-  // Handle "how many times X goes into Y" questions
-  const goesIntoMatches = Array.from(lowerInput.matchAll(/how\s+many\s+times\s+(\d+)\s+goes\s+into\s+(\d+)/gi))
-  for (const match of goesIntoMatches) {
-    const [, divisor, dividend] = match
-    const result = Number.parseInt(dividend) / Number.parseInt(divisor)
-    const isWholeNumber = result % 1 === 0
-    calculations.push(
-      `${divisor} goes into ${dividend} exactly ${isWholeNumber ? result : result.toFixed(2)} times (${dividend} ÷ ${divisor} = ${isWholeNumber ? result : result.toFixed(2)})`,
-    )
   }
 
   // Handle word problems like "double the quantity of four apples times four apples plus four more apples"
