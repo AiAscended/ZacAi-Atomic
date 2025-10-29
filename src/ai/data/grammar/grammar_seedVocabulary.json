@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "domain": "grammar",
+  "rules": [
+    "Subject-Verb Agreement",
+    "Proper Punctuation",
+    "Sentence Structure",
+    "Parts of Speech",
+    "Tense Consistency",
+    "Active vs Passive Voice",
+    "Parallel Structure",
+    "Modifier Placement"
+  ]
+}

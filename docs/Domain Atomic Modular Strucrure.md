@@ -16,7 +16,7 @@ Each **knowledge domain** (e.g., English language, mathematics, programming) is 
 
 Example folder:
 
-```
+\`\`\`
 /data/domains/english/
   - seedVocabulary.json
   - learnedData.json
@@ -26,7 +26,7 @@ Example folder:
     - grammarRules.ts
     - semanticAnalyzer.ts
     - trainingController.ts
-```
+\`\`\`
 
 ***
 
@@ -75,7 +75,7 @@ Example folder:
 
 ### 6. **Summary of Folder/File Organization**
 
-```
+\`\`\`
 /data/domains/
   /english/
     seedVocabulary.json
@@ -110,7 +110,7 @@ Example folder:
   pipelineController.ts          # Multi-domain learning and inference orchestration
   taskScheduler.ts
   eventBus.ts
-```
+\`\`\`
 
 ***
 
@@ -160,7 +160,7 @@ Here’s the best practice approach integrating all your requirements:
 
 ### 2. **File / Folder Structure: Modular Data Domains**
 
-```
+\`\`\`
 /data                     # Persistent storage: seed & learned data
   /domains
     /english
@@ -207,7 +207,7 @@ Here’s the best practice approach integrating all your requirements:
 /config                    # App configuration includes data paths, domain discovery configs
   dataPaths.ts             # E.g. mapping domain names to /data/domains/*
 
-```
+\`\`\`
 
 ***
 
@@ -318,4 +318,3 @@ This design balances:
 This way, your system will mirror the scientific hierarchy **both physically and functionally**, fully leveraging the bio-inspired modularity philosophy you want while keeping the system efficient and maintainable.
 
 If needed, help can be given to define this metadata schema, module interface standards, and orchestrator control code to fully realize this vision.
-

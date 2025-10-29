@@ -1,0 +1,10 @@
+{
+  "notes": ["Initial environment domain setup"],
+  "concepts": {
+    "containerization": "Packaging applications with dependencies",
+    "orchestration": "Managing containerized applications at scale",
+    "cicd": "Continuous integration and deployment pipelines",
+    "infrastructure": "Infrastructure as code with Terraform/Ansible",
+    "monitoring": "Application and infrastructure monitoring"
+  }
+}

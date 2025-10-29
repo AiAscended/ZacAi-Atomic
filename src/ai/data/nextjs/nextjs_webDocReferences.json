@@ -1,0 +1,29 @@
+{
+  "domain": "nextjs",
+  "references": [
+    {
+      "title": "Next.js Official Documentation",
+      "url": "https://nextjs.org/docs",
+      "topics": ["app-router", "pages-router", "getting-started"]
+    },
+    {
+      "title": "Next.js App Router",
+      "url": "https://nextjs.org/docs/app",
+      "topics": ["server-components", "routing", "data-fetching"]
+    },
+    {
+      "title": "Next.js API Reference",
+      "url": "https://nextjs.org/docs/app/api-reference",
+      "topics": ["functions", "components", "configuration"]
+    },
+    {
+      "title": "Next.js Deployment",
+      "url": "https://nextjs.org/docs/deployment",
+      "topics": ["vercel", "self-hosting", "static-export"]
+    }
+  ],
+  "metadata": {
+    "created": "2025-01-30",
+    "totalReferences": 4
+  }
+}
