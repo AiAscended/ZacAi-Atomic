@@ -68,6 +68,36 @@ export const generalRunInference = async (input: string, context?: any) => {
     confidence = 0.05
   }
 
+  const lowerInput = input.toLowerCase()
+  if (
+    lowerInput.includes("your name") ||
+    lowerInput.includes("who are you") ||
+    lowerInput.includes("what do you do") ||
+    lowerInput.includes("what are you")
+  ) {
+    responseText =
+      "I'm ZacAi-Atomic, a hybrid multi-domain modular AI assistant. " +
+      "I can help with mathematics, programming (TypeScript), general knowledge, internet searches, and more. " +
+      "I use domain-specific inference engines to provide accurate responses across multiple knowledge areas. " +
+      "Nice to meet you, Ron!"
+    sources.push("General Domain (Self-Description)")
+    confidence = 0.8
+    inferenceSucceeded = true
+
+    return {
+      response: responseText,
+      confidence,
+      domain: GENERAL_DOMAIN,
+      sources,
+      metadata: {
+        tokensUsed: tokens.length,
+        embeddingsUsed: embeddings.length > 0,
+        sentimentDetected: sentiment?.sentiment || "neutral",
+        inferenceMethod: "self_description",
+      },
+    }
+  }
+
   const hasTrainedKnowledge = confidence > 0.03 // Very low threshold for testing
 
   if (hasTrainedKnowledge) {
