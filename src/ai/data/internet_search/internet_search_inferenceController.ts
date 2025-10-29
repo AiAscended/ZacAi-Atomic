@@ -71,25 +71,14 @@ function calculateConfidence(tokens: string[], input: string): number {
  * Extract search query from user input
  */
 function extractSearchQuery(input: string, semantics: any): string {
-  const lowerInput = input.toLowerCase()
-
-  // Remove common question prefixes
-  let query = input
+  // Simply clean up the query by removing common prefixes
+  const query = input
     .replace(/^(can you |could you |please |would you )/i, "")
-    .replace(/^(search for |find |lookup |google |tell me about |what is |who is |where is )/i, "")
+    .replace(/^(search for |find |lookup |google |tell me about )/i, "")
     .replace(/\?$/g, "")
     .trim()
 
-  // For definition queries, add "definition" or "wikipedia"
-  if (semantics.queryType === "definition") {
-    query = `${query} definition site:wikipedia.org`
-  }
-
-  // For history queries, add "history"
-  if (semantics.queryType === "history" && !lowerInput.includes("history")) {
-    query = `${query} history`
-  }
-
+  // NO MORE HARDCODED ADDITIONS - the domain decides what to search for based on its own inference
   return query
 }
 
