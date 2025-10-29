@@ -223,7 +223,7 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     const multiplyResult = multiply(Number.parseInt(num2), Number.parseInt(num3))
     const finalResult = add(Number.parseInt(num1), multiplyResult)
     calculations.push(
-      `${num1} + ${num2} × ${num3} = ${finalResult} (multiply first: ${num2} × ${num3} = ${multiplyResult}, then add ${num1})`,
+      `${num1} + ${num2} × ${num3} = ${finalResult} (order of operations: ${num2} × ${num3} = ${multiplyResult}, then ${num1} + ${multiplyResult} = ${finalResult})`,
     )
   }
 
