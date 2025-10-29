@@ -35,7 +35,8 @@ import { listDomains, type DomainAPI } from "../data/registry"
 import { SessionManager } from "../context_management/sessionManager"
 import { ContextWindowManager } from "../context_management/contextWindowManager"
 import { classifyIntent } from "../context_management/intentClassifier"
-import { searchWeb } from "../knowledge_retrieval/webSearchAPIConnector"
+// import { searchWeb } from "../knowledge_retrieval/webSearchAPIConnector"
+import { searchAndScrapeGoogle, searchWikipedia } from "../shared/tools/webScraper"
 import { publish, subscribe } from "./eventBus"
 import dataRegistry from "../data/dataRegistry"
 import { textNormalizer } from "../input_processing/textNormalizer"
@@ -289,18 +290,28 @@ export class AIOrchestrator {
       }
 
       const needsSearch = this.needsInternetSearch(normalizedText)
-      let searchResults: string[] = []
+      const searchResults: string[] = []
 
       if (needsSearch) {
-        this.thinkingTracker.addStep("search", "Performing internet search")
-        logger.info("AIOrchestrator", "Performing internet search...")
+        this.thinkingTracker.addStep("search", "Performing web scraping search")
+        logger.info("AIOrchestrator", "Performing web scraping search...")
         try {
-          const results = await searchWeb(normalizedText)
-          searchResults = results.map((r) => r.snippet || r.title)
+          // Try Wikipedia first for factual queries
+          if (normalizedText.toLowerCase().includes("wikipedia") || normalizedText.toLowerCase().includes("history")) {
+            const wikiResult = await searchWikipedia(normalizedText)
+            if (wikiResult) {
+              searchResults.push(`${wikiResult.title}: ${wikiResult.snippet}`)
+            }
+          }
+
+          // Then try Google scraping
+          const results = await searchAndScrapeGoogle(normalizedText, 3)
+          searchResults.push(...results.map((r) => `${r.title}: ${r.snippet}`))
+
           this.thinkingTracker.addStep("search_complete", `Found ${searchResults.length} search results`)
           logger.info("AIOrchestrator", `Found ${searchResults.length} search results`)
         } catch (error) {
-          logger.error("AIOrchestrator", "Search failed", error)
+          logger.error("AIOrchestrator", "Web scraping search failed", error)
         }
       }
 
@@ -328,7 +339,7 @@ export class AIOrchestrator {
         searchResults,
         relevantDomains.map((d) => d.name),
         inferenceResults.reduce((sum, r) => sum + r.confidence, 0) / (inferenceResults.length || 1),
-        subtasks, // Pass subtasks for validation
+        subtasks,
       )
 
       response.text = postProcess(response.text)
@@ -342,7 +353,7 @@ export class AIOrchestrator {
         userProfile: Object.keys(userProfile).length > 0 ? userProfile : undefined,
         dialogueState: dialogueResult.status,
         thinkingSteps: this.thinkingTracker.getSteps(),
-        subtasks: subtasks.length > 0 ? subtasks : undefined, // Include subtasks in metadata
+        subtasks: subtasks.length > 0 ? subtasks : undefined,
       }
 
       await this.saveInteraction(sessionId, prompt, response)

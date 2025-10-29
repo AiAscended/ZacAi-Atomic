@@ -14,12 +14,13 @@ export interface ScrapedContent {
 }
 
 /**
- * Extract text content from HTML
+ * Extract text content from HTML and clean it properly
  */
 function extractTextFromHTML(html: string): string {
   // Remove script and style tags
   let text = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
   text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+  text = text.replace(/<noscript[^>]*>[\s\S]*?<\/noscript>/gi, "")
 
   // Remove HTML tags
   text = text.replace(/<[^>]+>/g, " ")
@@ -31,6 +32,8 @@ function extractTextFromHTML(html: string): string {
   text = text.replace(/&gt;/g, ">")
   text = text.replace(/&quot;/g, '"')
   text = text.replace(/&#39;/g, "'")
+  text = text.replace(/&apos;/g, "'")
+  text = text.replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec))
 
   // Clean up whitespace
   text = text.replace(/\s+/g, " ").trim()
@@ -162,6 +165,53 @@ export async function searchAndScrapeGoogle(query: string, limit = 3): Promise<S
 }
 
 /**
+ * Search Bing and scrape results (no API key needed)
+ */
+export async function searchAndScrapeBing(query: string, limit = 3): Promise<ScrapedContent[]> {
+  const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`
+
+  try {
+    const response = await fetch("/api/proxy-fetch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: searchUrl }),
+    })
+
+    if (!response.ok) {
+      return []
+    }
+
+    const html = await response.text()
+
+    // Extract search result URLs from Bing HTML
+    const urlMatches = html.matchAll(/<a[^>]*href=["']([^"']+)["'][^>]*>/g)
+    const urls: string[] = []
+
+    for (const match of urlMatches) {
+      const url = match[1]
+      if (url.startsWith("http") && !url.includes("bing.com") && !url.includes("microsoft.com")) {
+        urls.push(url)
+        if (urls.length >= limit) break
+      }
+    }
+
+    // Scrape each result URL
+    const results: ScrapedContent[] = []
+    for (const url of urls) {
+      const content = await scrapeURL(url)
+      if (content) {
+        results.push(content)
+      }
+    }
+
+    return results
+  } catch (error) {
+    console.error("[v0] Bing search scraping failed:", error)
+    return []
+  }
+}
+
+/**
  * Search Wikipedia and extract content
  */
 export async function searchWikipedia(query: string): Promise<ScrapedContent | null> {
@@ -191,4 +241,58 @@ export async function searchWikipedia(query: string): Promise<ScrapedContent | n
     console.error("[v0] Wikipedia search failed:", error)
     return null
   }
+}
+
+/**
+ * Search DuckDuckGo and scrape results (no API key needed)
+ */
+export async function searchAndScrapeDuckDuckGo(query: string, limit = 3): Promise<ScrapedContent[]> {
+  const searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`
+
+  try {
+    const response = await fetch("/api/proxy-fetch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: searchUrl }),
+    })
+
+    if (!response.ok) {
+      return []
+    }
+
+    const html = await response.text()
+
+    // Extract search result URLs from DuckDuckGo HTML
+    const urlMatches = html.matchAll(/<a[^>]*href=["']([^"']+)["'][^>]*class=["'][^"']*result[^"']*["']/g)
+    const urls: string[] = []
+
+    for (const match of urlMatches) {
+      const url = match[1]
+      if (url.startsWith("http") && !url.includes("duckduckgo.com")) {
+        urls.push(url)
+        if (urls.length >= limit) break
+      }
+    }
+
+    // Scrape each result URL
+    const results: ScrapedContent[] = []
+    for (const url of urls) {
+      const content = await scrapeURL(url)
+      if (content) {
+        results.push(content)
+      }
+    }
+
+    return results
+  } catch (error) {
+    console.error("[v0] DuckDuckGo search scraping failed:", error)
+    return []
+  }
+}
+
+/**
+ * Crawl a domain-specific URL from webDocReferences
+ */
+export async function crawlDomainSource(url: string): Promise<ScrapedContent | null> {
+  return await scrapeURL(url)
 }
