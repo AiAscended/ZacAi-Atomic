@@ -67,9 +67,11 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
 
   const inferenceResults = context?.inferenceResults
   const tokens = context?.tokens || []
-  const confidence = Array.isArray(inferenceResults)
-    ? inferenceResults.reduce((sum, r) => sum + (r.confidence || 0), 0) / (inferenceResults.length || 1)
-    : inferenceResults?.confidence || 0.5
+
+  const domainInferenceResult = Array.isArray(inferenceResults)
+    ? inferenceResults.find((r) => r.domain === "mathematics")
+    : inferenceResults
+  const confidence = domainInferenceResult?.confidence || 0.5
 
   const numericInput = convertWordsToNumbers(input)
   const lowerInput = numericInput.toLowerCase()
