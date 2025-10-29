@@ -1,0 +1,68 @@
+{
+  "domain": "internet_search",
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-30",
+  "searchEngines": [
+    {
+      "name": "Google",
+      "baseUrl": "https://www.google.com/search",
+      "apiUrl": "https://www.googleapis.com/customsearch/v1",
+      "priority": 1,
+      "features": ["web_search", "image_search", "news_search", "scholar"],
+      "rateLimit": "100_requests_per_day_free"
+    },
+    {
+      "name": "Bing",
+      "baseUrl": "https://www.bing.com/search",
+      "apiUrl": "https://api.bing.microsoft.com/v7.0/search",
+      "priority": 2,
+      "features": ["web_search", "image_search", "news_search", "video_search"],
+      "rateLimit": "1000_requests_per_month_free"
+    },
+    {
+      "name": "DuckDuckGo",
+      "baseUrl": "https://duckduckgo.com",
+      "apiUrl": "https://api.duckduckgo.com",
+      "priority": 3,
+      "features": ["web_search", "instant_answers", "privacy_focused"],
+      "rateLimit": "unlimited"
+    }
+  ],
+  "crawlerTools": [
+    {
+      "name": "Cheerio",
+      "url": "https://cheerio.js.org",
+      "type": "html_parser",
+      "useCase": "server_side_scraping"
+    },
+    {
+      "name": "Puppeteer",
+      "url": "https://pptr.dev",
+      "type": "headless_browser",
+      "useCase": "dynamic_content_scraping"
+    },
+    {
+      "name": "Playwright",
+      "url": "https://playwright.dev",
+      "type": "headless_browser",
+      "useCase": "cross_browser_scraping"
+    }
+  ],
+  "apiEndpoints": {
+    "google": {
+      "search": "https://www.googleapis.com/customsearch/v1?key={API_KEY}&cx={SEARCH_ENGINE_ID}&q={QUERY}",
+      "requiresAuth": true
+    },
+    "bing": {
+      "search": "https://api.bing.microsoft.com/v7.0/search?q={QUERY}",
+      "requiresAuth": true,
+      "headers": {
+        "Ocp-Apim-Subscription-Key": "{API_KEY}"
+      }
+    },
+    "duckduckgo": {
+      "instantAnswer": "https://api.duckduckgo.com/?q={QUERY}&format=json",
+      "requiresAuth": false
+    }
+  }
+}
