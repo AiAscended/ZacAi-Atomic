@@ -40,6 +40,8 @@ const wordToNumber: Record<string, number> = {
 function convertWordsToNumbers(input: string): string {
   let converted = input.toLowerCase()
 
+  converted = converted.replace(/(\d+)\s+ten\s+times/gi, "$1 × 10")
+
   converted = converted
     .replace(/\btime\s+/gi, "× ") // "108 time 9" -> "108 × 9"
     .replace(/\btimes\s+by\b/gi, "×")
@@ -182,24 +184,47 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
 
   const calculations: string[] = []
 
-  const goesIntoPattern = /how\s+many\s+times\s+(?:does\s+)?(\w+)\s+goes?\s+into\s+(\w+)/gi
+  const tenTimesPattern = /(\d+)\s+ten\s+times/gi
+  const tenTimesMatches = Array.from(input.matchAll(tenTimesPattern))
+
+  for (const match of tenTimesMatches) {
+    const [, num] = match
+    const result = multiply(Number.parseInt(num), 10)
+    calculations.push(`${num} ten times = ${num} × 10 = ${result}`)
+  }
+
+  const goesIntoPattern =
+    /how\s+many\s+times\s+(?:does\s+|can\s+)?(\w+)\s+goes?\s+into\s+(?:that\s+final\s+number|(\w+))/gi
   const goesIntoMatches = Array.from(input.matchAll(goesIntoPattern))
 
   for (const match of goesIntoMatches) {
     const [, divisorWord, dividendWord] = match
     // Convert words to numbers first
     const divisorConverted = convertWordsToNumbers(divisorWord)
-    const dividendConverted = convertWordsToNumbers(dividendWord)
+    let dividendConverted = dividendWord ? convertWordsToNumbers(dividendWord) : null
 
-    const divisor = Number.parseInt(divisorConverted)
-    const dividend = Number.parseInt(dividendConverted)
+    if (!dividendConverted && match[0].includes("that final number")) {
+      // Look for the last calculated result in previous calculations
+      if (calculations.length > 0) {
+        const lastCalc = calculations[calculations.length - 1]
+        const resultMatch = lastCalc.match(/=\s*(\d+)(?:\s|$)/)
+        if (resultMatch) {
+          dividendConverted = resultMatch[1]
+        }
+      }
+    }
 
-    if (!isNaN(divisor) && !isNaN(dividend) && divisor !== 0) {
-      const result = dividend / divisor
-      const isWholeNumber = result % 1 === 0
-      calculations.push(
-        `${divisor} goes into ${dividend} exactly ${isWholeNumber ? result : result.toFixed(2)} times (${dividend} ÷ ${divisor} = ${isWholeNumber ? result : result.toFixed(2)})`,
-      )
+    if (dividendConverted) {
+      const divisor = Number.parseInt(divisorConverted)
+      const dividend = Number.parseInt(dividendConverted)
+
+      if (!isNaN(divisor) && !isNaN(dividend) && divisor !== 0) {
+        const result = dividend / divisor
+        const isWholeNumber = result % 1 === 0
+        calculations.push(
+          `${divisor} goes into ${dividend} exactly ${isWholeNumber ? result : result.toFixed(2)} times (${dividend} ÷ ${divisor} = ${isWholeNumber ? result : result.toFixed(2)})`,
+        )
+      }
     }
   }
 
@@ -294,6 +319,22 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
         `Step 2: ${multiplyResult} + ${num3} = ${addResult}\n` +
         `Step 3: Double it: ${addResult} × 2 = ${doubledResult}`,
     )
+  }
+
+  const addDivMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[÷/]\s*(\d+)/gi))
+  for (const match of addDivMatches) {
+    const [, num1, num2, num3] = match
+    const divisor = Number.parseInt(num3)
+    if (divisor === 0) {
+      calculations.push(`${num1} + ${num2} ÷ ${num3} = undefined (cannot divide by zero)`)
+    } else {
+      const divideResult = Number.parseInt(num2) / divisor
+      const finalResult = add(Number.parseInt(num1), divideResult)
+      const isWholeNumber = finalResult % 1 === 0
+      calculations.push(
+        `${num1} + ${num2} ÷ ${num3} = ${isWholeNumber ? finalResult : finalResult.toFixed(2)} (order of operations: ${num2} ÷ ${num3} = ${divideResult.toFixed(2)}, then ${num1} + ${divideResult.toFixed(2)} = ${isWholeNumber ? finalResult : finalResult.toFixed(2)})`,
+      )
+    }
   }
 
   // If we found calculations, return them all
