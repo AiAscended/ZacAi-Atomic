@@ -52,7 +52,20 @@ function convertWordsToNumbers(input: string): string {
     .replace(/\bhow\s+much\??/gi, "")
     .replace(/\bwhat\s+is\b/gi, "")
 
-  // Process compound numbers first (e.g., "ninety nine" -> "99")
+  // Process hundreds first
+  converted = converted.replace(/(\w+)\s+hundred(?:\s+and)?\s+(\w+)/gi, (match, hundreds, remainder) => {
+    const hundredValue = wordToNumber[hundreds.toLowerCase()] || 0
+    const remainderValue = wordToNumber[remainder.toLowerCase()] || 0
+    return String(hundredValue * 100 + remainderValue)
+  })
+
+  // Process standalone hundreds
+  converted = converted.replace(/(\w+)\s+hundred/gi, (match, hundreds) => {
+    const hundredValue = wordToNumber[hundreds.toLowerCase()] || 0
+    return String(hundredValue * 100)
+  })
+
+  // Process compound numbers (e.g., "ninety nine" -> "99")
   converted = converted
     .replace(/\bninety\s+nine\b/gi, "99")
     .replace(/\bninety\s+eight\b/gi, "98")
@@ -146,7 +159,8 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
   const domainInferenceResult = Array.isArray(inferenceResults)
     ? inferenceResults.find((r) => r.domain === "mathematics")
     : inferenceResults
-  const confidence = domainInferenceResult?.confidence || 0.5
+
+  const confidence = domainInferenceResult?.confidence || 0.05
 
   const numericInput = convertWordsToNumbers(input)
   const lowerInput = numericInput.toLowerCase()
@@ -167,6 +181,13 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
   }
 
   const calculations: string[] = []
+
+  const squareMatch = numericInput.match(/(\d+)\s+times\s+by\s+itself/i)
+  if (squareMatch) {
+    const num = Number.parseInt(squareMatch[1])
+    const result = multiply(num, num)
+    calculations.push(`${num} × ${num} = ${result} (${num} squared)`)
+  }
 
   // Find all chained multiplication expressions (3+ numbers)
   const chainedMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)\s*[×x*]\s*(\d+)/gi))

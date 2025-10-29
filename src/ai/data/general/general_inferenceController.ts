@@ -63,29 +63,12 @@ export const generalRunInference = async (input: string, context?: any) => {
 
   console.log(`[v0] ${GENERAL_DOMAIN} inference confidence:`, confidence)
 
-  if (confidence < 0.1) {
-    return {
-      response: null,
-      confidence: 0,
-      domain: GENERAL_DOMAIN,
-      sources: [],
-      error: {
-        code: "LOW_CONFIDENCE",
-        message: "Inference confidence too low for this domain",
-        details: {
-          inferenceConfidence: confidence,
-          tokensProcessed: tokens.length,
-        },
-      },
-      metadata: {
-        tokensUsed: tokens.length,
-        embeddingsUsed: embeddings.length > 0,
-        sentimentDetected: sentiment?.sentiment || "neutral",
-      },
-    }
+  if (confidence < 0.05) {
+    // Still try URL lookup even with low confidence
+    confidence = 0.05
   }
 
-  const hasTrainedKnowledge = confidence > 0.05 // Very low threshold for testing
+  const hasTrainedKnowledge = confidence > 0.03 // Very low threshold for testing
 
   if (hasTrainedKnowledge) {
     try {

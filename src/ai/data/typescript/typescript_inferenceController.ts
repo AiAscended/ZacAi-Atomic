@@ -44,7 +44,8 @@ function calculateConfidence(tokens: string[], input: string): number {
     { regex: /\b(typescript|ts)\b/i, weight: 0.95 },
     { regex: /\b(code|example|sample|file)\b/i, weight: 0.75 },
     { regex: /\b(interface|type|class|function)\b/i, weight: 0.85 },
-    { regex: /\b(show|demonstrate|create)\b/i, weight: 0.65 },
+    { regex: /\b(show|demonstrate|create|generate)\b/i, weight: 0.65 },
+    { regex: /\b(entry|point|main|index|page)\b/i, weight: 0.7 },
   ]
 
   for (const pattern of patterns) {
@@ -59,6 +60,10 @@ function calculateConfidence(tokens: string[], input: string): number {
   // Combine scores using weights from pretrained config
   const thresholds = pretrainedWeights.thresholds
   const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
+
+  if (lowerInput.match(/\b(code|example|file|entry|main|index)\b/)) {
+    return Math.min(finalConfidence + 0.2, 1.0)
+  }
 
   return Math.min(finalConfidence, 1.0)
 }
@@ -591,7 +596,7 @@ export async function typescriptRunInference(input: string, context?: InferenceC
 
   const confidence = calculateConfidence(tokens, input)
 
-  if (confidence < pretrainedWeights.thresholds.min_confidence) {
+  if (confidence < 0.05) {
     return {
       response: null,
       confidence: 0,
@@ -599,7 +604,7 @@ export async function typescriptRunInference(input: string, context?: InferenceC
       sources: [],
       error: {
         code: "LOW_CONFIDENCE",
-        message: `Query confidence (${confidence.toFixed(2)}) below threshold (${pretrainedWeights.thresholds.min_confidence})`,
+        message: `Query confidence (${confidence.toFixed(2)}) below threshold (0.05)`,
       },
     }
   }
