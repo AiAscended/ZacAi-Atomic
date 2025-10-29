@@ -15,7 +15,7 @@
  * - src/input_processing/wordTokenizer.ts (word tokenization)
  * - src/input_processing/sentenceBoundaryDetector.ts (sentence boundary detection)
  * - src/output_generation/responsePostProcessor.ts (response post-processing)
- * - src/ai/orchestration/inferenceEngine.ts (neural network inference)
+ * - src/ai/inference/inferenceEngine.ts (neural network inference)
  * - src/inference/batchAssembler.ts (batch assembly)
  * - src/inference/latencyOptimizer.ts (latency optimization)
  * - src/inference/sequencePaddingManager.ts (sequence padding)
@@ -42,7 +42,7 @@ import { textNormalizer } from "../input_processing/textNormalizer"
 import { wordTokenizer } from "../input_processing/wordTokenizer"
 import { detectSentences } from "../input_processing/sentenceBoundaryDetector"
 import { postProcess } from "../output_generation/responsePostProcessor"
-import { InferenceEngine, defaultInferenceConfig, type InferenceInput } from "./inferenceEngine"
+import { InferenceEngine, defaultInferenceConfig, type InferenceInput } from "../inference/inferenceEngine"
 import { padOrTruncate } from "../inference/sequencePaddingManager"
 import { detectSentiment } from "../context_management/sentimentEmotionDetector"
 import { extractSlots } from "../context_management/slotFiller"
