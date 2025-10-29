@@ -73,12 +73,16 @@ export const generalRunInference = async (input: string, context?: any) => {
     lowerInput.includes("your name") ||
     lowerInput.includes("who are you") ||
     lowerInput.includes("what do you do") ||
-    lowerInput.includes("what are you")
+    lowerInput.includes("what are you") ||
+    lowerInput.includes("who invented you") ||
+    lowerInput.includes("what can you do") ||
+    lowerInput.includes("tell me about you")
   ) {
     responseText =
-      "I'm ZacAi-Atomic, a hybrid multi-domain modular AI assistant. " +
+      "I'm ZacAi-Atomic, a hybrid multi-domain modular AI assistant created by Ron. " +
       "I can help with mathematics, programming (TypeScript), general knowledge, internet searches, and more. " +
-      "I use domain-specific inference engines to provide accurate responses across multiple knowledge areas. " +
+      "I use domain-specific inference engines with pretrained weights to provide accurate responses across multiple knowledge areas. " +
+      "Each domain (mathematics, TypeScript, internet search, etc.) acts as a specialized mini-agent with its own tokenizer, semantic analyzer, and inference logic. " +
       "Nice to meet you, Ron!"
     sources.push("General Domain (Self-Description)")
     confidence = 0.8

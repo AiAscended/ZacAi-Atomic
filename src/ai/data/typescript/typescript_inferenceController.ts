@@ -72,6 +72,14 @@ function detectCodeContext(tokens: string[], input: string): string {
   const lowerInput = input.toLowerCase()
   const lowerTokens = tokens.map((t) => t.toLowerCase())
 
+  if (lowerInput.match(/\b(ai function|ai process|function for ai|ai file)\b/)) {
+    return "ai_function"
+  }
+
+  if (lowerInput.match(/\b(entry point|main file|index file|starting point)\b/)) {
+    return "entry_point"
+  }
+
   // Check for blockchain/crypto context
   const blockchainKeywords = ["blockchain", "crypto", "cryptocurrency", "block", "chain", "bitcoin", "ethereum"]
   if (blockchainKeywords.some((kw) => lowerTokens.includes(kw) || lowerInput.includes(kw))) {
@@ -107,6 +115,156 @@ function detectCodeContext(tokens: string[], input: string): string {
 
 function generateCodeExample(context: string): string {
   switch (context) {
+    case "ai_function":
+      return `\`\`\`typescript
+// ai-inference.ts - AI Inference Function
+/**
+ * Performs AI inference on input data using a trained model
+ * @param input - The input data to process
+ * @param modelWeights - Pretrained model weights
+ * @returns Prediction result with confidence score
+ */
+export async function aiInference(
+  input: number[],
+  modelWeights: number[][]
+): Promise<{ prediction: number[]; confidence: number }> {
+  // Normalize input
+  const normalizedInput = input.map(x => x / 255.0);
+  
+  // Forward pass through neural network
+  let activations = normalizedInput;
+  
+  for (const layerWeights of modelWeights) {
+    activations = activations.map((_, i) => {
+      const sum = layerWeights.reduce(
+        (acc, weight, j) => acc + weight * activations[j],
+        0
+      );
+      return sigmoid(sum);
+    });
+  }
+  
+  // Calculate confidence (max activation value)
+  const confidence = Math.max(...activations);
+  
+  return {
+    prediction: activations,
+    confidence
+  };
+}
+
+/**
+ * Sigmoid activation function
+ */
+function sigmoid(x: number): number {
+  return 1 / (1 + Math.exp(-x));
+}
+
+/**
+ * Trains the AI model using backpropagation
+ * @param trainingData - Array of input-output pairs
+ * @param epochs - Number of training iterations
+ * @param learningRate - Learning rate for gradient descent
+ * @returns Trained model weights
+ */
+export async function trainAIModel(
+  trainingData: Array<{ input: number[]; output: number[] }>,
+  epochs: number = 100,
+  learningRate: number = 0.01
+): Promise<number[][]> {
+  // Initialize random weights
+  const weights: number[][] = [];
+  
+  // Training loop
+  for (let epoch = 0; epoch < epochs; epoch++) {
+    for (const sample of trainingData) {
+      const { prediction } = await aiInference(sample.input, weights);
+      
+      // Calculate error
+      const error = sample.output.map((target, i) => target - prediction[i]);
+      
+      // Update weights using gradient descent
+      // (simplified backpropagation)
+      weights.forEach((layer, i) => {
+        layer.forEach((weight, j) => {
+          weights[i][j] += learningRate * error[j] * sample.input[j];
+        });
+      });
+    }
+  }
+  
+  return weights;
+}
+
+/**
+ * Evaluates model performance on test data
+ * @param testData - Test dataset
+ * @param modelWeights - Trained model weights
+ * @returns Accuracy score (0-1)
+ */
+export async function evaluateModel(
+  testData: Array<{ input: number[]; output: number[] }>,
+  modelWeights: number[][]
+): Promise<number> {
+  let correct = 0;
+  
+  for (const sample of testData) {
+    const { prediction } = await aiInference(sample.input, modelWeights);
+    const predictedClass = prediction.indexOf(Math.max(...prediction));
+    const actualClass = sample.output.indexOf(Math.max(...sample.output));
+    
+    if (predictedClass === actualClass) {
+      correct++;
+    }
+  }
+  
+  return correct / testData.length;
+}
+\`\`\``
+
+    case "entry_point":
+      return `\`\`\`typescript
+// index.ts - Application Entry Point
+import { aiInference, trainAIModel, evaluateModel } from './ai-inference';
+import { loadDataset } from './data-loader';
+import { logger } from './utils/logger';
+
+/**
+ * Main application entry point
+ */
+async function main(): Promise<void> {
+  try {
+    logger.info('Starting AI application...');
+    
+    // Load training and test data
+    const { trainingData, testData } = await loadDataset('./data/dataset.json');
+    logger.info(\`Loaded \${trainingData.length} training samples\`);
+    
+    // Train the model
+    logger.info('Training model...');
+    const modelWeights = await trainAIModel(trainingData, 100, 0.01);
+    logger.info('Model training complete');
+    
+    // Evaluate model performance
+    const accuracy = await evaluateModel(testData, modelWeights);
+    logger.info(\`Model accuracy: \${(accuracy * 100).toFixed(2)}%\`);
+    
+    // Run inference on new data
+    const newInput = [0.5, 0.3, 0.8, 0.2];
+    const result = await aiInference(newInput, modelWeights);
+    logger.info('Inference result:', result);
+    
+    logger.info('Application completed successfully');
+  } catch (error) {
+    logger.error('Application error:', error);
+    process.exit(1);
+  }
+}
+
+// Run the application
+main();
+\`\`\``
+
     case "blockchain":
       return `\`\`\`typescript
 // Blockchain Implementation in TypeScript
@@ -613,11 +771,26 @@ export async function typescriptRunInference(input: string, context?: InferenceC
 
   const codeExample = generateCodeExample(codeContext)
 
-  const responseText = `Here's a TypeScript ${codeContext === "general" ? "" : codeContext + " "}code example:
+  let responseText = ""
+  if (codeContext === "ai_function") {
+    responseText = `Here's a TypeScript file with AI inference functions:
+
+${codeExample}
+
+This demonstrates a complete AI inference system with training, evaluation, and prediction functions.`
+  } else if (codeContext === "entry_point") {
+    responseText = `Here's a TypeScript entry point file (index.ts):
+
+${codeExample}
+
+This demonstrates the main application entry point that orchestrates AI training and inference.`
+  } else {
+    responseText = `Here's a TypeScript ${codeContext === "general" ? "" : codeContext + " "}code example:
 
 ${codeExample}
 
 This demonstrates TypeScript's type system${codeContext !== "general" ? ` for ${codeContext} use cases` : " with interfaces and classes"}.`
+  }
 
   return {
     response: responseText,
