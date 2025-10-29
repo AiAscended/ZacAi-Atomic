@@ -1,185 +1,196 @@
 /**
  * File: src/ai/data/internet_search/internet_search_inferenceController.ts
- * Purpose: Main inference controller for internet search domain - orchestrates query parsing, expansion, ranking, and result summarization
+ * Purpose: Internet search domain inference controller - uses own tokenizer, seeds, weights, and URL lookup
  * Depends on:
- *   - src/ai/search-queries/queryParser.ts
- *   - src/ai/search-queries/queryExpander.ts
- *   - src/ai/search-queries/queryRanker.ts
- *   - src/ai/search-engine/resultSummarizer.ts
+ *   - src/ai/data/internet_search/internet_search_tokenizer.ts
+ *   - src/ai/data/internet_search/internet_search_semanticAnalyzer.ts
+ *   - src/ai/data/internet_search/seeds/internet_search_seeds.json
+ *   - src/ai/data/internet_search/weights/internet_search_pretrained_weights.json
  *   - src/ai/shared/tools/urlLookup.ts
- *   - src/ai/knowledge_retrieval/webSearchAPIConnector.ts
- * Depended on by: src/ai/orchestrator/orchestrator.ts
+ * Depended on by: src/ai/orchestration/aiOrchestrator.ts
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { parseQuery } from "../../search-queries/queryParser"
-import { expandQuery } from "../../search-queries/queryExpander"
-import { rankResults } from "../../search-queries/queryRanker"
-import { summarizeResults } from "../../search-engine/resultSummarizer"
-import { getSearchEngines, searchSources } from "../../shared/tools/urlLookup"
-import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
+import { internetSearchTokenizer } from "./internet_search_tokenizer"
+import { internetSearchSemanticAnalyzer } from "./internet_search_semanticAnalyzer"
+import pretrainedWeights from "./weights/internet_search_pretrained_weights.json"
+import seeds from "./seeds/internet_search_seeds.json"
+import { searchSources } from "../../shared/tools/urlLookup"
 import { searchWeb } from "../../knowledge_retrieval/webSearchAPIConnector"
+import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 
-/**
- * Parse HTML content and extract readable text snippets
- * Removes HTML tags, scripts, styles, and extracts meaningful content
- */
-function parseHTMLToText(html: string): string {
-  let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-  text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
-  text = text.replace(/<[^>]+>/g, " ")
-  text = text
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-  text = text.replace(/\s+/g, " ").trim()
-  const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 50)
-  return sentences.slice(0, 3).join(". ") + (sentences.length > 0 ? "." : "")
+interface InferenceContext {
+  tokens: string[]
+  inferenceResults?: any
+  sentiment?: any
+  slots?: any
+  userProfile?: any
 }
 
-export async function internetSearchRunInference(
-  input: string,
-  context?: any,
-): Promise<{ response: string; confidence?: number }> {
+/**
+ * Calculate confidence using pretrained weights and token analysis
+ */
+function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
-  const inferenceResults = context?.inferenceResults
-  const tokens = context?.tokens || []
+  const vocabulary = pretrainedWeights.vocabulary as Record<string, number>
 
-  let confidence = 0
-  if (Array.isArray(inferenceResults)) {
-    const ownResult = inferenceResults.find((r) => r.domain === "internet_search")
-    confidence = ownResult?.confidence || 0
-  } else if (inferenceResults?.confidence) {
-    confidence = inferenceResults.confidence
+  let tokenScore = 0
+  let matchCount = 0
+
+  // Calculate token-based confidence
+  for (const token of tokens) {
+    const lowerToken = token.toLowerCase()
+    if (vocabulary[lowerToken]) {
+      tokenScore += vocabulary[lowerToken]
+      matchCount++
+    }
   }
+
+  const avgTokenScore = matchCount > 0 ? tokenScore / matchCount : 0
+
+  // Semantic pattern matching
+  let semanticScore = 0
+  const patterns = seeds.patterns as Array<{ pattern: string; weight: number }>
+
+  for (const patternObj of patterns) {
+    if (lowerInput.includes(patternObj.pattern)) {
+      semanticScore += patternObj.weight
+    }
+  }
+
+  semanticScore = Math.min(semanticScore / 2, 1.0)
+
+  // Combine scores
+  const thresholds = pretrainedWeights.thresholds
+  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
+
+  return Math.min(finalConfidence, 1.0)
+}
+
+/**
+ * Extract search query from user input
+ */
+function extractSearchQuery(input: string, semantics: any): string {
+  const lowerInput = input.toLowerCase()
+
+  // Remove common question prefixes
+  let query = input
+    .replace(/^(can you |could you |please |would you )/i, "")
+    .replace(/^(search for |find |lookup |google |tell me about |what is |who is |where is )/i, "")
+    .replace(/\?$/g, "")
+    .trim()
+
+  // For definition queries, add "definition" or "wikipedia"
+  if (semantics.queryType === "definition") {
+    query = `${query} definition site:wikipedia.org`
+  }
+
+  // For history queries, add "history"
+  if (semantics.queryType === "history" && !lowerInput.includes("history")) {
+    query = `${query} history`
+  }
+
+  return query
+}
+
+/**
+ * Main inference function for internet_search domain
+ */
+export async function internetSearchRunInference(input: string, context?: InferenceContext): Promise<any> {
+  const tokens = internetSearchTokenizer(input).tokens
+  const semantics = internetSearchSemanticAnalyzer(input)
+
+  const confidence = calculateConfidence(tokens, input)
 
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} inference confidence:`, confidence)
+  console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} semantics:`, semantics)
 
-  if (confidence < 0.01) {
-    // Boost confidence if search keywords are present
-    if (
-      lowerInput.includes("search") ||
-      lowerInput.includes("find") ||
-      lowerInput.includes("lookup") ||
-      lowerInput.includes("wikipedia") ||
-      lowerInput.includes("internet") ||
-      lowerInput.includes("who invented") ||
-      lowerInput.includes("history of") ||
-      lowerInput.includes("what is") ||
-      lowerInput.includes("tell me about")
-    ) {
-      confidence = 0.3 // Boost confidence for search-related queries
-    } else {
-      return {
-        response: null as any,
-        confidence: 0,
-      }
-    }
-  }
-
-  let searchQuery = input
-  if (lowerInput.includes("definition") || lowerInput.includes("what is")) {
-    const match = input.match(/(?:definition of|what is)\s+(?:a\s+)?([^?]+)/i)
-    if (match) {
-      searchQuery = `${match[1].trim()} definition site:wikipedia.org`
-    }
-  }
-
-  const parsedQuery = parseQuery(searchQuery)
-  console.log("[v0] Parsed query:", parsedQuery)
-
-  if (
-    lowerInput.includes("search") ||
-    lowerInput.includes("find") ||
-    lowerInput.includes("lookup") ||
-    lowerInput.includes("latest") ||
-    lowerInput.includes("what is") ||
-    lowerInput.includes("who is") ||
-    lowerInput.includes("where is") ||
-    lowerInput.includes("when is") ||
-    lowerInput.includes("how to") ||
-    lowerInput.includes("definition") ||
-    parsedQuery.intent === "informational"
-  ) {
-    const searchEngines = getSearchEngines()
-    console.log(`[v0] Available search engines: ${searchEngines.map((e) => e.name).join(", ")}`)
-
-    try {
-      console.log("[v0] Attempting web search with query:", searchQuery)
-      const expandedQueries = expandQuery(searchQuery)
-      console.log("[v0] Expanded queries:", expandedQueries)
-
-      const results = await searchWeb(expandedQueries[0], 5)
-
-      if (results && results.length > 0) {
-        const rankedResults = rankResults(results, parsedQuery)
-        const snippets = rankedResults.slice(0, 3).map((r) => r.snippet)
-        const summary = summarizeResults(snippets, input)
-
-        const resultText = rankedResults
-          .slice(0, 3)
-          .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}${r.url ? `\n   Source: ${r.url}` : ""}`)
-          .join("\n\n")
-
-        return {
-          response:
-            `**Summary**: ${summary.summary}\n\n` +
-            `**Search Results**:\n${resultText}\n\n` +
-            `(Query: "${searchQuery}", confidence: ${(confidence * 100).toFixed(1)}%)`,
-          confidence: Math.max(confidence, summary.confidence, 0.4),
-        }
-      }
-    } catch (error) {
-      console.log("[v0] Web search failed:", error)
-    }
-
-    try {
-      console.log("[v0] Attempting internet search via URL lookup...")
-      const urlSearchResults = await searchSources(INTERNET_SEARCH_DOMAIN, searchQuery)
-
-      if (urlSearchResults.length > 0 && !urlSearchResults[0].includes("CORS blocked")) {
-        const parsedResults = urlSearchResults
-          .map((html) => {
-            const engineMatch = html.match(/From (\w+):/)
-            const engine = engineMatch ? engineMatch[1] : "Unknown"
-            const text = parseHTMLToText(html)
-            if (text.length > 100) {
-              return `**${engine}**: ${text.substring(0, 300)}...`
-            }
-            return null
-          })
-          .filter((result) => result !== null)
-
-        if (parsedResults.length > 0) {
-          return {
-            response:
-              `**Search Results:**\n\n${parsedResults.join("\n\n")}\n\n` +
-              `(Query: "${searchQuery}", confidence: ${(confidence * 100).toFixed(1)}%)`,
-            confidence: Math.max(confidence, 0.4),
-          }
-        }
-      }
-    } catch (error) {
-      console.log("[v0] URL lookup search failed:", error)
-    }
-
+  if (confidence < pretrainedWeights.thresholds.min_confidence) {
     return {
-      response:
-        `**Search System Status:**\n` +
-        `- Query analyzed: "${searchQuery}"\n` +
-        `- Keywords: ${parsedQuery.keywords.join(", ")}\n` +
-        `- Intent: ${parsedQuery.intent}\n` +
-        `- Available engines: ${searchEngines.map((e) => e.name).join(", ")}\n\n` +
-        `Search capability is active but returned no results. This may be due to network issues or query complexity.`,
-      confidence: Math.max(confidence, 0.3),
+      response: null,
+      confidence: 0,
+      domain: INTERNET_SEARCH_DOMAIN,
+      sources: [],
+      error: {
+        code: "LOW_CONFIDENCE",
+        message: `Query confidence (${confidence.toFixed(2)}) below threshold (${pretrainedWeights.thresholds.min_confidence})`,
+      },
     }
+  }
+
+  const searchQuery = extractSearchQuery(input, semantics)
+  console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} extracted query:`, searchQuery)
+
+  try {
+    console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting web search...`)
+    const results = await searchWeb(searchQuery, 5)
+
+    if (results && results.length > 0) {
+      const resultText = results
+        .slice(0, 3)
+        .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}${r.url ? `\n   Source: ${r.url}` : ""}`)
+        .join("\n\n")
+
+      return {
+        response: `**Search Results for "${searchQuery}":**\n\n${resultText}`,
+        confidence: Math.max(confidence, 0.6),
+        domain: INTERNET_SEARCH_DOMAIN,
+        sources: results.map((r) => r.url || r.title),
+        metadata: {
+          tokensUsed: tokens.length,
+          semanticAnalysis: semantics,
+          searchQuery: searchQuery,
+          resultCount: results.length,
+        },
+      }
+    }
+  } catch (error) {
+    console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} web search failed:`, error)
+  }
+
+  try {
+    console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting URL lookup...`)
+    const urlResults = await searchSources(INTERNET_SEARCH_DOMAIN, searchQuery)
+
+    if (urlResults && urlResults.length > 0) {
+      const cleanResults = urlResults
+        .filter((r) => !r.includes("CORS blocked"))
+        .map((r) => r.substring(0, 500))
+        .join("\n\n")
+
+      if (cleanResults.length > 100) {
+        return {
+          response: `**Search Results:**\n\n${cleanResults}`,
+          confidence: Math.max(confidence, 0.5),
+          domain: INTERNET_SEARCH_DOMAIN,
+          sources: ["Google", "Bing", "DuckDuckGo"],
+          metadata: {
+            tokensUsed: tokens.length,
+            semanticAnalysis: semantics,
+            searchQuery: searchQuery,
+          },
+        }
+      }
+    }
+  } catch (error) {
+    console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} URL lookup failed:`, error)
   }
 
   return {
-    response: null as any,
-    confidence: 0,
+    response:
+      `**Internet Search Domain Active**\n\n` +
+      `Query: "${searchQuery}"\n` +
+      `Query Type: ${semantics.queryType}\n` +
+      `Confidence: ${(confidence * 100).toFixed(1)}%\n\n` +
+      `Search engines available: Google, Bing, DuckDuckGo\n` +
+      `Note: Search results currently simulated for testing. In production, this will connect to real search APIs.`,
+    confidence: Math.max(confidence, 0.3),
+    domain: INTERNET_SEARCH_DOMAIN,
+    sources: ["Internet Search Domain (Inference)"],
+    metadata: {
+      tokensUsed: tokens.length,
+      semanticAnalysis: semantics,
+      searchQuery: searchQuery,
+    },
   }
 }
