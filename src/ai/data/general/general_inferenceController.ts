@@ -63,12 +63,12 @@ export const generalRunInference = async (input: string, context?: any) => {
 
   console.log(`[v0] ${GENERAL_DOMAIN} inference confidence:`, confidence)
 
-  if (confidence < 0.05) {
-    // Still try URL lookup even with low confidence
+  if (confidence < 0.01) {
     confidence = 0.05
   }
 
   const lowerInput = input.toLowerCase()
+
   if (
     lowerInput.includes("your name") ||
     lowerInput.includes("who are you") ||
@@ -76,7 +76,9 @@ export const generalRunInference = async (input: string, context?: any) => {
     lowerInput.includes("what are you") ||
     lowerInput.includes("who invented you") ||
     lowerInput.includes("what can you do") ||
-    lowerInput.includes("tell me about you")
+    lowerInput.includes("tell me about you") ||
+    lowerInput.includes("your purpose") ||
+    lowerInput.includes("what is your purpose")
   ) {
     responseText =
       "I'm ZacAi-Atomic, a hybrid multi-domain modular AI assistant created by Ron. " +
@@ -99,6 +101,52 @@ export const generalRunInference = async (input: string, context?: any) => {
         sentimentDetected: sentiment?.sentiment || "neutral",
         inferenceMethod: "self_description",
       },
+    }
+  }
+
+  if (
+    lowerInput.match(/\b(what is|define|definition of|explain|tell me about)\b/) &&
+    lowerInput.match(/\b(scientific calculator|calculator|general knowledge|knowledge)\b/)
+  ) {
+    const queryKeywords = tokens
+      .filter((t: string) => {
+        const token = t.toLowerCase()
+        return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token)
+      })
+      .slice(0, 5)
+
+    if (lowerInput.includes("scientific calculator")) {
+      responseText =
+        "A scientific calculator is an advanced electronic calculator designed to perform complex mathematical operations beyond basic arithmetic. " +
+        "It can handle functions like trigonometry (sin, cos, tan), logarithms, exponentials, roots, powers, and statistical calculations. " +
+        "Scientific calculators are essential tools for students, engineers, scientists, and mathematicians. " +
+        "Examples of operations: sin(30°), log(100), √25, 2^8, factorial(5)."
+      sources.push("General Domain (Definition)")
+      confidence = 0.7
+      inferenceSucceeded = true
+    } else if (lowerInput.includes("general knowledge")) {
+      responseText =
+        "General knowledge refers to a broad understanding of facts, information, and concepts across various subjects and disciplines. " +
+        "It includes awareness of history, geography, science, culture, current events, and common facts that are widely known or easily accessible. " +
+        "General knowledge is often tested in quizzes, trivia games, and educational assessments."
+      sources.push("General Domain (Definition)")
+      confidence = 0.7
+      inferenceSucceeded = true
+    }
+
+    if (inferenceSucceeded) {
+      return {
+        response: responseText,
+        confidence,
+        domain: GENERAL_DOMAIN,
+        sources,
+        metadata: {
+          tokensUsed: tokens.length,
+          embeddingsUsed: embeddings.length > 0,
+          sentimentDetected: sentiment?.sentiment || "neutral",
+          inferenceMethod: "definition",
+        },
+      }
     }
   }
 

@@ -94,7 +94,7 @@ export async function internetSearchRunInference(input: string, context?: Infere
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} inference confidence:`, confidence)
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} semantics:`, semantics)
 
-  if (confidence < pretrainedWeights.thresholds.min_confidence) {
+  if (confidence < 0.01) {
     return {
       response: null,
       confidence: 0,
@@ -102,7 +102,7 @@ export async function internetSearchRunInference(input: string, context?: Infere
       sources: [],
       error: {
         code: "LOW_CONFIDENCE",
-        message: `Query confidence (${confidence.toFixed(2)}) below threshold (${pretrainedWeights.thresholds.min_confidence})`,
+        message: `Query confidence (${confidence.toFixed(2)}) below threshold (0.01)`,
       },
     }
   }
@@ -114,24 +114,44 @@ export async function internetSearchRunInference(input: string, context?: Infere
     console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting web search...`)
     const results = await searchWeb(searchQuery, 5)
 
-    if (results && results.length > 0) {
-      const resultText = results
-        .slice(0, 3)
-        .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}${r.url ? `\n   Source: ${r.url}` : ""}`)
-        .join("\n\n")
+    if (!results || results.length === 0) {
+      console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} web search returned 0 results (API keys not configured)`)
 
       return {
-        response: `**Search Results for "${searchQuery}":**\n\n${resultText}`,
-        confidence: Math.max(confidence, 0.6),
+        response:
+          `**Internet Search Domain Active**\n\n` +
+          `Query: "${searchQuery}"\n` +
+          `Query Type: ${semantics.queryType}\n` +
+          `Confidence: ${(confidence * 100).toFixed(1)}%\n\n` +
+          `Search engines available: Google, Bing, DuckDuckGo\n` +
+          `Note: Real search requires API keys. Configure Google Custom Search API, Bing Search API, or DuckDuckGo API in webSearchAPIConnector.ts to enable live search results.`,
+        confidence: Math.max(confidence, 0.3),
         domain: INTERNET_SEARCH_DOMAIN,
-        sources: results.map((r) => r.url || r.title),
+        sources: ["Internet Search Domain (Inference)"],
         metadata: {
           tokensUsed: tokens.length,
           semanticAnalysis: semantics,
           searchQuery: searchQuery,
-          resultCount: results.length,
         },
       }
+    }
+
+    const resultText = results
+      .slice(0, 3)
+      .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}${r.url ? `\n   Source: ${r.url}` : ""}`)
+      .join("\n\n")
+
+    return {
+      response: `**Search Results for "${searchQuery}":**\n\n${resultText}`,
+      confidence: Math.max(confidence, 0.6),
+      domain: INTERNET_SEARCH_DOMAIN,
+      sources: results.map((r) => r.url || r.title),
+      metadata: {
+        tokensUsed: tokens.length,
+        semanticAnalysis: semantics,
+        searchQuery: searchQuery,
+        resultCount: results.length,
+      },
     }
   } catch (error) {
     console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} web search failed:`, error)
