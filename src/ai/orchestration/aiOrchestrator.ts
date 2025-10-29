@@ -35,8 +35,6 @@ import { listDomains, type DomainAPI } from "../data/registry"
 import { SessionManager } from "../context_management/sessionManager"
 import { ContextWindowManager } from "../context_management/contextWindowManager"
 import { classifyIntent } from "../context_management/intentClassifier"
-// import { searchWeb } from "../knowledge_retrieval/webSearchAPIConnector"
-import { searchAndScrapeGoogle, searchWikipedia } from "../shared/tools/webScraper"
 import { publish, subscribe } from "./eventBus"
 import dataRegistry from "../data/dataRegistry"
 import { textNormalizer } from "../input_processing/textNormalizer"
@@ -293,26 +291,8 @@ export class AIOrchestrator {
       const searchResults: string[] = []
 
       if (needsSearch) {
-        this.thinkingTracker.addStep("search", "Performing web scraping search")
-        logger.info("AIOrchestrator", "Performing web scraping search...")
-        try {
-          // Try Wikipedia first for factual queries
-          if (normalizedText.toLowerCase().includes("wikipedia") || normalizedText.toLowerCase().includes("history")) {
-            const wikiResult = await searchWikipedia(normalizedText)
-            if (wikiResult) {
-              searchResults.push(`${wikiResult.title}: ${wikiResult.snippet}`)
-            }
-          }
-
-          // Then try Google scraping
-          const results = await searchAndScrapeGoogle(normalizedText, 3)
-          searchResults.push(...results.map((r) => `${r.title}: ${r.snippet}`))
-
-          this.thinkingTracker.addStep("search_complete", `Found ${searchResults.length} search results`)
-          logger.info("AIOrchestrator", `Found ${searchResults.length} search results`)
-        } catch (error) {
-          logger.error("AIOrchestrator", "Web scraping search failed", error)
-        }
+        this.thinkingTracker.addStep("search", "Internet search will be handled by internet_search domain")
+        logger.info("AIOrchestrator", "Internet search delegated to internet_search domain")
       }
 
       this.thinkingTracker.addStep("domain_queries", "Querying knowledge domains")
