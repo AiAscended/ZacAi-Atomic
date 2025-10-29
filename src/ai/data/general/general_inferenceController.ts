@@ -1,4 +1,4 @@
-import { findSources } from "../../shared/tools/urlLookup"
+import { findSources } from "../url_lookup"
 import { scrapeURL } from "../../shared/tools/webScraper"
 import { GENERAL_DOMAIN } from "./general_constants"
 

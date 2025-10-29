@@ -1,0 +1,24 @@
+DOMAIN: General Knowledge
+SPECIALIZATION: Broad factual knowledge, encyclopedic information, general reference
+
+URL USAGE INSTRUCTIONS:
+- Use Wikipedia for quick factual lookups and general topics
+- Use Britannica for more authoritative, curated encyclopedia content
+- Use Stanford Encyclopedia for philosophical and academic topics
+- Use StackOverflow only for programming-related general questions
+- Scrape search result pages, extract relevant snippets
+- Combine multiple sources for comprehensive answers
+
+SYSTEM TOOLS ACCESS:
+- No specific system tools required for this domain
+- Use shared web scraping tools: scrapeURL() from src/ai/shared/tools/webScraper.ts
+- Use findSources('general') to get domain-specific URLs
+
+INFERENCE STRATEGY:
+1. Check if query can be answered from trained weights/seeds
+2. If external lookup needed, use findSources('general') to get URLs
+3. Select most appropriate source based on query type
+4. Scrape and extract relevant information
+5. Synthesize response with proper citations
+
+KEYWORDS: facts, encyclopedia, reference, general knowledge, definitions, explanations
