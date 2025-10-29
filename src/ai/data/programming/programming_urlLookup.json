@@ -1,0 +1,50 @@
+{
+  "officialDocs": [
+    {
+      "name": "MDN Web Docs",
+      "url": "https://developer.mozilla.org",
+      "description": "Comprehensive web development documentation"
+    },
+    {
+      "name": "Stack Overflow",
+      "url": "https://stackoverflow.com",
+      "description": "Programming Q&A community"
+    }
+  ],
+  "tutorials": [
+    {
+      "name": "freeCodeCamp",
+      "url": "https://www.freecodecamp.org",
+      "description": "Free programming tutorials and certifications"
+    },
+    {
+      "name": "Codecademy",
+      "url": "https://www.codecademy.com",
+      "description": "Interactive programming courses"
+    }
+  ],
+  "patterns": [
+    {
+      "name": "Refactoring Guru",
+      "url": "https://refactoring.guru/design-patterns",
+      "description": "Design patterns and refactoring techniques"
+    },
+    {
+      "name": "Patterns.dev",
+      "url": "https://www.patterns.dev",
+      "description": "Modern web development patterns"
+    }
+  ],
+  "community": [
+    {
+      "name": "Dev.to",
+      "url": "https://dev.to",
+      "description": "Developer community and articles"
+    },
+    {
+      "name": "GitHub",
+      "url": "https://github.com",
+      "description": "Code hosting and collaboration platform"
+    }
+  ]
+}
