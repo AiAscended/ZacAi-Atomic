@@ -6,7 +6,7 @@
  *   - src/ai/data/internet_search/internet_search_semanticAnalyzer.ts
  *   - src/ai/data/internet_search/seeds/internet_search_seeds.json
  *   - src/ai/data/internet_search/weights/internet_search_pretrained_weights.json
- *   - src/ai/shared/tools/urlLookup.ts
+ *   - src/ai/data/url_lookup.ts
  *   - src/ai/shared/tools/webScraper.ts
  * Depended on by: src/ai/orchestration/aiOrchestrator.ts
  * Creator: Vercel v0 Coding Assistant
@@ -16,7 +16,7 @@ import { internetSearchTokenizer } from "./internet_search_tokenizer"
 import { internetSearchSemanticAnalyzer } from "./internet_search_semanticAnalyzer"
 import pretrainedWeights from "./weights/internet_search_pretrained_weights.json"
 import seeds from "./seeds/internet_search_seeds.json"
-import { findSources } from "../../shared/tools/urlLookup"
+import { findSources } from "../url_lookup"
 import { scrapeURL } from "../../shared/tools/webScraper"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 
