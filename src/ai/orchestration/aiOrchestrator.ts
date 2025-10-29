@@ -150,6 +150,15 @@ export class AIOrchestrator {
       this.thinkingTracker.addStep("normalization", "Normalizing input text")
       const normalizedText = textNormalizer(prompt.text)
 
+      this.thinkingTracker.addStep("decomposition", "Decomposing query into atomic subtasks")
+      const subtasks = this.decomposeIntoSubtasks(normalizedText)
+      this.thinkingTracker.addStep("decomposition_complete", `Identified ${subtasks.length} atomic subtasks`, {
+        subtasks: subtasks.map((st) => ({ task: st.task, type: st.type, domains: st.domains })),
+      })
+      logger.info("AIOrchestrator", `Decomposed into ${subtasks.length} atomic subtasks`, {
+        subtasks: subtasks.map((st) => st.type),
+      })
+
       this.thinkingTracker.addStep("tokenization", "Tokenizing input")
       const tokens = wordTokenizer(normalizedText)
       const sentences = detectSentences(normalizedText)
@@ -237,7 +246,10 @@ export class AIOrchestrator {
       logger.debug("AIOrchestrator", `Dialogue flow: ${dialogueResult.status}`)
 
       this.thinkingTracker.addStep("domain_selection", "Selecting relevant knowledge domains")
-      const relevantDomains = this.selectDomains(normalizedText, intent.intent)
+      const relevantDomains =
+        subtasks.length > 0
+          ? this.selectDomainsForSubtasks(subtasks)
+          : this.selectDomains(normalizedText, intent.intent)
       this.thinkingTracker.addStep("domains_selected", `Selected ${relevantDomains.length} domains`, {
         domains: relevantDomains.map((d) => d.name),
       })
@@ -301,10 +313,12 @@ export class AIOrchestrator {
         userProfile: userProfile,
         dialogueState: dialogueResult,
       }
-      const domainResponses = await this.queryDomains(
+
+      const domainResponses = await this.queryDomainsWithRetry(
         normalizedText,
         relevantDomains.map((d) => d.name),
         context,
+        subtasks,
       )
 
       this.thinkingTracker.addStep("synthesis", "Synthesizing final response")
@@ -314,6 +328,7 @@ export class AIOrchestrator {
         searchResults,
         relevantDomains.map((d) => d.name),
         inferenceResults.reduce((sum, r) => sum + r.confidence, 0) / (inferenceResults.length || 1),
+        subtasks, // Pass subtasks for validation
       )
 
       response.text = postProcess(response.text)
@@ -327,6 +342,7 @@ export class AIOrchestrator {
         userProfile: Object.keys(userProfile).length > 0 ? userProfile : undefined,
         dialogueState: dialogueResult.status,
         thinkingSteps: this.thinkingTracker.getSteps(),
+        subtasks: subtasks.length > 0 ? subtasks : undefined, // Include subtasks in metadata
       }
 
       await this.saveInteraction(sessionId, prompt, response)
@@ -365,7 +381,7 @@ export class AIOrchestrator {
   }
 
   /**
-   * Select relevant domains based on prompt content and intent
+   * Select relevant domains based on prompt text and intent
    */
   private selectDomains(promptText: string, intent: string): DomainAPI[] {
     const allDomains = listDomains()
@@ -462,6 +478,35 @@ export class AIOrchestrator {
     }
 
     return selected
+  }
+
+  /**
+   * Select domains based on atomic subtasks
+   */
+  private selectDomainsForSubtasks(subtasks: Array<{ task: string; type: string; domains: string[] }>): DomainAPI[] {
+    const allDomains = listDomains()
+    const selectedDomainNames = new Set<string>()
+
+    // Collect all unique domain names from subtasks
+    for (const subtask of subtasks) {
+      for (const domainName of subtask.domains) {
+        selectedDomainNames.add(domainName)
+      }
+    }
+
+    // Always include general domain
+    selectedDomainNames.add("general")
+
+    // Map domain names to DomainAPI objects
+    const selectedDomains: DomainAPI[] = []
+    for (const domainName of selectedDomainNames) {
+      const domain = allDomains.find((d) => d.name === domainName)
+      if (domain) {
+        selectedDomains.push(domain)
+      }
+    }
+
+    return selectedDomains
   }
 
   /**
@@ -564,6 +609,108 @@ export class AIOrchestrator {
   }
 
   /**
+   * Query domains with confidence-driven retry logic
+   */
+  private async queryDomainsWithRetry(
+    input: string,
+    selectedDomains: string[],
+    context: any,
+    subtasks: Array<{ task: string; type: string; domains: string[] }>,
+  ): Promise<Map<string, any>> {
+    const domainResponses = new Map<string, any>()
+    const domainApis = listDomains()
+    const CONFIDENCE_THRESHOLD = 0.1
+    const MAX_RETRIES = 2
+
+    for (const domainName of selectedDomains) {
+      try {
+        this.thinkingTracker.addStep(`query_${domainName}`, `Querying ${domainName} domain`)
+        const startTime = Date.now()
+
+        const domainApi = domainApis.find((d) => d.name === domainName)
+        if (!domainApi) {
+          logger.warn(`Domain ${domainName} not found in registry`)
+          continue
+        }
+
+        let result = await domainApi.query(input, context)
+        let retryCount = 0
+
+        while (
+          retryCount < MAX_RETRIES &&
+          result &&
+          result.confidence !== null &&
+          result.confidence < CONFIDENCE_THRESHOLD
+        ) {
+          retryCount++
+          logger.info(
+            `Domain ${domainName} returned low confidence (${result.confidence}), retrying (${retryCount}/${MAX_RETRIES})`,
+          )
+
+          // Reformulate query for retry (simplify or add context)
+          const reformulatedInput = this.reformulateQuery(input, domainName, subtasks)
+          this.thinkingTracker.addStep(
+            `retry_${domainName}_${retryCount}`,
+            `Retrying ${domainName} with reformulated query`,
+            { reformulated: reformulatedInput },
+          )
+
+          result = await domainApi.query(reformulatedInput, context)
+        }
+
+        const endTime = Date.now()
+        this.thinkingTracker.addStep(`query_${domainName}_complete`, `${domainName} query complete`, {
+          confidence: result?.confidence || null,
+          duration: endTime - startTime,
+          retries: retryCount,
+        })
+
+        if (result && result.response) {
+          domainResponses.set(domainName, result)
+          logger.info(`Domain ${domainName} query succeeded`, {
+            confidence: result.confidence,
+            responseLength: result.response?.length || 0,
+            duration: endTime - startTime,
+            retries: retryCount,
+          })
+        } else {
+          logger.info(`Domain ${domainName} returned null (not applicable for this query)`)
+        }
+      } catch (error) {
+        logger.error(`Domain ${domainName} query failed`, error)
+        this.thinkingTracker.addStep(`query_${domainName}_error`, `${domainName} query failed`, {
+          error: error instanceof Error ? error.message : String(error),
+        })
+      }
+    }
+
+    return domainResponses
+  }
+
+  /**
+   * Reformulate query for retry attempts
+   */
+  private reformulateQuery(
+    originalQuery: string,
+    domainName: string,
+    subtasks: Array<{ task: string; type: string; domains: string[] }>,
+  ): string {
+    // Find subtasks relevant to this domain
+    const relevantSubtasks = subtasks.filter((st) => st.domains.includes(domainName))
+
+    if (relevantSubtasks.length > 0) {
+      // Use the first relevant subtask as the reformulated query
+      return relevantSubtasks[0].task
+    }
+
+    // Fallback: simplify the original query
+    return originalQuery
+      .replace(/^(can you |could you |please |would you )/i, "")
+      .replace(/\?$/g, "")
+      .trim()
+  }
+
+  /**
    * Synthesize final response from multiple domain outputs with atomic task decomposition
    */
   private synthesizeResponse(
@@ -572,15 +719,15 @@ export class AIOrchestrator {
     searchResults: string[],
     domains: string[],
     inferenceConfidence: number,
+    subtasks?: Array<{ task: string; type: string; domains: string[] }>,
   ): Response {
     const responseParts: string[] = []
     const sources: string[] = []
 
-    // Step 1: Decompose prompt into atomic subtasks
-    const subtasks = this.decomposeIntoSubtasks(prompt)
-    logger.info("AIOrchestrator", `Decomposed prompt into ${subtasks.length} atomic subtasks`)
+    const completedSubtasks: string[] = []
+    const missingSubtasks: string[] = []
 
-    // Step 2: Collect ALL successful domain responses (not just best per subtask)
+    // Collect ALL successful domain responses
     const successfulResponses = domainResponses
       .filter(({ result }) => {
         if (!result || typeof result !== "object") return false
@@ -599,11 +746,8 @@ export class AIOrchestrator {
 
     const usedDomains = new Set<string>()
 
-    // Step 3: If we have subtasks, organize responses by subtask type
-    if (subtasks.length > 0) {
-      const completedSubtasks: string[] = []
-      const missingSubtasks: string[] = []
-
+    // If we have subtasks, organize responses by subtask type
+    if (subtasks && subtasks.length > 0) {
       for (const subtask of subtasks) {
         let bestResponse: string | null = null
         let bestDomain: string | null = null
@@ -631,7 +775,7 @@ export class AIOrchestrator {
         }
       }
 
-      // Step 4: Add any remaining successful responses that weren't matched to subtasks
+      // Add any remaining successful responses that weren't matched to subtasks
       for (const { domain, response, confidence } of successfulResponses) {
         if (usedDomains.has(domain)) continue
 
@@ -640,7 +784,6 @@ export class AIOrchestrator {
         usedDomains.add(domain)
       }
 
-      // Step 5: Self-review - check if all subtasks were completed
       if (missingSubtasks.length > 0) {
         logger.warn("AIOrchestrator", `Missing responses for ${missingSubtasks.length} subtasks`, {
           missing: missingSubtasks,
@@ -654,7 +797,7 @@ export class AIOrchestrator {
         )
       }
     } else {
-      // No subtasks identified - include ALL successful responses (no duplicates)
+      // No subtasks identified - include ALL successful responses
       for (const { domain, response, confidence } of successfulResponses) {
         if (usedDomains.has(domain)) continue
 
@@ -664,7 +807,7 @@ export class AIOrchestrator {
       }
     }
 
-    // Step 6: If no responses at all, provide system status
+    // If no responses at all, provide system status
     if (responseParts.length === 0) {
       responseParts.push(
         `**System Status:**\n` +

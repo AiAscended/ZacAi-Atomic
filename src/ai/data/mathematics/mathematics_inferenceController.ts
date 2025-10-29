@@ -1,7 +1,6 @@
 import { mathematicsTokenizer } from "./mathematics_tokenizer"
 import { mathematicsSemanticAnalyzer } from "./mathematics_semanticAnalyzer"
-import { add } from "../../scientific-calculator/arithmetic/addition"
-import { multiply } from "../../scientific-calculator/arithmetic/multiplication"
+import { calculator } from "../../shared/tools/shared-ScientificCalculator"
 
 const wordToNumber: Record<string, number> = {
   zero: 0,
@@ -184,6 +183,7 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
 
   const calculations: string[] = []
 
+  // Handle "goes into" division questions
   const goesIntoPattern =
     /how\s+many\s+times\s+(?:does\s+|can\s+)?(\w+)\s+goes?\s+into\s+(?:that\s+final\s+number|(\w+))/gi
   const goesIntoMatches = Array.from(input.matchAll(goesIntoPattern))
@@ -217,163 +217,128 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     }
   }
 
-  const chainedMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)(?:\s*[×x*]\s*(\d+))+/gi))
-  for (const match of chainedMultMatches) {
-    const fullMatch = match[0]
-    const numbers = fullMatch.split(/[×x*]/).map((n) => Number.parseInt(n.trim()))
+  // Try to use ScientificCalculator for complex expressions first
+  const expressionMatch = numericInput.match(/(\d+(?:\s*[+\-×x*÷/]\s*\d+)+)/i)
+  if (expressionMatch && calculations.length === 0) {
+    try {
+      const expression = expressionMatch[1].replace(/×/g, "*").replace(/÷/g, "/").replace(/x/gi, "*")
 
-    if (numbers.length >= 3) {
-      let result = numbers[0]
-      const steps: string[] = [`Starting with ${numbers[0]}`]
+      const result = calculator.evaluate(expression)
 
-      for (let i = 1; i < numbers.length; i++) {
-        result = multiply(result, numbers[i])
-        steps.push(`Step ${i}: ${result / numbers[i]} × ${numbers[i]} = ${result}`)
+      if (!result.error && !isNaN(result.value)) {
+        calculations.push(
+          `${expressionMatch[1]} = ${result.value}\n` +
+            (result.steps ? `Steps:\n${result.steps.slice(1).join("\n")}` : ""),
+        )
       }
-
-      calculations.push(`${fullMatch} = ${result}\n` + steps.join("\n"))
+    } catch (error) {
+      console.log("[v0] ScientificCalculator evaluation failed, falling back to pattern matching")
     }
   }
 
-  const addMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)(?!\s*[+×x*])/gi))
-  for (const match of addMultMatches) {
-    const [, num1, num2, num3] = match
-    if (calculations.some((c) => c.includes(`${num1} + ${num2} × ${num3}`))) continue
+  if (calculations.length === 0) {
+    // Chained multiplication
+    const chainedMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)(?:\s*[×x*]\s*(\d+))+/gi))
+    for (const match of chainedMultMatches) {
+      const fullMatch = match[0]
+      const numbers = fullMatch.split(/[×x*]/).map((n) => Number.parseInt(n.trim()))
 
-    const multiplyResult = multiply(Number.parseInt(num2), Number.parseInt(num3))
-    const finalResult = add(Number.parseInt(num1), multiplyResult)
-    calculations.push(
-      `${num1} + ${num2} × ${num3} = ${finalResult} (order of operations: ${num2} × ${num3} = ${multiplyResult}, then ${num1} + ${multiplyResult} = ${finalResult})`,
-    )
-  }
-
-  const simpleMultiplyMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)(?!\s*[×x*])/gi))
-  for (const match of simpleMultiplyMatches) {
-    const [, num1, num2] = match
-    if (!calculations.some((c) => c.includes(`${num1} ×`) || c.includes(`× ${num2}`))) {
-      const result = multiply(Number.parseInt(num1), Number.parseInt(num2))
-      calculations.push(`${num1} × ${num2} = ${result}`)
-    }
-  }
-
-  const simpleAddMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)(?!\s*[×x*])/gi))
-  for (const match of simpleAddMatches) {
-    const [, num1, num2] = match
-    if (!calculations.some((c) => c.includes(`${num1} +`) || c.includes(`+ ${num2}`))) {
-      const result = add(Number.parseInt(num1), Number.parseInt(num2))
-      calculations.push(`${num1} + ${num2} = ${result}`)
-    }
-  }
-
-  const squareMatch = numericInput.match(/(\d+)\s+times\s+by\s+itself/i)
-  if (squareMatch) {
-    const num = Number.parseInt(squareMatch[1])
-    const result = multiply(num, num)
-    calculations.push(`${num} × ${num} = ${result} (${num} squared)`)
-  }
-
-  const complexChainMatch = numericInput.match(/(\d+)(?:\s*[×x*]\s*(\d+))+/gi)
-  if (complexChainMatch) {
-    for (const chain of complexChainMatch) {
-      const numbers = chain.split(/[×x*]/).map((n) => Number.parseInt(n.trim()))
-      if (numbers.length > 3) {
+      if (numbers.length >= 3) {
         let result = numbers[0]
         const steps: string[] = [`Starting with ${numbers[0]}`]
 
         for (let i = 1; i < numbers.length; i++) {
-          result = multiply(result, numbers[i])
+          result = result * numbers[i]
           steps.push(`Step ${i}: ${result / numbers[i]} × ${numbers[i]} = ${result}`)
         }
 
-        calculations.push(`${chain} = ${result}\n` + steps.join("\n"))
+        calculations.push(`${fullMatch} = ${result}\n` + steps.join("\n"))
       }
     }
-  }
 
-  // Find all division expressions
-  const divisionMatches = Array.from(numericInput.matchAll(/(\d+)\s*[÷/]\s*(\d+)/gi))
-  for (const match of divisionMatches) {
-    const [, num1, num2] = match
-    const divisor = Number.parseInt(num2)
-    if (divisor === 0) {
-      calculations.push(`${num1} ÷ ${num2} = undefined (cannot divide by zero)`)
-    } else {
-      const result = Number.parseInt(num1) / divisor
-      const isWholeNumber = result % 1 === 0
-      calculations.push(`${num1} ÷ ${num2} = ${isWholeNumber ? result : result.toFixed(2)}`)
-    }
-  }
+    // Addition with multiplication (order of operations)
+    const addMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)(?!\s*[+×x*])/gi))
+    for (const match of addMultMatches) {
+      const [, num1, num2, num3] = match
+      if (calculations.some((c) => c.includes(`${num1} + ${num2} × ${num3}`))) continue
 
-  // Handle word problems like "double the quantity of four apples times four apples plus four more apples"
-  const appleMatch = lowerInput.match(/double.*?(\d+)\s+apples?\s+times\s+(\d+)\s+apples?\s+plus\s+(\d+)/i)
-  if (appleMatch) {
-    const [, num1, num2, num3] = appleMatch
-    const multiplyResult = multiply(Number.parseInt(num1), Number.parseInt(num2))
-    const addResult = add(multiplyResult, Number.parseInt(num3))
-    const doubledResult = multiply(addResult, 2)
-    calculations.push(
-      `Apple calculation: (${num1} × ${num2} + ${num3}) × 2 = ${doubledResult} apples\n` +
-        `Step 1: ${num1} × ${num2} = ${multiplyResult}\n` +
-        `Step 2: ${multiplyResult} + ${num3} = ${addResult}\n` +
-        `Step 3: Double it: ${addResult} × 2 = ${doubledResult}`,
-    )
-  }
-
-  const powerPattern = /(\w+)\s+times\s+(\w+)\s+(\w+)\s+times/i
-  const powerMatch = input.match(powerPattern)
-  if (powerMatch) {
-    const [, num1Word, num2Word, num3Word] = powerMatch
-    const num1 = convertWordsToNumbers(num1Word)
-    const num2 = convertWordsToNumbers(num2Word)
-    const num3 = convertWordsToNumbers(num3Word)
-
-    // Check if num1 === num2 (e.g., "nine times nine")
-    if (num1 === num2) {
-      const base = Number.parseInt(num1)
-      const exponent = Number.parseInt(num3)
-
-      if (!isNaN(base) && !isNaN(exponent) && exponent > 0 && exponent < 20) {
-        let result = base
-        for (let i = 1; i < exponent; i++) {
-          result = multiply(result, base)
-        }
-        calculations.push(`${base} to the power of ${exponent} (${base}^${exponent}) = ${result.toLocaleString()}`)
-      }
-    }
-  }
-
-  // Find all addition + division expressions
-  const addDivMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[÷/]\s*(\d+)/gi))
-  for (const match of addDivMatches) {
-    const [, num1, num2, num3] = match
-    const divisor = Number.parseInt(num3)
-    if (divisor === 0) {
-      calculations.push(`${num1} + ${num2} ÷ ${num3} = undefined (cannot divide by zero)`)
-    } else {
-      const divideResult = Number.parseInt(num2) / divisor
-      const finalResult = add(Number.parseInt(num1), divideResult)
-      const isWholeNumber = finalResult % 1 === 0
+      const multiplyResult = Number.parseInt(num2) * Number.parseInt(num3)
+      const finalResult = Number.parseInt(num1) + multiplyResult
       calculations.push(
-        `${num1} + ${num2} ÷ ${num3} = ${isWholeNumber ? finalResult : finalResult.toFixed(2)} (order of operations: ${num2} ÷ ${num3} = ${divideResult.toFixed(2)}, then ${num1} + ${divideResult.toFixed(2)} = ${isWholeNumber ? finalResult : finalResult.toFixed(2)})`,
+        `${num1} + ${num2} × ${num3} = ${finalResult} (order of operations: ${num2} × ${num3} = ${multiplyResult}, then ${num1} + ${multiplyResult} = ${finalResult})`,
       )
     }
-  }
 
-  const complexAddMultAddMatches = Array.from(
-    numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/gi),
-  )
-  for (const match of complexAddMultAddMatches) {
-    const [, num1, num2, num3, num4] = match
-    // Order of operations: multiply first, then add left to right
-    const multiplyResult = multiply(Number.parseInt(num2), Number.parseInt(num3))
-    const firstAdd = add(Number.parseInt(num1), multiplyResult)
-    const finalResult = add(firstAdd, Number.parseInt(num4))
-    calculations.push(
-      `${num1} + ${num2} × ${num3} + ${num4} = ${finalResult}\n` +
-        `Step 1: ${num2} × ${num3} = ${multiplyResult} (multiplication first)\n` +
-        `Step 2: ${num1} + ${multiplyResult} = ${firstAdd}\n` +
-        `Step 3: ${firstAdd} + ${num4} = ${finalResult}`,
+    // Simple multiplication
+    const simpleMultiplyMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)(?!\s*[×x*])/gi))
+    for (const match of simpleMultiplyMatches) {
+      const [, num1, num2] = match
+      if (!calculations.some((c) => c.includes(`${num1} ×`) || c.includes(`× ${num2}`))) {
+        const result = Number.parseInt(num1) * Number.parseInt(num2)
+        calculations.push(`${num1} × ${num2} = ${result}`)
+      }
+    }
+
+    // Simple addition
+    const simpleAddMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)(?!\s*[×x*])/gi))
+    for (const match of simpleAddMatches) {
+      const [, num1, num2] = match
+      if (!calculations.some((c) => c.includes(`${num1} +`) || c.includes(`+ ${num2}`))) {
+        const result = Number.parseInt(num1) + Number.parseInt(num2)
+        calculations.push(`${num1} + ${num2} = ${result}`)
+      }
+    }
+
+    // Division
+    const divisionMatches = Array.from(numericInput.matchAll(/(\d+)\s*[÷/]\s*(\d+)/gi))
+    for (const match of divisionMatches) {
+      const [, num1, num2] = match
+      const divisor = Number.parseInt(num2)
+      if (divisor === 0) {
+        calculations.push(`${num1} ÷ ${num2} = undefined (cannot divide by zero)`)
+      } else {
+        const result = Number.parseInt(num1) / divisor
+        const isWholeNumber = result % 1 === 0
+        calculations.push(`${num1} ÷ ${num2} = ${isWholeNumber ? result : result.toFixed(2)}`)
+      }
+    }
+
+    // Power expressions (e.g., "nine times nine nine times" = 9^9)
+    const powerPattern = /(\w+)\s+times\s+(\w+)\s+(\w+)\s+times/i
+    const powerMatch = input.match(powerPattern)
+    if (powerMatch) {
+      const [, num1Word, num2Word, num3Word] = powerMatch
+      const num1 = convertWordsToNumbers(num1Word)
+      const num2 = convertWordsToNumbers(num2Word)
+      const num3 = convertWordsToNumbers(num3Word)
+
+      if (num1 === num2) {
+        const base = Number.parseInt(num1)
+        const exponent = Number.parseInt(num3)
+
+        if (!isNaN(base) && !isNaN(exponent) && exponent > 0 && exponent < 20) {
+          const result = calculator.power(base, exponent)
+          calculations.push(`${base} to the power of ${exponent} (${base}^${exponent}) = ${result.toLocaleString()}`)
+        }
+      }
+    }
+
+    // Complex expressions with multiple operations
+    const complexAddMultAddMatches = Array.from(
+      numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/gi),
     )
+    for (const match of complexAddMultAddMatches) {
+      const [, num1, num2, num3, num4] = match
+      const multiplyResult = Number.parseInt(num2) * Number.parseInt(num3)
+      const firstAdd = Number.parseInt(num1) + multiplyResult
+      const finalResult = firstAdd + Number.parseInt(num4)
+      calculations.push(
+        `${num1} + ${num2} × ${num3} + ${num4} = ${finalResult}\n` +
+          `Step 1: ${num2} × ${num3} = ${multiplyResult} (multiplication first)\n` +
+          `Step 2: ${num1} + ${multiplyResult} = ${firstAdd}\n` +
+          `Step 3: ${firstAdd} + ${num4} = ${finalResult}`,
+      )
+    }
   }
 
   // If we found calculations, return them all
@@ -383,7 +348,7 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
       tokenCount: tk.length,
       semantics: sem,
       response: calculations.join("\n\n"),
-      confidence,
+      confidence: Math.max(confidence, 0.7), // Higher confidence for successful calculations
     }
   }
 
