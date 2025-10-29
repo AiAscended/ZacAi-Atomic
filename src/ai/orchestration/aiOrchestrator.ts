@@ -568,22 +568,36 @@ export class AIOrchestrator {
     const subtasks = this.decomposeIntoSubtasks(prompt)
     logger.info("AIOrchestrator", `Decomposed prompt into ${subtasks.length} atomic subtasks`)
 
-    // Step 2: For each subtask, find the best domain response
-    const completedSubtasks: string[] = []
-    const missingSubtasks: string[] = []
+    // Step 2: Collect ALL successful domain responses (not just best per subtask)
+    const successfulResponses = domainResponses
+      .filter(({ result }) => {
+        if (!result || typeof result !== "object") return false
+        if ("error" in result) return false
+        if ("response" in result && result.response === null) return false
+        if ("confidence" in result && typeof result.confidence === "number" && result.confidence < 0.1) return false
+        return true
+      })
+      .map(({ domain, result }) => ({
+        domain,
+        response: (result as { response: string; confidence: number }).response,
+        confidence: (result as { response: string; confidence: number }).confidence,
+      }))
+      .filter((r) => r.response && r.confidence > 0)
+      .sort((a, b) => b.confidence - a.confidence)
 
-    for (const subtask of subtasks) {
-      let bestResponse: string | null = null
-      let bestDomain: string | null = null
-      let bestConfidence = 0
+    // Step 3: If we have subtasks, organize responses by subtask type
+    if (subtasks.length > 0) {
+      const completedSubtasks: string[] = []
+      const missingSubtasks: string[] = []
 
-      // Find the best domain response for this subtask
-      for (const { domain, result } of domainResponses) {
-        if (!subtask.domains.includes(domain)) continue
+      for (const subtask of subtasks) {
+        let bestResponse: string | null = null
+        let bestDomain: string | null = null
+        let bestConfidence = 0
 
-        if (result && typeof result === "object" && "response" in result && "confidence" in result) {
-          const response = (result as { response: string; confidence: number }).response
-          const confidence = (result as { response: string; confidence: number }).confidence
+        // Find the best domain response for this subtask
+        for (const { domain, response, confidence } of successfulResponses) {
+          if (!subtask.domains.includes(domain)) continue
 
           if (response && confidence > bestConfidence) {
             bestResponse = response
@@ -591,60 +605,49 @@ export class AIOrchestrator {
             bestConfidence = confidence
           }
         }
-      }
 
-      if (bestResponse && bestConfidence >= 0.1) {
-        completedSubtasks.push(subtask.task)
-        responseParts.push(`**${subtask.type.replace("_", " ").toUpperCase()}:**\n${bestResponse}`)
-        if (bestDomain) {
-          sources.push(`${subtask.type}: ${bestDomain} (confidence: ${(bestConfidence * 100).toFixed(1)}%)`)
+        if (bestResponse && bestConfidence >= 0.1) {
+          completedSubtasks.push(subtask.task)
+          responseParts.push(`**${subtask.type.replace("_", " ").toUpperCase()}:**\n${bestResponse}`)
+          if (bestDomain) {
+            sources.push(`${subtask.type}: ${bestDomain} (confidence: ${(bestConfidence * 100).toFixed(1)}%)`)
+          }
+        } else {
+          missingSubtasks.push(subtask.task)
         }
-      } else {
-        missingSubtasks.push(subtask.task)
+      }
+
+      // Step 4: Add any remaining successful responses that weren't matched to subtasks
+      const usedDomains = new Set(sources.map((s) => s.split(":")[1]?.split("(")[0]?.trim()))
+      for (const { domain, response, confidence } of successfulResponses) {
+        if (!usedDomains.has(domain)) {
+          responseParts.push(`**${domain.toUpperCase()}:**\n${response}`)
+          sources.push(`${domain} (confidence: ${(confidence * 100).toFixed(1)}%)`)
+        }
+      }
+
+      // Step 5: Self-review - check if all subtasks were completed
+      if (missingSubtasks.length > 0) {
+        logger.warn("AIOrchestrator", `Missing responses for ${missingSubtasks.length} subtasks`, {
+          missing: missingSubtasks,
+        })
+
+        responseParts.push(
+          `\n**System Note:** Some parts of your query could not be fully answered:\n` +
+            missingSubtasks.map((t) => `- ${t}`).join("\n") +
+            `\n\nThe system is functioning correctly with small pretrained weights. ` +
+            `Domains that responded: ${successfulResponses.map((r) => r.domain).join(", ")}`,
+        )
+      }
+    } else {
+      // No subtasks identified - include ALL successful responses
+      for (const { domain, response, confidence } of successfulResponses) {
+        responseParts.push(`**${domain.toUpperCase()}:**\n${response}`)
+        sources.push(`${domain} (confidence: ${(confidence * 100).toFixed(1)}%)`)
       }
     }
 
-    // Step 3: If no subtasks were identified, use the original synthesis logic
-    if (subtasks.length === 0) {
-      const successfulResponses = domainResponses.filter(({ result }) => {
-        if (!result || typeof result !== "object") return false
-        if ("error" in result) return false
-        if ("response" in result && result.response === null) return false
-        if ("confidence" in result && typeof result.confidence === "number" && result.confidence < 0.1) return false
-        return true
-      })
-
-      // Sort by confidence and include all responses above threshold
-      const sortedResponses = successfulResponses
-        .map(({ domain, result }) => ({
-          domain,
-          response: (result as { response: string; confidence: number }).response,
-          confidence: (result as { response: string; confidence: number }).confidence,
-        }))
-        .filter((r) => r.response && r.confidence > 0)
-        .sort((a, b) => b.confidence - a.confidence)
-
-      for (const { domain, response, confidence } of sortedResponses) {
-        responseParts.push(response)
-        sources.push(`Domain: ${domain} (confidence: ${(confidence * 100).toFixed(1)}%)`)
-      }
-    }
-
-    // Step 4: Self-review - check if all subtasks were completed
-    if (missingSubtasks.length > 0) {
-      logger.warn("AIOrchestrator", `Missing responses for ${missingSubtasks.length} subtasks`, {
-        missing: missingSubtasks,
-      })
-
-      // Add a note about missing subtasks
-      responseParts.push(
-        `\n**Note:** Some parts of your query could not be fully answered:\n` +
-          missingSubtasks.map((t) => `- ${t}`).join("\n") +
-          `\n\nThis is expected with small pretrained weights. The system is functioning correctly.`,
-      )
-    }
-
-    // Step 5: If no responses at all, provide system status
+    // Step 6: If no responses at all, provide system status
     if (responseParts.length === 0) {
       responseParts.push(
         `**System Status:**\n` +
@@ -660,11 +663,8 @@ export class AIOrchestrator {
 
     // Calculate average confidence
     const avgConfidence =
-      completedSubtasks.length > 0
-        ? domainResponses.reduce((sum, { result }) => {
-            const conf = (result as { confidence?: number }).confidence || 0
-            return sum + conf
-          }, 0) / domainResponses.length
+      successfulResponses.length > 0
+        ? successfulResponses.reduce((sum, r) => sum + r.confidence, 0) / successfulResponses.length
         : Math.max(inferenceConfidence, 0.1)
 
     return {

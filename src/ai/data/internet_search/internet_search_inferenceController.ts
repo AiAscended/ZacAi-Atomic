@@ -58,14 +58,22 @@ export async function internetSearchRunInference(
 
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} inference confidence:`, confidence)
 
-  if (confidence < 0.1) {
+  if (confidence < 0.05) {
     return {
       response: null as any,
       confidence: 0,
     }
   }
 
-  const parsedQuery = parseQuery(input)
+  let searchQuery = input
+  if (lowerInput.includes("definition") || lowerInput.includes("what is")) {
+    const match = input.match(/(?:definition of|what is)\s+(?:a\s+)?([^?]+)/i)
+    if (match) {
+      searchQuery = `${match[1].trim()} definition site:wikipedia.org`
+    }
+  }
+
+  const parsedQuery = parseQuery(searchQuery)
   console.log("[v0] Parsed query:", parsedQuery)
 
   if (
@@ -78,14 +86,44 @@ export async function internetSearchRunInference(
     lowerInput.includes("where is") ||
     lowerInput.includes("when is") ||
     lowerInput.includes("how to") ||
+    lowerInput.includes("definition") ||
     parsedQuery.intent === "informational"
   ) {
     const searchEngines = getSearchEngines()
     console.log(`[v0] Available search engines: ${searchEngines.map((e) => e.name).join(", ")}`)
 
     try {
+      console.log("[v0] Attempting web search with query:", searchQuery)
+      const expandedQueries = expandQuery(searchQuery)
+      console.log("[v0] Expanded queries:", expandedQueries)
+
+      const results = await searchWeb(expandedQueries[0], 5)
+
+      if (results && results.length > 0) {
+        const rankedResults = rankResults(results, parsedQuery)
+        const snippets = rankedResults.slice(0, 3).map((r) => r.snippet)
+        const summary = summarizeResults(snippets, input)
+
+        const resultText = rankedResults
+          .slice(0, 3)
+          .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}${r.url ? `\n   Source: ${r.url}` : ""}`)
+          .join("\n\n")
+
+        return {
+          response:
+            `**Summary**: ${summary.summary}\n\n` +
+            `**Search Results**:\n${resultText}\n\n` +
+            `(Query: "${searchQuery}", confidence: ${(confidence * 100).toFixed(1)}%)`,
+          confidence: Math.max(confidence, summary.confidence, 0.4),
+        }
+      }
+    } catch (error) {
+      console.log("[v0] Web search failed:", error)
+    }
+
+    try {
       console.log("[v0] Attempting internet search via URL lookup...")
-      const urlSearchResults = await searchSources(INTERNET_SEARCH_DOMAIN, input)
+      const urlSearchResults = await searchSources(INTERNET_SEARCH_DOMAIN, searchQuery)
 
       if (urlSearchResults.length > 0 && !urlSearchResults[0].includes("CORS blocked")) {
         const parsedResults = urlSearchResults
@@ -104,9 +142,8 @@ export async function internetSearchRunInference(
           return {
             response:
               `**Search Results:**\n\n${parsedResults.join("\n\n")}\n\n` +
-              `(Searched via: ${searchEngines.map((e) => e.name).join(", ")}, ` +
-              `processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%)`,
-            confidence: Math.max(confidence, 0.5),
+              `(Query: "${searchQuery}", confidence: ${(confidence * 100).toFixed(1)}%)`,
+            confidence: Math.max(confidence, 0.4),
           }
         }
       }
@@ -114,44 +151,15 @@ export async function internetSearchRunInference(
       console.log("[v0] URL lookup search failed:", error)
     }
 
-    try {
-      const expandedQueries = expandQuery(input)
-      console.log("[v0] Expanded queries:", expandedQueries)
-
-      const results = await searchWeb(expandedQueries[0], 5)
-
-      if (results && results.length > 0) {
-        const rankedResults = rankResults(results, parsedQuery)
-        const snippets = rankedResults.slice(0, 3).map((r) => r.snippet)
-        const summary = summarizeResults(snippets, input)
-
-        const resultText = rankedResults
-          .slice(0, 3)
-          .map(
-            (r, i) =>
-              `${i + 1}. **${r.title}** (relevance: ${r.score?.toFixed(1)})\n   ${r.snippet}${r.url ? `\n   Source: ${r.url}` : ""}`,
-          )
-          .join("\n\n")
-
-        return {
-          response:
-            `**Summary**: ${summary.summary}\n\n` +
-            `**Detailed Results**:\n${resultText}\n\n` +
-            `(Processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%, ` +
-            `query intent: ${parsedQuery.intent})`,
-          confidence: Math.max(confidence, summary.confidence, 0.5),
-        }
-      }
-    } catch (error) {
-      console.log("[v0] Web search failed:", error)
-    }
-
     return {
       response:
-        `Search capability available. Available engines: ${searchEngines.map((e) => e.name).join(", ")}\n\n` +
-        `(Query analysis: ${parsedQuery.keywords.length} keywords, intent: ${parsedQuery.intent}, ` +
-        `confidence: ${(confidence * 100).toFixed(1)}%)`,
-      confidence,
+        `**Search System Status:**\n` +
+        `- Query analyzed: "${searchQuery}"\n` +
+        `- Keywords: ${parsedQuery.keywords.join(", ")}\n` +
+        `- Intent: ${parsedQuery.intent}\n` +
+        `- Available engines: ${searchEngines.map((e) => e.name).join(", ")}\n\n` +
+        `Search capability is active but returned no results. This may be due to network issues or query complexity.`,
+      confidence: Math.max(confidence, 0.3),
     }
   }
 
