@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { CodeBlock } from "@/components/code/CodeBlock"
 
 interface Message {
   role: "user" | "assistant"
@@ -16,6 +17,12 @@ interface Message {
     description: string
     timestamp: number
     data?: Record<string, unknown>
+  }>
+  codeBlocks?: Array<{
+    id: string
+    language: string
+    code: string
+    filename?: string
   }>
 }
 
@@ -106,12 +113,26 @@ export default function HomePage() {
       console.log("[v0] AI response data:", data)
 
       if (data && data.text) {
+        const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g
+        const codeBlocks: Message["codeBlocks"] = []
+        let match
+        let blockId = 0
+
+        while ((match = codeBlockRegex.exec(data.text)) !== null) {
+          codeBlocks.push({
+            id: `code-${blockId++}`,
+            language: match[1] || "text",
+            code: match[2].trim(),
+          })
+        }
+
         setMessages((prev) => [
           ...prev,
           {
             role: "assistant",
             content: data.text,
             thinkingSteps: data.metadata?.thinkingSteps,
+            codeBlocks,
           },
         ])
       } else {
@@ -124,6 +145,63 @@ export default function HomePage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const renderMessageContent = (msg: Message) => {
+    if (!msg.codeBlocks || msg.codeBlocks.length === 0) {
+      return <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
+    }
+
+    // Split content by code blocks and render
+    const parts: React.ReactNode[] = []
+    let lastIndex = 0
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g
+    let match
+    let blockIdx = 0
+
+    while ((match = codeBlockRegex.exec(msg.content)) !== null) {
+      // Add text before code block
+      if (match.index > lastIndex) {
+        const textContent = msg.content.substring(lastIndex, match.index).trim()
+        if (textContent) {
+          parts.push(
+            <div key={`text-${blockIdx}`} className="text-sm whitespace-pre-wrap mb-3">
+              {textContent}
+            </div>,
+          )
+        }
+      }
+
+      // Add code block
+      if (msg.codeBlocks[blockIdx]) {
+        parts.push(
+          <CodeBlock
+            key={msg.codeBlocks[blockIdx].id}
+            code={msg.codeBlocks[blockIdx].code}
+            language={msg.codeBlocks[blockIdx].language}
+            filename={msg.codeBlocks[blockIdx].filename}
+            className="mb-3"
+          />,
+        )
+      }
+
+      lastIndex = match.index + match[0].length
+      blockIdx++
+    }
+
+    // Add remaining text
+    if (lastIndex < msg.content.length) {
+      const textContent = msg.content.substring(lastIndex).trim()
+      if (textContent) {
+        parts.push(
+          <div key={`text-final`} className="text-sm whitespace-pre-wrap">
+            {textContent}
+          </div>,
+        )
+      }
+    }
+
+    return <>{parts}</>
   }
 
   return (
@@ -156,7 +234,7 @@ export default function HomePage() {
                   <div className="mb-1 text-xs font-semibold opacity-70">
                     {msg.role === "user" ? "You" : "AI Assistant"}
                   </div>
-                  <div className="text-sm">{msg.content}</div>
+                  {renderMessageContent(msg)}
 
                   {msg.role === "assistant" && msg.thinkingSteps && msg.thinkingSteps.length > 0 && (
                     <div className="mt-3 border-t border-slate-200 pt-2 dark:border-slate-700">

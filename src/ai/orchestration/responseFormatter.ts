@@ -1,225 +1,132 @@
 /**
  * File: src/ai/orchestration/responseFormatter.ts
- * Purpose: Formats AI-generated responses with code highlighting and text formatting
- * Depends on: src/ai/shared/tools/codeFormatting/codeFormatter.ts, src/ai/shared/tools/textFormatting/textFormatter.ts
- * Depended on by: src/ai/orchestration/aiOrchestrator.ts, app/api/chat/route.ts
+ * Purpose: Formats AI responses with code blocks, text, and metadata
+ * Depends on: src/ai/shared/tools/codeFormatting/codeFormatter.ts
+ * Depended on by: src/ai/orchestration/aiOrchestrator.ts
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { formatCode, extractCodeBlocks, type SupportedLanguage } from "../shared/tools/codeFormatting/codeFormatter"
-import { formatText, stripMarkdown } from "../shared/tools/textFormatting/textFormatter"
+import { formatCode, detectLanguage } from "../shared/tools/codeFormatting/codeFormatter"
 
-/**
- * Response section types
- */
-export type ResponseSectionType = "text" | "code" | "heading" | "list" | "table"
+export interface CodeBlock {
+  id: string
+  language: string
+  code: string
+  filename?: string
+  startLine?: number
+  endLine?: number
+}
 
-/**
- * Individual response section
- */
-export interface ResponseSection {
-  type: ResponseSectionType
+export interface TextBlock {
+  id: string
   content: string
-  language?: SupportedLanguage
-  metadata?: {
-    lineCount?: number
-    characterCount?: number
-    formatted?: boolean
-    snippetId?: string
-  }
+  type: "paragraph" | "heading" | "list"
 }
 
-/**
- * Formatted response structure
- */
 export interface FormattedResponse {
-  sections: ResponseSection[]
-  rawText: string
-  formattedText: string
-  codeBlockCount: number
-  wordCount: number
-  estimatedReadingTime: number // in seconds
+  text: string
+  codeBlocks: CodeBlock[]
+  textBlocks: TextBlock[]
+  metadata: {
+    totalCodeBlocks: number
+    languages: string[]
+    hasFormatting: boolean
+  }
 }
 
 /**
- * Response formatting options
- */
-export interface ResponseFormattingOptions {
-  formatCode?: boolean
-  formatText?: boolean
-  extractCodeBlocks?: boolean
-  addSnippetIds?: boolean
-  maxLineLength?: number
-}
-
-/**
- * Formats AI-generated response into structured sections
- *
- * @param rawResponse - Raw AI response text
- * @param options - Formatting options
+ * Parses and formats AI response into structured output
+ * @param rawResponse - Raw AI-generated response text
  * @returns Structured formatted response
- *
- * @example
- * ```typescript
- * const formatted = await formatResponse(aiResponse, {
- *   formatCode: true,
- *   formatText: true,
- *   extractCodeBlocks: true
- * });
- * ```
  */
-export async function formatResponse(
-  rawResponse: string,
-  options: ResponseFormattingOptions = {},
-): Promise<FormattedResponse> {
-  const sections: ResponseSection[] = []
-  const formattedText = rawResponse
+export function formatResponse(rawResponse: string): FormattedResponse {
+  const codeBlocks: CodeBlock[] = []
+  const textBlocks: TextBlock[] = []
+  const languages = new Set<string>()
 
-  // Extract and format code blocks
-  if (options.extractCodeBlocks !== false) {
-    const codeBlocks = extractCodeBlocks(rawResponse)
+  // Extract code blocks using regex
+  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g
+  let match
+  let lastIndex = 0
+  let blockId = 0
 
-    for (const block of codeBlocks) {
-      let codeContent = block.code
-      let formatted = false
-
-      // Format code if requested
-      if (options.formatCode !== false) {
-        try {
-          const result = await formatCode(block.code, {
-            language: block.language as SupportedLanguage,
-          })
-          codeContent = result.code
-          formatted = result.formatted
-        } catch (error) {
-          console.error("[v0] Code formatting failed:", error)
-        }
+  while ((match = codeBlockRegex.exec(rawResponse)) !== null) {
+    // Add text before code block
+    if (match.index > lastIndex) {
+      const textContent = rawResponse.substring(lastIndex, match.index).trim()
+      if (textContent) {
+        textBlocks.push({
+          id: `text-${blockId}`,
+          content: textContent,
+          type: "paragraph",
+        })
       }
+    }
 
-      sections.push({
-        type: "code",
-        content: codeContent,
-        language: block.language as SupportedLanguage,
-        metadata: {
-          lineCount: codeContent.split("\n").length,
-          characterCount: codeContent.length,
-          formatted,
-          snippetId: options.addSnippetIds ? generateSnippetId() : undefined,
-        },
+    // Add code block
+    const language = match[1] || detectLanguage(match[2])
+    const code = match[2].trim()
+
+    languages.add(language)
+    codeBlocks.push({
+      id: `code-${blockId}`,
+      language,
+      code: formatCode(code, { language }),
+    })
+
+    lastIndex = match.index + match[0].length
+    blockId++
+  }
+
+  // Add remaining text after last code block
+  if (lastIndex < rawResponse.length) {
+    const textContent = rawResponse.substring(lastIndex).trim()
+    if (textContent) {
+      textBlocks.push({
+        id: `text-${blockId}`,
+        content: textContent,
+        type: "paragraph",
       })
     }
   }
 
-  // Extract text sections (everything that's not code)
-  const textWithoutCode = rawResponse.replace(/```[\s\S]*?```/g, "[[CODE_BLOCK]]")
-  const textParts = textWithoutCode.split("[[CODE_BLOCK]]")
-
-  for (const part of textParts) {
-    if (!part.trim()) continue
-
-    // Format text if requested
-    let textContent = part
-    if (options.formatText !== false) {
-      const result = formatText(part, {
-        correctGrammar: true,
-        fixPunctuation: true,
-        capitalizeFirstLetter: true,
-        removeExtraSpaces: true,
-        normalizeLineBreaks: true,
-        maxLineLength: options.maxLineLength,
-      })
-      textContent = result.text
-    }
-
-    // Detect section type
-    const sectionType = detectSectionType(textContent)
-
-    sections.push({
-      type: sectionType,
-      content: textContent,
-      metadata: {
-        characterCount: textContent.length,
-      },
+  // If no code blocks found, treat entire response as text
+  if (codeBlocks.length === 0 && textBlocks.length === 0) {
+    textBlocks.push({
+      id: "text-0",
+      content: rawResponse.trim(),
+      type: "paragraph",
     })
   }
 
-  // Calculate metadata
-  const plainText = stripMarkdown(rawResponse)
-  const wordCount = plainText.trim().split(/\s+/).length
-  const estimatedReadingTime = Math.ceil(wordCount / 200) // Average reading speed: 200 words/minute
-
   return {
-    sections,
-    rawText: rawResponse,
-    formattedText,
-    codeBlockCount: sections.filter((s) => s.type === "code").length,
-    wordCount,
-    estimatedReadingTime,
+    text: rawResponse,
+    codeBlocks,
+    textBlocks,
+    metadata: {
+      totalCodeBlocks: codeBlocks.length,
+      languages: Array.from(languages),
+      hasFormatting: codeBlocks.length > 0,
+    },
   }
 }
 
 /**
- * Detects the type of text section
+ * Cleans and corrects grammar/punctuation in text
+ * @param text - Raw text to clean
+ * @returns Cleaned text
  */
-function detectSectionType(text: string): ResponseSectionType {
-  const trimmed = text.trim()
+export function cleanText(text: string): string {
+  let cleaned = text.trim()
 
-  // Check for headings
-  if (/^#{1,6}\s+/.test(trimmed)) {
-    return "heading"
-  }
+  // Fix common punctuation issues
+  cleaned = cleaned.replace(/\s+([.,!?;:])/g, "$1") // Remove space before punctuation
+  cleaned = cleaned.replace(/([.,!?;:])\s*([a-zA-Z])/g, "$1 $2") // Add space after punctuation
+  cleaned = cleaned.replace(/\s+/g, " ") // Normalize whitespace
+  cleaned = cleaned.replace(/\n{3,}/g, "\n\n") // Limit consecutive newlines
 
-  // Check for lists
-  if (/^[-*+]\s+/.test(trimmed) || /^\d+\.\s+/.test(trimmed)) {
-    return "list"
-  }
+  // Capitalize first letter of sentences
+  cleaned = cleaned.replace(/(^|[.!?]\s+)([a-z])/g, (match, p1, p2) => p1 + p2.toUpperCase())
 
-  // Check for tables
-  if (/\|.*\|/.test(trimmed) && trimmed.includes("---")) {
-    return "table"
-  }
-
-  return "text"
-}
-
-/**
- * Generates a unique snippet ID
- */
-function generateSnippetId(): string {
-  return `snippet-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-}
-
-/**
- * Merges multiple domain responses into a single formatted response
- *
- * @param domainResponses - Array of responses from different domains
- * @param options - Formatting options
- * @returns Merged and formatted response
- */
-export async function mergeDomainResponses(
-  domainResponses: Array<{ domain: string; response: string; confidence: number }>,
-  options: ResponseFormattingOptions = {},
-): Promise<FormattedResponse> {
-  // Sort by confidence (highest first)
-  const sorted = domainResponses.sort((a, b) => b.confidence - a.confidence)
-
-  // Take the highest confidence response as primary
-  const primaryResponse = sorted[0]?.response || ""
-
-  // Optionally merge additional context from other high-confidence responses
-  let mergedResponse = primaryResponse
-
-  if (sorted.length > 1) {
-    const additionalContext = sorted
-      .slice(1, 3) // Take up to 2 additional responses
-      .filter((r) => r.confidence > 0.3) // Only include if confidence > 30%
-      .map((r) => r.response)
-      .join("\n\n")
-
-    if (additionalContext) {
-      mergedResponse += "\n\n---\n\n**Additional Context:**\n\n" + additionalContext
-    }
-  }
-
-  return formatResponse(mergedResponse, options)
+  return cleaned
 }
