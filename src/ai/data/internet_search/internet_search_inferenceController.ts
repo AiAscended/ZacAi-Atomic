@@ -84,7 +84,7 @@ function extractSearchQuery(input: string, semantics: any): string {
 
 /**
  * Main inference function for internet_search domain
- * Now uses ONLY web scraping, no API search
+ * PRIORITY: Wikipedia first for knowledge queries, then web scraping
  */
 export async function internetSearchRunInference(input: string, context?: InferenceContext): Promise<any> {
   const tokens = internetSearchTokenizer(input).tokens
@@ -111,69 +111,21 @@ export async function internetSearchRunInference(input: string, context?: Infere
   const searchQuery = extractSearchQuery(input, semantics)
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} extracted query:`, searchQuery)
 
-  try {
-    console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting web scraping...`)
-    const scrapedResults = await searchAndScrapeGoogle(searchQuery, 3)
-
-    if (scrapedResults && scrapedResults.length > 0) {
-      const resultText = scrapedResults
-        .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}\n   Source: ${r.url}`)
-        .join("\n\n")
-
-      return {
-        response: `**Search Results for "${searchQuery}":**\n\n${resultText}`,
-        confidence: Math.max(confidence, 0.65),
-        domain: INTERNET_SEARCH_DOMAIN,
-        sources: scrapedResults.map((r) => r.url),
-        metadata: {
-          tokensUsed: tokens.length,
-          semanticAnalysis: semantics,
-          searchQuery: searchQuery,
-          resultCount: scrapedResults.length,
-          method: "web_scraping",
-        },
-      }
-    }
-  } catch (error) {
-    console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} web scraping failed:`, error)
-  }
-
-  try {
-    console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting Bing scraping...`)
-    const bingResults = await searchAndScrapeBing(searchQuery, 3)
-
-    if (bingResults && bingResults.length > 0) {
-      const resultText = bingResults
-        .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}\n   Source: ${r.url}`)
-        .join("\n\n")
-
-      return {
-        response: `**Search Results for "${searchQuery}":**\n\n${resultText}`,
-        confidence: Math.max(confidence, 0.6),
-        domain: INTERNET_SEARCH_DOMAIN,
-        sources: bingResults.map((r) => r.url),
-        metadata: {
-          tokensUsed: tokens.length,
-          semanticAnalysis: semantics,
-          searchQuery: searchQuery,
-          resultCount: bingResults.length,
-          method: "bing_scraping",
-        },
-      }
-    }
-  } catch (error) {
-    console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} Bing scraping failed:`, error)
-  }
-
-  if (semantics.queryType === "factual" || input.toLowerCase().includes("wikipedia")) {
+  if (
+    semantics.queryType === "factual" ||
+    input.toLowerCase().includes("wikipedia") ||
+    input.toLowerCase().includes("history") ||
+    input.toLowerCase().includes("what is") ||
+    input.toLowerCase().includes("who invented")
+  ) {
     try {
-      console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting Wikipedia search...`)
+      console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting Wikipedia search (PRIORITY)...`)
       const wikiResult = await searchWikipedia(searchQuery)
 
       if (wikiResult) {
         return {
-          response: `**Wikipedia Result for "${searchQuery}":**\n\n**${wikiResult.title}**\n\n${wikiResult.snippet}\n\nSource: ${wikiResult.url}`,
-          confidence: Math.max(confidence, 0.7),
+          response: `**Wikipedia: ${wikiResult.title}**\n\n${wikiResult.snippet}\n\n[Read more](${wikiResult.url})`,
+          confidence: Math.max(confidence, 0.85),
           domain: INTERNET_SEARCH_DOMAIN,
           sources: [wikiResult.url],
           metadata: {
@@ -190,17 +142,71 @@ export async function internetSearchRunInference(input: string, context?: Infere
   }
 
   try {
+    console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting Google web scraping...`)
+    const scrapedResults = await searchAndScrapeGoogle(searchQuery, 3)
+
+    if (scrapedResults && scrapedResults.length > 0) {
+      const resultText = scrapedResults
+        .map((r, i) => `**${i + 1}. ${r.title}**\n${r.snippet}\n[Source](${r.url})`)
+        .join("\n\n")
+
+      return {
+        response: `**Search Results:**\n\n${resultText}`,
+        confidence: Math.max(confidence, 0.75),
+        domain: INTERNET_SEARCH_DOMAIN,
+        sources: scrapedResults.map((r) => r.url),
+        metadata: {
+          tokensUsed: tokens.length,
+          semanticAnalysis: semantics,
+          searchQuery: searchQuery,
+          resultCount: scrapedResults.length,
+          method: "google_scraping",
+        },
+      }
+    }
+  } catch (error) {
+    console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} Google scraping failed:`, error)
+  }
+
+  try {
+    console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting Bing web scraping...`)
+    const bingResults = await searchAndScrapeBing(searchQuery, 3)
+
+    if (bingResults && bingResults.length > 0) {
+      const resultText = bingResults
+        .map((r, i) => `**${i + 1}. ${r.title}**\n${r.snippet}\n[Source](${r.url})`)
+        .join("\n\n")
+
+      return {
+        response: `**Search Results:**\n\n${resultText}`,
+        confidence: Math.max(confidence, 0.7),
+        domain: INTERNET_SEARCH_DOMAIN,
+        sources: bingResults.map((r) => r.url),
+        metadata: {
+          tokensUsed: tokens.length,
+          semanticAnalysis: semantics,
+          searchQuery: searchQuery,
+          resultCount: bingResults.length,
+          method: "bing_scraping",
+        },
+      }
+    }
+  } catch (error) {
+    console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} Bing scraping failed:`, error)
+  }
+
+  try {
     console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting domain URL lookup...`)
     const urlResults = await searchSources(INTERNET_SEARCH_DOMAIN, searchQuery)
 
     if (urlResults && urlResults.length > 0) {
       const resultText = urlResults
-        .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}\n   Source: ${r.url}`)
+        .map((r, i) => `**${i + 1}. ${r.title}**\n${r.snippet}\n[Source](${r.url})`)
         .join("\n\n")
 
       return {
         response: `**Search Results:**\n\n${resultText}`,
-        confidence: Math.max(confidence, 0.5),
+        confidence: Math.max(confidence, 0.6),
         domain: INTERNET_SEARCH_DOMAIN,
         sources: urlResults.map((r) => r.url),
         metadata: {
@@ -217,12 +223,11 @@ export async function internetSearchRunInference(input: string, context?: Infere
 
   return {
     response:
-      `**Internet Search Domain Active**\n\n` +
+      `**Internet Search Domain**\n\n` +
       `Query: "${searchQuery}"\n` +
-      `Query Type: ${semantics.queryType}\n` +
-      `Confidence: ${(confidence * 100).toFixed(1)}%\n\n` +
-      `I attempted to search for this information using web scraping (Google, Bing, Wikipedia) and domain-specific sources, but encountered technical limitations. ` +
-      `The system is functioning correctly with autonomous web crawling capabilities.`,
+      `Type: ${semantics.queryType}\n\n` +
+      `I attempted to search using Wikipedia, Google scraping, Bing scraping, and domain sources, but encountered technical limitations. ` +
+      `The system uses autonomous web crawling (no API keys required).`,
     confidence: Math.max(confidence, 0.4),
     domain: INTERNET_SEARCH_DOMAIN,
     sources: ["Internet Search Domain (Inference)"],

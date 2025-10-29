@@ -1,26 +1,14 @@
 /**
  * File: src/ai/orchestration/knowledgeRetriever.ts
- * Purpose: Retrieves relevant knowledge from multiple sources including
- * local knowledge base, document cache, and web search.
- *
- * Dependencies:
- * - src/ai/knowledge_retrieval/documentCache.ts
- * - src/ai/knowledge_retrieval/documentRetrieverRanker.ts
- * - src/ai/knowledge_retrieval/localKBLoader.ts
- * - src/ai/knowledge_retrieval/webSearchAPIConnector.ts
- *
- * Depended on by:
- * - src/ai/orchestration/aiOrchestrator.ts
+ * Purpose: Retrieves relevant knowledge from multiple sources
+ * NO API SEARCH - Uses only local KB, cache, and web scraping
  */
 
 import { DocumentCache } from "../knowledge_retrieval/documentCache"
 import { DocumentRetrieverRanker } from "../knowledge_retrieval/documentRetrieverRanker"
 import { LocalKBLoader } from "../knowledge_retrieval/localKBLoader"
-import { searchWeb } from "../knowledge_retrieval/webSearchAPIConnector"
+import { searchWikipedia, searchAndScrapeGoogle } from "../shared/tools/webScraper"
 
-/**
- * Retrieved knowledge with sources
- */
 export interface RetrievedKnowledge {
   documents: Array<{
     content: string
@@ -36,9 +24,6 @@ export interface RetrievedKnowledge {
   totalSources: number
 }
 
-/**
- * Knowledge Retriever - Fetches relevant information from multiple sources
- */
 export class KnowledgeRetriever {
   private cache: DocumentCache
   private retriever: DocumentRetrieverRanker
@@ -50,9 +35,6 @@ export class KnowledgeRetriever {
     this.kbLoader = new LocalKBLoader()
   }
 
-  /**
-   * Retrieve knowledge for a query
-   */
   public async retrieve(query: string, domains: string[], useWeb = true): Promise<RetrievedKnowledge> {
     const results: RetrievedKnowledge = {
       documents: [],
@@ -81,20 +63,28 @@ export class KnowledgeRetriever {
     // Step 3: Retrieve and rank documents
     if (results.documents.length > 0) {
       const ranked = this.retriever.rank(query, results.documents)
-      results.documents = ranked.slice(0, 5) // Top 5 documents
+      results.documents = ranked.slice(0, 5)
     }
 
-    // Step 4: Web search if needed
     if (useWeb) {
       try {
-        const webResults = await searchWeb(query)
-        results.webResults = webResults.map((r) => ({
-          title: r.title,
-          snippet: r.snippet || "",
-          url: r.url || "",
-        }))
+        // Try Wikipedia first for knowledge queries
+        const wikiResult = await searchWikipedia(query)
+        if (wikiResult) {
+          results.webResults.push({
+            title: wikiResult.title,
+            snippet: wikiResult.snippet,
+            url: wikiResult.url,
+          })
+        }
+
+        // Then try Google scraping
+        if (results.webResults.length === 0) {
+          const googleResults = await searchAndScrapeGoogle(query, 3)
+          results.webResults.push(...googleResults)
+        }
       } catch (error) {
-        console.error("[KnowledgeRetriever] Web search failed:", error)
+        console.error("[KnowledgeRetriever] Web scraping failed:", error)
       }
     }
 
@@ -111,13 +101,9 @@ export class KnowledgeRetriever {
     return results
   }
 
-  /**
-   * Clear cache
-   */
   public clearCache(): void {
     this.cache.clear()
   }
 }
 
-// Export singleton
 export const knowledgeRetriever = new KnowledgeRetriever()
