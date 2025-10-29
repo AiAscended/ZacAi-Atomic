@@ -1,5 +1,5 @@
-import { searchSources } from "../../shared/tools/urlLookup"
-import { searchWikipedia } from "../../shared/tools/webScraper"
+import { findSources } from "../../shared/tools/urlLookup"
+import { scrapeURL } from "../../shared/tools/webScraper"
 import { GENERAL_DOMAIN } from "./general_constants"
 
 const stopWords = [
@@ -184,59 +184,31 @@ export const generalRunInference = async (input: string, context?: any) => {
         .slice(0, 5)
 
       const searchQuery = queryKeywords.join(" ") || input.split(" ").slice(0, 5).join(" ")
-      console.log("[v0] Searching Wikipedia for:", searchQuery)
+      console.log(`[v0] ${GENERAL_DOMAIN} searching domain sources for:`, searchQuery)
 
-      const wikiContent = await searchWikipedia(searchQuery)
+      // Get all general domain sources (Wikipedia, Britannica, Stanford Encyclopedia)
+      const domainSources = findSources(GENERAL_DOMAIN)
 
-      if (wikiContent && wikiContent.snippet.length > 50) {
-        responseText = wikiContent.snippet + `\n\n*Source: [Wikipedia](${wikiContent.url})*`
-        sources.push(wikiContent.url)
-        confidence = Math.max(confidence, 0.65)
-        inferenceSucceeded = true
-      } else {
-        // Fallback to old URL lookup method
-        const sourcesFromLookup = await searchSources("general", searchQuery)
+      // Let inference decide which source to use based on query
+      for (const source of domainSources) {
+        const searchUrl = source.searchPath
+          ? `${source.url}${source.searchPath}${encodeURIComponent(searchQuery)}`
+          : source.url
 
-        if (sourcesFromLookup && sourcesFromLookup.length > 0) {
-          const wikiUrlMatch = sourcesFromLookup[0].match(/https:\/\/en\.wikipedia\.org[^\s)]+/)
-          const wikiUrl = wikiUrlMatch ? wikiUrlMatch[0] : sourcesFromLookup[0]
+        console.log(`[v0] ${GENERAL_DOMAIN} trying ${source.name} at: ${searchUrl}`)
 
-          console.log("[v0] Searching Wikipedia at:", wikiUrl)
+        const content = await scrapeURL(searchUrl)
 
-          try {
-            const response = await fetch(wikiUrl, {
-              method: "GET",
-              headers: { Accept: "text/html" },
-              redirect: "follow",
-            })
-
-            if (response.ok) {
-              const html = await response.text()
-              const paragraphMatch = html.match(/<p[^>]*>(.*?)<\/p>/s)
-
-              if (paragraphMatch) {
-                const cleanText = paragraphMatch[1]
-                  .replace(/<[^>]*>/g, "")
-                  .replace(/\[.*?\]/g, "")
-                  .replace(/\s+/g, " ")
-                  .trim()
-                  .substring(0, 500)
-
-                if (cleanText.length > 50) {
-                  responseText = cleanText + `\n\n*Source: Wikipedia*`
-                  sources.push(wikiUrl)
-                  confidence = Math.max(confidence, 0.6)
-                  inferenceSucceeded = true
-                }
-              }
-            }
-          } catch (fetchError) {
-            console.error("[v0] Wikipedia fetch failed:", fetchError)
-          }
+        if (content && content.snippet.length > 50) {
+          responseText = content.snippet + `\n\n*Source: [${source.name}](${content.url})*`
+          sources.push(content.url)
+          confidence = Math.max(confidence, 0.65)
+          inferenceSucceeded = true
+          break // Found good content, stop searching
         }
       }
     } catch (lookupError) {
-      console.error("[v0] URL lookup failed:", lookupError)
+      console.error(`[v0] ${GENERAL_DOMAIN} URL lookup failed:`, lookupError)
     }
   }
 

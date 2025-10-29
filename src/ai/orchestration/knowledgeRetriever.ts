@@ -1,13 +1,14 @@
 /**
  * File: src/ai/orchestration/knowledgeRetriever.ts
  * Purpose: Retrieves relevant knowledge from multiple sources
- * NO API SEARCH - Uses only local KB, cache, and web scraping
+ * NO API SEARCH - Uses only local KB, cache, and domain-specific URL lookup
  */
 
 import { DocumentCache } from "../knowledge_retrieval/documentCache"
 import { DocumentRetrieverRanker } from "../knowledge_retrieval/documentRetrieverRanker"
 import { LocalKBLoader } from "../knowledge_retrieval/localKBLoader"
-import { searchWikipedia, searchAndScrapeGoogle } from "../shared/tools/webScraper"
+import { findSources } from "../shared/tools/urlLookup"
+import { scrapeURL } from "../shared/tools/webScraper"
 
 export interface RetrievedKnowledge {
   documents: Array<{
@@ -68,20 +69,26 @@ export class KnowledgeRetriever {
 
     if (useWeb) {
       try {
-        // Try Wikipedia first for knowledge queries
-        const wikiResult = await searchWikipedia(query)
-        if (wikiResult) {
-          results.webResults.push({
-            title: wikiResult.title,
-            snippet: wikiResult.snippet,
-            url: wikiResult.url,
-          })
-        }
+        // Let each domain handle its own source lookups
+        for (const domain of domains) {
+          const domainSources = findSources(domain)
 
-        // Then try Google scraping
-        if (results.webResults.length === 0) {
-          const googleResults = await searchAndScrapeGoogle(query, 3)
-          results.webResults.push(...googleResults)
+          for (const source of domainSources.slice(0, 2)) {
+            // Limit to 2 sources per domain
+            const searchUrl = source.searchPath
+              ? `${source.url}${source.searchPath}${encodeURIComponent(query)}`
+              : source.url
+
+            const content = await scrapeURL(searchUrl)
+
+            if (content && content.snippet.length > 50) {
+              results.webResults.push({
+                title: content.title,
+                snippet: content.snippet,
+                url: content.url,
+              })
+            }
+          }
         }
       } catch (error) {
         console.error("[KnowledgeRetriever] Web scraping failed:", error)
