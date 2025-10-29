@@ -597,6 +597,8 @@ export class AIOrchestrator {
       .filter((r) => r.response && r.confidence > 0)
       .sort((a, b) => b.confidence - a.confidence)
 
+    const usedDomains = new Set<string>()
+
     // Step 3: If we have subtasks, organize responses by subtask type
     if (subtasks.length > 0) {
       const completedSubtasks: string[] = []
@@ -610,6 +612,7 @@ export class AIOrchestrator {
         // Find the best domain response for this subtask
         for (const { domain, response, confidence } of successfulResponses) {
           if (!subtask.domains.includes(domain)) continue
+          if (usedDomains.has(domain)) continue
 
           if (response && confidence > bestConfidence) {
             bestResponse = response
@@ -618,24 +621,23 @@ export class AIOrchestrator {
           }
         }
 
-        if (bestResponse && bestConfidence >= 0.1) {
+        if (bestResponse && bestConfidence >= 0.1 && bestDomain) {
           completedSubtasks.push(subtask.task)
           responseParts.push(`**${subtask.type.replace("_", " ").toUpperCase()}:**\n${bestResponse}`)
-          if (bestDomain) {
-            sources.push(`${subtask.type}: ${bestDomain} (confidence: ${(bestConfidence * 100).toFixed(1)}%)`)
-          }
+          sources.push(`${subtask.type}: ${bestDomain} (confidence: ${(bestConfidence * 100).toFixed(1)}%)`)
+          usedDomains.add(bestDomain)
         } else {
           missingSubtasks.push(subtask.task)
         }
       }
 
       // Step 4: Add any remaining successful responses that weren't matched to subtasks
-      const usedDomains = new Set(sources.map((s) => s.split(":")[1]?.split("(")[0]?.trim()))
       for (const { domain, response, confidence } of successfulResponses) {
-        if (!usedDomains.has(domain)) {
-          responseParts.push(`**${domain.toUpperCase()}:**\n${response}`)
-          sources.push(`${domain} (confidence: ${(confidence * 100).toFixed(1)}%)`)
-        }
+        if (usedDomains.has(domain)) continue
+
+        responseParts.push(`**${domain.toUpperCase()}:**\n${response}`)
+        sources.push(`${domain} (confidence: ${(confidence * 100).toFixed(1)}%)`)
+        usedDomains.add(domain)
       }
 
       // Step 5: Self-review - check if all subtasks were completed
@@ -648,14 +650,17 @@ export class AIOrchestrator {
           `\n**System Note:** Some parts of your query could not be fully answered:\n` +
             missingSubtasks.map((t) => `- ${t}`).join("\n") +
             `\n\nThe system is functioning correctly with small pretrained weights. ` +
-            `Domains that responded: ${successfulResponses.map((r) => r.domain).join(", ")}`,
+            `Domains that responded: ${Array.from(usedDomains).join(", ")}`,
         )
       }
     } else {
-      // No subtasks identified - include ALL successful responses
+      // No subtasks identified - include ALL successful responses (no duplicates)
       for (const { domain, response, confidence } of successfulResponses) {
+        if (usedDomains.has(domain)) continue
+
         responseParts.push(`**${domain.toUpperCase()}:**\n${response}`)
         sources.push(`${domain} (confidence: ${(confidence * 100).toFixed(1)}%)`)
+        usedDomains.add(domain)
       }
     }
 
