@@ -489,14 +489,14 @@ export class AIOrchestrator {
     const subtasks: Array<{ task: string; type: string; domains: string[] }> = []
     const text = prompt.toLowerCase()
 
-    // Extract mathematical calculations
     const mathPatterns = [
-      /(\d+\s*[+\-*/×÷]\s*\d+)/g,
+      /(\d+\s*[+\-*/×÷]\s*\d+(?:\s*[+\-*/×÷]\s*\d+)*)/g,
       /how many times (\d+) goes into (\d+)/gi,
       /what'?s? (\w+) divided by (\w+)/gi,
       /what'?s? (\w+) plus (\w+)/gi,
       /what'?s? (\w+) minus (\w+)/gi,
       /what'?s? (\w+) times (\w+)/gi,
+      /double.*?(\d+).*?apples?.*?(\d+).*?apples?.*?(\d+)/gi,
     ]
 
     for (const pattern of mathPatterns) {
@@ -510,10 +510,23 @@ export class AIOrchestrator {
       }
     }
 
+    if (text.match(/\b(history|who invented|when did|where did|origin)\b/)) {
+      const historyMatch = prompt.match(
+        /(?:history of|who invented|when did|where did|origin of)\s+([^?]+?)(?:\?|and|$)/i,
+      )
+      if (historyMatch) {
+        subtasks.push({
+          task: `History: ${historyMatch[1].trim()}`,
+          type: "history",
+          domains: ["internet_search", "general"],
+        })
+      }
+    }
+
     // Extract definition requests
-    if (text.match(/\b(what is|define|definition of|explain|tell me about)\b/)) {
+    if (text.match(/\b(what is|define|definition of|explain|tell me about|what does)\b/)) {
       const defMatch = prompt.match(
-        /(?:what is|define|definition of|explain|tell me about)\s+(?:a\s+)?([^?]+?)(?:\?|and|$)/i,
+        /(?:what is|define|definition of|explain|tell me about|what does)\s+(?:a\s+|an\s+)?([^?]+?)(?:\?|and|do|$)/i,
       )
       if (defMatch) {
         subtasks.push({
@@ -524,9 +537,8 @@ export class AIOrchestrator {
       }
     }
 
-    // Extract code example requests
-    if (text.match(/\b(show|example|sample|code|file)\b/) && text.match(/\b(typescript|javascript|python|code)\b/)) {
-      const codeMatch = prompt.match(/(?:show|example of|sample)\s+(?:a\s+)?([^?]+?)(?:\?|and|$)/i)
+    if (text.match(/\b(show|example|sample|code|file)\b/) && text.match(/\b(typescript|javascript|python|ai)\b/)) {
+      const codeMatch = prompt.match(/(?:show|example of|sample)\s+(?:a\s+|an\s+)?([^?]+?)(?:\?|and|$)/i)
       if (codeMatch) {
         subtasks.push({
           task: `Code example: ${codeMatch[1].trim()}`,

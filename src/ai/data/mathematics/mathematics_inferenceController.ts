@@ -91,90 +91,99 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     return null // Not a mathematics query, let other domains handle it
   }
 
-  const divisionMatch = numericInput.match(/(\d+)\s*[÷/]\s*(\d+)/i)
-  if (divisionMatch) {
-    const [, num1, num2] = divisionMatch
+  const calculations: string[] = []
+
+  // Find all division expressions
+  const divisionMatches = Array.from(numericInput.matchAll(/(\d+)\s*[÷/]\s*(\d+)/gi))
+  for (const match of divisionMatches) {
+    const [, num1, num2] = match
     const divisor = Number.parseInt(num2)
     if (divisor === 0) {
-      return {
-        tokens: tk.tokens,
-        tokenCount: tk.length,
-        semantics: sem,
-        response: `Cannot divide by zero. Division by zero is undefined in mathematics.`,
-        confidence,
-      }
-    }
-    const result = Number.parseInt(num1) / divisor
-    const isWholeNumber = result % 1 === 0
-    return {
-      tokens: tk.tokens,
-      tokenCount: tk.length,
-      semantics: sem,
-      response: `${num1} ÷ ${num2} = ${isWholeNumber ? result : result.toFixed(2)}`,
-      confidence,
+      calculations.push(`${num1} ÷ ${num2} = undefined (cannot divide by zero)`)
+    } else {
+      const result = Number.parseInt(num1) / divisor
+      const isWholeNumber = result % 1 === 0
+      calculations.push(`${num1} ÷ ${num2} = ${isWholeNumber ? result : result.toFixed(2)}`)
     }
   }
 
-  const addMultMatch = numericInput.match(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)/i)
-  if (addMultMatch) {
-    const [, num1, num2, num3] = addMultMatch
+  // Find all addition + multiplication expressions (order of operations)
+  const addMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)/gi))
+  for (const match of addMultMatches) {
+    const [, num1, num2, num3] = match
     const multiplyResult = multiply(Number.parseInt(num2), Number.parseInt(num3))
     const finalResult = add(Number.parseInt(num1), multiplyResult)
-
-    return {
-      tokens: tk.tokens,
-      tokenCount: tk.length,
-      semantics: sem,
-      response:
-        `**${num1} + ${num2} × ${num3} = ${finalResult}**\n\n` +
-        `Following order of operations (PEMDAS), we first multiply ${num2} × ${num3} = ${multiplyResult}, then add ${num1} + ${multiplyResult} = ${finalResult}. ` +
-        `(Processed ${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
-      confidence,
-    }
+    calculations.push(
+      `${num1} + ${num2} × ${num3} = ${finalResult} (multiply first: ${num2} × ${num3} = ${multiplyResult}, then add ${num1})`,
+    )
   }
 
-  // Handle expressions like "3×3+3" (multiplication + addition)
-  const multAddMatch = numericInput.match(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/i)
-  if (multAddMatch) {
-    const [, num1, num2, num3] = multAddMatch
+  // Find all multiplication + addition expressions
+  const multAddMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/gi))
+  for (const match of multAddMatches) {
+    const [, num1, num2, num3] = match
     const multiplyResult = multiply(Number.parseInt(num1), Number.parseInt(num2))
     const finalResult = add(multiplyResult, Number.parseInt(num3))
-    return {
-      tokens: tk.tokens,
-      tokenCount: tk.length,
-      semantics: sem,
-      response:
-        `${num1} × ${num2} + ${num3} = ${finalResult}. ` +
-        `First we multiply ${num1} × ${num2} = ${multiply(Number.parseInt(num1), Number.parseInt(num2))}, then add ${num3} to get ${finalResult}. ` +
-        `(Processed with ${tokens.length} tokens, ${(confidence * 100).toFixed(1)}% confidence)`,
-      confidence,
+    calculations.push(
+      `${num1} × ${num2} + ${num3} = ${finalResult} (multiply first: ${num1} × ${num2} = ${multiplyResult}, then add ${num3})`,
+    )
+  }
+
+  // Find all simple addition expressions
+  const simpleAddMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)/gi))
+  for (const match of simpleAddMatches) {
+    const [, num1, num2] = match
+    // Skip if already processed as part of a complex expression
+    if (!calculations.some((c) => c.includes(`${num1} +`) || c.includes(`+ ${num2}`))) {
+      const result = add(Number.parseInt(num1), Number.parseInt(num2))
+      calculations.push(`${num1} + ${num2} = ${result}`)
     }
   }
 
-  // Handle simple addition expressions like "3+3"
-  const simpleAddMatch = numericInput.match(/(\d+)\s*\+\s*(\d+)/i)
-  if (simpleAddMatch) {
-    const [, num1, num2] = simpleAddMatch
-    const result = add(Number.parseInt(num1), Number.parseInt(num2))
-    return {
-      tokens: tk.tokens,
-      tokenCount: tk.length,
-      semantics: sem,
-      response: `${num1} + ${num2} = ${result}`,
-      confidence,
+  // Find all simple multiplication expressions
+  const simpleMultiplyMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)/gi))
+  for (const match of simpleMultiplyMatches) {
+    const [, num1, num2] = match
+    // Skip if already processed as part of a complex expression
+    if (!calculations.some((c) => c.includes(`${num1} ×`) || c.includes(`× ${num2}`))) {
+      const result = multiply(Number.parseInt(num1), Number.parseInt(num2))
+      calculations.push(`${num1} × ${num2} = ${result}`)
     }
   }
 
-  // Handle simple multiplication expressions like "3×3"
-  const simpleMultiplyMatch = numericInput.match(/(\d+)\s*[×x*]\s*(\d+)/i)
-  if (simpleMultiplyMatch) {
-    const [, num1, num2] = simpleMultiplyMatch
-    const result = multiply(Number.parseInt(num1), Number.parseInt(num2))
+  // Handle "how many times X goes into Y" questions
+  const goesIntoMatches = Array.from(lowerInput.matchAll(/how\s+many\s+times\s+(\d+)\s+goes\s+into\s+(\d+)/gi))
+  for (const match of goesIntoMatches) {
+    const [, divisor, dividend] = match
+    const result = Number.parseInt(dividend) / Number.parseInt(divisor)
+    const isWholeNumber = result % 1 === 0
+    calculations.push(
+      `${divisor} goes into ${dividend} exactly ${isWholeNumber ? result : result.toFixed(2)} times (${dividend} ÷ ${divisor} = ${isWholeNumber ? result : result.toFixed(2)})`,
+    )
+  }
+
+  // Handle word problems like "double the quantity of four apples times four apples plus four more apples"
+  const appleMatch = lowerInput.match(/double.*?(\d+)\s+apples?\s+times\s+(\d+)\s+apples?\s+plus\s+(\d+)/i)
+  if (appleMatch) {
+    const [, num1, num2, num3] = appleMatch
+    const multiplyResult = multiply(Number.parseInt(num1), Number.parseInt(num2))
+    const addResult = add(multiplyResult, Number.parseInt(num3))
+    const doubledResult = multiply(addResult, 2)
+    calculations.push(
+      `Apple calculation: (${num1} × ${num2} + ${num3}) × 2 = ${doubledResult} apples\n` +
+        `Step 1: ${num1} × ${num2} = ${multiplyResult}\n` +
+        `Step 2: ${multiplyResult} + ${num3} = ${addResult}\n` +
+        `Step 3: Double it: ${addResult} × 2 = ${doubledResult}`,
+    )
+  }
+
+  // If we found calculations, return them all
+  if (calculations.length > 0) {
     return {
       tokens: tk.tokens,
       tokenCount: tk.length,
       semantics: sem,
-      response: `${num1} × ${num2} = ${result}`,
+      response: calculations.join("\n\n"),
       confidence,
     }
   }
