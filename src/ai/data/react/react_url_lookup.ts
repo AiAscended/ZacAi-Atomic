@@ -6,6 +6,8 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
+import { registerSource } from "../url_lookup"
+
 export interface ReactDocReference {
   title: string
   url: string
@@ -40,6 +42,21 @@ export const REACT_DOC_REFERENCES: ReactDocReference[] = [
   },
 ]
 
+registerSource("react", "React Official Docs", "https://react.dev", "Official React documentation and guides")
+registerSource(
+  "react",
+  "React Hooks Reference",
+  "https://react.dev/reference/react",
+  "Complete reference for all React Hooks",
+)
+registerSource(
+  "react",
+  "React Components Reference",
+  "https://react.dev/reference/react/components",
+  "Built-in React components reference",
+)
+registerSource("react", "React Patterns", "https://react.dev/learn", "Learn React patterns and best practices")
+
 export function findReactDocumentation(query: string): ReactDocReference[] {
   const lowerQuery = query.toLowerCase()
   return REACT_DOC_REFERENCES.filter(
@@ -49,3 +66,5 @@ export function findReactDocumentation(query: string): ReactDocReference[] {
       ref.topics.some((topic) => topic.toLowerCase().includes(lowerQuery)),
   )
 }
+
+export default () => registerSource
