@@ -281,9 +281,12 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
   }
 
   // Find all addition + multiplication expressions (order of operations)
-  const addMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)/gi))
+  const addMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)(?!\s*\+)/gi))
   for (const match of addMultMatches) {
     const [, num1, num2, num3] = match
+    // Skip if already processed as part of a complex expression
+    if (calculations.some((c) => c.includes(`${num1} + ${num2} × ${num3}`))) continue
+
     const multiplyResult = multiply(Number.parseInt(num2), Number.parseInt(num3))
     const finalResult = add(Number.parseInt(num1), multiplyResult)
     calculations.push(
@@ -377,6 +380,23 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
         `${num1} + ${num2} ÷ ${num3} = ${isWholeNumber ? finalResult : finalResult.toFixed(2)} (order of operations: ${num2} ÷ ${num3} = ${divideResult.toFixed(2)}, then ${num1} + ${divideResult.toFixed(2)} = ${isWholeNumber ? finalResult : finalResult.toFixed(2)})`,
       )
     }
+  }
+
+  const complexAddMultAddMatches = Array.from(
+    numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/gi),
+  )
+  for (const match of complexAddMultAddMatches) {
+    const [, num1, num2, num3, num4] = match
+    // Order of operations: multiply first, then add left to right
+    const multiplyResult = multiply(Number.parseInt(num2), Number.parseInt(num3))
+    const firstAdd = add(Number.parseInt(num1), multiplyResult)
+    const finalResult = add(firstAdd, Number.parseInt(num4))
+    calculations.push(
+      `${num1} + ${num2} × ${num3} + ${num4} = ${finalResult}\n` +
+        `Step 1: ${num2} × ${num3} = ${multiplyResult} (multiplication first)\n` +
+        `Step 2: ${num1} + ${multiplyResult} = ${firstAdd}\n` +
+        `Step 3: ${firstAdd} + ${num4} = ${finalResult}`,
+    )
   }
 
   // If we found calculations, return them all
