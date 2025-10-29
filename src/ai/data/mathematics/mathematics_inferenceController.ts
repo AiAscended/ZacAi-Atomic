@@ -184,27 +184,16 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
 
   const calculations: string[] = []
 
-  const tenTimesPattern = /(\d+)\s+ten\s+times/gi
-  const tenTimesMatches = Array.from(input.matchAll(tenTimesPattern))
-
-  for (const match of tenTimesMatches) {
-    const [, num] = match
-    const result = multiply(Number.parseInt(num), 10)
-    calculations.push(`${num} ten times = ${num} × 10 = ${result}`)
-  }
-
   const goesIntoPattern =
     /how\s+many\s+times\s+(?:does\s+|can\s+)?(\w+)\s+goes?\s+into\s+(?:that\s+final\s+number|(\w+))/gi
   const goesIntoMatches = Array.from(input.matchAll(goesIntoPattern))
 
   for (const match of goesIntoMatches) {
     const [, divisorWord, dividendWord] = match
-    // Convert words to numbers first
     const divisorConverted = convertWordsToNumbers(divisorWord)
     let dividendConverted = dividendWord ? convertWordsToNumbers(dividendWord) : null
 
     if (!dividendConverted && match[0].includes("that final number")) {
-      // Look for the last calculated result in previous calculations
       if (calculations.length > 0) {
         const lastCalc = calculations[calculations.length - 1]
         const resultMatch = lastCalc.match(/=\s*(\d+)(?:\s|$)/)
@@ -228,24 +217,59 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     }
   }
 
+  const chainedMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)(?:\s*[×x*]\s*(\d+))+/gi))
+  for (const match of chainedMultMatches) {
+    const fullMatch = match[0]
+    const numbers = fullMatch.split(/[×x*]/).map((n) => Number.parseInt(n.trim()))
+
+    if (numbers.length >= 3) {
+      let result = numbers[0]
+      const steps: string[] = [`Starting with ${numbers[0]}`]
+
+      for (let i = 1; i < numbers.length; i++) {
+        result = multiply(result, numbers[i])
+        steps.push(`Step ${i}: ${result / numbers[i]} × ${numbers[i]} = ${result}`)
+      }
+
+      calculations.push(`${fullMatch} = ${result}\n` + steps.join("\n"))
+    }
+  }
+
+  const addMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)(?!\s*[+×x*])/gi))
+  for (const match of addMultMatches) {
+    const [, num1, num2, num3] = match
+    if (calculations.some((c) => c.includes(`${num1} + ${num2} × ${num3}`))) continue
+
+    const multiplyResult = multiply(Number.parseInt(num2), Number.parseInt(num3))
+    const finalResult = add(Number.parseInt(num1), multiplyResult)
+    calculations.push(
+      `${num1} + ${num2} × ${num3} = ${finalResult} (order of operations: ${num2} × ${num3} = ${multiplyResult}, then ${num1} + ${multiplyResult} = ${finalResult})`,
+    )
+  }
+
+  const simpleMultiplyMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)(?!\s*[×x*])/gi))
+  for (const match of simpleMultiplyMatches) {
+    const [, num1, num2] = match
+    if (!calculations.some((c) => c.includes(`${num1} ×`) || c.includes(`× ${num2}`))) {
+      const result = multiply(Number.parseInt(num1), Number.parseInt(num2))
+      calculations.push(`${num1} × ${num2} = ${result}`)
+    }
+  }
+
+  const simpleAddMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)(?!\s*[×x*])/gi))
+  for (const match of simpleAddMatches) {
+    const [, num1, num2] = match
+    if (!calculations.some((c) => c.includes(`${num1} +`) || c.includes(`+ ${num2}`))) {
+      const result = add(Number.parseInt(num1), Number.parseInt(num2))
+      calculations.push(`${num1} + ${num2} = ${result}`)
+    }
+  }
+
   const squareMatch = numericInput.match(/(\d+)\s+times\s+by\s+itself/i)
   if (squareMatch) {
     const num = Number.parseInt(squareMatch[1])
     const result = multiply(num, num)
     calculations.push(`${num} × ${num} = ${result} (${num} squared)`)
-  }
-
-  // Find all chained multiplication expressions (3+ numbers)
-  const chainedMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)\s*[×x*]\s*(\d+)/gi))
-  for (const match of chainedMultMatches) {
-    const [fullMatch, num1, num2, num3] = match
-    const step1 = multiply(Number.parseInt(num1), Number.parseInt(num2))
-    const finalResult = multiply(step1, Number.parseInt(num3))
-    calculations.push(
-      `${num1} × ${num2} × ${num3} = ${finalResult}\n` +
-        `Step 1: ${num1} × ${num2} = ${step1}\n` +
-        `Step 2: ${step1} × ${num3} = ${finalResult}`,
-    )
   }
 
   const complexChainMatch = numericInput.match(/(\d+)(?:\s*[×x*]\s*(\d+))+/gi)
@@ -277,53 +301,6 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
       const result = Number.parseInt(num1) / divisor
       const isWholeNumber = result % 1 === 0
       calculations.push(`${num1} ÷ ${num2} = ${isWholeNumber ? result : result.toFixed(2)}`)
-    }
-  }
-
-  // Find all addition + multiplication expressions (order of operations)
-  const addMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)(?!\s*\+)/gi))
-  for (const match of addMultMatches) {
-    const [, num1, num2, num3] = match
-    // Skip if already processed as part of a complex expression
-    if (calculations.some((c) => c.includes(`${num1} + ${num2} × ${num3}`))) continue
-
-    const multiplyResult = multiply(Number.parseInt(num2), Number.parseInt(num3))
-    const finalResult = add(Number.parseInt(num1), multiplyResult)
-    calculations.push(
-      `${num1} + ${num2} × ${num3} = ${finalResult} (order of operations: ${num2} × ${num3} = ${multiplyResult}, then ${num1} + ${multiplyResult} = ${finalResult})`,
-    )
-  }
-
-  // Find all multiplication + addition expressions
-  const multAddMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/gi))
-  for (const match of multAddMatches) {
-    const [, num1, num2, num3] = match
-    const multiplyResult = multiply(Number.parseInt(num1), Number.parseInt(num2))
-    const finalResult = add(multiplyResult, Number.parseInt(num3))
-    calculations.push(
-      `${num1} × ${num2} + ${num3} = ${finalResult} (multiply first: ${num1} × ${num2} = ${multiplyResult}, then add ${num3})`,
-    )
-  }
-
-  // Find all simple addition expressions
-  const simpleAddMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)/gi))
-  for (const match of simpleAddMatches) {
-    const [, num1, num2] = match
-    // Skip if already processed as part of a complex expression
-    if (!calculations.some((c) => c.includes(`${num1} +`) || c.includes(`+ ${num2}`))) {
-      const result = add(Number.parseInt(num1), Number.parseInt(num2))
-      calculations.push(`${num1} + ${num2} = ${result}`)
-    }
-  }
-
-  // Find all simple multiplication expressions (only if not part of chained multiplication)
-  const simpleMultiplyMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)(?!\s*[×x*])/gi))
-  for (const match of simpleMultiplyMatches) {
-    const [, num1, num2] = match
-    // Skip if already processed as part of a complex expression
-    if (!calculations.some((c) => c.includes(`${num1} ×`) || c.includes(`× ${num2}`))) {
-      const result = multiply(Number.parseInt(num1), Number.parseInt(num2))
-      calculations.push(`${num1} × ${num2} = ${result}`)
     }
   }
 
