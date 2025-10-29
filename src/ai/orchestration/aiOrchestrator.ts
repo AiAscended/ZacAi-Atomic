@@ -392,7 +392,7 @@ export class AIOrchestrator {
     const generalDomain = allDomains.find((d) => d.name === "general")
     if (generalDomain) selected.push(generalDomain)
 
-    if (text.match(/\b(react|jsx|component|hook|usestate|useeffect|props|state)\b/)) {
+    if (text.match(/\b(react|jsx|component|hook|useState|useEffect|props|state)\b/)) {
       const reactDomain = allDomains.find((d) => d.name === "react")
       if (reactDomain) selected.push(reactDomain)
     }
@@ -402,13 +402,12 @@ export class AIOrchestrator {
       if (nextjsDomain) selected.push(nextjsDomain)
     }
 
-    if (text.match(/\b(program|programming|code|algorithm|function|variable|loop|condition)\b/)) {
+    if (text.match(/\b(code|program|algorithm|function|class|variable|loop|condition|debug)\b/)) {
       const programmingDomain = allDomains.find((d) => d.name === "programming")
       if (programmingDomain) selected.push(programmingDomain)
     }
 
-    // Domain selection heuristics
-    if (text.match(/\b(code|function|class|typescript|javascript|python)\b/)) {
+    if (text.match(/\b(code|program|function|class|typescript|javascript|python)\b/)) {
       const tsDomain = allDomains.find((d) => d.name === "typescript")
       if (tsDomain) selected.push(tsDomain)
     }

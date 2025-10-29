@@ -1,120 +1,95 @@
 /**
  * File: src/ai/data/programming/tools/programming-CodeAnalyzer.ts
  * Purpose: Analyze code structure, complexity, and patterns
- * Depends on: None (standalone tool)
+ * Depends on: src/ai/shared/tools/shared-CodeLinter.ts
  * Depended on by: src/ai/data/programming/programming_inferenceController.ts
  * Creator: Vercel v0 Coding Assistant
  */
 
 /**
- * Analyze code complexity (cyclomatic complexity approximation)
+ * Analyzes code complexity and structure
  * @param code - Source code to analyze
- * @returns Complexity score and analysis
+ * @param language - Programming language
+ * @returns Analysis results with metrics
  */
-export function analyzeComplexity(code: string): {
-  score: number
-  level: "low" | "medium" | "high" | "very high"
-  details: string
+export function analyzeCodeComplexity(
+  code: string,
+  language: string,
+): {
+  linesOfCode: number
+  cyclomaticComplexity: number
+  functions: number
+  classes: number
+  comments: number
 } {
-  // Count decision points: if, else, for, while, case, catch, &&, ||, ?
-  const decisionPoints = (code.match(/\b(if|else|for|while|case|catch)\b|&&|\|\||\?/g) || []).length
+  const lines = code.split("\n")
+  const linesOfCode = lines.filter((line) => line.trim().length > 0).length
 
-  const score = decisionPoints + 1 // Base complexity is 1
+  // Count control flow statements for cyclomatic complexity
+  const controlFlowKeywords = /\b(if|else|for|while|switch|case|catch|&&|\|\|)\b/g
+  const matches = code.match(controlFlowKeywords)
+  const cyclomaticComplexity = matches ? matches.length + 1 : 1
 
-  let level: "low" | "medium" | "high" | "very high"
-  if (score <= 5) level = "low"
-  else if (score <= 10) level = "medium"
-  else if (score <= 20) level = "high"
-  else level = "very high"
+  // Count functions
+  const functionPatterns = /\b(function|def|func|fn|=>|\bpublic\s+\w+\s+\w+\s*\()/g
+  const functionMatches = code.match(functionPatterns)
+  const functions = functionMatches ? functionMatches.length : 0
+
+  // Count classes
+  const classPatterns = /\b(class|interface|struct|enum)\s+\w+/g
+  const classMatches = code.match(classPatterns)
+  const classes = classMatches ? classMatches.length : 0
+
+  // Count comments
+  const commentPatterns = /(\/\/|\/\*|\*\/|#|<!--)/g
+  const commentMatches = code.match(commentPatterns)
+  const comments = commentMatches ? commentMatches.length : 0
 
   return {
-    score,
-    level,
-    details: `Found ${decisionPoints} decision points. Cyclomatic complexity: ${score}`,
+    linesOfCode,
+    cyclomaticComplexity,
+    functions,
+    classes,
+    comments,
   }
 }
 
 /**
- * Detect code patterns and anti-patterns
+ * Detects code patterns and best practices
  * @param code - Source code to analyze
- * @returns Detected patterns
+ * @returns Detected patterns and recommendations
  */
-export function detectPatterns(code: string): {
+export function detectCodePatterns(code: string): {
   patterns: string[]
-  antiPatterns: string[]
+  recommendations: string[]
 } {
   const patterns: string[] = []
-  const antiPatterns: string[] = []
+  const recommendations: string[] = []
 
-  // Detect patterns
-  if (code.includes("class") && code.includes("extends")) {
+  // Detect design patterns
+  if (code.includes("getInstance") || code.includes("private constructor")) {
+    patterns.push("Singleton Pattern")
+  }
+  if (code.includes("extends") && code.includes("super(")) {
     patterns.push("Inheritance")
   }
-  if (code.match(/function\s+\w+\s*$$[^)]*$$\s*\{[^}]*return/)) {
-    patterns.push("Pure Functions")
+  if (code.includes("interface") && code.includes("implements")) {
+    patterns.push("Interface Implementation")
   }
-  if (code.includes("async") && code.includes("await")) {
-    patterns.push("Async/Await")
-  }
-  if (code.match(/\btry\s*\{[\s\S]*\}\s*catch/)) {
-    patterns.push("Error Handling")
+  if (code.match(/\bfactory\b/i)) {
+    patterns.push("Factory Pattern")
   }
 
-  // Detect anti-patterns
-  if (code.match(/var\s+\w+/)) {
-    antiPatterns.push("Using var instead of let/const")
+  // Check for best practices
+  if (!code.includes("try") && !code.includes("catch")) {
+    recommendations.push("Consider adding error handling with try-catch blocks")
   }
-  if (code.match(/==(?!=)/g)?.length || 0 > 0) {
-    antiPatterns.push("Using == instead of ===")
+  if (code.split("\n").some((line) => line.length > 120)) {
+    recommendations.push("Some lines exceed 120 characters - consider breaking them up")
   }
-  if (code.match(/console\.log/g)?.length || 0 > 3) {
-    antiPatterns.push("Excessive console.log statements")
-  }
-  if (code.match(/function\s+\w+\s*$$[^)]{50,}$$/)) {
-    antiPatterns.push("Functions with too many parameters")
+  if (!code.includes("/**") && !code.includes("//")) {
+    recommendations.push("Add comments and documentation for better maintainability")
   }
 
-  return { patterns, antiPatterns }
-}
-
-/**
- * Extract function signatures from code
- * @param code - Source code to analyze
- * @returns Array of function signatures
- */
-export function extractFunctions(code: string): Array<{
-  name: string
-  params: string[]
-  isAsync: boolean
-}> {
-  const functions: Array<{ name: string; params: string[]; isAsync: boolean }> = []
-
-  // Match function declarations and expressions
-  const functionRegex = /(async\s+)?function\s+(\w+)\s*$$([^)]*)$$/g
-  const arrowRegex = /(async\s+)?(?:const|let|var)\s+(\w+)\s*=\s*$$([^)]*)$$\s*=>/g
-
-  let match
-  while ((match = functionRegex.exec(code)) !== null) {
-    functions.push({
-      name: match[2],
-      params: match[3]
-        .split(",")
-        .map((p) => p.trim())
-        .filter(Boolean),
-      isAsync: !!match[1],
-    })
-  }
-
-  while ((match = arrowRegex.exec(code)) !== null) {
-    functions.push({
-      name: match[2],
-      params: match[3]
-        .split(",")
-        .map((p) => p.trim())
-        .filter(Boolean),
-      isAsync: !!match[1],
-    })
-  }
-
-  return functions
+  return { patterns, recommendations }
 }
