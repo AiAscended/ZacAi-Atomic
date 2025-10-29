@@ -495,35 +495,26 @@ export class AIOrchestrator {
 
     const successfulResponses = domainResponses.filter(({ result }) => {
       if (!result || typeof result !== "object") return false
-      if ("error" in result) return false // Skip error responses
-      if ("response" in result && result.response === null) return false // Skip null responses
+      if ("error" in result) return false
+      if ("response" in result && result.response === null) return false
+      // Accept responses with confidence >= 0.3 (lowered threshold)
+      if ("confidence" in result && typeof result.confidence === "number" && result.confidence < 0.3) return false
       return true
     })
 
     let bestResponse: string | null = null
     let bestDomain: string | null = null
+    let bestConfidence = 0
 
     for (const { domain, result } of successfulResponses) {
-      if (domain !== "general" && domain !== "english") {
-        if (result && typeof result === "object" && "text" in result) {
-          const text = (result as { text: string }).text
-          if (!text.includes("I can help with") && !text.includes("Try asking me")) {
-            bestResponse = text
-            bestDomain = domain
-            break
-          }
-        }
-      }
-    }
+      if (result && typeof result === "object" && "response" in result && "confidence" in result) {
+        const response = (result as { response: string; confidence: number }).response
+        const confidence = (result as { response: string; confidence: number }).confidence
 
-    if (!bestResponse) {
-      for (const { domain, result } of successfulResponses) {
-        if (domain === "general") {
-          if (result && typeof result === "object" && "response" in result) {
-            bestResponse = (result as { response: string }).response
-            bestDomain = domain
-            break
-          }
+        if (response && confidence > bestConfidence) {
+          bestResponse = response
+          bestDomain = domain
+          bestConfidence = confidence
         }
       }
     }
@@ -531,56 +522,27 @@ export class AIOrchestrator {
     if (bestResponse) {
       responseParts.push(bestResponse)
       if (bestDomain) {
-        sources.push(`Domain: ${bestDomain}`)
+        sources.push(`Domain: ${bestDomain} (confidence: ${(bestConfidence * 100).toFixed(1)}%)`)
       }
     }
 
     if (responseParts.length === 0) {
-      // Collect error information from failed domains
-      const failedDomains = domainResponses
-        .filter(({ result }) => result && typeof result === "object" && "error" in result)
-        .map(({ domain, result }) => ({
-          domain,
-          error: (result as any).error,
-        }))
-
-      if (failedDomains.length > 0) {
-        // Production-grade error response with system diagnostics
-        const errorDetails = failedDomains
-          .map(({ domain, error }) => `- ${domain}: ${error.message || "Unknown error"}`)
-          .join("\n")
-
-        responseParts.push(
-          `I encountered difficulties processing your request across ${failedDomains.length} knowledge domain(s):\n\n` +
-            `${errorDetails}\n\n` +
-            `**System Status:**\n` +
-            `- Tokens processed: ${inferenceConfidence > 0 ? "Yes" : "No"}\n` +
-            `- Neural inference: ${inferenceConfidence > 0 ? `${(inferenceConfidence * 100).toFixed(1)}% confidence` : "Failed"}\n` +
-            `- Domains attempted: ${domains.join(", ")}\n\n` +
-            `This appears to be a temporary issue with external knowledge sources. ` +
-            `The system is functioning normally but couldn't retrieve specific information for your query. ` +
-            `Please try rephrasing your question or ask about a different topic.`,
-        )
-        sources.push("System Diagnostics")
-      } else {
-        // Generic fallback only as last resort
-        responseParts.push(
-          `I'm processing your request: "${prompt}"\n\n` +
-            `**System Status:**\n` +
-            `- Active domains: ${domains.length}\n` +
-            `- Neural inference confidence: ${(inferenceConfidence * 100).toFixed(1)}%\n` +
-            `- Tokens processed: Yes\n\n` +
-            `The system is operational but needs more specific information to provide a detailed answer. ` +
-            `Could you please rephrase your question or provide more context?`,
-        )
-        sources.push("Orchestrator Fallback")
-      }
+      responseParts.push(
+        `I'm processing your request: "${prompt}"\n\n` +
+          `**System Status:**\n` +
+          `- Active domains: ${domains.length}\n` +
+          `- Neural inference confidence: ${(inferenceConfidence * 100).toFixed(1)}%\n` +
+          `- Tokens processed: Yes\n\n` +
+          `The system is operational but needs more specific information to provide a detailed answer. ` +
+          `Could you please rephrase your question or provide more context?`,
+      )
+      sources.push("Orchestrator Fallback")
     }
 
     return {
       text: responseParts.join("\n\n"),
       sources,
-      confidence: domainResponses.length > 0 ? (0.8 + inferenceConfidence) / 2 : 0.5,
+      confidence: bestConfidence > 0 ? bestConfidence : 0.5,
       domains,
       timestamp: Date.now(),
     }
