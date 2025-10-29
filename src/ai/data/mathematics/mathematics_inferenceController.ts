@@ -93,6 +93,19 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
 
   const calculations: string[] = []
 
+  // Find all chained multiplication expressions (3+ numbers)
+  const chainedMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)\s*[×x*]\s*(\d+)/gi))
+  for (const match of chainedMultMatches) {
+    const [fullMatch, num1, num2, num3] = match
+    const step1 = multiply(Number.parseInt(num1), Number.parseInt(num2))
+    const finalResult = multiply(step1, Number.parseInt(num3))
+    calculations.push(
+      `${num1} × ${num2} × ${num3} = ${finalResult}\n` +
+        `Step 1: ${num1} × ${num2} = ${step1}\n` +
+        `Step 2: ${step1} × ${num3} = ${finalResult}`,
+    )
+  }
+
   // Find all division expressions
   const divisionMatches = Array.from(numericInput.matchAll(/(\d+)\s*[÷/]\s*(\d+)/gi))
   for (const match of divisionMatches) {
@@ -140,8 +153,8 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     }
   }
 
-  // Find all simple multiplication expressions
-  const simpleMultiplyMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)/gi))
+  // Find all simple multiplication expressions (only if not part of chained multiplication)
+  const simpleMultiplyMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)(?!\s*[×x*])/gi))
   for (const match of simpleMultiplyMatches) {
     const [, num1, num2] = match
     // Skip if already processed as part of a complex expression

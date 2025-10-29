@@ -123,7 +123,10 @@ export const generalRunInference = async (input: string, context?: any) => {
       const sourcesFromLookup = await searchSources("general", searchQuery)
 
       if (sourcesFromLookup && sourcesFromLookup.length > 0) {
-        const wikiUrl = sourcesFromLookup[0]
+        // Extract the Wikipedia URL from the response
+        const wikiUrlMatch = sourcesFromLookup[0].match(/https:\/\/en\.wikipedia\.org[^\s)]+/)
+        const wikiUrl = wikiUrlMatch ? wikiUrlMatch[0] : sourcesFromLookup[0]
+
         console.log("[v0] Searching Wikipedia at:", wikiUrl)
 
         try {
@@ -135,18 +138,23 @@ export const generalRunInference = async (input: string, context?: any) => {
 
           if (response.ok) {
             const html = await response.text()
-            const paragraphMatch = html.match(/<p>(.*?)<\/p>/s)
+            // Extract first paragraph from Wikipedia article
+            const paragraphMatch = html.match(/<p[^>]*>(.*?)<\/p>/s)
 
             if (paragraphMatch) {
               const cleanText = paragraphMatch[1]
                 .replace(/<[^>]*>/g, "")
                 .replace(/\[.*?\]/g, "")
+                .replace(/\s+/g, " ")
+                .trim()
                 .substring(0, 500)
 
-              responseText = cleanText + `\n\n*Source: ${wikiUrl}*`
-              sources.push(wikiUrl)
-              confidence = Math.max(confidence, 0.4) // Boost confidence for successful Wikipedia lookup
-              inferenceSucceeded = true
+              if (cleanText.length > 50) {
+                responseText = cleanText + `\n\n*Source: Wikipedia*`
+                sources.push(wikiUrl)
+                confidence = Math.max(confidence, 0.6) // Boost confidence for successful Wikipedia lookup
+                inferenceSucceeded = true
+              }
             }
           }
         } catch (fetchError) {
