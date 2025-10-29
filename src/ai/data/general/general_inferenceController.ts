@@ -51,9 +51,13 @@ export const generalRunInference = async (input: string, context?: any) => {
   const sentiment = context?.sentiment
   const userProfile = context?.userProfile || {}
 
-  const confidence = Array.isArray(inferenceResults)
-    ? inferenceResults.reduce((sum, r) => sum + (r.confidence || 0), 0) / (inferenceResults.length || 1)
-    : inferenceResults?.confidence || 0
+  const domainInferenceResult = Array.isArray(inferenceResults)
+    ? inferenceResults.find((r) => r.domain === GENERAL_DOMAIN)
+    : inferenceResults
+
+  const confidence = domainInferenceResult?.confidence || 0
+
+  console.log(`[v0] ${GENERAL_DOMAIN} inference confidence:`, confidence)
 
   let responseText = ""
   const sources: string[] = []
@@ -69,7 +73,7 @@ export const generalRunInference = async (input: string, context?: any) => {
 
     console.log("[v0] Query keywords extracted:", queryKeywords)
 
-    const hasTrainedKnowledge = confidence > 0.4
+    const hasTrainedKnowledge = confidence > 0.3
 
     if (hasTrainedKnowledge && queryKeywords.length > 0) {
       responseText = `Based on my trained knowledge (confidence: ${(confidence * 100).toFixed(1)}%), `
@@ -82,7 +86,7 @@ export const generalRunInference = async (input: string, context?: any) => {
     console.error("[v0] Domain inference failed:", error)
   }
 
-  if (!inferenceSucceeded || confidence < 0.4) {
+  if (!inferenceSucceeded || confidence < 0.3) {
     try {
       const queryKeywords = tokens
         .filter((t: string) => {
