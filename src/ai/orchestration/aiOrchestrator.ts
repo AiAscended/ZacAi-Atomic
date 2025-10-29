@@ -497,32 +497,51 @@ export class AIOrchestrator {
       if (!result || typeof result !== "object") return false
       if ("error" in result) return false
       if ("response" in result && result.response === null) return false
-      // Accept responses with confidence >= 0.3 (lowered threshold)
-      if ("confidence" in result && typeof result.confidence === "number" && result.confidence < 0.3) return false
+      if ("confidence" in result && typeof result.confidence === "number" && result.confidence < 0.25) return false
       return true
     })
 
-    let bestResponse: string | null = null
-    let bestDomain: string | null = null
-    let bestConfidence = 0
+    const hasMultipleQuestions = (prompt.match(/\?/g) || []).length > 1 || (prompt.match(/\band\b/gi) || []).length > 0
 
-    for (const { domain, result } of successfulResponses) {
-      if (result && typeof result === "object" && "response" in result && "confidence" in result) {
-        const response = (result as { response: string; confidence: number }).response
-        const confidence = (result as { response: string; confidence: number }).confidence
+    if (hasMultipleQuestions && successfulResponses.length > 1) {
+      // Sort by confidence descending
+      const sortedResponses = successfulResponses
+        .map(({ domain, result }) => ({
+          domain,
+          response: (result as { response: string; confidence: number }).response,
+          confidence: (result as { response: string; confidence: number }).confidence,
+        }))
+        .filter((r) => r.response && r.confidence > 0)
+        .sort((a, b) => b.confidence - a.confidence)
 
-        if (response && confidence > bestConfidence) {
-          bestResponse = response
-          bestDomain = domain
-          bestConfidence = confidence
+      // Combine responses from all domains
+      for (const { domain, response, confidence } of sortedResponses) {
+        responseParts.push(response)
+        sources.push(`Domain: ${domain} (confidence: ${(confidence * 100).toFixed(1)}%)`)
+      }
+    } else {
+      let bestResponse: string | null = null
+      let bestDomain: string | null = null
+      let bestConfidence = 0
+
+      for (const { domain, result } of successfulResponses) {
+        if (result && typeof result === "object" && "response" in result && "confidence" in result) {
+          const response = (result as { response: string; confidence: number }).response
+          const confidence = (result as { response: string; confidence: number }).confidence
+
+          if (response && confidence > bestConfidence) {
+            bestResponse = response
+            bestDomain = domain
+            bestConfidence = confidence
+          }
         }
       }
-    }
 
-    if (bestResponse) {
-      responseParts.push(bestResponse)
-      if (bestDomain) {
-        sources.push(`Domain: ${bestDomain} (confidence: ${(bestConfidence * 100).toFixed(1)}%)`)
+      if (bestResponse) {
+        responseParts.push(bestResponse)
+        if (bestDomain) {
+          sources.push(`Domain: ${bestDomain} (confidence: ${(bestConfidence * 100).toFixed(1)}%)`)
+        }
       }
     }
 
@@ -539,10 +558,18 @@ export class AIOrchestrator {
       sources.push("Orchestrator Fallback")
     }
 
+    const avgConfidence =
+      successfulResponses.length > 0
+        ? successfulResponses.reduce((sum, { result }) => {
+            const conf = (result as { confidence?: number }).confidence || 0
+            return sum + conf
+          }, 0) / successfulResponses.length
+        : 0.5
+
     return {
-      text: responseParts.join("\n\n"),
+      text: responseParts.join("\n\n---\n\n"),
       sources,
-      confidence: bestConfidence > 0 ? bestConfidence : 0.5,
+      confidence: avgConfidence > 0 ? avgConfidence : 0.5,
       domains,
       timestamp: Date.now(),
     }
