@@ -202,6 +202,42 @@ export async function loadWeights(domainName: string): Promise<WeightsData> {
 }
 
 /**
+ * Load domain-specific weights in the format expected by the inference engine
+ * Returns weights organized by transformer layers
+ */
+export async function loadDomainWeights(
+  domainName: string,
+): Promise<{ layers: number[][][]; biases: number[][] } | null> {
+  try {
+    // Load the full weights data
+    const weightsData = await loadWeights(domainName)
+
+    // Convert to inference engine format
+    // Each layer has weights and biases
+    const layers: number[][][] = []
+    const biases: number[][] = []
+
+    // Use hiddenWeights as the base for each layer
+    // In a real system, this would load actual trained transformer layers
+    const numLayers = 6 // Match defaultInferenceConfig.numLayers
+    for (let i = 0; i < numLayers; i++) {
+      layers.push(weightsData.hiddenWeights)
+      biases.push(weightsData.biases)
+    }
+
+    logger.info("WeightsLoader", `Loaded domain weights for ${domainName}`, {
+      numLayers: layers.length,
+      layerSize: layers[0]?.length || 0,
+    })
+
+    return { layers, biases }
+  } catch (error) {
+    logger.error("WeightsLoader", `Failed to load domain weights for ${domainName}`, error)
+    return null
+  }
+}
+
+/**
  * Generate embeddings for tokens using loaded weights
  */
 export function generateEmbeddings(tokens: string[], weights: WeightsData): number[][] {
