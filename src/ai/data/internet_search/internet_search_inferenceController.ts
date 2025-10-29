@@ -17,6 +17,7 @@ import pretrainedWeights from "./weights/internet_search_pretrained_weights.json
 import seeds from "./seeds/internet_search_seeds.json"
 import { searchSources } from "../../shared/tools/urlLookup"
 import { searchWeb } from "../../knowledge_retrieval/webSearchAPIConnector"
+import { searchAndScrapeGoogle } from "../../shared/tools/webScraper"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 
 interface InferenceContext {
@@ -111,54 +112,62 @@ export async function internetSearchRunInference(input: string, context?: Infere
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} extracted query:`, searchQuery)
 
   try {
-    console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting web search...`)
+    console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting API web search...`)
     const results = await searchWeb(searchQuery, 5)
 
-    if (!results || results.length === 0) {
-      console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} web search returned 0 results (API keys not configured)`)
+    if (results && results.length > 0) {
+      const resultText = results
+        .slice(0, 3)
+        .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}${r.url ? `\n   Source: ${r.url}` : ""}`)
+        .join("\n\n")
 
       return {
-        response:
-          `**Internet Search Domain Active**\n\n` +
-          `Query: "${searchQuery}"\n` +
-          `Query Type: ${semantics.queryType}\n` +
-          `Confidence: ${(confidence * 100).toFixed(1)}%\n\n` +
-          `Search engines available: Google, Bing, DuckDuckGo\n` +
-          `Note: Real search requires API keys. Configure Google Custom Search API, Bing Search API, or DuckDuckGo API in webSearchAPIConnector.ts to enable live search results.`,
-        confidence: Math.max(confidence, 0.3),
+        response: `**Search Results for "${searchQuery}":**\n\n${resultText}`,
+        confidence: Math.max(confidence, 0.7),
         domain: INTERNET_SEARCH_DOMAIN,
-        sources: ["Internet Search Domain (Inference)"],
+        sources: results.map((r) => r.url || r.title),
         metadata: {
           tokensUsed: tokens.length,
           semanticAnalysis: semantics,
           searchQuery: searchQuery,
+          resultCount: results.length,
+          method: "api_search",
         },
       }
     }
-
-    const resultText = results
-      .slice(0, 3)
-      .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}${r.url ? `\n   Source: ${r.url}` : ""}`)
-      .join("\n\n")
-
-    return {
-      response: `**Search Results for "${searchQuery}":**\n\n${resultText}`,
-      confidence: Math.max(confidence, 0.6),
-      domain: INTERNET_SEARCH_DOMAIN,
-      sources: results.map((r) => r.url || r.title),
-      metadata: {
-        tokensUsed: tokens.length,
-        semanticAnalysis: semantics,
-        searchQuery: searchQuery,
-        resultCount: results.length,
-      },
-    }
   } catch (error) {
-    console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} web search failed:`, error)
+    console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} API web search failed:`, error)
   }
 
   try {
-    console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting URL lookup...`)
+    console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting web scraping fallback...`)
+    const scrapedResults = await searchAndScrapeGoogle(searchQuery, 3)
+
+    if (scrapedResults && scrapedResults.length > 0) {
+      const resultText = scrapedResults
+        .map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}\n   Source: ${r.url}`)
+        .join("\n\n")
+
+      return {
+        response: `**Search Results for "${searchQuery}":**\n\n${resultText}`,
+        confidence: Math.max(confidence, 0.65),
+        domain: INTERNET_SEARCH_DOMAIN,
+        sources: scrapedResults.map((r) => r.url),
+        metadata: {
+          tokensUsed: tokens.length,
+          semanticAnalysis: semantics,
+          searchQuery: searchQuery,
+          resultCount: scrapedResults.length,
+          method: "web_scraping",
+        },
+      }
+    }
+  } catch (error) {
+    console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} web scraping failed:`, error)
+  }
+
+  try {
+    console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} attempting URL lookup fallback...`)
     const urlResults = await searchSources(INTERNET_SEARCH_DOMAIN, searchQuery)
 
     if (urlResults && urlResults.length > 0) {
@@ -177,6 +186,7 @@ export async function internetSearchRunInference(input: string, context?: Infere
             tokensUsed: tokens.length,
             semanticAnalysis: semantics,
             searchQuery: searchQuery,
+            method: "url_lookup",
           },
         }
       }
@@ -191,15 +201,16 @@ export async function internetSearchRunInference(input: string, context?: Infere
       `Query: "${searchQuery}"\n` +
       `Query Type: ${semantics.queryType}\n` +
       `Confidence: ${(confidence * 100).toFixed(1)}%\n\n` +
-      `Search engines available: Google, Bing, DuckDuckGo\n` +
-      `Note: Search results currently simulated for testing. In production, this will connect to real search APIs.`,
-    confidence: Math.max(confidence, 0.3),
+      `I attempted to search for this information using multiple methods (API search, web scraping, URL lookup), but encountered technical limitations. ` +
+      `In a production environment with proper API access and server-side scraping, I would provide comprehensive search results from Google, Bing, and DuckDuckGo.`,
+    confidence: Math.max(confidence, 0.4),
     domain: INTERNET_SEARCH_DOMAIN,
     sources: ["Internet Search Domain (Inference)"],
     metadata: {
       tokensUsed: tokens.length,
       semanticAnalysis: semantics,
       searchQuery: searchQuery,
+      method: "inference_only",
     },
   }
 }
