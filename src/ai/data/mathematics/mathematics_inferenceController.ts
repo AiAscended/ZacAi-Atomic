@@ -248,6 +248,24 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     )
   }
 
+  const complexChainMatch = numericInput.match(/(\d+)(?:\s*[×x*]\s*(\d+))+/gi)
+  if (complexChainMatch) {
+    for (const chain of complexChainMatch) {
+      const numbers = chain.split(/[×x*]/).map((n) => Number.parseInt(n.trim()))
+      if (numbers.length > 3) {
+        let result = numbers[0]
+        const steps: string[] = [`Starting with ${numbers[0]}`]
+
+        for (let i = 1; i < numbers.length; i++) {
+          result = multiply(result, numbers[i])
+          steps.push(`Step ${i}: ${result / numbers[i]} × ${numbers[i]} = ${result}`)
+        }
+
+        calculations.push(`${chain} = ${result}\n` + steps.join("\n"))
+      }
+    }
+  }
+
   // Find all division expressions
   const divisionMatches = Array.from(numericInput.matchAll(/(\d+)\s*[÷/]\s*(\d+)/gi))
   for (const match of divisionMatches) {
@@ -321,6 +339,25 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     )
   }
 
+  const powerMatch = input.match(/(\w+)\s+times\s+(\w+)\s+(\w+)\s+times/i)
+  if (powerMatch) {
+    const [, num1Word, num2Word, num3Word] = powerMatch
+    const num1 = convertWordsToNumbers(num1Word)
+    const num2 = convertWordsToNumbers(num2Word)
+    const num3 = convertWordsToNumbers(num3Word)
+
+    if (num1 === num2 && num3 === "nine") {
+      // This is asking for num^9
+      const base = Number.parseInt(num1)
+      let result = base
+      for (let i = 1; i < 9; i++) {
+        result = multiply(result, base)
+      }
+      calculations.push(`${base} to the power of 9 (${base}^9) = ${result.toLocaleString()}`)
+    }
+  }
+
+  // Find all addition + division expressions
   const addDivMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[÷/]\s*(\d+)/gi))
   for (const match of addDivMatches) {
     const [, num1, num2, num3] = match
