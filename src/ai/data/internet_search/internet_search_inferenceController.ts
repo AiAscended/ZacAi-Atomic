@@ -58,10 +58,25 @@ export async function internetSearchRunInference(
 
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} inference confidence:`, confidence)
 
-  if (confidence < 0.05) {
-    return {
-      response: null as any,
-      confidence: 0,
+  if (confidence < 0.01) {
+    // Boost confidence if search keywords are present
+    if (
+      lowerInput.includes("search") ||
+      lowerInput.includes("find") ||
+      lowerInput.includes("lookup") ||
+      lowerInput.includes("wikipedia") ||
+      lowerInput.includes("internet") ||
+      lowerInput.includes("who invented") ||
+      lowerInput.includes("history of") ||
+      lowerInput.includes("what is") ||
+      lowerInput.includes("tell me about")
+    ) {
+      confidence = 0.3 // Boost confidence for search-related queries
+    } else {
+      return {
+        response: null as any,
+        confidence: 0,
+      }
     }
   }
 
