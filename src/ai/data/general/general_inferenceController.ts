@@ -56,13 +56,34 @@ export const generalRunInference = async (input: string, context?: any) => {
     ? inferenceResults.find((r) => r.domain === GENERAL_DOMAIN)
     : inferenceResults
 
-  let confidence = domainInferenceResult?.confidence || 0.1
-
-  console.log(`[v0] ${GENERAL_DOMAIN} inference confidence:`, confidence)
-
+  let confidence = domainInferenceResult?.confidence || 0
   let responseText = ""
   const sources: string[] = []
   let inferenceSucceeded = false
+
+  console.log(`[v0] ${GENERAL_DOMAIN} inference confidence:`, confidence)
+
+  if (confidence < 0.1) {
+    return {
+      response: null,
+      confidence: 0,
+      domain: GENERAL_DOMAIN,
+      sources: [],
+      error: {
+        code: "LOW_CONFIDENCE",
+        message: "Inference confidence too low for this domain",
+        details: {
+          inferenceConfidence: confidence,
+          tokensProcessed: tokens.length,
+        },
+      },
+      metadata: {
+        tokensUsed: tokens.length,
+        embeddingsUsed: embeddings.length > 0,
+        sentimentDetected: sentiment?.sentiment || "neutral",
+      },
+    }
+  }
 
   const hasTrainedKnowledge = confidence > 0.05 // Very low threshold for testing
 

@@ -48,15 +48,22 @@ export async function internetSearchRunInference(
   const inferenceResults = context?.inferenceResults
   const tokens = context?.tokens || []
 
-  let confidence = 0.1 // Start with very low confidence for testing
+  let confidence = 0
   if (Array.isArray(inferenceResults)) {
     const ownResult = inferenceResults.find((r) => r.domain === "internet_search")
-    confidence = ownResult?.confidence || 0.1
+    confidence = ownResult?.confidence || 0
   } else if (inferenceResults?.confidence) {
     confidence = inferenceResults.confidence
   }
 
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} inference confidence:`, confidence)
+
+  if (confidence < 0.1) {
+    return {
+      response: null as any,
+      confidence: 0,
+    }
+  }
 
   const parsedQuery = parseQuery(input)
   console.log("[v0] Parsed query:", parsedQuery)
