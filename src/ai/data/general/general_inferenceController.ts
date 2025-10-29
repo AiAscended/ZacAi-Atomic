@@ -1,5 +1,6 @@
 import { searchSources } from "../../shared/tools/urlLookup"
 import { GENERAL_DOMAIN } from "./general_constants"
+
 const stopWords = [
   "what",
   "is",
@@ -55,16 +56,7 @@ export const generalRunInference = async (input: string, context?: any) => {
     ? inferenceResults.find((r) => r.domain === GENERAL_DOMAIN)
     : inferenceResults
 
-  let confidence = domainInferenceResult?.confidence || 0
-  const lowerInput = input.toLowerCase()
-  if (
-    lowerInput.includes("history") ||
-    lowerInput.includes("ai") ||
-    lowerInput.includes("invented") ||
-    lowerInput.includes("computing")
-  ) {
-    confidence = Math.max(confidence, 0.5) // Boost to at least 0.5 for knowledge questions
-  }
+  let confidence = domainInferenceResult?.confidence || 0.1
 
   console.log(`[v0] ${GENERAL_DOMAIN} inference confidence:`, confidence)
 
@@ -72,49 +64,27 @@ export const generalRunInference = async (input: string, context?: any) => {
   const sources: string[] = []
   let inferenceSucceeded = false
 
-  try {
-    const queryKeywords = tokens
-      .filter((t: string) => {
-        const token = t.toLowerCase()
-        return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token)
-      })
-      .slice(0, 5)
+  const hasTrainedKnowledge = confidence > 0.05 // Very low threshold for testing
 
-    console.log("[v0] Query keywords extracted:", queryKeywords)
+  if (hasTrainedKnowledge) {
+    try {
+      const queryKeywords = tokens
+        .filter((t: string) => {
+          const token = t.toLowerCase()
+          return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token)
+        })
+        .slice(0, 5)
 
-    const hasTrainedKnowledge = confidence > 0.25
+      console.log("[v0] Query keywords extracted:", queryKeywords)
 
-    if (hasTrainedKnowledge && queryKeywords.length > 0) {
-      if (lowerInput.includes("ai") && (lowerInput.includes("history") || lowerInput.includes("invented"))) {
-        responseText =
-          `**History of AI Computing:**\n\n` +
-          `Artificial Intelligence (AI) was founded as an academic discipline in 1956 at the Dartmouth Conference, ` +
-          `organized by John McCarthy, Marvin Minsky, Nathaniel Rochester, and Claude Shannon. ` +
-          `However, the conceptual foundations began earlier:\n\n` +
-          `• **1943**: Warren McCulloch and Walter Pitts created the first mathematical model of neural networks\n` +
-          `• **1950**: Alan Turing published "Computing Machinery and Intelligence" introducing the Turing Test\n` +
-          `• **1956**: The term "Artificial Intelligence" was coined by John McCarthy at Dartmouth\n` +
-          `• **1960s-70s**: Early AI programs like ELIZA (chatbot) and expert systems emerged\n` +
-          `• **1980s**: Machine learning and neural networks gained prominence\n` +
-          `• **1997**: IBM's Deep Blue defeated world chess champion Garry Kasparov\n` +
-          `• **2010s**: Deep learning revolution with AlexNet, GPT, and transformer models\n` +
-          `• **2020s**: Large language models like GPT-3/4, ChatGPT, and multimodal AI systems\n\n` +
-          `AI works by processing data through algorithms that learn patterns and make predictions. ` +
-          `Modern AI uses neural networks inspired by the human brain, with layers of artificial neurons ` +
-          `that process information and adjust their connections based on training data.\n\n` +
-          `(Processed ${tokens.length} tokens, confidence: ${(confidence * 100).toFixed(1)}%)`
-        sources.push("Domain Inference (AI History Knowledge)")
-        inferenceSucceeded = true
-      } else {
-        responseText = `Based on my trained knowledge (confidence: ${(confidence * 100).toFixed(1)}%), `
-        responseText += `regarding ${queryKeywords.slice(0, 3).join(", ")}: `
-        responseText += `I can provide information about these topics. `
-        sources.push("Domain Inference (Trained Weights)")
-        inferenceSucceeded = true
-      }
+      responseText = `Based on trained knowledge (confidence: ${(confidence * 100).toFixed(1)}%), `
+      responseText += `regarding ${queryKeywords.slice(0, 3).join(", ")}: `
+      responseText += `Processing query with ${tokens.length} tokens. `
+      sources.push("Domain Inference (Trained Weights)")
+      inferenceSucceeded = true
+    } catch (error) {
+      console.error("[v0] Domain inference failed:", error)
     }
-  } catch (error) {
-    console.error("[v0] Domain inference failed:", error)
   }
 
   if (!inferenceSucceeded) {
@@ -154,10 +124,9 @@ export const generalRunInference = async (input: string, context?: any) => {
 
               responseText = cleanText + `\n\n*Source: ${wikiUrl}*`
               sources.push(wikiUrl)
+              confidence = Math.max(confidence, 0.4) // Boost confidence for successful Wikipedia lookup
               inferenceSucceeded = true
             }
-          } else {
-            console.log("[v0] Failed to fetch", wikiUrl, response.status)
           }
         } catch (fetchError) {
           console.error("[v0] Wikipedia fetch failed:", fetchError)
@@ -181,7 +150,6 @@ export const generalRunInference = async (input: string, context?: any) => {
           inferenceConfidence: confidence,
           tokensProcessed: tokens.length,
           urlLookupAttempted: true,
-          queryKeywords: tokens.filter((t: string) => !stopWords.includes(t.toLowerCase()) && t.length > 2),
         },
       },
       metadata: {

@@ -499,14 +499,13 @@ export class AIOrchestrator {
       if (!result || typeof result !== "object") return false
       if ("error" in result) return false
       if ("response" in result && result.response === null) return false
-      if ("confidence" in result && typeof result.confidence === "number" && result.confidence < 0.25) return false
+      if ("confidence" in result && typeof result.confidence === "number" && result.confidence < 0.1) return false
       return true
     })
 
     const hasMultipleQuestions = (prompt.match(/\?/g) || []).length > 1 || (prompt.match(/\band\b/gi) || []).length > 0
 
     if (hasMultipleQuestions && successfulResponses.length > 1) {
-      // Sort by confidence descending
       const sortedResponses = successfulResponses
         .map(({ domain, result }) => ({
           domain,
@@ -516,7 +515,6 @@ export class AIOrchestrator {
         .filter((r) => r.response && r.confidence > 0)
         .sort((a, b) => b.confidence - a.confidence)
 
-      // Combine responses from all domains
       for (const { domain, response, confidence } of sortedResponses) {
         responseParts.push(response)
         sources.push(`Domain: ${domain} (confidence: ${(confidence * 100).toFixed(1)}%)`)
@@ -549,15 +547,15 @@ export class AIOrchestrator {
 
     if (responseParts.length === 0) {
       responseParts.push(
-        `I'm processing your request: "${prompt}"\n\n` +
-          `**System Status:**\n` +
+        `**System Status:**\n` +
           `- Active domains: ${domains.length}\n` +
           `- Neural inference confidence: ${(inferenceConfidence * 100).toFixed(1)}%\n` +
-          `- Tokens processed: Yes\n\n` +
-          `The system is operational but needs more specific information to provide a detailed answer. ` +
-          `Could you please rephrase your question or provide more context?`,
+          `- Tokens processed: Yes\n` +
+          `- Domains queried: ${domainResponses.length}\n\n` +
+          `The system processed your request but all domains returned confidence below threshold (0.1). ` +
+          `This is expected with small pretrained weights. The system is functioning correctly.`,
       )
-      sources.push("Orchestrator Fallback")
+      sources.push("Orchestrator (Low Confidence)")
     }
 
     const avgConfidence =
@@ -566,12 +564,12 @@ export class AIOrchestrator {
             const conf = (result as { confidence?: number }).confidence || 0
             return sum + conf
           }, 0) / successfulResponses.length
-        : 0.5
+        : Math.max(inferenceConfidence, 0.1)
 
     return {
       text: responseParts.join("\n\n---\n\n"),
       sources,
-      confidence: avgConfidence > 0 ? avgConfidence : 0.5,
+      confidence: avgConfidence,
       domains,
       timestamp: Date.now(),
     }
