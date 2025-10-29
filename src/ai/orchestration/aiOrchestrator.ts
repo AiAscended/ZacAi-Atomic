@@ -383,6 +383,20 @@ export class AIOrchestrator {
     const generalDomain = allDomains.find((d) => d.name === "general")
     if (generalDomain) selected.push(generalDomain)
 
+    if (
+      text.match(/\b(math|calculate|equation|number|sum|multiply|add|subtract|divide|plus|minus|times|equals)\b/) ||
+      text.match(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/) ||
+      text.match(/\d+\s*[+\-*/×÷]\s*\d+/) ||
+      text.match(/\b(squared|cubed|power|root|percent)\b/) ||
+      text.match(/\b(double|triple|half|quarter|quantity|amount|how much|how many)\b/) ||
+      text.match(/\b(ingredients?|recipe|measurement|cup|tablespoon|teaspoon)\b/) ||
+      text.match(/\b(mathematics|mathematical|equations?|formulas?)\b/) ||
+      (text.includes("ai") && text.match(/\b(computing|algorithm|neural|network)\b/))
+    ) {
+      const mathDomain = allDomains.find((d) => d.name === "mathematics")
+      if (mathDomain) selected.push(mathDomain)
+    }
+
     if (text.match(/\b(react|jsx|component|hook|useState|useEffect|props|state)\b/)) {
       const reactDomain = allDomains.find((d) => d.name === "react")
       if (reactDomain) selected.push(reactDomain)
@@ -393,26 +407,20 @@ export class AIOrchestrator {
       if (nextjsDomain) selected.push(nextjsDomain)
     }
 
-    if (text.match(/\b(code|program|algorithm|function|class|variable|loop|condition|debug)\b/)) {
+    if (
+      text.match(/\b(code|program|algorithm|function|class|variable|loop|condition|debug)\b/) ||
+      text.match(/\b(script|computing|ai|neural|machine learning)\b/)
+    ) {
       const programmingDomain = allDomains.find((d) => d.name === "programming")
       if (programmingDomain) selected.push(programmingDomain)
     }
 
-    if (text.match(/\b(code|program|function|class|typescript|javascript|python)\b/)) {
+    if (
+      text.match(/\b(code|program|function|class|typescript|javascript|python)\b/) ||
+      (text.match(/\b(example|sample|snippet|demo)\b/) && text.match(/\b(code|function|algorithm|ai)\b/))
+    ) {
       const tsDomain = allDomains.find((d) => d.name === "typescript")
       if (tsDomain) selected.push(tsDomain)
-    }
-
-    if (
-      text.match(/\b(math|calculate|equation|number|sum|multiply|add|subtract|divide|plus|minus|times|equals)\b/) ||
-      text.match(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/) ||
-      text.match(/\d+\s*[+\-*/×÷]\s*\d+/) ||
-      text.match(/\b(squared|cubed|power|root|percent)\b/) ||
-      text.match(/\b(double|triple|half|quarter|quantity|amount|how much|how many)\b/) ||
-      text.match(/\b(ingredients?|recipe|measurement|cup|tablespoon|teaspoon)\b/)
-    ) {
-      const mathDomain = allDomains.find((d) => d.name === "mathematics")
-      if (mathDomain) selected.push(mathDomain)
     }
 
     if (text.match(/\b(grammar|spell|sentence|word|language|english)\b/)) {
