@@ -1,14 +1,13 @@
-import { safeParseJSON } from './mathematics_utils';
+import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./mathematics_utils"
 
 export const loadMathematicsSeedVocabulary = async (
-  path = '/src/ai/data/mathematics/mathematics_seedVocabulary.json'
+  path = "/src/ai/data/mathematics/mathematics_seedVocabulary.json",
 ) => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const fs = require('fs');
-    const raw = fs.readFileSync(path, 'utf-8');
-    return safeParseJSON(raw, { terms: [] }) as { terms: string[] };
+    const raw = await storageAdapter.readFile(path, "utf-8")
+    return safeParseJSON(raw, { terms: [] }) as { terms: string[] }
   } catch (e) {
-    return { terms: [] };
+    return { terms: [] }
   }
-};
+}

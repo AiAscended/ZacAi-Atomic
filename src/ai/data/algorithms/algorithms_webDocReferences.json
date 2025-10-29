@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "name": "Algorithm Visualizer",
+      "url": "https://algorithm-visualizer.org/",
+      "description": "Interactive algorithm visualizations"
+    },
+    {
+      "name": "LeetCode",
+      "url": "https://leetcode.com/",
+      "description": "Algorithm practice and learning platform"
+    }
+  ]
+}

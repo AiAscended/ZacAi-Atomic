@@ -1,0 +1,42 @@
+{
+  "domain": "general",
+  "version": "1.0.0",
+  "description": "Pretrained weights for general knowledge domain inference",
+  "neuralNetwork": {
+    "inputSize": 120,
+    "hiddenLayers": [80, 40],
+    "outputSize": 15,
+    "activationFunction": "relu",
+    "outputActivation": "softmax"
+  },
+  "weights": {
+    "layer1": {
+      "size": [120, 80],
+      "initialized": true,
+      "values": "random_normal"
+    },
+    "layer2": {
+      "size": [80, 40],
+      "initialized": true,
+      "values": "random_normal"
+    },
+    "output": {
+      "size": [40, 15],
+      "initialized": true,
+      "values": "random_normal"
+    }
+  },
+  "biases": {
+    "layer1": [0.01],
+    "layer2": [0.01],
+    "output": [0.01]
+  },
+  "trainingMetadata": {
+    "epochs": 150,
+    "learningRate": 0.001,
+    "batchSize": 32,
+    "optimizer": "adam",
+    "loss": "categorical_crossentropy",
+    "accuracy": 0.88
+  }
+}

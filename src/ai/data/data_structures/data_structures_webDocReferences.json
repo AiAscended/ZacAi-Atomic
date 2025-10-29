@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "name": "GeeksforGeeks Data Structures",
+      "url": "https://www.geeksforgeeks.org/data-structures/",
+      "description": "Comprehensive data structures tutorials"
+    },
+    {
+      "name": "Visualgo",
+      "url": "https://visualgo.net/",
+      "description": "Data structure and algorithm visualizations"
+    }
+  ]
+}

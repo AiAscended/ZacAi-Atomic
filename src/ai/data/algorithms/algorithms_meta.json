@@ -1,0 +1,13 @@
+{
+  "domain": "algorithms",
+  "version": "1.0.0",
+  "description": "Algorithms domain for sorting, searching, dynamic programming, and complexity analysis",
+  "capabilities": [
+    "sorting_algorithms",
+    "searching_algorithms",
+    "dynamic_programming",
+    "greedy_algorithms",
+    "complexity_analysis"
+  ],
+  "dependencies": []
+}

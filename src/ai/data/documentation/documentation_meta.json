@@ -1,0 +1,13 @@
+{
+  "name": "documentation",
+  "version": "0.1",
+  "description": "Documentation domain (JSDoc, comments, API documentation, code explanations).",
+  "author": "auto-generated",
+  "files": [
+    "documentation_seedVocabulary.json",
+    "documentation_learnedData.json",
+    "documentation_webDocReferences.json",
+    "documentation_trainingWeights.bin",
+    "src/ai/data/documentation/*"
+  ]
+}

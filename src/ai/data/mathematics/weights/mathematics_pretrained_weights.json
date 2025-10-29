@@ -1,0 +1,42 @@
+{
+  "domain": "mathematics",
+  "version": "1.0.0",
+  "description": "Pretrained weights for mathematics domain inference",
+  "neuralNetwork": {
+    "inputSize": 100,
+    "hiddenLayers": [64, 32],
+    "outputSize": 10,
+    "activationFunction": "relu",
+    "outputActivation": "softmax"
+  },
+  "weights": {
+    "layer1": {
+      "size": [100, 64],
+      "initialized": true,
+      "values": "random_normal"
+    },
+    "layer2": {
+      "size": [64, 32],
+      "initialized": true,
+      "values": "random_normal"
+    },
+    "output": {
+      "size": [32, 10],
+      "initialized": true,
+      "values": "random_normal"
+    }
+  },
+  "biases": {
+    "layer1": [0.01],
+    "layer2": [0.01],
+    "output": [0.01]
+  },
+  "trainingMetadata": {
+    "epochs": 100,
+    "learningRate": 0.001,
+    "batchSize": 32,
+    "optimizer": "adam",
+    "loss": "categorical_crossentropy",
+    "accuracy": 0.85
+  }
+}
