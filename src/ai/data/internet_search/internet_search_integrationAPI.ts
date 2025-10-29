@@ -42,7 +42,12 @@ export const internetSearchInit = async () => {
     },
     query: async (input: string, context?: any) => {
       const result = await internetSearchRunInference(input, context)
-      return { text: result.response }
+      return {
+        response: result.response,
+        confidence: result.confidence,
+        sources: result.sources,
+        metadata: result.metadata,
+      }
     },
   })
 }

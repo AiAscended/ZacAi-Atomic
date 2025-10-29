@@ -30,7 +30,12 @@ export const generalInit = async () => {
     },
     query: async (input: string, context?: any) => {
       const result = await generalRunInference(input, context)
-      return { text: result.response }
+      return {
+        response: result.response,
+        confidence: result.confidence,
+        sources: result.sources,
+        metadata: result.metadata,
+      }
     },
     train: async (opts?: Record<string, unknown>) => generalRunTrainingEpoch(opts as { epochs?: number }),
   })
