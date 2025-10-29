@@ -392,39 +392,27 @@ export class AIOrchestrator {
     const generalDomain = allDomains.find((d) => d.name === "general")
     if (generalDomain) selected.push(generalDomain)
 
-    // React domain
-    if (text.match(/\b(react|jsx|tsx|component|hook|usestate|useeffect|props|state|virtual dom|context api|redux)\b/)) {
+    if (text.match(/\b(react|jsx|component|hook|usestate|useeffect|props|state)\b/)) {
       const reactDomain = allDomains.find((d) => d.name === "react")
       if (reactDomain) selected.push(reactDomain)
     }
 
-    // Next.js domain
-    if (
-      text.match(
-        /\b(next\.?js|nextjs|app router|pages router|server component|client component|server action|route handler|vercel|deployment|edge|isr|ssg|ssr)\b/,
-      )
-    ) {
+    if (text.match(/\b(next\.?js|app router|pages router|server component|server action|route handler|middleware)\b/)) {
       const nextjsDomain = allDomains.find((d) => d.name === "nextjs")
       if (nextjsDomain) selected.push(nextjsDomain)
     }
 
-    // Programming domain
-    if (
-      text.match(
-        /\b(programming|coding|software|development|oop|design pattern|solid|dry|api|rest|graphql|async|promise)\b/,
-      )
-    ) {
+    if (text.match(/\b(program|programming|code|algorithm|function|variable|loop|condition)\b/)) {
       const programmingDomain = allDomains.find((d) => d.name === "programming")
       if (programmingDomain) selected.push(programmingDomain)
     }
 
-    // TypeScript domain
-    if (text.match(/\b(code|program|function|class|typescript|javascript|python)\b/)) {
+    // Domain selection heuristics
+    if (text.match(/\b(code|function|class|typescript|javascript|python)\b/)) {
       const tsDomain = allDomains.find((d) => d.name === "typescript")
       if (tsDomain) selected.push(tsDomain)
     }
 
-    // Domain selection heuristics
     if (
       text.match(/\b(math|calculate|equation|number|sum|multiply|add|subtract|divide|plus|minus|times|equals)\b/) ||
       text.match(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/) ||
