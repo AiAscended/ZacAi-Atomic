@@ -339,21 +339,26 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
     )
   }
 
-  const powerMatch = input.match(/(\w+)\s+times\s+(\w+)\s+(\w+)\s+times/i)
+  const powerPattern = /(\w+)\s+times\s+(\w+)\s+(\w+)\s+times/i
+  const powerMatch = input.match(powerPattern)
   if (powerMatch) {
     const [, num1Word, num2Word, num3Word] = powerMatch
     const num1 = convertWordsToNumbers(num1Word)
     const num2 = convertWordsToNumbers(num2Word)
     const num3 = convertWordsToNumbers(num3Word)
 
-    if (num1 === num2 && num3 === "nine") {
-      // This is asking for num^9
+    // Check if num1 === num2 (e.g., "nine times nine")
+    if (num1 === num2) {
       const base = Number.parseInt(num1)
-      let result = base
-      for (let i = 1; i < 9; i++) {
-        result = multiply(result, base)
+      const exponent = Number.parseInt(num3)
+
+      if (!isNaN(base) && !isNaN(exponent) && exponent > 0 && exponent < 20) {
+        let result = base
+        for (let i = 1; i < exponent; i++) {
+          result = multiply(result, base)
+        }
+        calculations.push(`${base} to the power of ${exponent} (${base}^${exponent}) = ${result.toLocaleString()}`)
       }
-      calculations.push(`${base} to the power of 9 (${base}^9) = ${result.toLocaleString()}`)
     }
   }
 
