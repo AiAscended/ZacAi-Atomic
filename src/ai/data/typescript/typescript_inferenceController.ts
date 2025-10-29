@@ -8,7 +8,6 @@
 
 import { typescriptTokenizer } from "./typescript_tokenizer"
 import { typescriptSemanticAnalyzer } from "./typescript_semanticAnalyzer"
-import { searchSources } from "../../shared/tools/urlLookup"
 import pretrainedWeights from "./weights/typescript_pretrained_weights.json"
 
 interface InferenceContext {
@@ -609,16 +608,6 @@ export async function typescriptRunInference(input: string, context?: InferenceC
 
   const codeExample = generateCodeExample(codeContext)
 
-  let urlSources: string[] = []
-  try {
-    const searchResults = await searchSources("typescript", input)
-    if (searchResults.length > 0) {
-      urlSources = searchResults
-    }
-  } catch (error) {
-    console.log("[v0] TypeScript URL lookup failed (expected in browser):", error)
-  }
-
   const responseText = `Here's a TypeScript ${codeContext === "general" ? "" : codeContext + " "}code example:
 
 ${codeExample}
@@ -629,7 +618,7 @@ This demonstrates TypeScript's type system${codeContext !== "general" ? ` for ${
     response: responseText,
     confidence: confidence,
     domain: "typescript",
-    sources: ["TypeScript Domain Inference (Pretrained Weights)", ...urlSources],
+    sources: ["TypeScript Domain Inference (Pretrained Weights)"],
     metadata: {
       tokensUsed: tokens.length,
       semanticAnalysis: semantics,
