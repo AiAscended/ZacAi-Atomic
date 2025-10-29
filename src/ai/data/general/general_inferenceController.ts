@@ -1,4 +1,5 @@
 import { searchSources } from "../../shared/tools/urlLookup"
+import { searchWikipedia } from "../../shared/tools/webScraper"
 import { GENERAL_DOMAIN } from "./general_constants"
 
 const stopWords = [
@@ -185,45 +186,53 @@ export const generalRunInference = async (input: string, context?: any) => {
       const searchQuery = queryKeywords.join(" ") || input.split(" ").slice(0, 5).join(" ")
       console.log("[v0] Searching Wikipedia for:", searchQuery)
 
-      const sourcesFromLookup = await searchSources("general", searchQuery)
+      const wikiContent = await searchWikipedia(searchQuery)
 
-      if (sourcesFromLookup && sourcesFromLookup.length > 0) {
-        // Extract the Wikipedia URL from the response
-        const wikiUrlMatch = sourcesFromLookup[0].match(/https:\/\/en\.wikipedia\.org[^\s)]+/)
-        const wikiUrl = wikiUrlMatch ? wikiUrlMatch[0] : sourcesFromLookup[0]
+      if (wikiContent && wikiContent.snippet.length > 50) {
+        responseText = wikiContent.snippet + `\n\n*Source: [Wikipedia](${wikiContent.url})*`
+        sources.push(wikiContent.url)
+        confidence = Math.max(confidence, 0.65)
+        inferenceSucceeded = true
+      } else {
+        // Fallback to old URL lookup method
+        const sourcesFromLookup = await searchSources("general", searchQuery)
 
-        console.log("[v0] Searching Wikipedia at:", wikiUrl)
+        if (sourcesFromLookup && sourcesFromLookup.length > 0) {
+          const wikiUrlMatch = sourcesFromLookup[0].match(/https:\/\/en\.wikipedia\.org[^\s)]+/)
+          const wikiUrl = wikiUrlMatch ? wikiUrlMatch[0] : sourcesFromLookup[0]
 
-        try {
-          const response = await fetch(wikiUrl, {
-            method: "GET",
-            headers: { Accept: "text/html" },
-            redirect: "follow",
-          })
+          console.log("[v0] Searching Wikipedia at:", wikiUrl)
 
-          if (response.ok) {
-            const html = await response.text()
-            // Extract first paragraph from Wikipedia article
-            const paragraphMatch = html.match(/<p[^>]*>(.*?)<\/p>/s)
+          try {
+            const response = await fetch(wikiUrl, {
+              method: "GET",
+              headers: { Accept: "text/html" },
+              redirect: "follow",
+            })
 
-            if (paragraphMatch) {
-              const cleanText = paragraphMatch[1]
-                .replace(/<[^>]*>/g, "")
-                .replace(/\[.*?\]/g, "")
-                .replace(/\s+/g, " ")
-                .trim()
-                .substring(0, 500)
+            if (response.ok) {
+              const html = await response.text()
+              const paragraphMatch = html.match(/<p[^>]*>(.*?)<\/p>/s)
 
-              if (cleanText.length > 50) {
-                responseText = cleanText + `\n\n*Source: Wikipedia*`
-                sources.push(wikiUrl)
-                confidence = Math.max(confidence, 0.6) // Boost confidence for successful Wikipedia lookup
-                inferenceSucceeded = true
+              if (paragraphMatch) {
+                const cleanText = paragraphMatch[1]
+                  .replace(/<[^>]*>/g, "")
+                  .replace(/\[.*?\]/g, "")
+                  .replace(/\s+/g, " ")
+                  .trim()
+                  .substring(0, 500)
+
+                if (cleanText.length > 50) {
+                  responseText = cleanText + `\n\n*Source: Wikipedia*`
+                  sources.push(wikiUrl)
+                  confidence = Math.max(confidence, 0.6)
+                  inferenceSucceeded = true
+                }
               }
             }
+          } catch (fetchError) {
+            console.error("[v0] Wikipedia fetch failed:", fetchError)
           }
-        } catch (fetchError) {
-          console.error("[v0] Wikipedia fetch failed:", fetchError)
         }
       }
     } catch (lookupError) {
