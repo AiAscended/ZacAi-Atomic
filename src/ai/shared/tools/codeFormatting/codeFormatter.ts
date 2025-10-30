@@ -1,136 +1,37 @@
 /**
  * File: src/ai/shared/tools/codeFormatting/codeFormatter.ts
- * Purpose: Shared code formatting utility for all domains
- * Depends on: None
- * Depended on by: All domain inference controllers
- * Creator: Vercel v0 Coding Assistant
+ * Utilities to detect code language and perform code formatting.
  */
 
-export interface FormatOptions {
-  language: string
-  tabSize?: number
-  useTabs?: boolean
-  semicolons?: boolean
-  singleQuote?: boolean
-  trailingComma?: "none" | "es5" | "all"
-  printWidth?: number
-}
+import prettier from "prettier/standalone"
+import parserTypescript from "prettier/parser-typescript"
+import parserBabel from "prettier/parser-babel"
 
-/**
- * Formats code according to language-specific rules
- * @param code - Raw code string to format
- * @param options - Formatting options
- * @returns Formatted code string
- */
-export function formatCode(code: string, options: FormatOptions): string {
-  const { language, tabSize = 2, useTabs = false, printWidth = 80 } = options
-
-  // Basic formatting logic - in production, integrate with Prettier or similar
-  let formatted = code.trim()
-
-  // Normalize line endings
-  formatted = formatted.replace(/\r\n/g, "\n")
-
-  // Handle indentation
-  const indent = useTabs ? "\t" : " ".repeat(tabSize)
-  const lines = formatted.split("\n")
-  let indentLevel = 0
-  const formattedLines: string[] = []
-
-  for (let line of lines) {
-    line = line.trim()
-
-    // Decrease indent for closing brackets
-    if (line.startsWith("}") || line.startsWith("]") || line.startsWith(")")) {
-      indentLevel = Math.max(0, indentLevel - 1)
-    }
-
-    // Add indentation
-    if (line.length > 0) {
-      formattedLines.push(indent.repeat(indentLevel) + line)
-    } else {
-      formattedLines.push("")
-    }
-
-    // Increase indent for opening brackets
-    if (line.endsWith("{") || line.endsWith("[") || line.endsWith("(")) {
-      indentLevel++
-    }
-  }
-
-  formatted = formattedLines.join("\n")
-
-  // Language-specific formatting
-  switch (language.toLowerCase()) {
-    case "typescript":
-    case "javascript":
-    case "tsx":
-    case "jsx":
-      formatted = formatJavaScript(formatted, options)
-      break
-    case "python":
-      formatted = formatPython(formatted, options)
-      break
-    case "json":
-      try {
-        formatted = JSON.stringify(JSON.parse(formatted), null, tabSize)
-      } catch {
-        // Keep original if invalid JSON
-      }
-      break
-  }
-
-  return formatted
-}
-
-function formatJavaScript(code: string, options: FormatOptions): string {
-  let formatted = code
-
-  // Add semicolons if required
-  if (options.semicolons !== false) {
-    formatted = formatted.replace(/([^;{}\s])\s*\n/g, "$1;\n")
-  }
-
-  // Handle quotes
-  if (options.singleQuote) {
-    formatted = formatted.replace(/"([^"]*)"/g, "'$1'")
-  }
-
-  return formatted
-}
-
-function formatPython(code: string, options: FormatOptions): string {
-  // Python-specific formatting (PEP 8 style)
-  let formatted = code
-
-  // Ensure proper spacing around operators
-  formatted = formatted.replace(/([^=!<>])=([^=])/g, "$1 = $2")
-  formatted = formatted.replace(/([^=!<>])==([^=])/g, "$1 == $2")
-
-  return formatted
-}
-
-/**
- * Detects the programming language from code content
- * @param code - Code string to analyze
- * @returns Detected language identifier
- */
 export function detectLanguage(code: string): string {
-  const trimmed = code.trim()
+  // Simple heuristic based on common keywords
+  if (/^\s*import|export|from\s+/m.test(code)) return "typescript"
+  if (/def\s+\w+\(/.test(code)) return "python"
+  if (/^\s*<\w+/.test(code)) return "html"
+  return "javascript"
+}
 
-  // Check for common patterns
-  if (trimmed.includes("import React") || trimmed.includes("export default function")) {
-    return trimmed.includes("<") ? "tsx" : "typescript"
+/**
+ * Format code using Prettier with appropriate parser.
+ * Falls back to unformatted code on errors.
+ */
+export function formatCode(code: string, options?: { language: string }): string {
+  try {
+    const parser = options?.language === "typescript" ? "typescript" : "babel"
+    return prettier.format(code, {
+      parser,
+      plugins: [parserTypescript, parserBabel],
+      semi: true,
+      singleQuote: true,
+      tabWidth: 2,
+      printWidth: 80,
+    })
+  } catch (err) {
+    // Return unformatted code if error encountered
+    return code
   }
-  if (trimmed.includes("def ") || trimmed.includes("import ")) {
-    return "python"
-  }
-  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
-    return "json"
-  }
-  if (trimmed.includes("function") || trimmed.includes("const ") || trimmed.includes("let ")) {
-    return "javascript"
-  }
-
-  return "text"
 }
