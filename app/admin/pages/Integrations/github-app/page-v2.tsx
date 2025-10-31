@@ -1,66 +1,65 @@
 /**
- * app/admin/integrations/github-app/page-v2.tsx
+ * app/admin/pages/Integrations/github-app/page.tsx
  * Extended GitHub App Integration Admin UI with full settings,
  * webhook/workflow toggles, and a Test Connection panel
  * to verify credentials and GitHub API read/write/commit access.
- *
+ * 
  * Depends on:
  * - ./hooks/useGitHubAppSettings.ts (manages config state and API)
  * - ./testApi.ts (API route to run integration tests)
  */
 
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { useGitHubAppSettings, type GitHubAppSettings } from "./hooks/useGitHubAppSettings"
+import React, { useState, useEffect } from "react";
+import { useGitHubAppSettings, GitHubAppSettings } from "./hooks/useGitHubAppSettings";
 
 export default function GitHubAppAdminPage() {
-  const { settings, loading, error, updateSettings } = useGitHubAppSettings()
+  const { settings, loading, error, updateSettings } = useGitHubAppSettings();
 
-  const [form, setForm] = useState<GitHubAppSettings>({ appId: "", clientId: "", webhookSecret: "" })
-  const [isEditing, setIsEditing] = useState(false)
+  const [form, setForm] = useState<GitHubAppSettings>({ appId: "", clientId: "", webhookSecret: "" });
+  const [isEditing, setIsEditing] = useState(false);
 
   // Test connection panel state
-  const [testing, setTesting] = useState(false)
-  const [testResult, setTestResult] = useState<string | null>(null)
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<string | null>(null);
 
   useEffect(() => {
-    if (settings) setForm(settings)
-  }, [settings])
+    if (settings) setForm(settings);
+  }, [settings]);
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    setForm({ ...form, [e.target.name]: e.target.value });
   }
 
   async function onSave() {
-    await updateSettings(form)
-    setIsEditing(false)
+    await updateSettings(form);
+    setIsEditing(false);
   }
 
   function onCancel() {
-    setForm(settings)
-    setIsEditing(false)
+    setForm(settings);
+    setIsEditing(false);
   }
 
   // Runs the backend integration test script via API
   async function runTestConnection() {
-    setTesting(true)
-    setTestResult(null)
+    setTesting(true);
+    setTestResult(null);
     try {
-      const res = await fetch("/admin/integrations/github-app/testApi", { method: "POST" })
-      if (!res.ok) throw new Error(`Test failed with status ${res.status}`)
-      const data = await res.json()
-      setTestResult(data.output || "Test completed successfully.")
+      const res = await fetch("/admin/pages/Integrations/github-app/testApi", { method: "POST" });
+      if (!res.ok) throw new Error(`Test failed with status ${res.status}`);
+      const data = await res.json();
+      setTestResult(data.output || "Test completed successfully.");
     } catch (e: any) {
-      setTestResult(`Test error: ${e.message}`)
+      setTestResult(`Test error: ${e.message}`);
     } finally {
-      setTesting(false)
+      setTesting(false);
     }
   }
 
-  if (loading) return <p>Loading configuration...</p>
-  if (error) return <p className="text-red-600">Error loading config: {error}</p>
+  if (loading) return <p>Loading configuration...</p>;
+  if (error) return <p className="text-red-600">Error loading config: {error}</p>;
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white rounded shadow-md">
@@ -108,10 +107,16 @@ export default function GitHubAppAdminPage() {
             </button>
           ) : (
             <>
-              <button onClick={onSave} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+              <button
+                onClick={onSave}
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              >
                 Save
               </button>
-              <button onClick={onCancel} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+              <button
+                onClick={onCancel}
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+              >
                 Cancel
               </button>
             </>
@@ -136,5 +141,5 @@ export default function GitHubAppAdminPage() {
         )}
       </section>
     </div>
-  )
+  );
 }
