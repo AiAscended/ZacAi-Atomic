@@ -69,7 +69,7 @@ This integration enables secure monitoring, debugging, and management of your Gi
 
 ## Folder Structure
 
-```
+\`\`\`
 src/
   app/
     admin/
@@ -95,7 +95,7 @@ src/
         webhooks.ts                   # GitHub webhook verification
         __tests__                    # Colocated tests for GitHub App utils
           githubAppIntegration.test.ts
-```
+\`\`\`
 
 ***
 
@@ -134,7 +134,7 @@ src/
 
 Set environment variables:
 
-```bash
+\`\`\`bash
 GITHUB_APP_ID=your-app-id
 GITHUB_APP_CLIENT_ID=your-client-id
 GITHUB_APP_PRIVATE_KEY="your-private-key"
@@ -142,19 +142,19 @@ GITHUB_APP_WEBHOOK_SECRET=your-webhook-secret
 TEST_GITHUB_INSTALLATION_ID=your-installation-id
 GITHUB_USER=your-github-username
 TEST_GITHUB_TEST_REPO=your-test-repo-name
-```
+\`\`\`
 
 Install dependencies:
 
-```bash
+\`\`\`bash
 npm install
-```
+\`\`\`
 
 Run integration tests manually with:
 
-```bash
+\`\`\`bash
 npx jest src/app/admin/integrations/github-app/__tests__ --verbose
-```
+\`\`\`
 
 Run the app and access the admin page at `/admin/integrations/github-app/`.  
 Use the **Test Connection** button to trigger automated backend tests.
@@ -165,7 +165,7 @@ Use the **Test Connection** button to trigger automated backend tests.
 
 Example GitHub Actions workflow to run the full test suite on push/PR:
 
-```yaml
+\`\`\`yaml
 name: CI Pipeline
 
 on:
@@ -193,7 +193,7 @@ jobs:
           TEST_GITHUB_INSTALLATION_ID: ${{ secrets.TEST_GITHUB_INSTALLATION_ID }}
           GITHUB_USER: ${{ secrets.GITHUB_USER }}
           TEST_GITHUB_TEST_REPO: ${{ secrets.TEST_GITHUB_TEST_REPO }}
-```
+\`\`\`
 
 ***
 
@@ -245,7 +245,7 @@ Citations:
 
 Here is your updated, comprehensive, professional Next.js 2025 project folder tree reflecting best practices including colocated and well-scoped test folders as per your requirements and domain separation:
 
-```
+\`\`\`
 /src
 ├── ai                               # AI domain logic
 │   ├── orchestration
@@ -286,7 +286,7 @@ Here is your updated, comprehensive, professional Next.js 2025 project folder tr
 /tsconfig.json
 /next.config.js
 /.env.local                             # Environment variables and secrets (not committed)
-```
+\`\`\`
 
 Key points:
 

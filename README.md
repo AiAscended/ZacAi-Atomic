@@ -3,7 +3,7 @@ Full Modularity of evey single Ai Model function required!
 
 Here is a complete, production-ready **TypeScript hybrid modular AI system MVP project folder and file tree**, fully covering all atomic modules required for orchestration, inference, training, UI, config, monitoring, and integration — ready to deploy and test on GitHub Codespaces:
 
-```
+\`\`\`
 /ai-hybrid-mvp
 │
 ├── /src                                # Source code root
@@ -223,7 +223,7 @@ Here is a complete, production-ready **TypeScript hybrid modular AI system MVP p
 ├── Dockerfile                      # Container build config
 ├── docker-compose.yml              # Container orchestration config
 ├── README.md                       # Project overview and docs
-```
+\`\`\`
 
 This tree fully covers every atomic module discussed for the MVP hybrid AI system — from atomic AI modules (tokenizer, embeddings, transformer layers, inference controllers, knowledge retrieval) to orchestration engine and monitoring, all included neatly under `src/ai`. User interface components and admin CMS live in `src/ui`, with configuration and helpers easily locatable.
 

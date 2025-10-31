@@ -20,7 +20,6 @@ export default function SystemPage() {
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="api">API Keys</TabsTrigger>
           <TabsTrigger value="rag">RAG Settings</TabsTrigger>
           <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
         </TabsList>
@@ -40,26 +39,6 @@ export default function SystemPage() {
               <div className="space-y-2">
                 <Label htmlFor="timeout">Request Timeout (ms)</Label>
                 <Input id="timeout" type="number" defaultValue="30000" />
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="api" className="space-y-4">
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">API Keys</h2>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="openaiKey">OpenAI API Key</Label>
-                <Input id="openaiKey" type="password" placeholder="sk-..." />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="googleKey">Google Custom Search API Key</Label>
-                <Input id="googleKey" type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bingKey">Bing Search API Key</Label>
-                <Input id="bingKey" type="password" />
               </div>
             </div>
           </Card>
