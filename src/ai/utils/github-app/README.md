@@ -11,7 +11,40 @@ Next, it’s recommended to:
 - Document usage patterns for developers via comprehensive docs and example calls.
 
 ***
+Admin pages belong in src/app/admin/integrations/github-app/ for clear colocation with related UI and API routes.
 
+AI-related utilities, including your GitHub App integration logic, belong in src/ai/utils/github-app/ because these utilities are part of the AI domain model, managing authentication tokens, API calls and interfacing with GitHub on behalf of AI and system logic.
+
+Placing these utilities in src/ai/utils keeps concerns well separated from general project-level utilities (src/utils) which would hold more generic or shared functions unrelated to AI or GitHub specifically.
+
+This separation brings clear modularity and scalability:
+
+text
+src/
+  app/
+    admin/
+      integrations/
+        github-app/
+          hooks/
+          page.tsx
+          testApi.ts
+  ai/
+    utils/
+      github-app/
+        auth.ts
+        repos.ts
+        files.ts
+        search.ts
+        webhooks.ts
+This way:
+
+Admin UI and API route code go with frontend React and route files.
+
+AI-related business logic modules, including GitHub app API abstractions, are grouped with AI domain code.
+
+Clear separation of concerns avoids bloated utility folders and keeps codebases manageable.
+
+Summary: Your current plan to have the admin page files inside src/app/admin/integrations/github-app/ and the GitHub API utilities inside src/ai/utils/github-app/ is a recommended and scalable convention consistent with best practices for Next.js modular monorepo-like projects.
 
 
 # GitHub App Integration for Hybrid AI Model System
@@ -35,6 +68,9 @@ This project integrates a full-featured GitHub App API client into a modular, pr
 ***
 
 ## Architecture and File Structure
+
+
+
 
 - `src/ai/utils/github-app/`  
   Modular, atomic utility modules (`auth.ts`, `repos.ts`, `files.ts`, `search.ts`, `webhooks.ts`, `config.ts`) managing distinct GitHub API functionality.
