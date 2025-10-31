@@ -21,6 +21,7 @@ import {
   AlertTriangle,
   ChevronRight,
   ChevronDown,
+  Plug,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -82,6 +83,12 @@ const menuItems: MenuItem[] = [
     label: "Tools Management",
     icon: Wrench,
     path: "/admin/tools",
+  },
+  {
+    id: "integrations",
+    label: "Integrations",
+    icon: Plug,
+    children: [{ id: "github-app", label: "GitHub App", icon: Plug, path: "/admin/integrations/github-app" }],
   },
   {
     id: "users",
