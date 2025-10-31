@@ -1,5 +1,5 @@
 /**
- * File: app/admin/integrations/github-app/page.tsx
+ * File: app/admin/pages/Integrations/github-app/page.tsx
  * Extended Admin UI with Test Connection including output panel
  * showing real-time test results.
  *
@@ -8,58 +8,57 @@
  * - ./testApi.ts (POST API to trigger integration test)
  */
 
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { useGitHubAppSettings, type GitHubAppSettings } from "./hooks/useGitHubAppSettings"
+import React, { useState, useEffect } from "react";
+import { useGitHubAppSettings, GitHubAppSettings } from "./hooks/useGitHubAppSettings";
 
 export default function GitHubAppAdminPage() {
-  const { settings, loading, error, updateSettings } = useGitHubAppSettings()
-  const [form, setForm] = useState<GitHubAppSettings>({ appId: "", clientId: "", webhookSecret: "" })
-  const [isEditing, setIsEditing] = useState(false)
+  const { settings, loading, error, updateSettings } = useGitHubAppSettings();
+  const [form, setForm] = useState<GitHubAppSettings>({ appId: "", clientId: "", webhookSecret: "" });
+  const [isEditing, setIsEditing] = useState(false);
 
   // Test connection states and logs
-  const [testing, setTesting] = useState(false)
-  const [testOutput, setTestOutput] = useState<string | null>(null)
-  const [testError, setTestError] = useState<string | null>(null)
+  const [testing, setTesting] = useState(false);
+  const [testOutput, setTestOutput] = useState<string | null>(null);
+  const [testError, setTestError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (settings) setForm(settings)
-  }, [settings])
+    if (settings) setForm(settings);
+  }, [settings]);
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    setForm({ ...form, [e.target.name]: e.target.value });
   }
 
   async function onSave() {
-    await updateSettings(form)
-    setIsEditing(false)
+    await updateSettings(form);
+    setIsEditing(false);
   }
 
   function onCancel() {
-    setForm(settings)
-    setIsEditing(false)
+    setForm(settings);
+    setIsEditing(false);
   }
 
   async function runTestConnection() {
-    setTesting(true)
-    setTestOutput(null)
-    setTestError(null)
+    setTesting(true);
+    setTestOutput(null);
+    setTestError(null);
     try {
-      const res = await fetch("/admin/integrations/github-app/testApi", { method: "POST" })
-      if (!res.ok) throw new Error(`Test failed with status ${res.status}`)
-      const data = await res.json()
-      setTestOutput(data.output || "Test completed successfully.")
+      const res = await fetch("/admin/pages/Integrations/github-app/testApi", { method: "POST" });
+      if (!res.ok) throw new Error(`Test failed with status ${res.status}`);
+      const data = await res.json();
+      setTestOutput(data.output || "Test completed successfully.");
     } catch (e: any) {
-      setTestError(`Test failed: ${e.message}`)
+      setTestError(`Test failed: ${e.message}`);
     } finally {
-      setTesting(false)
+      setTesting(false);
     }
   }
 
-  if (loading) return <p>Loading GitHub App settings...</p>
-  if (error) return <p className="text-red-600">Error: {error}</p>
+  if (loading) return <p>Loading GitHub App settings...</p>;
+  if (error) return <p className="text-red-600">Error: {error}</p>;
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white rounded shadow-md">
@@ -106,10 +105,16 @@ export default function GitHubAppAdminPage() {
           </button>
         ) : (
           <>
-            <button onClick={onSave} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            <button
+              onClick={onSave}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
               Save
             </button>
-            <button onClick={onCancel} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+            <button
+              onClick={onCancel}
+              className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+            >
               Cancel
             </button>
           </>
@@ -134,5 +139,5 @@ export default function GitHubAppAdminPage() {
         {testError && <p className="mt-4 text-red-600 font-semibold">{testError}</p>}
       </section>
     </div>
-  )
+  );
 }

@@ -19,6 +19,7 @@ Placing these utilities in src/ai/utils keeps concerns well separated from gener
 
 This separation brings clear modularity and scalability:
 
+text
 src/
   app/
     admin/
@@ -45,9 +46,8 @@ Clear separation of concerns avoids bloated utility folders and keeps codebases 
 
 Summary: Your current plan to have the admin page files inside src/app/admin/integrations/github-app/ and the GitHub API utilities inside src/ai/utils/github-app/ is a recommended and scalable convention consistent with best practices for Next.js modular monorepo-like projects.
 
-***
 
-## GitHub App Integration for Hybrid AI Model System
+# GitHub App Integration for Hybrid AI Model System
 
 ## Overview
 
@@ -284,7 +284,7 @@ describe('GitHub App Integration Tests', () => {
 
 Add a simple button to your admin page (`page.tsx`) for running tests (calls a new API route that runs test suite or selective tests programmatically).
 
-Example additional API route `app/admin/integrations/github-app/testApi.ts`:
+Example additional API route `app/admin/pages/Integrations/github-app/testApi.ts`:
 
 \`\`\`typescript
 import type { NextApiRequest, NextApiResponse } from 'next'
