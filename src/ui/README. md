@@ -12,7 +12,7 @@ This document provides an overview and explanation of the modular, production-gr
 
 ## Project Structure
 
-```
+\`\`\`
 src/
  ├── ai/
  │    ├── orchestration/
@@ -38,7 +38,7 @@ src/
  │    └── page.tsx                   # Main chat UI page integrating AI and input UI
  └── styles/
       └── globals.css                # Global CSS with light/dark mode and brand palette
-```
+\`\`\`
 
 ***
 

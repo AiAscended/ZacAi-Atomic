@@ -19,7 +19,6 @@ Placing these utilities in src/ai/utils keeps concerns well separated from gener
 
 This separation brings clear modularity and scalability:
 
-text
 src/
   app/
     admin/
@@ -46,8 +45,9 @@ Clear separation of concerns avoids bloated utility folders and keeps codebases 
 
 Summary: Your current plan to have the admin page files inside src/app/admin/integrations/github-app/ and the GitHub API utilities inside src/ai/utils/github-app/ is a recommended and scalable convention consistent with best practices for Next.js modular monorepo-like projects.
 
+***
 
-# GitHub App Integration for Hybrid AI Model System
+## GitHub App Integration for Hybrid AI Model System
 
 ## Overview
 
@@ -115,10 +115,10 @@ This project integrates a full-featured GitHub App API client into a modular, pr
 
 Call `performGitHubOperation` with appropriate operation key and parameters, for example:
 
-```typescript
+\`\`\`typescript
 const repos = await orchestrator.performGitHubOperation('listRepos', installationId, {});
 const fileContent = await orchestrator.performGitHubOperation('readFile', installationId, { owner: 'user', repo: 'repo', path: 'file.txt' });
-```
+\`\`\`
 
 ### Admin Panel
 
@@ -168,7 +168,7 @@ Here's a comprehensive production-grade testing setup for your GitHub App integr
 
 # 1. Testing Script: `test/githubAppIntegration.test.ts`
 
-```typescript
+\`\`\`typescript
 /**
  * test/githubAppIntegration.test.ts
  *
@@ -245,7 +245,7 @@ describe('GitHub App Integration Tests', () => {
     expect(Array.isArray(results)).toBe(true)
   })
 })
-```
+\`\`\`
 
 ***
 
@@ -260,23 +260,23 @@ describe('GitHub App Integration Tests', () => {
 
 - Install testing dependencies:
   
-  ```
+  \`\`\`
   npm install --save-dev jest @types/jest ts-jest
-  ```
+  \`\`\`
 
 - Add to your `package.json`:
 
-  ```json
+  \`\`\`json
   "scripts": {
     "test": "jest"
   }
-  ```
+  \`\`\`
 
 - Run tests with:
 
-  ```bash
+  \`\`\`bash
   npx jest test/githubAppIntegration.test.ts
-  ```
+  \`\`\`
 
 ***
 
@@ -284,9 +284,9 @@ describe('GitHub App Integration Tests', () => {
 
 Add a simple button to your admin page (`page.tsx`) for running tests (calls a new API route that runs test suite or selective tests programmatically).
 
-Example additional API route `app/admin/pages/Integrations/github-app/testApi.ts`:
+Example additional API route `app/admin/integrations/github-app/testApi.ts`:
 
-```typescript
+\`\`\`typescript
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { exec } from 'child_process'
 
@@ -303,7 +303,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(405).end(`Method ${req.method} Not Allowed`)
   }
 }
-```
+\`\`\`
 
 Add a UI button calling this API, showing real-time output in the admin page.
 
@@ -311,7 +311,7 @@ Add a UI button calling this API, showing real-time output in the admin page.
 
 # 4. Sample CI/CD Workflow Snippet (GitHub Actions)
 
-```yaml
+\`\`\`yaml
 name: CI
 
 on: [push, pull_request]
@@ -335,7 +335,7 @@ jobs:
           GITHUB_APP_WEBHOOK_SECRET: ${{ secrets.GITHUB_APP_WEBHOOK_SECRET }}
           TEST_GITHUB_INSTALLATION_ID: ${{ secrets.TEST_GITHUB_INSTALLATION_ID }}
         run: npm test
-```
+\`\`\`
 
 ***
 
