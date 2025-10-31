@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import "@/ai/data/registerAllDomains"
-import { promptHandler } from "@/ai/orchestration/promptHandler"
+import "@/src/ai/data/registerAllDomains"
+import { promptHandler } from "@/src/ai/orchestration/promptHandler"
 
 // Session storage
 const sessions = new Map<string, { history: Array<{ role: string; content: string }> }>()

@@ -11,11 +11,12 @@
  * - Light/dark theme compatibility
  */
 
-import React, { useState, useEffect, useRef, useCallback } from "react"
+import type React from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ChevronDown, ChevronUp } from "lucide-react"
-import { ResponseRenderer } from "@/ui/components/ResponseRenderer"
+import { ResponseRenderer } from "@/src/ui/components/ResponseRenderer-v2"
 
 interface Message {
   id: string
@@ -156,8 +157,8 @@ export default function HomePage() {
                   msg.role === "user"
                     ? "ml-auto bg-indigo-600 text-white"
                     : msg.role === "assistant"
-                    ? "mr-auto bg-slate-100 dark:bg-slate-800 dark:text-white"
-                    : "mr-auto bg-red-500 text-white"
+                      ? "mr-auto bg-slate-100 dark:bg-slate-800 dark:text-white"
+                      : "mr-auto bg-red-500 text-white"
                 }`}
               >
                 <div className="text-xs font-semibold opacity-70 mb-2">
@@ -172,16 +173,26 @@ export default function HomePage() {
                       className="mt-3 w-full flex justify-between text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                     >
                       <span className="font-medium">AI Thinking Process ({msg.thinkingSteps.length} steps)</span>
-                      {expandedThinking === idx ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      {expandedThinking === idx ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
                     </button>
 
                     {expandedThinking === idx && (
                       <div className="mt-2 space-y-2 bg-slate-50 dark:bg-slate-900 p-2 rounded">
                         {msg.thinkingSteps.map((step, stepIdx) => (
                           <div key={stepIdx} className="border-l-2 border-indigo-600 pl-2">
-                            <div className="font-medium text-indigo-700 dark:text-indigo-400 text-xs">{step.description}</div>
+                            <div className="font-medium text-indigo-700 dark:text-indigo-400 text-xs">
+                              {step.description}
+                            </div>
                             <div className="opacity-60 text-xs">{step.timestamp}ms</div>
-                            {step.data && <pre className="text-xs mt-1 dark:text-indigo-200">{JSON.stringify(step.data, null, 2)}</pre>}
+                            {step.data && (
+                              <pre className="text-xs mt-1 dark:text-indigo-200">
+                                {JSON.stringify(step.data, null, 2)}
+                              </pre>
+                            )}
                           </div>
                         ))}
                       </div>
