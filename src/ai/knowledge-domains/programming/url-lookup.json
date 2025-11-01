@@ -1,0 +1,61 @@
+{
+  "domainId": "programming",
+  "domainName": "Programming",
+  "sources": [
+    {
+      "name": "MDN Web Docs",
+      "url": "https://developer.mozilla.org/api/v1/search?q={query}",
+      "description": "Mozilla Developer Network - web standards and APIs",
+      "enabled": true,
+      "priority": 1,
+      "rateLimit": {
+        "requestsPerMinute": 100,
+        "requestsPerDay": 2000
+      },
+      "timeout": 10000
+    },
+    {
+      "name": "W3Schools",
+      "url": "https://www.w3schools.com/search/search_asp.asp?search={query}",
+      "description": "Web development tutorials and references",
+      "enabled": true,
+      "priority": 2,
+      "rateLimit": {
+        "requestsPerMinute": 60,
+        "requestsPerDay": 1000
+      },
+      "timeout": 10000
+    },
+    {
+      "name": "GitHub",
+      "url": "https://api.github.com/search/repositories?q={query}",
+      "description": "Code repositories and examples",
+      "enabled": true,
+      "priority": 3,
+      "rateLimit": {
+        "requestsPerMinute": 10,
+        "requestsPerDay": 5000
+      },
+      "headers": {
+        "Accept": "application/vnd.github.v3+json"
+      },
+      "timeout": 15000
+    },
+    {
+      "name": "Stack Overflow",
+      "url": "https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=relevance&q={query}&site=stackoverflow",
+      "description": "Programming Q&A community",
+      "enabled": true,
+      "priority": 4,
+      "rateLimit": {
+        "requestsPerMinute": 30,
+        "requestsPerDay": 10000
+      },
+      "timeout": 10000
+    }
+  ],
+  "defaultSource": "MDN Web Docs",
+  "fallbackOrder": ["MDN Web Docs", "W3Schools", "GitHub", "Stack Overflow"],
+  "cacheEnabled": true,
+  "cacheTTL": 7200
+}
