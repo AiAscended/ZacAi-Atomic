@@ -1,0 +1,13 @@
+{
+  "name": "error_detection",
+  "version": "0.1",
+  "description": "Error detection domain (syntax errors, runtime errors, logical errors, debugging).",
+  "author": "auto-generated",
+  "files": [
+    "error_detection_seedVocabulary.json",
+    "error_detection_learnedData.json",
+    "error_detection_webDocReferences.json",
+    "error_detection_trainingWeights.bin",
+    "src/ai/data/error_detection/*"
+  ]
+}

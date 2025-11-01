@@ -1,0 +1,13 @@
+{
+  "name": "security",
+  "version": "0.1",
+  "description": "Security domain (vulnerabilities, secure coding, encryption, authentication, OWASP).",
+  "author": "auto-generated",
+  "files": [
+    "security_seedVocabulary.json",
+    "security_learnedData.json",
+    "security_webDocReferences.json",
+    "security_trainingWeights.bin",
+    "src/ai/data/security/*"
+  ]
+}

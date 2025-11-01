@@ -1,28 +1,20 @@
-import { safeParseJSON } from './general_utils';
+import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./general_utils"
 
-export const loadGeneralLearnedData = async (
-  path = '/src/ai/data/general/general_learnedData.json'
-) => {
+export const loadGeneralLearnedData = async (path = "/src/ai/data/general/general_learnedData.json") => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const fs = require('fs');
-    const raw = fs.readFileSync(path, 'utf-8');
-    return safeParseJSON(raw, { notes: [], concepts: {} });
+    const raw = await storageAdapter.readFile(path, "utf-8")
+    return safeParseJSON(raw, { notes: [], concepts: {} })
   } catch (e) {
-    return { notes: [], concepts: {} };
+    return { notes: [], concepts: {} }
   }
-};
+}
 
-export const saveGeneralLearnedData = async (
-  data: unknown,
-  path = '/src/ai/data/general/general_learnedData.json'
-) => {
+export const saveGeneralLearnedData = async (data: unknown, path = "/src/ai/data/general/general_learnedData.json") => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const fs = require('fs');
-    fs.writeFileSync(path, JSON.stringify(data, null, 2), 'utf-8');
-    return true;
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2), "utf-8")
+    return true
   } catch (e) {
-    return false;
+    return false
   }
-};
+}

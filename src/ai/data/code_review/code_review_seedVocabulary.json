@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "domain": "code_review",
+  "patterns": [
+    "DRY Principle",
+    "SOLID Principles",
+    "Code Complexity",
+    "Cyclomatic Complexity",
+    "Code Smells",
+    "Refactoring Patterns",
+    "Clean Code",
+    "Best Practices",
+    "Anti-patterns",
+    "Design Patterns"
+  ]
+}

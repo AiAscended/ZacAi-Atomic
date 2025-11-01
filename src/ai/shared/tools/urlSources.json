@@ -1,0 +1,84 @@
+{
+  "general": [
+    {
+      "name": "Wikipedia",
+      "url": "https://en.wikipedia.org",
+      "description": "General knowledge encyclopedia",
+      "searchPath": "/w/index.php?search="
+    },
+    {
+      "name": "Britannica",
+      "url": "https://www.britannica.com",
+      "description": "Encyclopedia Britannica - reliable general knowledge",
+      "searchPath": "/search?query="
+    },
+    {
+      "name": "Stanford Encyclopedia of Philosophy",
+      "url": "https://plato.stanford.edu",
+      "description": "Academic encyclopedia for philosophy and general knowledge",
+      "searchPath": "/search/searcher.py?query="
+    }
+  ],
+  "mathematics": [
+    {
+      "name": "Math is Fun",
+      "url": "https://www.mathsisfun.com",
+      "description": "Mathematics tutorials and explanations",
+      "searchPath": "/search/search.html?q="
+    },
+    {
+      "name": "Wolfram MathWorld",
+      "url": "https://mathworld.wolfram.com",
+      "description": "Comprehensive mathematics resource",
+      "searchPath": "/search/?query="
+    }
+  ],
+  "typescript": [
+    {
+      "name": "TypeScript Official Docs",
+      "url": "https://www.typescriptlang.org/docs",
+      "description": "Official TypeScript documentation",
+      "searchPath": "/search?q="
+    },
+    {
+      "name": "MDN Web Docs",
+      "url": "https://developer.mozilla.org",
+      "description": "Web development documentation",
+      "searchPath": "/en-US/search?q="
+    }
+  ],
+  "english": [
+    {
+      "name": "Merriam-Webster Dictionary",
+      "url": "https://www.merriam-webster.com",
+      "description": "English dictionary",
+      "searchPath": "/dictionary/"
+    },
+    {
+      "name": "Thesaurus.com",
+      "url": "https://www.thesaurus.com",
+      "description": "English thesaurus",
+      "searchPath": "/browse/"
+    }
+  ],
+  "internet_search": [
+    {
+      "name": "Google",
+      "url": "https://www.google.com",
+      "description": "Google search engine",
+      "searchPath": "/search?q="
+    },
+    {
+      "name": "Bing",
+      "url": "https://www.bing.com",
+      "description": "Microsoft Bing search engine",
+      "searchPath": "/search?q="
+    },
+    {
+      "name": "DuckDuckGo",
+      "url": "https://duckduckgo.com",
+      "description": "Privacy-focused search engine",
+      "searchPath": "/?q="
+    }
+  ]
+}
