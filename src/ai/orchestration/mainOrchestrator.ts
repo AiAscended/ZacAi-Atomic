@@ -35,6 +35,10 @@ import { LLMInferenceEngine } from "../models/unified-transformer-llm/llm-infere
 // Import scientific calculator for quick mathematical inference
 import { ScientificCalculator } from "../shared/tools/shared-ScientificCalculator"
 
+// Import settings store for runtime configuration
+import { settingsStore } from "../shared/config/settingsStore"
+import type { OrchestratorSettings } from "../shared/types/adminSettings"
+
 /**
  * Main Orchestrator Response Interface
  */
@@ -78,6 +82,9 @@ export class MainOrchestrator {
   private initialized: boolean = false
   private availableDomains: string[] = []
   private availableModels: string[] = []
+  
+  // Runtime configuration from settings store
+  private config: OrchestratorSettings | null = null
 
   private constructor() {
     this.thinkingTracker = new ThinkingTracker()
@@ -98,6 +105,7 @@ export class MainOrchestrator {
 
   /**
    * Initialize the complete AI system
+   * - Load runtime configuration from settings store
    * - Load all knowledge domains
    * - Initialize AI models (LLM, CNN, etc.)
    * - Verify weights and configurations
@@ -112,6 +120,11 @@ export class MainOrchestrator {
     const startTime = Date.now()
 
     try {
+      // Step 0: Load runtime configuration
+      this.thinkingTracker.addStep("load_config", "Loading orchestrator configuration")
+      this.config = await settingsStore.getOrchestrator()
+      logger.info("Orchestrator configuration loaded", { config: this.config })
+      
       // Step 1: Initialize LLM
       this.thinkingTracker.addStep("init_llm", "Initializing Unified Transformer LLM")
       // Use default LLM config
@@ -242,17 +255,30 @@ export class MainOrchestrator {
       
       const relevantDomains = this.identifyRelevantDomains(cleanedPrompt, subtasks)
       
-      logger.info("Domains identified", { domains: relevantDomains })
+      // Apply configuration constraints
+      const maxDomains = this.config?.maxDomainsPerQuery || 3
+      const limitedDomains = relevantDomains.slice(0, maxDomains)
+      
+      logger.info("Domains identified", { 
+        domains: limitedDomains,
+        totalFound: relevantDomains.length,
+        maxAllowed: maxDomains,
+      })
 
       // ============================================
       // STEP 3: KNOWLEDGE DOMAIN INFERENCE
       // ============================================
       this.thinkingTracker.addStep("domain_inference", "Querying knowledge domain engines")
       
-      const domainResults = await this.queryKnowledgeDomains(relevantDomains, subtasks)
+      // Use parallel inference if enabled in config
+      const enableParallel = this.config?.enableParallelInference ?? true
+      const domainResults = enableParallel
+        ? await this.queryKnowledgeDomainsParallel(limitedDomains, subtasks)
+        : await this.queryKnowledgeDomains(limitedDomains, subtasks)
       
       logger.info("Domain queries completed", {
         domainsQueried: domainResults.length,
+        parallelMode: enableParallel,
       })
 
       // ============================================
@@ -381,7 +407,7 @@ export class MainOrchestrator {
   }
 
   /**
-   * Query knowledge domains using their specialized inference engines
+   * Query knowledge domains using their specialized inference engines (sequential)
    */
   private async queryKnowledgeDomains(
     domains: string[],
@@ -404,6 +430,30 @@ export class MainOrchestrator {
     }
 
     return results
+  }
+
+  /**
+   * Query knowledge domains in parallel (if enabled in config)
+   */
+  private async queryKnowledgeDomainsParallel(
+    domains: string[],
+    subtasks: string[]
+  ): Promise<Array<{ domain: string; result: string }>> {
+    const promises = domains.map(async (domainName) => {
+      try {
+        const domain = domainRegistry.getDomain(domainName)
+        if (domain && domain.enabled) {
+          const result = await this.domainQueryExecutor.queryDomains(subtasks)
+          return { domain: domainName, result: JSON.stringify(result) }
+        }
+      } catch (error) {
+        logger.info(`Domain query failed: ${domainName}`, { error })
+      }
+      return null
+    })
+
+    const results = await Promise.all(promises)
+    return results.filter((r): r is { domain: string; result: string } => r !== null)
   }
 
   /**
