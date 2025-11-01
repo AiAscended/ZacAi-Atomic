@@ -1,3 +1,5 @@
+// main-(old-typesxript-project-now-using-next-framework-need-to-refractor-this-code).ts 
+
 import { querySelector } from "@utils/dom"
 import { Router } from "@utils/router"
 import { createNavigation, updateActiveLink } from "@components/Navigation"
