@@ -4,7 +4,7 @@
  */
 
 export class ScienceCalculator {
-  calculate(expression: string, unit?: string): {
+  calculate(_expression: string, unit?: string): {
     result: number;
     unit?: string;
     explanation: string;

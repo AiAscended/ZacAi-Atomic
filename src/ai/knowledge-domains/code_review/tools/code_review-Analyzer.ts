@@ -4,12 +4,13 @@
  */
 
 export class CodeReviewAnalyzer {
-  review(code: string): {
+  review(_code: string): {
     issues: string[];
     suggestions: string[];
     score: number;
   } {
     // Placeholder implementation
+    // TODO: Implement actual code review using _code
     return {
       issues: [],
       suggestions: [],

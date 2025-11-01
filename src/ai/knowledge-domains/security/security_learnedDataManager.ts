@@ -23,7 +23,7 @@ export const saveSecurityLearnedData = async (
   path = "/src/ai/data/security/security_learnedData.json",
 ) => {
   try {
-    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2), "utf-8")
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
     return true
   } catch (e) {
     return false

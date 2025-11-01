@@ -2720,7 +2720,7 @@ export class SpellChecker {
   /**
    * Check spelling of text
    */
-  public static check(text: string): SpellCheckResult {
+  public static check(_text: string): SpellCheckResult {
     const words = text.toLowerCase().match(/\b[a-z]+\b/g) || []
     const errors: SpellingError[] = []
     const uniqueWords = new Set(words)

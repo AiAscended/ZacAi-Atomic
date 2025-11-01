@@ -43,7 +43,7 @@ export const environmentInit = async () => {
   registerDomain({
     name: ENVIRONMENT_DOMAIN,
     version: "1.0.0",
-    init: async () => {
+    initialize: async () => {
       await loadEnvironmentSeedVocabulary()
     },
     query: async (input: string) => environmentRunInference(input),

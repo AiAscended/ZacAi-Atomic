@@ -4,7 +4,7 @@
  */
 
 export class GrammarChecker {
-  check(text: string): {
+  check(_text: string): {
     errors: Array<{
       position: number;
       message: string;

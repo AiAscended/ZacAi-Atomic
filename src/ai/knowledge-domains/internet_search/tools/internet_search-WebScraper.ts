@@ -4,7 +4,7 @@
  */
 
 export class InternetSearchWebScraper {
-  async scrape(url: string): Promise<{
+  async scrape(_url: string): Promise<{
     content: string;
     metadata: Record<string, any>;
     links: string[];

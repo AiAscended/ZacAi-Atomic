@@ -4,7 +4,7 @@
  */
 
 export class DocumentationGenerator {
-  generate(code: string, format: string = 'markdown'): {
+  generate(_code: string, format: string = 'markdown'): {
     documentation: string;
     sections: string[];
   } {

@@ -4,7 +4,7 @@
  */
 
 export class ErrorDetectionAnalyzer {
-  analyze(code: string): {
+  analyze(_code: string): {
     errors: Array<{
       line: number;
       message: string;

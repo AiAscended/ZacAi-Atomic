@@ -25,7 +25,7 @@ export const saveErrorDetectionLearnedData = async (
   path = "/src/ai/data/error_detection/error_detection_learnedData.json",
 ) => {
   try {
-    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2), "utf-8")
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
     return true
   } catch (e) {
     return false

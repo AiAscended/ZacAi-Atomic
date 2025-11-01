@@ -4,7 +4,7 @@
  */
 
 export class TestingGenerator {
-  generate(code: string, framework: string = 'jest'): {
+  generate(_code: string, framework: string = 'jest'): {
     tests: string;
     coverage: number;
   } {

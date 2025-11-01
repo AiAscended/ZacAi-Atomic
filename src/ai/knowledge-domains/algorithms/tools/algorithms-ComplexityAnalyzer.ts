@@ -4,12 +4,13 @@
  */
 
 export class AlgorithmsComplexityAnalyzer {
-  analyze(code: string): {
+  analyze(__code: string): {
     timeComplexity: string;
     spaceComplexity: string;
     confidence: number;
   } {
     // Placeholder implementation
+    // TODO: Implement actual complexity analysis using _code
     return {
       timeComplexity: 'O(n)',
       spaceComplexity: 'O(1)',
