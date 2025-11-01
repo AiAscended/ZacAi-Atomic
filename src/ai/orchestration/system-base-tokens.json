@@ -1,0 +1,97 @@
+{
+  "version": "2.0.0",
+  "description": "System-level base tokens for main orchestrator operations",
+  "totalTokens": 45,
+  "categories": {
+    "controlTokens": {
+      "description": "System control and lifecycle management",
+      "tokens": [
+        { "id": 0, "token": "[SYSTEM_START]", "description": "System initialization marker" },
+        { "id": 1, "token": "[SYSTEM_END]", "description": "System shutdown marker" },
+        { "id": 2, "token": "[ROUTE_TO]", "description": "Routing instruction prefix" },
+        { "id": 3, "token": "[MODEL_SELECT]", "description": "Model selection marker" },
+        { "id": 4, "token": "[DOMAIN_SELECT]", "description": "Domain selection marker" },
+        { "id": 5, "token": "[CONTEXT_BEGIN]", "description": "Context block start" },
+        { "id": 6, "token": "[CONTEXT_END]", "description": "Context block end" },
+        { "id": 7, "token": "[ERROR]", "description": "Error condition marker" },
+        { "id": 8, "token": "[SUCCESS]", "description": "Success condition marker" },
+        { "id": 9, "token": "[TIMEOUT]", "description": "Timeout condition marker" }
+      ]
+    },
+    "routingTokens": {
+      "description": "Module routing and orchestration",
+      "tokens": [
+        { "id": 10, "token": "[TO_LLM]", "description": "Route to language model" },
+        { "id": 11, "token": "[TO_DOMAIN]", "description": "Route to knowledge domain" },
+        { "id": 12, "token": "[TO_MATH]", "description": "Route to mathematics domain" },
+        { "id": 13, "token": "[TO_CODE]", "description": "Route to programming domain" },
+        { "id": 14, "token": "[TO_SEARCH]", "description": "Route to search domain" },
+        { "id": 15, "token": "[PARALLEL]", "description": "Execute in parallel" },
+        { "id": 16, "token": "[SEQUENTIAL]", "description": "Execute sequentially" },
+        { "id": 17, "token": "[ENSEMBLE]", "description": "Ensemble multiple outputs" }
+      ]
+    },
+    "statusTokens": {
+      "description": "Execution status indicators",
+      "tokens": [
+        { "id": 18, "token": "[PROCESSING]", "description": "Currently processing" },
+        { "id": 19, "token": "[READY]", "description": "Ready for next operation" },
+        { "id": 20, "token": "[WAITING]", "description": "Waiting for resource" },
+        { "id": 21, "token": "[COMPLETED]", "description": "Operation completed" },
+        { "id": 22, "token": "[FAILED]", "description": "Operation failed" },
+        { "id": 23, "token": "[DEGRADED]", "description": "Degraded performance mode" }
+      ]
+    },
+    "priorityTokens": {
+      "description": "Request priority levels",
+      "tokens": [
+        { "id": 24, "token": "[HIGH_PRIORITY]", "description": "High priority request" },
+        { "id": 25, "token": "[MEDIUM_PRIORITY]", "description": "Medium priority request" },
+        { "id": 26, "token": "[LOW_PRIORITY]", "description": "Low priority request" },
+        { "id": 27, "token": "[URGENT]", "description": "Urgent request" }
+      ]
+    },
+    "contextTokens": {
+      "description": "Context and metadata markers",
+      "tokens": [
+        { "id": 28, "token": "[USER_QUERY]", "description": "User query marker" },
+        { "id": 29, "token": "[SYSTEM_RESPONSE]", "description": "System response marker" },
+        { "id": 30, "token": "[HISTORY]", "description": "Conversation history marker" },
+        { "id": 31, "token": "[METADATA]", "description": "Metadata block marker" },
+        { "id": 32, "token": "[SESSION]", "description": "Session identifier marker" }
+      ]
+    },
+    "operationTokens": {
+      "description": "Operation type indicators",
+      "tokens": [
+        { "id": 33, "token": "[QUERY]", "description": "Query operation" },
+        { "id": 34, "token": "[CALCULATE]", "description": "Calculation operation" },
+        { "id": 35, "token": "[GENERATE]", "description": "Generation operation" },
+        { "id": 36, "token": "[ANALYZE]", "description": "Analysis operation" },
+        { "id": 37, "token": "[VERIFY]", "description": "Verification operation" },
+        { "id": 38, "token": "[TRANSFORM]", "description": "Transformation operation" }
+      ]
+    },
+    "pipelineTokens": {
+      "description": "Pipeline stage markers",
+      "tokens": [
+        { "id": 39, "token": "[INPUT]", "description": "Input stage" },
+        { "id": 40, "token": "[PROCESS]", "description": "Processing stage" },
+        { "id": 41, "token": "[OUTPUT]", "description": "Output stage" },
+        { "id": 42, "token": "[VALIDATE]", "description": "Validation stage" },
+        { "id": 43, "token": "[AGGREGATE]", "description": "Aggregation stage" },
+        { "id": 44, "token": "[FORMAT]", "description": "Formatting stage" }
+      ]
+    }
+  },
+  "usage": {
+    "inference": "These tokens guide the orchestrator's decision-making process and module coordination",
+    "training": "Used to structure training data for orchestration patterns",
+    "monitoring": "Enable tracking of system operations and performance metrics"
+  },
+  "interoperability": {
+    "note": "These tokens are recognized across all models and domains",
+    "priority": "System tokens have highest priority, followed by domain-specific tokens",
+    "conflicts": "System tokens override domain tokens in case of conflict"
+  }
+}

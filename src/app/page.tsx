@@ -44,6 +44,7 @@ export default function HomePage() {
   const [expandedThinking, setExpandedThinking] = useState<number | null>(null)
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Auto-resize textarea input height to fit content
   const resizeInput = useCallback(() => {
@@ -52,6 +53,15 @@ export default function HomePage() {
       inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 200)}px`
     }
   }, [])
+
+  // Auto-scroll to bottom when new messages arrive
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, scrollToBottom])
 
   useEffect(() => {
     resizeInput()
@@ -141,8 +151,8 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4">
-      <Card className="max-w-[1200px] w-full p-6 shadow-xl flex flex-col">
-        <header className="mb-6 border-b pb-4">
+      <Card className="max-w-[1200px] w-full h-[85vh] p-6 shadow-xl flex flex-col">
+        <header className="mb-6 border-b pb-4 flex-shrink-0">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">ZacAi Atomic</h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">Hybrid Multi-Domain Modular AI Assistant</p>
           <div className="mt-2 flex items-center gap-2">
@@ -151,7 +161,7 @@ export default function HomePage() {
           </div>
         </header>
 
-        <main className="flex-grow mb-4 space-y-4 overflow-y-auto rounded-lg bg-white dark:bg-slate-900 p-4">
+        <main className="flex-1 mb-4 space-y-4 overflow-y-auto rounded-lg bg-white dark:bg-slate-900 p-4 scroll-smooth">
           {messages.length === 0 ? (
             <p className="text-center text-slate-400">Start a conversation with the AI assistant...</p>
           ) : (
@@ -212,9 +222,10 @@ export default function HomePage() {
               AI is thinking...
             </article>
           )}
+          <div ref={messagesEndRef} />
         </main>
 
-        <form className="flex gap-3" onSubmit={handleSubmit}>
+        <form className="flex gap-3 flex-shrink-0" onSubmit={handleSubmit}>
           <textarea
             ref={inputRef}
             value={input}

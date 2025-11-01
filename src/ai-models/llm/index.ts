@@ -9,7 +9,7 @@ export type { LLMConfig } from './config';
 export { defaultLLMConfig } from './config';
 export type { Token, TokenizerResult } from './tokenizer';
 export { Tokenizer } from './tokenizer';
-export type { Embedding } from './embedding';
+export { Embedding } from './embedding';
 export type { GenerationOptions, GenerationResult } from './inference';
 export { Inference } from './inference';
 
