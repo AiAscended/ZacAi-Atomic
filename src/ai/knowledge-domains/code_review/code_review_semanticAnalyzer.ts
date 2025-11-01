@@ -6,16 +6,13 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { codeReviewTokenizer } from "./code_review_tokenizer"
 import { codeReviewParser } from "./code_review_parser"
 
 /**
  * Analyze code for review insights and recommendations
  */
 export const codeReviewSemanticAnalyzer = (code: string) => {
-  // TODO: Use tokens for advanced semantic analysis
-  // const { tokens } = codeReviewTokenizer(code)
-  codeReviewTokenizer(code) // Call tokenizer for side effects
+  // TODO: Use tokenizer for advanced semantic analysis
   const parsed = codeReviewParser(code)
 
   // Generate recommendations

@@ -71,7 +71,7 @@ function calculateConfidence(tokens: string[], input: string): number {
 /**
  * Extract search query from user input
  */
-function extractSearchQuery(input: string, semantics: any): string {
+function extractSearchQuery(input: string, _semantics: any): string {
   // Simply clean up the query by removing common prefixes
   const query = input
     .replace(/^(can you |could you |please |would you )/i, "")
@@ -86,7 +86,7 @@ function extractSearchQuery(input: string, semantics: any): string {
  * Main inference function for internet_search domain
  * NO PRIORITY - inference decides which search engine to use
  */
-export async function internetSearchRunInference(input: string, context?: InferenceContext): Promise<any> {
+export async function internetSearchRunInference(input: string, _context?: InferenceContext): Promise<any> {
   const tokens = internetSearchTokenizer(input).tokens
   const semantics = internetSearchSemanticAnalyzer(input)
 

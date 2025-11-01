@@ -6,11 +6,9 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { securityTokenizer } from "./security_tokenizer"
 import { securityParser } from "./security_parser"
 
 export const securitySemanticAnalyzer = (code: string) => {
-  const { tokens } = securityTokenizer(code)
   const parsed = securityParser(code)
 
   return {

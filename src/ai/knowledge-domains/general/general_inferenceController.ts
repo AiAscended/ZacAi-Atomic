@@ -46,12 +46,13 @@ const stopWords = [
   "your",
 ]
 
-export const generalRunInference = async (input: string, context?: any) => {
-  const tokens = context?.tokens || []
+export const generalRunInference = async (input: string, _context?: any) => {
+  const tokens = _context?.tokens || []
   const embeddings = context?.embeddings || []
-  const inferenceResults = context?.inferenceResults
-  const sentiment = context?.sentiment
-  const userProfile = context?.userProfile || {}
+  const inferenceResults = _context?.inferenceResults
+  const sentiment = _context?.sentiment
+  // TODO: Use userProfile for personalized responses
+  // const userProfile = _context?.userProfile || {}
 
   const domainInferenceResult = Array.isArray(inferenceResults)
     ? inferenceResults.find((r) => r.domain === GENERAL_DOMAIN)
@@ -109,12 +110,13 @@ export const generalRunInference = async (input: string, context?: any) => {
     lowerInput.match(/\b(what is|define|definition of|explain|tell me about)\b/) &&
     lowerInput.match(/\b(scientific calculator|calculator|general knowledge|knowledge)\b/)
   ) {
-    const queryKeywords = tokens
+    // TODO: Use queryKeywords for more specific knowledge retrieval
+    /* const queryKeywords = tokens
       .filter((t: string) => {
         const token = t.toLowerCase()
         return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token)
       })
-      .slice(0, 5)
+      .slice(0, 5) */
 
     if (lowerInput.includes("scientific calculator")) {
       responseText =

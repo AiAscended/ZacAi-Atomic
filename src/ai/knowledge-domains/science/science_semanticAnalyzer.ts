@@ -1,3 +1,4 @@
+import { scienceTokenizer } from "./science_tokenizer"
 /**
  * File: src/ai/data/science/science_semanticAnalyzer.ts
  * Purpose: Science semantic analyzer for concepts and relationships
@@ -6,7 +7,6 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { scienceTokenizer } from "./science_tokenizer"
 import { scienceParser } from "./science_parser"
 
 /**

@@ -6,11 +6,12 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { algorithmsTokenizer } from "./algorithms_tokenizer"
 import { algorithmsParser } from "./algorithms_parser"
 
 export const algorithmsSemanticAnalyzer = (code: string) => {
-  const { tokens } = algorithmsTokenizer(code)
+  // TODO: Use tokens for advanced semantic analysis
   const parsed = algorithmsParser(code)
+  // Placeholder token count
+  const tokens: string[] = []
   return { tokens, parsed, semanticScore: tokens.length * 0.1 + parsed.algorithms.length * 2 }
 }

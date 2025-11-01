@@ -6,11 +6,9 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { testingTokenizer } from "./testing_tokenizer"
 import { testingParser } from "./testing_parser"
 
 export const testingSemanticAnalyzer = (code: string) => {
-  const { tokens } = testingTokenizer(code)
   const parsed = testingParser(code)
 
   return {

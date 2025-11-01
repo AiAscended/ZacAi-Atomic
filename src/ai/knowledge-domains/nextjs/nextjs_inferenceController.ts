@@ -93,7 +93,7 @@ export async function nextjsRunInference(input: string): Promise<NextjsInference
   }
 }
 
-function generateRoutingResponse(input: string, analysis: any, parseResult: any): string {
+function generateRoutingResponse(_input: string, analysis: any, parseResult: any): string {
   const routerType = parseResult.metadata.routerType || "App Router"
   return `Next.js ${routerType} provides file-based routing. ${analysis.suggestedResponse} The App Router uses the app directory with layouts, pages, and route handlers.`
 }

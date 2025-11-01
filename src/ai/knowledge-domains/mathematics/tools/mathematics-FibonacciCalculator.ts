@@ -25,7 +25,7 @@ export class FibonacciCalculator {
   /**
    * Calculate nth Fibonacci number using iterative method (most efficient)
    */
-  public static calculate(_n: number): FibonacciResult {
+  public static calculate(n: number): FibonacciResult {
     const startTime = performance.now()
 
     if (n < 0) {
