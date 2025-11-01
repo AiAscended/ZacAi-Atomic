@@ -1,0 +1,28 @@
+{
+  "vocab": [
+    "sort",
+    "search",
+    "binary",
+    "linear",
+    "quicksort",
+    "mergesort",
+    "heapsort",
+    "bubblesort",
+    "bfs",
+    "dfs",
+    "dijkstra",
+    "dynamic",
+    "greedy",
+    "backtrack",
+    "recursion",
+    "iteration",
+    "divide",
+    "conquer",
+    "memoization",
+    "tabulation",
+    "optimization",
+    "complexity",
+    "time",
+    "space"
+  ]
+}

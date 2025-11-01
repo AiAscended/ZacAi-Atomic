@@ -1,0 +1,13 @@
+{
+  "name": "code_review",
+  "version": "0.1",
+  "description": "Code review domain (quality metrics, code smells, best practices, refactoring suggestions).",
+  "author": "auto-generated",
+  "files": [
+    "code_review_seedVocabulary.json",
+    "code_review_learnedData.json",
+    "code_review_webDocReferences.json",
+    "code_review_trainingWeights.bin",
+    "src/ai/data/code_review/*"
+  ]
+}

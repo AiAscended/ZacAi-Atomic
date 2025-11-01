@@ -1,0 +1,20 @@
+{
+  "domain": "react",
+  "version": "1.0.0",
+  "description": "React JavaScript library knowledge domain for component-based UI development",
+  "capabilities": [
+    "component_explanation",
+    "hooks_usage",
+    "state_management",
+    "lifecycle_methods",
+    "jsx_syntax",
+    "best_practices",
+    "performance_optimization",
+    "pattern_recognition"
+  ],
+  "dependencies": ["typescript", "programming", "general"],
+  "files": ["src/ai/data/react/*"],
+  "maintainer": "ZacAi-Atomic System",
+  "created": "2025-01-30",
+  "lastUpdated": "2025-01-30"
+}

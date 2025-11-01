@@ -1,0 +1,29 @@
+{
+  "vocab": [
+    "docker",
+    "kubernetes",
+    "ci/cd",
+    "pipeline",
+    "deploy",
+    "build",
+    "test",
+    "staging",
+    "production",
+    "development",
+    "environment",
+    "variable",
+    "config",
+    "secret",
+    "container",
+    "image",
+    "pod",
+    "service",
+    "ingress",
+    "volume",
+    "namespace",
+    "helm",
+    "terraform",
+    "ansible",
+    "jenkins"
+  ]
+}

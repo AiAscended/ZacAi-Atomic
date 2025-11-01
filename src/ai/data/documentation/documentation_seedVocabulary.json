@@ -1,0 +1,5 @@
+{
+  "version": "1.0",
+  "domain": "documentation",
+  "tags": ["@param", "@returns", "@example", "@description", "@throws", "@deprecated", "@see", "@author"]
+}

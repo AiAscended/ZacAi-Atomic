@@ -1,0 +1,77 @@
+{
+  "domain": "english",
+  "version": "1.0.0",
+  "vocabulary": {
+    "definition": 0.95,
+    "define": 0.9,
+    "meaning": 0.85,
+    "synonym": 0.9,
+    "antonym": 0.85,
+    "word": 0.8,
+    "language": 0.75,
+    "grammar": 0.7,
+    "sentence": 0.7,
+    "example": 0.65,
+    "molecular": 0.8,
+    "atomic": 0.8,
+    "structure": 0.75,
+    "explain": 0.7,
+    "what": 0.5,
+    "is": 0.3,
+    "the": 0.2,
+    "tell": 0.4,
+    "about": 0.4,
+    "use": 0.5,
+    "in": 0.3,
+    "a": 0.2
+  },
+  "patterns": [
+    {
+      "pattern": "what is",
+      "weight": 0.9
+    },
+    {
+      "pattern": "define",
+      "weight": 0.95
+    },
+    {
+      "pattern": "definition of",
+      "weight": 0.95
+    },
+    {
+      "pattern": "meaning of",
+      "weight": 0.9
+    },
+    {
+      "pattern": "synonym",
+      "weight": 0.9
+    },
+    {
+      "pattern": "antonym",
+      "weight": 0.85
+    },
+    {
+      "pattern": "use in a sentence",
+      "weight": 0.85
+    },
+    {
+      "pattern": "example sentence",
+      "weight": 0.8
+    },
+    {
+      "pattern": "tell me about",
+      "weight": 0.7
+    },
+    {
+      "pattern": "explain",
+      "weight": 0.75
+    }
+  ],
+  "examples": [
+    "what is the definition of molecular structure",
+    "define atomic",
+    "synonym for molecular",
+    "use atomic in a sentence",
+    "what does structure mean"
+  ]
+}

@@ -1,0 +1,20 @@
+DOMAIN: Next.js
+SPECIALIZATION: Next.js framework, App Router, Server Components, routing, deployment
+
+URL USAGE:
+- Use nextjs.org for official documentation
+- Reference App Router docs for modern Next.js patterns
+- Check Vercel guides for deployment best practices
+
+SYSTEM TOOLS:
+- Use shared code formatter for Next.js code
+- Use shared linter for Next.js conventions
+
+INFERENCE GUIDELINES:
+- Prefer App Router over Pages Router for new projects
+- Use Server Components by default, Client Components when needed
+- Recommend Route Handlers for API endpoints
+- Suggest proper data fetching patterns (fetch with caching)
+- Consider deployment optimization for Vercel
+
+KEYWORDS: nextjs, next.js, app router, server component, client component, route handler, server action

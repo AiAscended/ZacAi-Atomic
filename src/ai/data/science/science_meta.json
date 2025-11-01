@@ -1,0 +1,13 @@
+{
+  "name": "science",
+  "version": "0.1",
+  "description": "Science knowledge domain (physics, chemistry, biology, units, formulas, scientific method).",
+  "author": "auto-generated",
+  "files": [
+    "science_seedVocabulary.json",
+    "science_learnedData.json",
+    "science_webDocReferences.json",
+    "science_trainingWeights.bin",
+    "src/ai/data/science/*"
+  ]
+}

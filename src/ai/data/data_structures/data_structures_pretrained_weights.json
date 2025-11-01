@@ -1,0 +1,6 @@
+{
+  "domain": "data_structures",
+  "version": "0.2",
+  "embeddingDim": 128,
+  "seedWeights": {}
+}
