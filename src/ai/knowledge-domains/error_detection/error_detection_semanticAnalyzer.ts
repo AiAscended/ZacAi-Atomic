@@ -6,11 +6,9 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { errorDetectionTokenizer } from "./error_detection_tokenizer"
 import { errorDetectionParser } from "./error_detection_parser"
 
 export const errorDetectionSemanticAnalyzer = (code: string) => {
-  const { tokens } = errorDetectionTokenizer(code)
   const parsed = errorDetectionParser(code)
 
   return {

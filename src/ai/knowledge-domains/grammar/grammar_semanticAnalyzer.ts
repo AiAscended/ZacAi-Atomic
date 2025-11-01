@@ -1,3 +1,4 @@
+import { grammarTokenizer } from "./grammar_tokenizer"
 /**
  * File: src/ai/data/grammar/grammar_semanticAnalyzer.ts
  * Purpose: Grammar semantic analyzer for parts of speech and syntax
@@ -6,7 +7,6 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { grammarTokenizer } from "./grammar_tokenizer"
 import { grammarParser } from "./grammar_parser"
 
 /**

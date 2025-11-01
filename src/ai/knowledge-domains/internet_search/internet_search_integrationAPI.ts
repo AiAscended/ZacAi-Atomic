@@ -4,7 +4,8 @@ import { loadInternetSearchSeedVocabulary } from "./internet_search_vocabularyMa
 import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
 import { internetSearchRunInference } from "./internet_search_inferenceController"
 
-const internetSearchQuery = async (input: string, context?: any) => {
+// TODO: Use internetSearchQuery for additional context-aware search
+/* const internetSearchQuery = async (input: string, context?: any) => {
   const searchResults = context?.searchResults || []
 
   if (searchResults.length > 0) {
@@ -16,7 +17,7 @@ const internetSearchQuery = async (input: string, context?: any) => {
   return {
     text: "Internet search capabilities are available for real-time information lookup.",
   }
-}
+} */
 
 export const internetSearchInit = async () => {
   await loadInternetSearchSeedVocabulary()

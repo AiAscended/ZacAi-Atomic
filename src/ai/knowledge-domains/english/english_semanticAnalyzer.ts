@@ -3,7 +3,7 @@
  * Purpose: English semantic analyzer (MVP heuristics).
  */
 
-import { englishTokenizer } from './english_tokenizer';
+import { englishTokenizer } from "./english_tokenizer"
 
 export const englishSemanticAnalyzer = (text: string) => {
   const { tokens } = englishTokenizer(text);

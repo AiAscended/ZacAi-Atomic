@@ -54,14 +54,14 @@ function convertWordsToNumbers(input: string): string {
     .replace(/\bwhat\s+is\b/gi, "")
 
   // Process hundreds first
-  converted = converted.replace(/(\w+)\s+hundred(?:\s+and)?\s+(\w+)/gi, (match, hundreds, remainder) => {
+  converted = converted.replace(/(\w+)\s+hundred(?:\s+and)?\s+(\w+)/gi, (_match, hundreds, remainder) => {
     const hundredValue = wordToNumber[hundreds.toLowerCase()] || 0
     const remainderValue = wordToNumber[remainder.toLowerCase()] || 0
     return String(hundredValue * 100 + remainderValue)
   })
 
   // Process standalone hundreds
-  converted = converted.replace(/(\w+)\s+hundred/gi, (match, hundreds) => {
+  converted = converted.replace(/(\w+)\s+hundred/gi, (_match, hundreds) => {
     const hundredValue = wordToNumber[hundreds.toLowerCase()] || 0
     return String(hundredValue * 100)
   })
@@ -150,12 +150,12 @@ function convertWordsToNumbers(input: string): string {
   return converted.trim()
 }
 
-export const mathematicsRunInference = async (input: string, context?: any) => {
+export const mathematicsRunInference = async (input: string, _context?: any) => {
   const tk = mathematicsTokenizer(input)
   const sem = mathematicsSemanticAnalyzer(input)
 
-  const inferenceResults = context?.inferenceResults
-  const tokens = context?.tokens || []
+  const inferenceResults = _context?.inferenceResults
+  const tokens = _context?.tokens || []
 
   const domainInferenceResult = Array.isArray(inferenceResults)
     ? inferenceResults.find((r) => r.domain === "mathematics")

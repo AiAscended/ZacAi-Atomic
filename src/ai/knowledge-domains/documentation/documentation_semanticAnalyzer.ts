@@ -6,11 +6,9 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { documentationTokenizer } from "./documentation_tokenizer"
 import { documentationParser } from "./documentation_parser"
 
 export const documentationSemanticAnalyzer = (code: string) => {
-  const { tokens } = documentationTokenizer(code)
   const parsed = documentationParser(code)
 
   return {

@@ -1,4 +1,4 @@
-import { generalTokenizer } from './general_tokenizer';
+import { generalTokenizer } from "./general_tokenizer"
 
 export const generalSemanticAnalyzer = (text: string) => {
   const { tokens } = generalTokenizer(text);
