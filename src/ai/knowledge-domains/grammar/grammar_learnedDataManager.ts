@@ -20,7 +20,7 @@ export const loadGrammarLearnedData = async (path = "/src/ai/data/grammar/gramma
 
 export const saveGrammarLearnedData = async (data: unknown, path = "/src/ai/data/grammar/grammar_learnedData.json") => {
   try {
-    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2), "utf-8")
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
     return true
   } catch (e) {
     return false

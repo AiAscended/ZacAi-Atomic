@@ -25,7 +25,7 @@ export const saveDocumentationLearnedData = async (
   path = "/src/ai/data/documentation/documentation_learnedData.json",
 ) => {
   try {
-    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2), "utf-8")
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
     return true
   } catch (e) {
     return false

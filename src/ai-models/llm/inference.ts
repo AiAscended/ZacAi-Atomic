@@ -28,12 +28,12 @@ export interface GenerationResult {
 export class Inference {
   private config: LLMConfig;
   private tokenizer: Tokenizer;
-  private embedding: Embedding;
+  // private embedding: Embedding; // TODO: Use embedding for semantic operations
   
-  constructor(config: LLMConfig, tokenizer: Tokenizer, embedding: Embedding) {
+  constructor(config: LLMConfig, tokenizer: Tokenizer, _embedding: Embedding) {
     this.config = config;
     this.tokenizer = tokenizer;
-    this.embedding = embedding;
+    // this.embedding = embedding; // TODO: Store for future use
   }
   
   /**
@@ -130,9 +130,10 @@ export class Inference {
   /**
    * Get logits from model (placeholder)
    */
-  private async getLogits(tokens: number[]): Promise<number[]> {
+  private async getLogits(_tokens: number[]): Promise<number[]> {
     // Placeholder: Would run actual model forward pass
     // For now, return random logits
+    // TODO: Use tokens parameter for actual forward pass
     const vocabSize = this.config.vocabSize;
     return Array.from({ length: vocabSize }, () => Math.random() * 2 - 1);
   }

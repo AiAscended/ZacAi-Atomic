@@ -4,7 +4,7 @@
  */
 
 export class EnvironmentConfigValidator {
-  validate(config: Record<string, any>): {
+  validate(_config: Record<string, any>): {
     valid: boolean;
     errors: string[];
     warnings: string[];

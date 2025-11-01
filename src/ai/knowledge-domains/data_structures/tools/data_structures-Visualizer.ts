@@ -4,7 +4,7 @@
  */
 
 export class DataStructuresVisualizer {
-  visualize(structure: any, type: string): {
+  visualize(_structure: any, type: string): {
     visualization: string;
     metadata: Record<string, any>;
   } {

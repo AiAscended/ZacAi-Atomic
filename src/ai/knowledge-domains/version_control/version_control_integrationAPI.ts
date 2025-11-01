@@ -43,7 +43,7 @@ export const versionControlInit = async () => {
   registerDomain({
     name: VERSION_CONTROL_DOMAIN,
     version: "1.0.0",
-    init: async () => {
+    initialize: async () => {
       await loadVersionControlSeedVocabulary()
     },
     query: async (input: string) => versionControlRunInference(input),

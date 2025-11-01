@@ -23,7 +23,7 @@ export const saveEnvironmentLearnedData = async (
   path = "/src/ai/data/environment/environment_learnedData.json",
 ) => {
   try {
-    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2), "utf-8")
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
     return { success: true }
   } catch (err) {
     return { success: false, error: String(err) }

@@ -21,10 +21,10 @@ export interface TokenizerResult {
 export class Tokenizer {
   private vocab: Map<string, number>;
   private reverseVocab: Map<number, string>;
-  private config: LLMConfig;
+  // private config: LLMConfig; // TODO: Use for advanced tokenization features
   
-  constructor(config: LLMConfig) {
-    this.config = config;
+  constructor(_config: LLMConfig) {
+    // this.config = config; // TODO: Store for configuration-based tokenization
     this.vocab = new Map();
     this.reverseVocab = new Map();
     this.initializeVocab();

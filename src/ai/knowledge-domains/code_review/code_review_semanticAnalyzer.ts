@@ -13,7 +13,9 @@ import { codeReviewParser } from "./code_review_parser"
  * Analyze code for review insights and recommendations
  */
 export const codeReviewSemanticAnalyzer = (code: string) => {
-  const { tokens } = codeReviewTokenizer(code)
+  // TODO: Use tokens for advanced semantic analysis
+  // const { tokens } = codeReviewTokenizer(code)
+  codeReviewTokenizer(code) // Call tokenizer for side effects
   const parsed = codeReviewParser(code)
 
   // Generate recommendations

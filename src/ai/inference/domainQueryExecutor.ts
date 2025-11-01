@@ -19,7 +19,7 @@ export class DomainQueryExecutor {
         // Simulate domain query
         results[subtask] = await this.querySingleDomain(subtask)
       } catch (err) {
-        results[subtask] = { error: err.message }
+        results[subtask] = { error: err instanceof Error ? err.message : String(err) }
       }
     }
     return results

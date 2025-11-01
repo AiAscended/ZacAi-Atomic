@@ -43,7 +43,7 @@ export const algorithmsInit = async () => {
   registerDomain({
     name: ALGORITHMS_DOMAIN,
     version: "1.0.0",
-    init: async () => {
+    initialize: async () => {
       await loadAlgorithmsSeedVocabulary()
     },
     query: async (input: string) => algorithmsRunInference(input),

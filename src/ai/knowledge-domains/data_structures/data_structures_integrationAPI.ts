@@ -43,7 +43,7 @@ export const dataStructuresInit = async () => {
   registerDomain({
     name: DATA_STRUCTURES_DOMAIN,
     version: "1.0.0",
-    init: async () => {
+    initialize: async () => {
       await loadDataStructuresSeedVocabulary()
     },
     query: async (input: string) => dataStructuresRunInference(input),

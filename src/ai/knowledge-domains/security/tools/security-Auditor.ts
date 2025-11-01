@@ -4,7 +4,7 @@
  */
 
 export class SecurityAuditor {
-  audit(code: string): {
+  audit(_code: string): {
     vulnerabilities: Array<{
       severity: 'critical' | 'high' | 'medium' | 'low';
       type: string;

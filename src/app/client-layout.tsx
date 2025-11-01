@@ -8,13 +8,9 @@
 
 import type React from "react"
 import { useState, useEffect, createContext, useContext } from "react"
-import { Geist, Geist_Mono } from "next/font/google"
 import { NavigationWrapper } from "@/components/navigation/NavigationWrapper"
 import { Analytics } from "@vercel/analytics/next"
 import ThemeToggle from "@/components/ui/ThemeToggle"
-
-const geist = Geist({ subsets: ["latin"] })
-const geistMono = Geist_Mono({ subsets: ["latin"] })
 
 type Theme = "light" | "dark"
 
@@ -53,7 +49,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, [theme])
 
   return (
-    <html lang="en" className={geist.className}>
+    <html lang="en">
       <body className={`font-sans antialiased ${theme}`}>
         <ThemeContext.Provider value={{ theme, toggleTheme }}>
           <NavigationWrapper />
