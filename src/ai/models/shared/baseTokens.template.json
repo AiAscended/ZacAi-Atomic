@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Base Tokens Configuration",
+  "description": "20-40 foundational tokens that every model should recognize. These are separate from learned/trained tokens.",
+  "version": "1.0.0",
+  
+  "specialTokens": {
+    "[PAD]": {
+      "id": 0,
+      "description": "Padding token for sequence alignment",
+      "required": true
+    },
+    "[UNK]": {
+      "id": 1,
+      "description": "Unknown token for out-of-vocabulary words",
+      "required": true
+    },
+    "[BOS]": {
+      "id": 2,
+      "description": "Beginning of sequence token",
+      "required": true
+    },
+    "[EOS]": {
+      "id": 3,
+      "description": "End of sequence token",
+      "required": true
+    },
+    "[MASK]": {
+      "id": 4,
+      "description": "Masked token for training (MLM)",
+      "required": false
+    },
+    "[CLS]": {
+      "id": 5,
+      "description": "Classification token (for sentence-level tasks)",
+      "required": false
+    },
+    "[SEP]": {
+      "id": 6,
+      "description": "Separator token (between sentences)",
+      "required": false
+    }
+  },
+  
+  "numericalTokens": {
+    "0": { "id": 7, "type": "digit" },
+    "1": { "id": 8, "type": "digit" },
+    "2": { "id": 9, "type": "digit" },
+    "3": { "id": 10, "type": "digit" },
+    "4": { "id": 11, "type": "digit" },
+    "5": { "id": 12, "type": "digit" },
+    "6": { "id": 13, "type": "digit" },
+    "7": { "id": 14, "type": "digit" },
+    "8": { "id": 15, "type": "digit" },
+    "9": { "id": 16, "type": "digit" }
+  },
+  
+  "punctuationTokens": {
+    ".": { "id": 17, "type": "punctuation", "name": "period" },
+    ",": { "id": 18, "type": "punctuation", "name": "comma" },
+    "!": { "id": 19, "type": "punctuation", "name": "exclamation" },
+    "?": { "id": 20, "type": "punctuation", "name": "question" },
+    ":": { "id": 21, "type": "punctuation", "name": "colon" },
+    ";": { "id": 22, "type": "punctuation", "name": "semicolon" },
+    "'": { "id": 23, "type": "punctuation", "name": "apostrophe" },
+    "\"": { "id": 24, "type": "punctuation", "name": "quote" },
+    "(": { "id": 25, "type": "punctuation", "name": "left_paren" },
+    ")": { "id": 26, "type": "punctuation", "name": "right_paren" }
+  },
+  
+  "whitespaceTokens": {
+    " ": { "id": 27, "type": "whitespace", "name": "space" },
+    "\\n": { "id": 28, "type": "whitespace", "name": "newline" },
+    "\\t": { "id": 29, "type": "whitespace", "name": "tab" }
+  },
+  
+  "operatorTokens": {
+    "+": { "id": 30, "type": "operator", "name": "plus" },
+    "-": { "id": 31, "type": "operator", "name": "minus" },
+    "*": { "id": 32, "type": "operator", "name": "multiply" },
+    "/": { "id": 33, "type": "operator", "name": "divide" },
+    "=": { "id": 34, "type": "operator", "name": "equals" },
+    "<": { "id": 35, "type": "operator", "name": "less_than" },
+    ">": { "id": 36, "type": "operator", "name": "greater_than" }
+  },
+  
+  "bracketTokens": {
+    "[": { "id": 37, "type": "bracket", "name": "left_bracket" },
+    "]": { "id": 38, "type": "bracket", "name": "right_bracket" },
+    "{": { "id": 39, "type": "bracket", "name": "left_brace" },
+    "}": { "id": 40, "type": "bracket", "name": "right_brace" }
+  },
+  
+  "metadata": {
+    "totalTokens": 41,
+    "requiredTokens": 7,
+    "optionalTokens": 34,
+    "rangeRecommendation": "20-40 base tokens is optimal for most models",
+    "notes": [
+      "These are foundational tokens separate from domain-specific learned tokens",
+      "Models can extend this set but should maintain these core tokens",
+      "Token IDs should be consistent across all models for interoperability"
+    ]
+  }
+}

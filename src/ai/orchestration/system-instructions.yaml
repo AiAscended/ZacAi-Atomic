@@ -1,0 +1,353 @@
+# Main Orchestrator System Instructions
+# Purpose: Governance and operational instructions for the central orchestration system
+
+system:
+  id: main-orchestrator
+  name: "ZacAI Atomic Orchestrator"
+  version: "2.0.0"
+  description: "Central orchestration system for hybrid AI model and domain coordination"
+
+# Core Principles
+principles:
+  - name: "Intelligent Routing"
+    rule: "Analyze query and route to most appropriate model/domain"
+    priority: 1
+  
+  - name: "Graceful Degradation"
+    rule: "Continue operation if some modules fail; provide best available response"
+    priority: 2
+  
+  - name: "Context Preservation"
+    rule: "Maintain conversation context across multiple interactions"
+    priority: 3
+  
+  - name: "Resource Optimization"
+    rule: "Balance response quality with computational efficiency"
+    priority: 4
+
+# Orchestration Strategy
+routing:
+  analysis:
+    - "Extract keywords from query"
+    - "Identify query intent and category"
+    - "Determine required capabilities"
+    - "Check user preferences if available"
+  
+  selection:
+    - "Match query to domain expertise"
+    - "Select appropriate model type"
+    - "Consider model availability and status"
+    - "Apply fallback hierarchy if needed"
+  
+  execution:
+    - "Initialize selected modules"
+    - "Pass context and query"
+    - "Monitor execution progress"
+    - "Handle timeouts and errors"
+  
+  aggregation:
+    - "Collect responses from multiple sources if needed"
+    - "Synthesize coherent final answer"
+    - "Maintain attribution to sources"
+    - "Format response appropriately"
+
+# Module Coordination
+coordination:
+  multi_model:
+    enabled: true
+    strategies:
+      - name: "Sequential Pipeline"
+        description: "Pass output from one model as input to next"
+        use_cases: ["Text → Code", "Query → Calculation → Explanation"]
+      
+      - name: "Parallel Processing"
+        description: "Execute multiple models concurrently, merge results"
+        use_cases: ["Multi-perspective analysis", "Fact verification"]
+      
+      - name: "Ensemble"
+        description: "Combine predictions from multiple models"
+        use_cases: ["Improved accuracy", "Confidence scoring"]
+  
+  multi_domain:
+    enabled: true
+    strategies:
+      - name: "Primary-Fallback"
+        description: "Try primary domain, fall back if needed"
+      
+      - name: "Collaborative"
+        description: "Multiple domains contribute to answer"
+        use_cases: ["Physics + Mathematics", "Programming + General Knowledge"]
+      
+      - name: "Verification"
+        description: "One domain verifies another's output"
+        use_cases: ["Math verification", "Code validation"]
+
+# System Base Tokens
+base_tokens:
+  # Control tokens
+  control:
+    - "[SYSTEM_START]"
+    - "[SYSTEM_END]"
+    - "[ROUTE_TO]"
+    - "[MODEL_SELECT]"
+    - "[DOMAIN_SELECT]"
+    - "[CONTEXT_BEGIN]"
+    - "[CONTEXT_END]"
+    - "[ERROR]"
+    - "[SUCCESS]"
+    - "[TIMEOUT]"
+    - "[RETRY]"
+    - "[FALLBACK]"
+  
+  # Routing tokens
+  routing:
+    - "[TO_LLM]"
+    - "[TO_DOMAIN]"
+    - "[TO_MATH]"
+    - "[TO_CODE]"
+    - "[TO_SEARCH]"
+    - "[PARALLEL]"
+    - "[SEQUENTIAL]"
+    - "[ENSEMBLE]"
+  
+  # Status tokens
+  status:
+    - "[PROCESSING]"
+    - "[READY]"
+    - "[WAITING]"
+    - "[COMPLETED]"
+    - "[FAILED]"
+    - "[DEGRADED]"
+  
+  # Priority tokens
+  priority:
+    - "[HIGH_PRIORITY]"
+    - "[MEDIUM_PRIORITY]"
+    - "[LOW_PRIORITY]"
+    - "[URGENT]"
+  
+  # Context tokens
+  context:
+    - "[USER_QUERY]"
+    - "[SYSTEM_RESPONSE]"
+    - "[HISTORY]"
+    - "[METADATA]"
+    - "[SESSION]"
+
+# Decision Making
+decision_tree:
+  query_classification:
+    mathematical:
+      keywords: ["calculate", "solve", "equation", "formula", "derivative"]
+      action: "Route to mathematics domain + scientific calculator"
+      fallback: "LLM with math capabilities"
+    
+    programming:
+      keywords: ["code", "function", "implement", "debug", "API"]
+      action: "Route to programming domain"
+      fallback: "LLM with code generation"
+    
+    general_knowledge:
+      keywords: ["what is", "who is", "when did", "where is", "explain"]
+      action: "Route to general-knowledge domain + URL lookup"
+      fallback: "LLM general knowledge"
+    
+    search:
+      keywords: ["search", "find", "look up", "current", "latest"]
+      action: "Route to internet-search domain"
+      fallback: "General knowledge domain"
+    
+    conversational:
+      keywords: ["hello", "thanks", "help", "chat"]
+      action: "Route to LLM"
+      fallback: "Simple response template"
+
+# Error Handling & Recovery
+error_handling:
+  module_failure:
+    - "Log error details"
+    - "Attempt fallback module"
+    - "If all fail, return graceful error message"
+    - "Report to monitoring system"
+  
+  timeout:
+    - "Cancel operation after timeout"
+    - "Try faster alternative module"
+    - "Return partial result if available"
+  
+  invalid_input:
+    - "Validate input format"
+    - "Request clarification from user"
+    - "Suggest correct format"
+  
+  rate_limiting:
+    - "Queue requests if limit reached"
+    - "Use cached results when available"
+    - "Inform user of delay"
+
+# Performance Optimization
+optimization:
+  caching:
+    enabled: true
+    strategy:
+      - "Cache frequent queries"
+      - "Cache domain lookup results"
+      - "Cache model predictions"
+    ttl:
+      queries: 3600 # 1 hour
+      domain_results: 7200 # 2 hours
+      model_predictions: 1800 # 30 minutes
+  
+  load_balancing:
+    enabled: true
+    strategy:
+      - "Distribute across available modules"
+      - "Monitor module performance"
+      - "Adjust routing based on load"
+  
+  lazy_loading:
+    enabled: true
+    strategy:
+      - "Load modules on-demand"
+      - "Keep frequently used modules in memory"
+      - "Unload idle modules after timeout"
+
+# Integration Guidelines
+integration:
+  with_models:
+    llm:
+      capabilities: ["Text generation", "Language understanding", "Reasoning"]
+      routing_conditions: ["General queries", "Conversation", "Explanation"]
+    
+    cnn:
+      capabilities: ["Image recognition", "Visual processing"]
+      routing_conditions: ["Image analysis", "Computer vision tasks"]
+    
+    rnn:
+      capabilities: ["Sequence processing", "Time series"]
+      routing_conditions: ["Text sequences", "Temporal data"]
+  
+  with_domains:
+    mathematics:
+      capabilities: ["Calculations", "Equations", "Proofs"]
+      routing_conditions: ["Math queries", "Scientific computation"]
+    
+    programming:
+      capabilities: ["Code generation", "Debugging", "Algorithms"]
+      routing_conditions: ["Programming tasks", "Software development"]
+    
+    general_knowledge:
+      capabilities: ["Facts", "Explanations", "Reference"]
+      routing_conditions: ["Knowledge queries", "Information retrieval"]
+
+# Training & Learning
+training:
+  orchestrator_learning:
+    - "Track routing decisions and outcomes"
+    - "Learn from successful query resolutions"
+    - "Identify common failure patterns"
+    - "Optimize routing rules based on performance"
+  
+  feedback_loop:
+    - "Collect user satisfaction ratings"
+    - "Analyze response quality"
+    - "Adjust module selection weights"
+    - "Update decision tree rules"
+
+# Monitoring & Analytics
+monitoring:
+  metrics:
+    - name: "Response Time"
+      threshold: "< 5 seconds for 95th percentile"
+    
+    - name: "Success Rate"
+      threshold: "> 95% queries successfully answered"
+    
+    - name: "Module Availability"
+      threshold: "> 99% uptime for critical modules"
+    
+    - name: "Cache Hit Rate"
+      threshold: "> 40% for frequent queries"
+  
+  alerting:
+    - "Module failure alerts"
+    - "Performance degradation alerts"
+    - "Rate limit warnings"
+    - "System resource alerts"
+
+# Security
+security:
+  input_validation:
+    - "Sanitize user inputs"
+    - "Check for injection attempts"
+    - "Validate data types and formats"
+    - "Rate limit per user/IP"
+  
+  module_isolation:
+    - "Run modules in isolated environments"
+    - "Limit resource access per module"
+    - "Prevent cross-module interference"
+  
+  data_protection:
+    - "Encrypt sensitive data in transit"
+    - "Sanitize logs and monitoring data"
+    - "Implement access controls"
+    - "Regular security audits"
+
+# Admin Configuration
+admin:
+  editable_fields:
+    - "Routing decision tree"
+    - "Module priority weights"
+    - "Timeout thresholds"
+    - "Cache configuration"
+    - "Rate limits"
+  
+  upload_capabilities:
+    - "Custom routing rules (YAML)"
+    - "Module configurations (JSON)"
+    - "System tokens (XML)"
+  
+  settings_location: "/admin/orchestrator"
+
+# Pipeline Configuration
+pipeline:
+  stages:
+    1_input:
+      - "Receive user query"
+      - "Extract context and metadata"
+      - "Validate input format"
+    
+    2_analysis:
+      - "Classify query type"
+      - "Identify required capabilities"
+      - "Select modules"
+    
+    3_execution:
+      - "Initialize modules"
+      - "Execute in parallel/sequential"
+      - "Monitor progress"
+    
+    4_aggregation:
+      - "Collect results"
+      - "Synthesize response"
+      - "Apply formatting"
+    
+    5_output:
+      - "Deliver response to user"
+      - "Log interaction"
+      - "Update analytics"
+
+# Quality Assurance
+quality:
+  verification:
+    - "Validate response completeness"
+    - "Check factual accuracy when possible"
+    - "Ensure response coherence"
+    - "Verify appropriate module selection"
+  
+  continuous_improvement:
+    - "A/B test routing strategies"
+    - "Experiment with new module combinations"
+    - "Optimize based on user feedback"
+    - "Regular performance reviews"
