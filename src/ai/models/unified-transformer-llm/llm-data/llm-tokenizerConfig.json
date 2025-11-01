@@ -1,0 +1,15 @@
+{
+  "tokenizerType": "BPE",
+  "vocabSize": 50257,
+  "maxLength": 2048,
+  "paddingStrategy": "right",
+  "truncationStrategy": "right",
+  "addSpecialTokens": true,
+  "specialTokens": {
+    "padToken": "<PAD>",
+    "bosToken": "<BOS>",
+    "eosToken": "<EOS>",
+    "unkToken": "<UNK>",
+    "maskToken": "<MASK>"
+  }
+}

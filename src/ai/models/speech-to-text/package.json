@@ -1,0 +1,13 @@
+{
+  "name": "@zacai-atomic/speech-to-text",
+  "version": "1.0.0",
+  "description": "speech-to-text for ZacAi-Atomic",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": ["ai", "ml", "stt"],
+  "author": "ZacAi-Atomic",
+  "license": "MIT"
+}

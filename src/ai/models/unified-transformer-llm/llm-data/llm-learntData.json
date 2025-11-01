@@ -1,0 +1,11 @@
+{
+  "domain": "unified-transformer-llm",
+  "version": "1.0.0",
+  "description": "Learned data from fine-tuning",
+  "learnedVocabulary": [],
+  "statistics": {
+    "totalTokensSeen": 0,
+    "uniqueTokens": 0,
+    "averageSequenceLength": 0
+  }
+}
