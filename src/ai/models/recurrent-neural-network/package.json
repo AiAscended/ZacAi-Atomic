@@ -1,0 +1,13 @@
+{
+  "name": "@zacai-atomic/recurrent-neural-network",
+  "version": "1.0.0",
+  "description": "recurrent-neural-network for ZacAi-Atomic",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": ["ai", "ml", "rnn"],
+  "author": "ZacAi-Atomic",
+  "license": "MIT"
+}

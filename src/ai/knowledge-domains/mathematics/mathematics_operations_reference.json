@@ -1,0 +1,180 @@
+{
+  "basic_arithmetic": {
+    "addition": {
+      "symbols": ["+", "plus", "add", "sum"],
+      "examples": ["2 + 3 = 5", "add 5 and 7", "what is the sum of 10 and 20"],
+      "properties": ["commutative", "associative", "identity_element_0"]
+    },
+    "subtraction": {
+      "symbols": ["-", "minus", "subtract", "difference"],
+      "examples": ["10 - 3 = 7", "subtract 5 from 12", "what is 20 minus 8"],
+      "properties": ["not_commutative", "not_associative", "identity_element_0"]
+    },
+    "multiplication": {
+      "symbols": ["×", "*", "times", "multiply", "product"],
+      "examples": ["3 × 4 = 12", "multiply 5 by 6", "what is 7 times 8"],
+      "properties": ["commutative", "associative", "distributive", "identity_element_1"],
+      "methods": ["repeated_addition", "lattice_method", "chinese_stick_method", "grid_method"]
+    },
+    "division": {
+      "symbols": ["÷", "/", "divide", "quotient"],
+      "examples": ["12 ÷ 3 = 4", "divide 20 by 5", "what is 15 divided by 3"],
+      "properties": ["not_commutative", "not_associative", "identity_element_1"]
+    }
+  },
+  "order_of_operations": {
+    "acronym": "PEMDAS",
+    "full_name": "Parentheses, Exponents, Multiplication/Division, Addition/Subtraction",
+    "alternative_names": ["BODMAS", "BIDMAS"],
+    "rules": [
+      "1. Parentheses/Brackets () [] {}",
+      "2. Exponents/Orders (powers and square roots)",
+      "3. Multiplication and Division (left to right)",
+      "4. Addition and Subtraction (left to right)"
+    ],
+    "examples": [
+      {
+        "expression": "2 + 3 × 4",
+        "steps": ["3 × 4 = 12", "2 + 12 = 14"],
+        "result": 14,
+        "common_mistake": "5 × 4 = 20 (incorrect - addition first)"
+      },
+      {
+        "expression": "(2 + 3) × 4",
+        "steps": ["2 + 3 = 5", "5 × 4 = 20"],
+        "result": 20
+      }
+    ]
+  },
+  "multiplication_methods": {
+    "lattice_method": {
+      "description": "Grid-based multiplication method using diagonal sums",
+      "best_for": "multi-digit multiplication",
+      "steps": [
+        "Draw a grid with rows/columns matching digit counts",
+        "Divide each cell diagonally",
+        "Write products of digits in cells",
+        "Sum along diagonals from right to left"
+      ]
+    },
+    "chinese_stick_method": {
+      "description": "Visual multiplication using intersecting lines",
+      "best_for": "visual learners",
+      "steps": [
+        "Draw vertical lines for first number's digits",
+        "Draw horizontal lines for second number's digits",
+        "Count intersection points in groups",
+        "Sum groups to get result"
+      ]
+    },
+    "multiplication_tables": {
+      "times_2": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+      "times_3": [0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30],
+      "times_4": [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40],
+      "times_5": [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
+      "times_9_trick": "Digit sum equals 9, first digit is one less than multiplier"
+    }
+  },
+  "advanced_operations": {
+    "exponentiation": {
+      "symbols": ["^", "**", "power", "squared", "cubed"],
+      "properties": ["a^m × a^n = a^(m+n)", "a^m ÷ a^n = a^(m-n)", "(a^m)^n = a^(m×n)"],
+      "special_cases": {
+        "zero_exponent": "a^0 = 1 (for a ≠ 0)",
+        "negative_exponent": "a^(-n) = 1/a^n",
+        "fractional_exponent": "a^(1/n) = nth root of a"
+      }
+    },
+    "roots": {
+      "square_root": {
+        "symbol": "√",
+        "definition": "√a × √a = a",
+        "properties": ["√(ab) = √a × √b", "√(a/b) = √a / √b"]
+      },
+      "cube_root": {
+        "symbol": "∛",
+        "definition": "∛a × ∛a × ∛a = a"
+      },
+      "nth_root": {
+        "notation": "ⁿ√a",
+        "relationship": "ⁿ√a = a^(1/n)"
+      }
+    },
+    "logarithms": {
+      "natural_log": {
+        "notation": "ln(x)",
+        "base": "e ≈ 2.71828",
+        "properties": ["ln(xy) = ln(x) + ln(y)", "ln(x/y) = ln(x) - ln(y)", "ln(x^n) = n×ln(x)"]
+      },
+      "common_log": {
+        "notation": "log(x) or log₁₀(x)",
+        "base": 10,
+        "properties": ["log(xy) = log(x) + log(y)", "log(x/y) = log(x) - log(y)"]
+      },
+      "change_of_base": "logₐ(b) = ln(b) / ln(a)"
+    }
+  },
+  "trigonometry": {
+    "basic_ratios": {
+      "sine": "sin(θ) = opposite / hypotenuse",
+      "cosine": "cos(θ) = adjacent / hypotenuse",
+      "tangent": "tan(θ) = opposite / adjacent = sin(θ) / cos(θ)"
+    },
+    "reciprocal_ratios": {
+      "cosecant": "csc(θ) = 1 / sin(θ)",
+      "secant": "sec(θ) = 1 / cos(θ)",
+      "cotangent": "cot(θ) = 1 / tan(θ)"
+    },
+    "pythagorean_identities": [
+      "sin²(θ) + cos²(θ) = 1",
+      "1 + tan²(θ) = sec²(θ)",
+      "1 + cot²(θ) = csc²(θ)"
+    ],
+    "special_angles": {
+      "0°": {"sin": 0, "cos": 1, "tan": 0},
+      "30°": {"sin": 0.5, "cos": 0.866, "tan": 0.577},
+      "45°": {"sin": 0.707, "cos": 0.707, "tan": 1},
+      "60°": {"sin": 0.866, "cos": 0.5, "tan": 1.732},
+      "90°": {"sin": 1, "cos": 0, "tan": "undefined"}
+    }
+  },
+  "constants": {
+    "pi": {
+      "symbol": "π",
+      "value": 3.14159265358979323846,
+      "definition": "ratio of circle's circumference to its diameter",
+      "formulas": ["C = 2πr", "A = πr²"]
+    },
+    "euler": {
+      "symbol": "e",
+      "value": 2.71828182845904523536,
+      "definition": "base of natural logarithm",
+      "uses": ["compound interest", "exponential growth/decay", "calculus"]
+    },
+    "golden_ratio": {
+      "symbol": "φ (phi)",
+      "value": 1.61803398874989484820,
+      "formula": "(1 + √5) / 2",
+      "properties": ["φ² = φ + 1", "1/φ = φ - 1"]
+    }
+  },
+  "statistical_operations": {
+    "central_tendency": {
+      "mean": "sum of values / count of values",
+      "median": "middle value when sorted",
+      "mode": "most frequently occurring value"
+    },
+    "dispersion": {
+      "range": "maximum - minimum",
+      "variance": "average of squared differences from mean",
+      "standard_deviation": "square root of variance"
+    }
+  },
+  "mental_math_tricks": {
+    "multiply_by_11": "For two-digit numbers: add digits and place in middle (e.g., 23 × 11 = 253)",
+    "multiply_by_5": "Divide by 2 and multiply by 10",
+    "multiply_by_9": "Multiply by 10 and subtract the original number",
+    "square_numbers_ending_in_5": "n5² = n(n+1) × 100 + 25 (e.g., 25² = 2×3×100+25 = 625)",
+    "percentage_trick": "To find X% of Y, also find Y% of X (they're equal)"
+  }
+}

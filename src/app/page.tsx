@@ -16,7 +16,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ChevronDown, ChevronUp } from "lucide-react"
-import { ResponseRenderer } from "@/src/ui/components/ResponseRenderer-v2"
+import { ResponseRenderer } from "@/components/ResponseRenderer"
 
 interface Message {
   id: string
@@ -129,7 +129,12 @@ export default function HomePage() {
   // Render message content including modular code/text or plain text
   const renderMessageContent = (msg: Message) => {
     if (msg.role === "assistant" && msg.contentBlocks) {
-      return <ResponseRenderer textBlocks={msg.contentBlocks.textBlocks} codeBlocks={msg.contentBlocks.codeBlocks} />
+      // Map content blocks to include type field required by ResponseRenderer
+      const textBlocks = msg.contentBlocks.textBlocks.map((block) => ({
+        ...block,
+        type: "paragraph" as const,
+      }))
+      return <ResponseRenderer textBlocks={textBlocks} codeBlocks={msg.contentBlocks.codeBlocks} />
     }
     return <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
   }
