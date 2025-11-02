@@ -1,0 +1,13 @@
+{
+  "name": "@zacai-atomic/convolutional-neural-network",
+  "version": "1.0.0",
+  "description": "convolutional-neural-network for ZacAi-Atomic",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": ["ai", "ml", "cnn"],
+  "author": "ZacAi-Atomic",
+  "license": "MIT"
+}

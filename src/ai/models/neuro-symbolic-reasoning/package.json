@@ -1,0 +1,13 @@
+{
+  "name": "@zacai-atomic/neuro-symbolic-reasoning",
+  "version": "1.0.0",
+  "description": "neuro-symbolic-reasoning for ZacAi-Atomic",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": ["ai", "ml", "neuro"],
+  "author": "ZacAi-Atomic",
+  "license": "MIT"
+}
