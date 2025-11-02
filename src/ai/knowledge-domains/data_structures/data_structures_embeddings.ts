@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./data_structures_pretrained_weights.json"
+import pretrained from "./data_structures_weights/data_structures_pretrained_weights.json"
 import { DATA_STRUCTURES_DOMAIN } from "./data_structures_constants"
 
 const EMBEDDING_DIM = 128
@@ -32,10 +32,10 @@ export const persistDataStructuresWeights = (weights: Record<string, number[]>) 
   )
   // In production, write to file system
   const { updateFile } = require("../../orchestration/fileWatcher")
-  updateFile(DATA_STRUCTURES_DOMAIN, "src/ai/data/data_structures/data_structures_pretrained_weights.json", content)
+  updateFile(DATA_STRUCTURES_DOMAIN, "src/ai/knowledge-domains/data_structures/data_structures_weights/data_structures_pretrained_weights.json", content)
   return {
     success: true,
-    path: "src/ai/data/data_structures/data_structures_pretrained_weights.json",
+    path: "src/ai/knowledge-domains/data_structures/data_structures_weights/data_structures_pretrained_weights.json",
   }
 }
 

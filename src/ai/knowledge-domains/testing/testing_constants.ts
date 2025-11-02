@@ -7,4 +7,4 @@
  */
 
 export const TESTING_DOMAIN = "testing"
-export const TESTING_VOCAB_PATH = "/src/ai/data/testing/testing_seedVocabulary.json"
+export const TESTING_VOCAB_PATH = "/src/ai/knowledge-domains/testing/testing_seeds/testing_seedVocabulary.json"

@@ -5,24 +5,25 @@
  * Provides automated and semi-automated repair capabilities.
  */
 
-import { registerDomain } from '../domainRegistry';
+import { domainRegistry } from '../domainRegistry';
 import fs from 'fs/promises';
 import path from 'path';
 
 const DOMAIN_NAME = 'repair';
 const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+const SEEDS_DIR = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`);
 
 /**
  * Load all seed data for repair domain
  */
 async function loadSeedData(): Promise<any[]> {
   try {
-    const files = await fs.readdir(DOMAIN_DIR);
+    const files = await fs.readdir(SEEDS_DIR);
     const jsonFiles = files.filter(f => f.endsWith('.json'));
     
     const allConcepts: any[] = [];
     for (const file of jsonFiles) {
-      const filePath = path.join(DOMAIN_DIR, file);
+      const filePath = path.join(SEEDS_DIR, file);
       const content = await fs.readFile(filePath, 'utf-8');
       const data = JSON.parse(content);
       
@@ -87,9 +88,9 @@ async function query(prompt: string): Promise<any> {
 }
 
 /**
- * Initialize the repair domain
+ * Initialize and register the repair domain
  */
-async function repairInit(): Promise<void> {
+export const repairInit = async () => {
   try {
     console.log('[Repair] Initializing domain...');
     
@@ -102,31 +103,27 @@ async function repairInit(): Promise<void> {
     console.log('[Repair] Domain initialized successfully');
   } catch (error) {
     console.error('[Repair] Initialization error:', error);
-    throw error;
   }
-}
 
-// Register the domain
-registerDomain({
+  // Register domain files for tracking;
+
+};
+
+// Register the domain with the unified registry
+domainRegistry.registerDomain({
   name: DOMAIN_NAME,
   displayName: 'Repair & Debugging',
   description: 'Error fixing, code repair, debugging strategies, and self-healing operations',
-  query,
-  tags: ['repair', 'debugging', 'error-fixing', 'troubleshooting', 'self-healing'],
-  category: 'development',
-  priority: 9,
-  capabilities: [
-    'error diagnosis',
-    'automated repair',
-    'debugging guidance',
-    'self-healing strategies',
-    'root cause analysis',
-    'patch generation',
-    'recovery procedures'
-  ]
+  atomicLevel: 'molecule',
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
 });
 
-// Initialize domain asynchronously
+// Auto-initialize when imported
 void repairInit();
 
-export { query, loadSeedData, repairInit };
+export default repairInit;
+export { query, loadSeedData };

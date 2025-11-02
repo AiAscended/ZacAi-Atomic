@@ -7,10 +7,10 @@
  */
 
 export const PROGRAMMING_DOMAIN = "programming"
-export const PROGRAMMING_VOCAB_PATH = "/src/ai/data/programming/programming_seedVocabulary.json"
-export const PROGRAMMING_LEARNED_DATA_PATH = "/src/ai/data/programming/programming_learnedData.json"
-export const PROGRAMMING_WEIGHTS_PATH = "/src/ai/data/programming/programming_pretrained_weights.json"
-export const PROGRAMMING_TRAINING_WEIGHTS_PATH = "/src/ai/data/programming/programming_trainingWeights.bin"
+export const PROGRAMMING_VOCAB_PATH = "/src/ai/knowledge-domains/programming/programming_seeds/programming_seedVocabulary.json"
+export const PROGRAMMING_LEARNED_DATA_PATH = "/src/ai/knowledge-domains/programming/programming_learned/programming_learnedData.json"
+export const PROGRAMMING_WEIGHTS_PATH = "/src/ai/knowledge-domains/programming/programming_weights/programming_pretrained_weights.json"
+export const PROGRAMMING_TRAINING_WEIGHTS_PATH = "/src/ai/knowledge-domains/programming/programming_weights/programming_trainingWeights.bin"
 
 // Programming concepts
 export const PROGRAMMING_CONCEPTS = [

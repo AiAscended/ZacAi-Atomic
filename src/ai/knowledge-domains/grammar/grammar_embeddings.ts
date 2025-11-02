@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./grammar_pretrained_weights.json"
+import pretrained from "./grammar_weights/grammar_pretrained_weights.json"
 import { GRAMMAR_DOMAIN } from "./grammar_constants"
 import { updateFile } from "../dataRegistry"
 
@@ -38,7 +38,7 @@ export const persistGrammarWeights = (weights: Record<string, number[]>) => {
       null,
       2,
     )
-    updateFile(GRAMMAR_DOMAIN, "src/ai/data/grammar/grammar_pretrained_weights.json", content)
+    updateFile(GRAMMAR_DOMAIN, "src/ai/knowledge-domains/grammar/grammar_weights/grammar_pretrained_weights.json", content)
     return true
   } catch (e) {
     return false

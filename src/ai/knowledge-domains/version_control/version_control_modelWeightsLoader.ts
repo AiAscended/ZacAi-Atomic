@@ -9,7 +9,7 @@
 import { storageAdapter } from "../storageAdapter"
 
 export const versionControlLoadWeights = async (
-  path = "/src/ai/data/version_control/version_control_trainingWeights.bin",
+  path = "/src/ai/knowledge-domains/version_control/version_control_weights/version_control_trainingWeights.bin",
 ) => {
   try {
     const buffer = await storageAdapter.readFile(path)

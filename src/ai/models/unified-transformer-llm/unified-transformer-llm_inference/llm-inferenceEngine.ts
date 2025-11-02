@@ -3,11 +3,11 @@
  * Performs inference and forward passes for text generation
  */
 
-import { LLMTokenizer } from '../llm-model/llm-tokenizer';
-import { LLMEmbedding } from '../llm-model/llm-embedding';
-import { LLMDecoder } from '../llm-model/llm-decoder';
-import { LLMOutputHead } from '../llm-model/llm-outputHead';
-import type { LLMModelConfig } from '../llm-config/llm-modelConfig';
+import { LLMTokenizer } from '../unified-transformer-llm_model/llm-tokenizer';
+import { LLMEmbedding } from '../unified-transformer-llm_model/llm-embedding';
+import { LLMDecoder } from '../unified-transformer-llm_model/llm-decoder';
+import { LLMOutputHead } from '../unified-transformer-llm_model/llm-outputHead';
+import type { LLMModelConfig } from '../unified-transformer-llm_config/llm-modelConfig';
 
 export class LLMInferenceEngine {
   private config: LLMModelConfig;

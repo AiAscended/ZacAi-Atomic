@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/security/security_inferenceController.ts
+ * File: src/ai/knowledge-domains/security/security_inferenceController.ts
  * Purpose: Security domain inference pipeline wrapper
  * Depends on: security_tokenizer.ts, security_semanticAnalyzer.ts
  * Depended on by: security_integrationAPI.ts

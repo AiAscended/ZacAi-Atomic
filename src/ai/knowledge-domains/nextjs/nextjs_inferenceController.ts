@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/nextjs/nextjs_inferenceController.ts
+ * File: src/ai/knowledge-domains/nextjs/nextjs_inferenceController.ts
  * Purpose: Run inference for Next.js domain queries
  * Depends on: nextjs_parser.ts, nextjs_semanticAnalyzer.ts, nextjs_embeddings.ts
  * Depended on by: nextjs_integrationAPI.ts

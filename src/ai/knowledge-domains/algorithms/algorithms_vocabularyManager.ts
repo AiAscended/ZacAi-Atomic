@@ -9,7 +9,7 @@
 import { safeParseJSON } from "./algorithms_utils"
 import { storageAdapter } from "../storageAdapter"
 
-export const loadAlgorithmsSeedVocabulary = async (path = "/src/ai/data/algorithms/algorithms_seedVocabulary.json") => {
+export const loadAlgorithmsSeedVocabulary = async (path = "/src/ai/knowledge-domains/algorithms/algorithms_seeds/algorithms_seedVocabulary.json") => {
   try {
     const content = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(content, { vocab: [] })

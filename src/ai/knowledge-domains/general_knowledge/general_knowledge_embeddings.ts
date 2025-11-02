@@ -1,4 +1,4 @@
-import pretrained from './general_knowledge_pretrained_weights.json';
+import pretrained from './general_knowledge_weights/general_knowledge_pretrained_weights.json';
 import { GENERAL_DOMAIN } from './general_knowledge_constants';
 import { updateFile } from '../dataRegistry';
 
@@ -30,7 +30,7 @@ export const persistGeneralWeights = (weights: Record<string, number[]>) => {
       null,
       2
     );
-    updateFile(GENERAL_DOMAIN, 'src/ai/data/general/general_pretrained_weights.json', content);
+    updateFile(GENERAL_DOMAIN, 'src/ai/knowledge-domains/general/general_weights/general_pretrained_weights.json', content);
     return true;
   } catch (e) {
     return false;

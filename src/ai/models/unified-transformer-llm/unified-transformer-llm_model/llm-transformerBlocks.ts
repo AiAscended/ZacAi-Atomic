@@ -69,11 +69,13 @@ export class LLMTransformerBlock {
   
   /**
    * Initialize attention weight matrices for all heads
+   * Creates matrices of shape [outDim, inDim] for correct matmul with transposed weights
    */
   private initializeAttentionWeights(numHeads: number, inDim: number, outDim: number): number[][][] {
     const weights: number[][][] = [];
     for (let h = 0; h < numHeads; h++) {
-      weights.push(this.initializeMatrix(inDim, outDim));
+      // Swap dimensions: we want [outDim, inDim] so transpose gives us [inDim, outDim]
+      weights.push(this.initializeMatrix(outDim, inDim));
     }
     return weights;
   }

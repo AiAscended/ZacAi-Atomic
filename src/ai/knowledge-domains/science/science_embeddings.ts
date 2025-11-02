@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./science_pretrained_weights.json"
+import pretrained from "./science_weights/science_pretrained_weights.json"
 import { SCIENCE_DOMAIN } from "./science_constants"
 import { updateFile } from "../dataRegistry"
 
@@ -38,7 +38,7 @@ export const persistScienceWeights = (weights: Record<string, number[]>) => {
       null,
       2,
     )
-    updateFile(SCIENCE_DOMAIN, "src/ai/data/science/science_pretrained_weights.json", content)
+    updateFile(SCIENCE_DOMAIN, "src/ai/knowledge-domains/science/science_weights/science_pretrained_weights.json", content)
     return true
   } catch (e) {
     return false

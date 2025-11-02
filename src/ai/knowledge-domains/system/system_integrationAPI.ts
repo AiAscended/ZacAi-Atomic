@@ -5,7 +5,7 @@
  * and core system operations.
  */
 
-import { registerDomain } from '../domainRegistry';
+import { domainRegistry } from '../domainRegistry';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -115,23 +115,16 @@ async function systemInit(): Promise<void> {
 }
 
 // Register the domain
-registerDomain({
+domainRegistry.registerDomain({
   name: DOMAIN_NAME,
-  displayName: 'System Operations',
-  description: 'System configuration, deployment, environment setup, and dependencies',
-  query,
-  tags: ['system', 'config', 'deployment', 'infrastructure', 'operations'],
-  category: 'operations',
-  priority: 6,
-  capabilities: [
-    'configuration management',
-    'deployment automation',
-    'environment setup',
-    'dependency management',
-    'system monitoring',
-    'resource management',
-    'service orchestration'
-  ]
+  displayName: "System",
+  description: "System-level operations, configuration, and management",
+  atomicLevel: "organ",
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
 });
 
 // Initialize domain asynchronously

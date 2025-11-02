@@ -6,49 +6,31 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerDomain } from "../registry"
-import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
+import path from 'path'
+
+import { domainRegistry } from '../domainRegistry'
 import { ENVIRONMENT_DOMAIN } from "./environment_constants"
 import { loadEnvironmentSeedVocabulary } from "./environment_vocabularyManager"
 import { environmentRunInference } from "./environment_inferenceController"
 import { environmentRunTrainingEpoch } from "./environment_trainingController"
 
+const DOMAIN_NAME = 'environment';
+const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+
 export const environmentInit = async () => {
   await loadEnvironmentSeedVocabulary()
 
-  registerDomainFiles(ENVIRONMENT_DOMAIN, [
-    "src/ai/data/environment/environment_seedVocabulary.json",
-    "src/ai/data/environment/environment_learnedData.json",
-    "src/ai/data/environment/environment_webDocReferences.json",
-    "src/ai/data/environment/environment_trainingWeights.bin",
-    "src/ai/data/environment/environment_pretrained_weights.json",
-    "src/ai/data/environment/environment_tokens.ts",
-    "src/ai/data/environment/environment_tokenMap.ts",
-    "src/ai/data/environment/environment_embeddings.ts",
-    "src/ai/data/environment/environment_tokenizer.ts",
-    "src/ai/data/environment/environment_parser.ts",
-    "src/ai/data/environment/environment_semanticAnalyzer.ts",
-    "src/ai/data/environment/environment_vocabularyManager.ts",
-    "src/ai/data/environment/environment_learnedDataManager.ts",
-    "src/ai/data/environment/environment_inferenceController.ts",
-    "src/ai/data/environment/environment_trainingController.ts",
-    "src/ai/data/environment/environment_modelWeightsLoader.ts",
-    "src/ai/data/environment/environment_meta.json",
-  ])
-
-  try {
-    watchDomainFiles(ENVIRONMENT_DOMAIN)
-  } catch {}
-
-  registerDomain({
-    name: ENVIRONMENT_DOMAIN,
-    version: "1.0.0",
-    initialize: async () => {
-      await loadEnvironmentSeedVocabulary()
-    },
-    query: async (input: string) => environmentRunInference(input),
-    train: async (opts?: Record<string, unknown>) => environmentRunTrainingEpoch(opts as { epochs?: number }),
-  })
+  domainRegistry.registerDomain({
+  name: ENVIRONMENT_DOMAIN,
+  displayName: 'Environment',
+  description: 'Development environment setup, configuration, and tooling',
+  atomicLevel: 'molecule',
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
+});
 }
 
 void environmentInit()

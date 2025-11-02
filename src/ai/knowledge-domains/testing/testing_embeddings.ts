@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./testing_pretrained_weights.json"
+import pretrained from "./testing_weights/testing_pretrained_weights.json"
 import { TESTING_DOMAIN } from "./testing_constants"
 import { updateFile } from "../dataRegistry"
 
@@ -38,7 +38,7 @@ export const persistTestingWeights = (weights: Record<string, number[]>) => {
       null,
       2,
     )
-    updateFile(TESTING_DOMAIN, "src/ai/data/testing/testing_pretrained_weights.json", content)
+    updateFile(TESTING_DOMAIN, "src/ai/knowledge-domains/testing/testing_weights/testing_pretrained_weights.json", content)
     return true
   } catch (e) {
     return false

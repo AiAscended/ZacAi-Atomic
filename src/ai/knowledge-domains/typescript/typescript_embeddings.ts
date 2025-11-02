@@ -1,4 +1,4 @@
-import pretrained from './typescript_pretrained_weights.json';
+import pretrained from './typescript_weights/typescript_pretrained_weights.json';
 import { TYPESCRIPT_DOMAIN } from './typescript_constants';
 import { updateFile } from '../dataRegistry';
 
@@ -38,7 +38,7 @@ export const persistTypeScriptWeights = (weights: Record<string, number[]>) => {
     );
     updateFile(
       TYPESCRIPT_DOMAIN,
-      'src/ai/data/typescript/typescript_pretrained_weights.json',
+      'src/ai/knowledge-domains/typescript/typescript_weights/typescript_pretrained_weights.json',
       content
     );
     return true;

@@ -2,7 +2,7 @@ import { storageAdapter } from "../storageAdapter"
 import { safeParseJSON } from "./internet_search_utils"
 
 export const loadInternetSearchSeedVocabulary = async (
-  path = "/src/ai/data/internet_search/internet_search_seedVocabulary.json",
+  path = "/src/ai/knowledge-domains/internet_search/internet_search_seeds/internet_search_seedVocabulary.json",
 ) => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")

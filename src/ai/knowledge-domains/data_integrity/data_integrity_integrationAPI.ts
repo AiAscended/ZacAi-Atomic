@@ -5,24 +5,25 @@
  * Ensures data reliability and integrity across the system.
  */
 
-import { registerDomain } from '../domainRegistry';
+import { domainRegistry } from '../domainRegistry';
 import fs from 'fs/promises';
 import path from 'path';
 
 const DOMAIN_NAME = 'data_integrity';
 const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+const SEEDS_DIR = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`);
 
 /**
  * Load all seed data for data integrity domain
  */
 async function loadSeedData(): Promise<any[]> {
   try {
-    const files = await fs.readdir(DOMAIN_DIR);
+    const files = await fs.readdir(SEEDS_DIR);
     const jsonFiles = files.filter(f => f.endsWith('.json'));
     
     const allConcepts: any[] = [];
     for (const file of jsonFiles) {
-      const filePath = path.join(DOMAIN_DIR, file);
+      const filePath = path.join(SEEDS_DIR, file);
       const content = await fs.readFile(filePath, 'utf-8');
       const data = JSON.parse(content);
       
@@ -88,9 +89,9 @@ async function query(prompt: string): Promise<any> {
 }
 
 /**
- * Initialize the data integrity domain
+ * Initialize and register the data integrity domain
  */
-async function dataIntegrityInit(): Promise<void> {
+export const dataIntegrityInit = async () => {
   try {
     console.log('[DataIntegrity] Initializing domain...');
     
@@ -104,31 +105,25 @@ async function dataIntegrityInit(): Promise<void> {
     console.log('[DataIntegrity] Domain initialized successfully');
   } catch (error) {
     console.error('[DataIntegrity] Initialization error:', error);
-    throw error;
   }
-}
 
-// Register the domain
-registerDomain({
+  // Register domain files for tracking;
+
+  // Register the domain with the registry
+  domainRegistry.registerDomain({
   name: DOMAIN_NAME,
   displayName: 'Data Integrity',
-  description: 'Data validation, consistency checks, quality assurance, and error detection',
-  query,
-  tags: ['data', 'validation', 'quality', 'integrity', 'verification'],
-  category: 'data',
-  priority: 8,
-  capabilities: [
-    'data validation',
-    'consistency checks',
-    'quality metrics',
-    'error detection',
-    'anomaly detection',
-    'duplicate detection',
-    'completeness verification'
-  ]
+  description: 'Data Integrity domain capabilities',
+  atomicLevel: 'molecule',
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
 });
+};
 
-// Initialize domain asynchronously
+// Auto-initialize when imported
 void dataIntegrityInit();
 
-export { query, loadSeedData, dataIntegrityInit };
+export default dataIntegrityInit;

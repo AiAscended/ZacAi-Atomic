@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./algorithms_pretrained_weights.json"
+import pretrained from "./algorithms_weights/algorithms_pretrained_weights.json"
 import { ALGORITHMS_DOMAIN } from "./algorithms_constants"
 
 const EMBEDDING_DIM = 128
@@ -26,10 +26,10 @@ export const persistAlgorithmsWeights = (weights: Record<string, number[]>) => {
     2,
   )
   const { updateFile } = require("../../orchestration/fileWatcher")
-  updateFile(ALGORITHMS_DOMAIN, "src/ai/data/algorithms/algorithms_pretrained_weights.json", content)
+  updateFile(ALGORITHMS_DOMAIN, "src/ai/knowledge-domains/algorithms/algorithms_weights/algorithms_pretrained_weights.json", content)
   return {
     success: true,
-    path: "src/ai/data/algorithms/algorithms_pretrained_weights.json",
+    path: "src/ai/knowledge-domains/algorithms/algorithms_weights/algorithms_pretrained_weights.json",
   }
 }
 

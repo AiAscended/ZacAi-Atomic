@@ -10,7 +10,7 @@ import { safeParseJSON } from "./version_control_utils"
 import { storageAdapter } from "../storageAdapter"
 
 export const loadVersionControlSeedVocabulary = async (
-  path = "/src/ai/data/version_control/version_control_seedVocabulary.json",
+  path = "/src/ai/knowledge-domains/version_control/version_control_seeds/version_control_seedVocabulary.json",
 ) => {
   try {
     const content = await storageAdapter.readFile(path, "utf-8")

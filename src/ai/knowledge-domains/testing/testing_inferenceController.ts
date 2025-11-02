@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/testing/testing_inferenceController.ts
+ * File: src/ai/knowledge-domains/testing/testing_inferenceController.ts
  * Purpose: Testing domain inference pipeline wrapper
  * Depends on: testing_tokenizer.ts, testing_semanticAnalyzer.ts
  * Depended on by: testing_integrationAPI.ts

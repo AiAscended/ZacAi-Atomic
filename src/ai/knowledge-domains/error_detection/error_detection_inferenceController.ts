@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/error_detection/error_detection_inferenceController.ts
+ * File: src/ai/knowledge-domains/error_detection/error_detection_inferenceController.ts
  * Purpose: Error detection domain inference pipeline wrapper
  * Depends on: error_detection_tokenizer.ts, error_detection_semanticAnalyzer.ts
  * Depended on by: error_detection_integrationAPI.ts
