@@ -7,4 +7,4 @@
  */
 
 export const DATA_STRUCTURES_DOMAIN = "data_structures"
-export const DATA_STRUCTURES_VOCAB_PATH = "/src/ai/data/data_structures/data_structures_seedVocabulary.json"
+export const DATA_STRUCTURES_VOCAB_PATH = "/src/ai/knowledge-domains/data_structures/data_structures_seeds/data_structures_seedVocabulary.json"

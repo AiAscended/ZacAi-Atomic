@@ -7,4 +7,4 @@
  */
 
 export const CODE_REVIEW_DOMAIN = "code_review"
-export const CODE_REVIEW_VOCAB_PATH = "/src/ai/data/code_review/code_review_seedVocabulary.json"
+export const CODE_REVIEW_VOCAB_PATH = "/src/ai/knowledge-domains/code_review/code_review_seeds/code_review_seedVocabulary.json"

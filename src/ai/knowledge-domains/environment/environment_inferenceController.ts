@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/environment/environment_inferenceController.ts
+ * File: src/ai/knowledge-domains/environment/environment_inferenceController.ts
  * Purpose: Environment domain inference pipeline wrapper
  * Depends on: environment_tokenizer.ts, environment_semanticAnalyzer.ts
  * Depended on by: environment_integrationAPI.ts

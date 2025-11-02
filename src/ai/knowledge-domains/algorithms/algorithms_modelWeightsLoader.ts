@@ -8,7 +8,7 @@
 
 import { storageAdapter } from "../storageAdapter"
 
-export const algorithmsLoadWeights = async (path = "/src/ai/data/algorithms/algorithms_trainingWeights.bin") => {
+export const algorithmsLoadWeights = async (path = "/src/ai/knowledge-domains/algorithms/algorithms_weights/algorithms_trainingWeights.bin") => {
   try {
     const buffer = await storageAdapter.readFile(path)
     return { success: true, weights: buffer }

@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/algorithms/algorithms_inferenceController.ts
+ * File: src/ai/knowledge-domains/algorithms/algorithms_inferenceController.ts
  * Purpose: Algorithms domain inference pipeline wrapper
  * Depends on: algorithms_tokenizer.ts, algorithms_semanticAnalyzer.ts
  * Depended on by: algorithms_integrationAPI.ts

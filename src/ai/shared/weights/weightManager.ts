@@ -278,7 +278,7 @@ class WeightManagerSystem {
       entry.loaded = true;
       entry.lastLoaded = new Date();
 
-      return metadata;
+      return metadata || null;
     } catch (error) {
       console.error(`❌ Error loading weights for ${type}:${component}:`, error);
       return null;
@@ -346,7 +346,7 @@ class WeightManagerSystem {
   public getLatestTrainingDate(component: string, type: 'domain' | 'model'): string | null {
     const entry = this.getWeightEntry(component, type);
     
-    if (!entry || entry.trainedMetadata.length === 0) {
+    if (!entry || !entry.trainedMetadata || entry.trainedMetadata.length === 0) {
       return null;
     }
 

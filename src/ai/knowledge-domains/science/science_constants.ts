@@ -7,4 +7,4 @@
  */
 
 export const SCIENCE_DOMAIN = "science"
-export const SCIENCE_VOCAB_PATH = "/src/ai/data/science/science_seedVocabulary.json"
+export const SCIENCE_VOCAB_PATH = "/src/ai/knowledge-domains/science/science_seeds/science_seedVocabulary.json"

@@ -6,49 +6,31 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerDomain } from "../registry"
+import path from 'path'
+
+import { domainRegistry } from '../domainRegistry'
 import { TESTING_DOMAIN } from "./testing_constants"
 import { loadTestingSeedVocabulary } from "./testing_vocabularyManager"
 import { testingRunInference } from "./testing_inferenceController"
 import { testingRunTrainingEpoch } from "./testing_trainingController"
-import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
+
+const DOMAIN_NAME = 'testing';
+const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
 
 export const testingInit = async () => {
   await loadTestingSeedVocabulary()
 
-  registerDomainFiles(TESTING_DOMAIN, [
-    "src/ai/data/testing/testing_seedVocabulary.json",
-    "src/ai/data/testing/testing_learnedData.json",
-    "src/ai/data/testing/testing_webDocReferences.json",
-    "src/ai/data/testing/testing_trainingWeights.bin",
-    "src/ai/data/testing/testing_pretrained_weights.json",
-    "src/ai/data/testing/testing_tokens.ts",
-    "src/ai/data/testing/testing_tokenMap.ts",
-    "src/ai/data/testing/testing_embeddings.ts",
-    "src/ai/data/testing/testing_tokenizer.ts",
-    "src/ai/data/testing/testing_parser.ts",
-    "src/ai/data/testing/testing_semanticAnalyzer.ts",
-    "src/ai/data/testing/testing_vocabularyManager.ts",
-    "src/ai/data/testing/testing_learnedDataManager.ts",
-    "src/ai/data/testing/testing_inferenceController.ts",
-    "src/ai/data/testing/testing_trainingController.ts",
-    "src/ai/data/testing/testing_modelWeightsLoader.ts",
-    "src/ai/data/testing/testing_meta.json",
-  ])
-
-  try {
-    watchDomainFiles(TESTING_DOMAIN)
-  } catch (e) {}
-
-  registerDomain({
-    name: TESTING_DOMAIN,
-    version: "0.1",
-    initialize: async () => {
-      await loadTestingSeedVocabulary()
-    },
-    query: async (input: string) => testingRunInference(input),
-    train: async (opts?: Record<string, unknown>) => testingRunTrainingEpoch(opts as { epochs?: number }),
-  })
+  domainRegistry.registerDomain({
+  name: TESTING_DOMAIN,
+  displayName: 'Testing',
+  description: 'Test design, test-driven development, and quality assurance',
+  atomicLevel: 'molecule',
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
+});
 }
 
 void testingInit()

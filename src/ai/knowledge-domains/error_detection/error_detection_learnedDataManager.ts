@@ -10,7 +10,7 @@ import { safeParseJSON } from "./error_detection_utils"
 import { storageAdapter } from "../storageAdapter"
 
 export const loadErrorDetectionLearnedData = async (
-  path = "/src/ai/data/error_detection/error_detection_learnedData.json",
+  path = "/src/ai/knowledge-domains/error_detection/error_detection_learned/error_detection_learnedData.json",
 ) => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
@@ -22,7 +22,7 @@ export const loadErrorDetectionLearnedData = async (
 
 export const saveErrorDetectionLearnedData = async (
   data: unknown,
-  path = "/src/ai/data/error_detection/error_detection_learnedData.json",
+  path = "/src/ai/knowledge-domains/error_detection/error_detection_learned/error_detection_learnedData.json",
 ) => {
   try {
     await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))

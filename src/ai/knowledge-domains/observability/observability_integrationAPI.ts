@@ -5,24 +5,25 @@
  * Provides insights into system behavior and performance.
  */
 
-import { registerDomain } from '../domainRegistry';
+import { domainRegistry } from '../domainRegistry';
 import fs from 'fs/promises';
 import path from 'path';
 
 const DOMAIN_NAME = 'observability';
 const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+const SEEDS_DIR = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`);
 
 /**
  * Load all seed data for observability domain
  */
 async function loadSeedData(): Promise<any[]> {
   try {
-    const files = await fs.readdir(DOMAIN_DIR);
+    const files = await fs.readdir(SEEDS_DIR);
     const jsonFiles = files.filter(f => f.endsWith('.json'));
     
     const allConcepts: any[] = [];
     for (const file of jsonFiles) {
-      const filePath = path.join(DOMAIN_DIR, file);
+      const filePath = path.join(SEEDS_DIR, file);
       const content = await fs.readFile(filePath, 'utf-8');
       const data = JSON.parse(content);
       
@@ -87,9 +88,9 @@ async function query(prompt: string): Promise<any> {
 }
 
 /**
- * Initialize the observability domain
+ * Initialize and register the observability domain
  */
-async function observabilityInit(): Promise<void> {
+export const observabilityInit = async () => {
   try {
     console.log('[Observability] Initializing domain...');
     
@@ -102,31 +103,25 @@ async function observabilityInit(): Promise<void> {
     console.log('[Observability] Domain initialized successfully');
   } catch (error) {
     console.error('[Observability] Initialization error:', error);
-    throw error;
   }
-}
 
-// Register the domain
-registerDomain({
+  // Register domain files for tracking;
+
+  // Register the domain with the registry
+  domainRegistry.registerDomain({
   name: DOMAIN_NAME,
   displayName: 'Observability',
-  description: 'System monitoring, logging, tracing, metrics, and alerting',
-  query,
-  tags: ['monitoring', 'logging', 'metrics', 'tracing', 'alerting', 'performance'],
-  category: 'operations',
-  priority: 7,
-  capabilities: [
-    'performance monitoring',
-    'error tracking',
-    'distributed tracing',
-    'metrics collection',
-    'log aggregation',
-    'alerting',
-    'dashboard creation'
-  ]
+  description: 'Observability domain capabilities',
+  atomicLevel: 'molecule',
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
 });
+};
 
-// Initialize domain asynchronously
+// Auto-initialize when imported
 void observabilityInit();
 
-export { query, loadSeedData, observabilityInit };
+export default observabilityInit;

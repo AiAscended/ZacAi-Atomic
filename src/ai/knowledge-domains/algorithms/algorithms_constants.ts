@@ -7,4 +7,4 @@
  */
 
 export const ALGORITHMS_DOMAIN = "algorithms"
-export const ALGORITHMS_VOCAB_PATH = "/src/ai/data/algorithms/algorithms_seedVocabulary.json"
+export const ALGORITHMS_VOCAB_PATH = "/src/ai/knowledge-domains/algorithms/algorithms_seeds/algorithms_seedVocabulary.json"

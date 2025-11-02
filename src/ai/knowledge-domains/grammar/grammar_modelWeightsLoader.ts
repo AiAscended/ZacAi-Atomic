@@ -8,7 +8,7 @@
 
 import { storageAdapter } from "../storageAdapter"
 
-export const grammarLoadWeights = async (path = "/src/ai/data/grammar/grammar_trainingWeights.bin") => {
+export const grammarLoadWeights = async (path = "/src/ai/knowledge-domains/grammar/grammar_weights/grammar_trainingWeights.bin") => {
   try {
     const raw = await storageAdapter.readFile(path)
     return raw

@@ -10,7 +10,7 @@ import { safeParseJSON } from "./documentation_utils"
 import { storageAdapter } from "../storageAdapter"
 
 export const loadDocumentationLearnedData = async (
-  path = "/src/ai/data/documentation/documentation_learnedData.json",
+  path = "/src/ai/knowledge-domains/documentation/documentation_learned/documentation_learnedData.json",
 ) => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
@@ -22,7 +22,7 @@ export const loadDocumentationLearnedData = async (
 
 export const saveDocumentationLearnedData = async (
   data: unknown,
-  path = "/src/ai/data/documentation/documentation_learnedData.json",
+  path = "/src/ai/knowledge-domains/documentation/documentation_learned/documentation_learnedData.json",
 ) => {
   try {
     await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))

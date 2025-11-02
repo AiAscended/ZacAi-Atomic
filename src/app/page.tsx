@@ -38,6 +38,7 @@ export default function HomePage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isInitializing, setIsInitializing] = useState(true)
   const [aiReady, setAiReady] = useState(false)
   const [systemStatus, setSystemStatus] = useState("Initializing AI system...")
   const [sessionId, setSessionId] = useState("")
@@ -71,7 +72,7 @@ export default function HomePage() {
   useEffect(() => {
     async function initializeSession() {
       setSystemStatus("Connecting to AI system...")
-      setIsLoading(true)
+      setIsInitializing(true)
       try {
         const res = await fetch("/api/chat", {
           method: "POST",
@@ -86,7 +87,7 @@ export default function HomePage() {
       } catch {
         setSystemStatus("Failed to initialize AI system")
       } finally {
-        setIsLoading(false)
+        setIsInitializing(false)
       }
     }
     initializeSession()

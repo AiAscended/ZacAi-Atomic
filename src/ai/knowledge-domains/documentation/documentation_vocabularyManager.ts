@@ -10,7 +10,7 @@ import { safeParseJSON } from "./documentation_utils"
 import { storageAdapter } from "../storageAdapter"
 
 export const loadDocumentationSeedVocabulary = async (
-  path = "/src/ai/data/documentation/documentation_seedVocabulary.json",
+  path = "/src/ai/knowledge-domains/documentation/documentation_seeds/documentation_seedVocabulary.json",
 ) => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")

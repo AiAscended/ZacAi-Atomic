@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/version_control/version_control_inferenceController.ts
+ * File: src/ai/knowledge-domains/version_control/version_control_inferenceController.ts
  * Purpose: Version control domain inference pipeline wrapper
  * Depends on: version_control_tokenizer.ts, version_control_semanticAnalyzer.ts
  * Depended on by: version_control_integrationAPI.ts

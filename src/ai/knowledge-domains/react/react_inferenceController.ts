@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/react/react_inferenceController.ts
+ * File: src/ai/knowledge-domains/react/react_inferenceController.ts
  * Purpose: Run inference for React domain queries
  * Depends on: react_parser.ts, react_semanticAnalyzer.ts, react_embeddings.ts
  * Depended on by: react_integrationAPI.ts

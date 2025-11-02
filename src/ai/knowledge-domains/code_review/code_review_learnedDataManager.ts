@@ -9,7 +9,7 @@
 import { safeParseJSON } from "./code_review_utils"
 import { storageAdapter } from "../storageAdapter"
 
-export const loadCodeReviewLearnedData = async (path = "/src/ai/data/code_review/code_review_learnedData.json") => {
+export const loadCodeReviewLearnedData = async (path = "/src/ai/knowledge-domains/code_review/code_review_learned/code_review_learnedData.json") => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { notes: [], concepts: {} })
@@ -20,7 +20,7 @@ export const loadCodeReviewLearnedData = async (path = "/src/ai/data/code_review
 
 export const saveCodeReviewLearnedData = async (
   data: unknown,
-  path = "/src/ai/data/code_review/code_review_learnedData.json",
+  path = "/src/ai/knowledge-domains/code_review/code_review_learned/code_review_learnedData.json",
 ) => {
   try {
     await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))

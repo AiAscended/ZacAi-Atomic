@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./documentation_pretrained_weights.json"
+import pretrained from "./documentation_weights/documentation_pretrained_weights.json"
 import { DOCUMENTATION_DOMAIN } from "./documentation_constants"
 import { updateFile } from "../dataRegistry"
 
@@ -38,7 +38,7 @@ export const persistDocumentationWeights = (weights: Record<string, number[]>) =
       null,
       2,
     )
-    updateFile(DOCUMENTATION_DOMAIN, "src/ai/data/documentation/documentation_pretrained_weights.json", content)
+    updateFile(DOCUMENTATION_DOMAIN, "src/ai/knowledge-domains/documentation/documentation_weights/documentation_pretrained_weights.json", content)
     return true
   } catch (e) {
     return false
