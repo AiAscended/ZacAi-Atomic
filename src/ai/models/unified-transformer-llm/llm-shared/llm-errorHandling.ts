@@ -40,9 +40,9 @@ export class LLMConfigError extends LLMError {
 
 export function handleLLMError(error: unknown): void {
   if (error instanceof LLMError) {
-    console.error(\`[\${error.name}] \${error.message}\`);
+    console.error(`[${error.name}] ${error.message}`);
   } else if (error instanceof Error) {
-    console.error(\`[Error] \${error.message}\`);
+    console.error(`[Error] ${error.message}`);
   } else {
     console.error('Unknown error occurred');
   }

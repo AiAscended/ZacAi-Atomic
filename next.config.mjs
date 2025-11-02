@@ -47,7 +47,6 @@ const nextConfig = {
       '@/hooks': '/workspaces/ZacAi-Atomic/src/hooks',
       '@/styles': '/workspaces/ZacAi-Atomic/src/styles',
       '@/ai': '/workspaces/ZacAi-Atomic/src/ai',
-      '@/ai-models': '/workspaces/ZacAi-Atomic/src/ai-models',
       '@/app': '/workspaces/ZacAi-Atomic/src/app',
     };
     

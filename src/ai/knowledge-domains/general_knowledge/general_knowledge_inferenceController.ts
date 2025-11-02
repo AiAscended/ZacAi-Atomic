@@ -1,6 +1,6 @@
 import { findSources } from "../url_lookup"
 import { scrapeURL } from "../../shared/tools/webScraper"
-import { GENERAL_DOMAIN } from "./general_constants"
+import { GENERAL_DOMAIN } from "./general_knowledge_constants"
 
 const stopWords = [
   "what",
@@ -48,7 +48,7 @@ const stopWords = [
 
 export const generalRunInference = async (input: string, _context?: any) => {
   const tokens = _context?.tokens || []
-  const embeddings = context?.embeddings || []
+  const embeddings = _context?.embeddings || []
   const inferenceResults = _context?.inferenceResults
   const sentiment = _context?.sentiment
   // TODO: Use userProfile for personalized responses

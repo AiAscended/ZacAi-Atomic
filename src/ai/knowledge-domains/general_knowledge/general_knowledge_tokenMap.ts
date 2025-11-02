@@ -1,4 +1,4 @@
-import TOKENS from './general_tokens';
+import TOKENS from './general_knowledge_tokens';
 
 const tokenToId = new Map<string, number>();
 const idToToken = new Map<number, string>();

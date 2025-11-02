@@ -21,25 +21,25 @@ export class LLMLogger {
 
   debug(message: string, ...args: any[]): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
-      console.debug(\`[\${this.prefix}] [DEBUG] \${message}\`, ...args);
+      console.debug(`[\${this.prefix}] [DEBUG] \${message}`, ...args);
     }
   }
 
   info(message: string, ...args: any[]): void {
     if (this.shouldLog(LogLevel.INFO)) {
-      console.info(\`[\${this.prefix}] [INFO] \${message}\`, ...args);
+      console.info(`[\${this.prefix}] [INFO] \${message}`, ...args);
     }
   }
 
   warn(message: string, ...args: any[]): void {
     if (this.shouldLog(LogLevel.WARN)) {
-      console.warn(\`[\${this.prefix}] [WARN] \${message}\`, ...args);
+      console.warn(`[\${this.prefix}] [WARN] \${message}`, ...args);
     }
   }
 
   error(message: string, ...args: any[]): void {
     if (this.shouldLog(LogLevel.ERROR)) {
-      console.error(\`[\${this.prefix}] [ERROR] \${message}\`, ...args);
+      console.error(`[\${this.prefix}] [ERROR] \${message}`, ...args);
     }
   }
 

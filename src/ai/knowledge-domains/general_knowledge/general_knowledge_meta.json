@@ -1,0 +1,99 @@
+{
+  "domain": {
+    "id": "general_knowledge",
+    "name": "General Knowledge",
+    "version": "1.0.0",
+    "type": "knowledge-domain",
+    "status": "production",
+    "priority": "medium",
+    "category": "general"
+  },
+  "description": "Handles general queries, common-sense reasoning, basic facts, and conversational responses. Acts as a fallback domain when no specific specialized domain matches the query.",
+  "expertise": [
+    "General conversational responses",
+    "Common-sense reasoning",
+    "Basic facts and general knowledge",
+    "Fallback responses",
+    "Cross-domain routing",
+    "Context understanding"
+  ],
+  "capabilities": {
+    "inference": true,
+    "training": true,
+    "learning": true,
+    "urlLookup": true,
+    "embedding": true,
+    "tokenization": true,
+    "scoring": true
+  },
+  "files": {
+    "config": "domain-instructions.yaml",
+    "constants": "general_knowledge_constants.ts",
+    "embeddings": "general_knowledge_embeddings.ts",
+    "inferenceController": "general_knowledge_inferenceController.ts",
+    "instructions": "general_knowledge_instructions.txt",
+    "integrationAPI": "general_knowledge_integrationAPI.ts",
+    "learnedData": "general_knowledge_learnedData.json",
+    "learnedDataManager": "general_knowledge_learnedDataManager.ts",
+    "modelWeightsLoader": "general_knowledge_modelWeightsLoader.ts",
+    "parser": "general_knowledge_parser.ts",
+    "pretrainedWeights": "general_knowledge_pretrained_weights.json",
+    "seedVocabulary": "general_knowledge_seedVocabulary.json",
+    "semanticAnalyzer": "general_knowledge_semanticAnalyzer.ts",
+    "tokenMap": "general_knowledge_tokenMap.ts",
+    "tokenizer": "general_knowledge_tokenizer.ts",
+    "tokens": "general_knowledge_tokens.ts",
+    "trainingController": "general_knowledge_trainingController.ts",
+    "trainingWeights": "general_knowledge_trainingWeights.bin",
+    "urlLookup": "general_knowledge_urlLookup.json",
+    "urlLookupModule": "general_knowledge_url_lookup.ts",
+    "utils": "general_knowledge_utils.ts",
+    "vocabularyManager": "general_knowledge_vocabularyManager.ts",
+    "webDocReferences": "general_knowledge_webDocReferences.json"
+  },
+  "dependencies": {
+    "shared": [
+      "@/ai/shared/tools/url-lookup-tool",
+      "@/ai/shared/tools/urlLookup",
+      "@/ai/orchestration/domainRouter"
+    ],
+    "models": [
+      "@/ai/models/unified-transformer-llm"
+    ]
+  },
+  "integration": {
+    "orchestration": true,
+    "pipeline": true,
+    "adminPanel": true,
+    "apiEndpoint": "/api/domains/general-knowledge"
+  },
+  "training": {
+    "enabled": true,
+    "schedule": "continuous",
+    "autoSave": true,
+    "learnedDataPath": "general_knowledge_learnedData.json",
+    "weightsPath": "general_knowledge_trainingWeights.bin",
+    "mergeStrategy": "incremental",
+    "validationRequired": true
+  },
+  "scoring": {
+    "confidenceThreshold": 0.3,
+    "relevanceThreshold": 0.5,
+    "coherenceThreshold": 0.6,
+    "trackSuccessfulRoutes": true,
+    "trackFailures": true
+  },
+  "performance": {
+    "avgInferenceTime": "150ms",
+    "maxTokens": 500,
+    "cacheEnabled": true,
+    "cacheTTL": 3600
+  },
+  "metadata": {
+    "author": "ZacAi-Atomic System",
+    "created": "2025-11-01",
+    "lastUpdated": "2025-11-01",
+    "maintainer": "AI System Administrator",
+    "documentation": "See domain-instructions.yaml for detailed configuration"
+  }
+}

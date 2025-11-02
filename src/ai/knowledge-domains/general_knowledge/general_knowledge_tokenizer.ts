@@ -1,4 +1,4 @@
-import { normalizeText } from './general_utils';
+import { normalizeText } from './general_knowledge_utils';
 
 export const generalTokenizer = (text: string) => {
   const t = normalizeText(text);

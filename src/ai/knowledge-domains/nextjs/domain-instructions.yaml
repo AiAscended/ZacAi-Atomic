@@ -1,0 +1,254 @@
+# Next.js Domain Instructions
+# Purpose: Governance, guidelines, and operational instructions for Next.js domain
+
+domain:
+  id: nextjs
+  name: Next.js
+  version: "1.0.0"
+  description: "Expert Next.js domain with App Router, Server Components, and 2025 best practices"
+
+# Core Principles
+principles:
+  - name: "App Router First"
+    rule: "Use App Router architecture (app/ directory) for all new projects"
+    priority: 1
+  
+  - name: "Server Components by Default"
+    rule: "Use Server Components unless interactivity is needed; mark Client Components with 'use client'"
+    priority: 2
+  
+  - name: "File-based Routing"
+    rule: "Follow Next.js file-system routing conventions: page.tsx, layout.tsx, route.ts"
+    priority: 3
+  
+  - name: "Performance Optimization"
+    rule: "Leverage Next.js built-in optimizations: Image, Font, Script components"
+    priority: 4
+
+# Supported Versions
+versions:
+  current: "15.5+"
+  minimum_supported: "14.0"
+  router_preference: "App Router"
+  
+# Next.js Folder Structure Best Practices
+folder_structure:
+  app_directory:
+    - "app/ - App Router root"
+    - "app/layout.tsx - Root layout"
+    - "app/page.tsx - Home page"
+    - "app/api/ - Route handlers"
+    - "app/[dynamic]/ - Dynamic routes"
+    - "app/(group)/ - Route groups"
+  
+  src_directory:
+    - "src/components/ - React components"
+    - "src/lib/ - Utility functions"
+    - "src/hooks/ - Custom React hooks"
+    - "src/styles/ - Global styles"
+  
+  public:
+    - "public/ - Static assets"
+
+# Domain-Specific Knowledge
+foundational_concepts:
+  rendering:
+    - "Server Components (default)"
+    - "Client Components ('use client')"
+    - "Static Site Generation (SSG)"
+    - "Server-Side Rendering (SSR)"
+    - "Incremental Static Regeneration (ISR)"
+  
+  routing:
+    - "File-based routing"
+    - "Dynamic routes [slug]"
+    - "Catch-all routes [...slug]"
+    - "Parallel routes @folder"
+    - "Intercepting routes (.)folder"
+  
+  data_fetching:
+    - "async/await in Server Components"
+    - "fetch with caching options"
+    - "Server Actions"
+    - "Route Handlers (API routes)"
+  
+  optimization:
+    - "Image optimization with next/image"
+    - "Font optimization with next/font"
+    - "Script optimization with next/script"
+    - "Metadata API for SEO"
+  
+  configuration:
+    - "next.config.js/mjs"
+    - "TypeScript configuration"
+    - "Environment variables"
+    - "Middleware"
+
+# Tool Configuration
+tools:
+  url_lookup:
+    enabled: true
+    sources:
+      - "Next.js Official Docs"
+      - "Vercel Guides"
+      - "Next.js GitHub"
+      - "React Documentation"
+    usage_guidelines:
+      - "Look up API documentation"
+      - "Find migration guides"
+      - "Check feature support"
+      - "Verify best practices"
+  
+  code_analyzer:
+    enabled: true
+    capabilities:
+      - "Next.js-specific linting"
+      - "Performance analysis"
+      - "Bundle size checking"
+      - "Accessibility validation"
+    usage_guidelines:
+      - "Validate routing structure"
+      - "Check for Client/Server component issues"
+      - "Identify performance bottlenecks"
+
+# Inference Guidelines
+inference:
+  input_processing:
+    - "Identify Next.js version context"
+    - "Determine App Router vs Pages Router"
+    - "Parse component types (Server/Client)"
+    - "Recognize routing patterns"
+  
+  reasoning_steps:
+    - "Determine if Server or Client Component is needed"
+    - "Apply appropriate data fetching method"
+    - "Use correct file naming conventions"
+    - "Implement proper error handling"
+  
+  output_formatting:
+    - "Include 'use client' directive when needed"
+    - "Add TypeScript types"
+    - "Include loading and error states"
+    - "Provide metadata configuration"
+  
+  validation:
+    - "Check file structure correctness"
+    - "Verify component type usage"
+    - "Ensure proper async/await usage"
+    - "Validate metadata API usage"
+
+# Code Generation Guidelines
+code_generation:
+  structure:
+    - "Use TypeScript for type safety"
+    - "Export components as default"
+    - "Include proper imports"
+    - "Add loading and error boundaries"
+  
+  style:
+    - "Use functional components"
+    - "Prefer Server Components"
+    - "Use async/await for data fetching"
+    - "Follow Next.js naming conventions"
+  
+  best_practices:
+    - "Minimize client-side JavaScript"
+    - "Use Image component for images"
+    - "Implement proper metadata"
+    - "Use environment variables securely"
+
+# Training Guidelines
+training:
+  data_sources:
+    - "Next.js official documentation"
+    - "Vercel examples repository"
+    - "Next.js GitHub issues and discussions"
+    - "App Router migration guides"
+    - "Performance optimization guides"
+  
+  focus_areas:
+    - "App Router patterns"
+    - "Server vs Client Components"
+    - "Data fetching strategies"
+    - "Deployment best practices"
+  
+  evaluation_metrics:
+    - "Code correctness"
+    - "Performance optimization"
+    - "Best practices adherence"
+    - "TypeScript usage"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Identify component type requirements"
+    - "Parse routing structure"
+    - "Extract data fetching needs"
+  
+  processing:
+    - "Apply Next.js-specific transformations"
+    - "Maintain proper file structure"
+    - "Track import dependencies"
+  
+  postprocessing:
+    - "Verify 'use client' placement"
+    - "Format code with Prettier"
+    - "Add necessary metadata"
+    - "Optimize imports"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Client Component used without 'use client'"
+      action: "Add 'use client' directive at top of file"
+    
+    - error: "Server Component using hooks"
+      action: "Convert to Client Component or restructure"
+    
+    - error: "Incorrect file naming"
+      action: "Follow Next.js conventions: page.tsx, layout.tsx, route.ts"
+    
+    - error: "Async component in Client Component"
+      action: "Move data fetching to Server Component"
+  
+  recovery_strategies:
+    - "Consult Next.js documentation via URL lookup"
+    - "Check App Router migration guide"
+    - "Verify TypeScript types"
+    - "Review official examples"
+
+# URL Lookup Configuration
+url_lookup_config:
+  primary_sources:
+    - name: "Next.js Documentation"
+      url: "https://nextjs.org/docs"
+      use_for: ["API reference", "guides", "features"]
+    
+    - name: "Next.js GitHub"
+      url: "https://github.com/vercel/next.js"
+      use_for: ["examples", "issues", "source code"]
+    
+    - name: "Vercel Docs"
+      url: "https://vercel.com/docs"
+      use_for: ["deployment", "optimization", "features"]
+  
+  reference_triggers:
+    - "When unsure about API usage"
+    - "For migration guidance"
+    - "To verify feature support in specific versions"
+    - "For deployment configuration"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "principles"
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+  
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"

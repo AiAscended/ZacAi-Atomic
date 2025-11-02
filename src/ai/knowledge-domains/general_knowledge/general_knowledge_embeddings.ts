@@ -1,5 +1,5 @@
-import pretrained from './general_pretrained_weights.json';
-import { GENERAL_DOMAIN } from './general_constants';
+import pretrained from './general_knowledge_pretrained_weights.json';
+import { GENERAL_DOMAIN } from './general_knowledge_constants';
 import { updateFile } from '../dataRegistry';
 
 const p = pretrained as Record<string, unknown>;
