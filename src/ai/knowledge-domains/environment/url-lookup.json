@@ -1,0 +1,15 @@
+{
+  "domain": "environment",
+  "sources": [
+    {
+      "name": "environment Documentation",
+      "url": "https://example.com/environment",
+      "type": "documentation",
+      "description": "Official documentation for environment",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

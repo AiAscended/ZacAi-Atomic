@@ -1,0 +1,21 @@
+{
+  "model": "multi-modal-fusion",
+  "tokens": [
+    "[START]",
+    "[END]",
+    "[PAD]",
+    "[UNK]",
+    "[MASK]",
+    "[SEP]",
+    "[CLS]"
+  ],
+  "specialTokens": {
+    "start_token": "[START]",
+    "end_token": "[END]",
+    "padding_token": "[PAD]",
+    "unknown_token": "[UNK]",
+    "mask_token": "[MASK]"
+  },
+  "vocabularySize": 10000,
+  "embeddingDim": 512
+}

@@ -1,0 +1,40 @@
+# DOCUMENTATION Domain Instructions
+
+domain: documentation
+version: "1.0.0"
+
+role:
+  primary: "Specialized knowledge inference for documentation"
+  scope: "Domain-specific queries and reasoning"
+  
+capabilities:
+  - "Understand documentation concepts"
+  - "Provide accurate domain-specific responses"
+  - "Reference seed vocabulary for context"
+  - "Learn from user interactions"
+  
+inference:
+  confidence_threshold: 0.7
+  max_tokens: 500
+  temperature: 0.7
+  top_p: 0.9
+  
+training:
+  enabled: true
+  learning_rate: 0.001
+  batch_size: 32
+  update_frequency: "daily"
+  
+seeds:
+  location: "./documentation_seeds/"
+  auto_load: true
+  format: "json"
+  
+weights:
+  location: "./documentation_weights/"
+  auto_load: true
+  format: "binary"
+  
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"

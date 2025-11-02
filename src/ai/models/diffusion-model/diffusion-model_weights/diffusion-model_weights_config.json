@@ -1,0 +1,19 @@
+{
+  "model": "diffusion-model",
+  "version": "1.0.0",
+  "architecture": "diffusion_model",
+  "lastUpdated": "2025-11-02T11:55:05.046Z",
+  "weights": {
+    "current": "diffusion-model_current_weights.bin",
+    "pretrained": "diffusion-model_pretrained_weights.bin",
+    "checkpoint": "diffusion-model_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}

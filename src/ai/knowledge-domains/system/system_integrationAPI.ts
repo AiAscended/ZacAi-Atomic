@@ -1,0 +1,140 @@
+/**
+ * System Domain Integration API
+ * 
+ * Handles system configuration, deployment, environment setup, dependencies,
+ * and core system operations.
+ */
+
+import { registerDomain } from '../domainRegistry';
+import fs from 'fs/promises';
+import path from 'path';
+
+const DOMAIN_NAME = 'system';
+const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+
+/**
+ * Load all seed data for system domain
+ */
+async function loadSeedData(): Promise<any[]> {
+  try {
+    const files = await fs.readdir(DOMAIN_DIR);
+    const jsonFiles = files.filter(f => f.endsWith('.json'));
+    
+    const allConcepts: any[] = [];
+    for (const file of jsonFiles) {
+      const filePath = path.join(DOMAIN_DIR, file);
+      const content = await fs.readFile(filePath, 'utf-8');
+      const data = JSON.parse(content);
+      
+      // System domain may have various formats - handle flexibly
+      if (data.concepts && Array.isArray(data.concepts)) {
+        allConcepts.push(...data.concepts);
+      } else if (Array.isArray(data)) {
+        allConcepts.push(...data);
+      } else if (typeof data === 'object') {
+        // For configuration files, wrap them as concepts
+        allConcepts.push({
+          name: file.replace('.json', ''),
+          type: 'configuration',
+          data: data
+        });
+      }
+    }
+    
+    console.log(`[System] Loaded ${allConcepts.length} concepts from ${jsonFiles.length} seed files`);
+    return allConcepts;
+  } catch (error) {
+    console.error('[System] Error loading seed data:', error);
+    return [];
+  }
+}
+
+/**
+ * Query the system domain with a prompt
+ */
+async function query(prompt: string): Promise<any> {
+  const normalizedPrompt = prompt.toLowerCase();
+  
+  // Keywords for system operations
+  const systemKeywords = [
+    'system', 'config', 'configuration', 'setup', 'deploy', 'deployment',
+    'environment', 'dependency', 'dependencies', 'infrastructure',
+    'server', 'host', 'network', 'resource', 'process',
+    'service', 'daemon', 'startup', 'shutdown', 'restart'
+  ];
+  
+  const hasSystemKeyword = systemKeywords.some(keyword => 
+    normalizedPrompt.includes(keyword)
+  );
+  
+  if (!hasSystemKeyword) {
+    return null;
+  }
+  
+  const seedData = await loadSeedData();
+  
+  const matches = seedData.filter(concept => {
+    const conceptText = JSON.stringify(concept).toLowerCase();
+    return systemKeywords.some(keyword => conceptText.includes(keyword));
+  });
+  
+  if (matches.length === 0) {
+    return null;
+  }
+  
+  return {
+    domain: DOMAIN_NAME,
+    confidence: 0.82,
+    matches: matches.slice(0, 5),
+    suggestion: 'Review system configuration, dependencies, and deployment requirements',
+    metadata: {
+      totalConcepts: seedData.length,
+      matchCount: matches.length
+    }
+  };
+}
+
+/**
+ * Initialize the system domain
+ */
+async function systemInit(): Promise<void> {
+  try {
+    console.log('[System] Initializing domain...');
+    
+    const seedData = await loadSeedData();
+    
+    if (seedData.length === 0) {
+      console.warn('[System] No seed data loaded - domain may have limited capabilities');
+    }
+    
+    console.log('[System] Domain initialized successfully');
+  } catch (error) {
+    console.error('[System] Initialization error:', error);
+    throw error;
+  }
+}
+
+// Register the domain
+registerDomain({
+  name: DOMAIN_NAME,
+  displayName: 'System Operations',
+  description: 'System configuration, deployment, environment setup, and dependencies',
+  query,
+  tags: ['system', 'config', 'deployment', 'infrastructure', 'operations'],
+  category: 'operations',
+  priority: 6,
+  capabilities: [
+    'configuration management',
+    'deployment automation',
+    'environment setup',
+    'dependency management',
+    'system monitoring',
+    'resource management',
+    'service orchestration'
+  ]
+});
+
+// Initialize domain asynchronously
+void systemInit();
+
+export { query, loadSeedData, systemInit };

@@ -1,0 +1,12 @@
+{
+  "model": "neuro-symbolic-reasoning",
+  "source": "initialization",
+  "method": "Xavier/He initialization",
+  "date": "2025-11-02T11:55:05.062Z",
+  "description": "Base pretrained weights for model initialization",
+  "files": [
+    "neuro-symbolic-reasoning_pretrained_embeddings.bin",
+    "neuro-symbolic-reasoning_pretrained_encoder.bin",
+    "neuro-symbolic-reasoning_pretrained_decoder.bin"
+  ]
+}

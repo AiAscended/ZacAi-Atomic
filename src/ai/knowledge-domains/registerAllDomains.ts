@@ -26,6 +26,10 @@ import "./algorithms/algorithms_integrationAPI"
 import "./data_structures/data_structures_integrationAPI"
 import "./version_control/version_control_integrationAPI"
 import "./environment/environment_integrationAPI"
+import "./data_integrity/data_integrity_integrationAPI"
+import "./observability/observability_integrationAPI"
+import "./repair/repair_integrationAPI"
+import "./system/system_integrationAPI"
 
 import { listDomains } from "./registry"
 

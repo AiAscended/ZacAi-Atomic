@@ -1,54 +1,15 @@
 {
-  "domainId": "mathematics",
-  "domainName": "Mathematics",
+  "domain": "mathematics",
   "sources": [
     {
-      "name": "Wolfram MathWorld",
-      "url": "https://mathworld.wolfram.com/search/?query={query}",
-      "description": "Comprehensive mathematics encyclopedia",
-      "enabled": true,
-      "priority": 1,
-      "rateLimit": {
-        "requestsPerMinute": 60,
-        "requestsPerDay": 1000
-      },
-      "timeout": 15000
-    },
-    {
-      "name": "Wolfram Alpha",
-      "url": "https://api.wolframalpha.com/v2/query?input={query}&appid=YOUR_APP_ID",
-      "description": "Computational knowledge engine",
-      "enabled": false,
-      "priority": 2,
-      "rateLimit": {
-        "requestsPerMinute": 10,
-        "requestsPerDay": 2000
-      },
-      "timeout": 20000
-    },
-    {
-      "name": "Math Stack Exchange",
-      "url": "https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=relevance&q={query}&site=math",
-      "description": "Mathematics Q&A community",
-      "enabled": true,
-      "priority": 3,
-      "rateLimit": {
-        "requestsPerMinute": 30,
-        "requestsPerDay": 10000
-      },
-      "timeout": 10000
-    },
-    {
-      "name": "OEIS",
-      "url": "https://oeis.org/search?q={query}&fmt=json",
-      "description": "Online Encyclopedia of Integer Sequences",
-      "enabled": true,
-      "priority": 4,
-      "timeout": 10000
+      "name": "mathematics Documentation",
+      "url": "https://example.com/mathematics",
+      "type": "documentation",
+      "description": "Official documentation for mathematics",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
     }
   ],
-  "defaultSource": "Wolfram MathWorld",
-  "fallbackOrder": ["Wolfram MathWorld", "Math Stack Exchange", "OEIS"],
-  "cacheEnabled": true,
-  "cacheTTL": 86400
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
 }

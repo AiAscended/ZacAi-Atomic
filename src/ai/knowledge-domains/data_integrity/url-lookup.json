@@ -1,0 +1,15 @@
+{
+  "domain": "data_integrity",
+  "sources": [
+    {
+      "name": "data integrity Documentation",
+      "url": "https://example.com/data_integrity",
+      "type": "documentation",
+      "description": "Official documentation for data integrity",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

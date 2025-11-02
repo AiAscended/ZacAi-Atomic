@@ -1,0 +1,15 @@
+{
+  "domain": "security",
+  "sources": [
+    {
+      "name": "security Documentation",
+      "url": "https://example.com/security",
+      "type": "documentation",
+      "description": "Official documentation for security",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

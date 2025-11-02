@@ -1,0 +1,19 @@
+{
+  "model": "speech-to-text",
+  "version": "1.0.0",
+  "architecture": "speech_to_text",
+  "lastUpdated": "2025-11-02T11:55:05.069Z",
+  "weights": {
+    "current": "speech-to-text_current_weights.bin",
+    "pretrained": "speech-to-text_pretrained_weights.bin",
+    "checkpoint": "speech-to-text_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}

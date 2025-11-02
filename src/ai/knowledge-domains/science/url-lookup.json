@@ -1,0 +1,15 @@
+{
+  "domain": "science",
+  "sources": [
+    {
+      "name": "science Documentation",
+      "url": "https://example.com/science",
+      "type": "documentation",
+      "description": "Official documentation for science",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

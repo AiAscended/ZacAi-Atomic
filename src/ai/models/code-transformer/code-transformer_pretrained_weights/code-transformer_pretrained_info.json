@@ -1,0 +1,12 @@
+{
+  "model": "code-transformer",
+  "source": "initialization",
+  "method": "Xavier/He initialization",
+  "date": "2025-11-02T11:55:05.039Z",
+  "description": "Base pretrained weights for model initialization",
+  "files": [
+    "code-transformer_pretrained_embeddings.bin",
+    "code-transformer_pretrained_encoder.bin",
+    "code-transformer_pretrained_decoder.bin"
+  ]
+}
