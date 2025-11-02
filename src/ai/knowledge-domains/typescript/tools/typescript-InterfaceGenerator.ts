@@ -162,10 +162,9 @@ export class InterfaceGenerator {
   }
 
   /**
-   * Generate comment for property
+   * Generate a descriptive comment for a property
    */
   private static generateComment(key: string, value: unknown): string {
-    const type = typeof value
     const example = value !== null && value !== undefined ? ` (e.g., ${JSON.stringify(value)})` : ""
 
     return `${key} property${example}`

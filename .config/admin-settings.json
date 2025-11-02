@@ -1,0 +1,80 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-11-02T04:26:39.611Z",
+  "system": {
+    "general": {
+      "appName": "ZacAI Atomic",
+      "environment": "development",
+      "logLevel": "info",
+      "enableTelemetry": false
+    },
+    "rag": {
+      "embeddingModel": "text-embedding-3-small",
+      "chunkSize": 512,
+      "chunkOverlap": 50,
+      "maxRetrievalResults": 10,
+      "similarityThreshold": 0.7
+    },
+    "security": {
+      "enableRateLimiting": true,
+      "maxRequestsPerMinute": 60,
+      "enableCORS": true,
+      "allowedOrigins": [
+        "http://localhost:3000"
+      ]
+    }
+  },
+  "orchestrator": {
+    "domainSelectionThreshold": 0.6,
+    "maxDomainsPerQuery": 3,
+    "enableParallelInference": true,
+    "enableContextEnhancement": true,
+    "enableKnowledgeRetrieval": true,
+    "performance": {
+      "maxConcurrentRequests": 10,
+      "requestTimeoutMs": 30000,
+      "enableCaching": true,
+      "cacheMaxSize": 1000
+    },
+    "reasoning": {
+      "maxReasoningSteps": 10,
+      "enableThinkingSteps": true,
+      "thinkingVerbosity": "normal"
+    }
+  },
+  "domains": {},
+  "githubApp": {
+    "appId": "",
+    "clientId": "",
+    "installations": [],
+    "webhookSecret": "",
+    "enableAutoCommit": false,
+    "enablePRCreation": true,
+    "enableIssueSync": true,
+    "defaultBranch": "main",
+    "commitMessagePrefix": "[AI]"
+  },
+  "ideMode": {
+    "enabled": false,
+    "features": {
+      "enableCodeCompletion": true,
+      "enableInlineChat": true,
+      "enableFileTree": true,
+      "enableTerminal": true,
+      "enableGitIntegration": true
+    },
+    "editor": {
+      "theme": "auto",
+      "fontSize": 14,
+      "tabSize": 2,
+      "wordWrap": true,
+      "minimap": false
+    },
+    "ai": {
+      "enableContextualSuggestions": true,
+      "suggestionDelay": 300,
+      "maxSuggestions": 5
+    }
+  },
+  "models": {}
+}
