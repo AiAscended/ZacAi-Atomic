@@ -23,6 +23,7 @@ import {
   ChevronDown,
   Plug,
   MessageSquare,
+  X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -122,9 +123,10 @@ interface AdminSidebarProps {
   isExpanded: boolean
   onExpandToggle: () => void
   onNavigate?: () => void
+  onClose: () => void
 }
 
-export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate }: AdminSidebarProps) {
+export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate, onClose }: AdminSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
   const pathname = usePathname()
   const router = useRouter()
@@ -147,10 +149,7 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate }:
       }
     } else if (item.path) {
       router.push(item.path)
-      // Auto-close menu after navigation
-      if (onNavigate) {
-        onNavigate()
-      }
+      // Don't auto-close menu - let users navigate freely
     }
   }
 
@@ -199,8 +198,21 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate }:
         isOpen ? (isExpanded ? "w-64" : "w-16") : "w-0 -translate-x-full",
       )}
     >
-      <div className="flex flex-col h-full pt-16 pb-4">
-        <nav className="flex-1 overflow-y-auto px-2 space-y-1">{menuItems.map((item) => renderMenuItem(item))}</nav>
+      <div className="flex flex-col h-full pb-4">
+        {/* Header with close button */}
+        <div className="flex items-center justify-between px-3 py-4 border-b">
+          {isExpanded && <span className="font-semibold text-lg">Menu</span>}
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-accent transition-colors ml-auto"
+            aria-label="Close menu"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        <nav className="flex-1 overflow-y-auto px-2 space-y-1 pt-2">{menuItems.map((item) => renderMenuItem(item))}</nav>
+        
         {isOpen && !isExpanded && (
           <button
             onClick={onExpandToggle}
