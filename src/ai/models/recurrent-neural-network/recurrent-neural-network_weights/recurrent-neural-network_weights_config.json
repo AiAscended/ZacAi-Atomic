@@ -1,0 +1,19 @@
+{
+  "model": "recurrent-neural-network",
+  "version": "1.0.0",
+  "architecture": "recurrent_neural_network",
+  "lastUpdated": "2025-11-02T11:55:05.065Z",
+  "weights": {
+    "current": "recurrent-neural-network_current_weights.bin",
+    "pretrained": "recurrent-neural-network_pretrained_weights.bin",
+    "checkpoint": "recurrent-neural-network_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}

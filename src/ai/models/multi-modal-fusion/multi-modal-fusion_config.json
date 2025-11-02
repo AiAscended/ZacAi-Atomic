@@ -1,0 +1,25 @@
+{
+  "model": "multi-modal-fusion",
+  "version": "1.0.0",
+  "type": "neural_network",
+  "architecture": {
+    "input_dim": 512,
+    "hidden_dim": 1024,
+    "output_dim": 512,
+    "num_layers": 6,
+    "num_heads": 8,
+    "dropout": 0.1
+  },
+  "hyperparameters": {
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "max_epochs": 100,
+    "early_stopping_patience": 10
+  },
+  "paths": {
+    "seeds": "./multi-modal-fusion_seeds/",
+    "weights": "./multi-modal-fusion_weights/",
+    "pretrained": "./multi-modal-fusion_pretrained_weights/",
+    "checkpoints": "./multi-modal-fusion_checkpoints/"
+  }
+}

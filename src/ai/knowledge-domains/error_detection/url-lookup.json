@@ -1,0 +1,15 @@
+{
+  "domain": "error_detection",
+  "sources": [
+    {
+      "name": "error detection Documentation",
+      "url": "https://example.com/error_detection",
+      "type": "documentation",
+      "description": "Official documentation for error detection",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

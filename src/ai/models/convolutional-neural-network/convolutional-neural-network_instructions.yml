@@ -1,0 +1,39 @@
+# CONVOLUTIONAL NEURAL NETWORK Model Instructions
+
+model: convolutional-neural-network
+version: "1.0.0"
+type: "neural_network"
+
+architecture:
+  name: "convolutional-neural-network"
+  layers: []
+  parameters: 0
+  
+task:
+  primary: "Model-specific inference task"
+  input: "Task-specific input format"
+  output: "Task-specific output format"
+  
+training:
+  enabled: true
+  optimizer: "adam"
+  learning_rate: 0.001
+  batch_size: 32
+  epochs: 100
+  validation_split: 0.2
+  
+inference:
+  batch_size: 1
+  max_sequence_length: 512
+  temperature: 1.0
+  top_k: 50
+  top_p: 0.9
+  
+seeds:
+  location: "./convolutional-neural-network_seeds/"
+  tokens_file: "convolutional-neural-network_seed_tokens.json"
+  
+weights:
+  current: "./convolutional-neural-network_weights/convolutional-neural-network_current_weights.bin"
+  pretrained: "./convolutional-neural-network_pretrained_weights/convolutional-neural-network_pretrained_embeddings.bin"
+  auto_load: true

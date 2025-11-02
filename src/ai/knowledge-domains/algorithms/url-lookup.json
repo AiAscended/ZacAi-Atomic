@@ -1,0 +1,15 @@
+{
+  "domain": "algorithms",
+  "sources": [
+    {
+      "name": "algorithms Documentation",
+      "url": "https://example.com/algorithms",
+      "type": "documentation",
+      "description": "Official documentation for algorithms",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

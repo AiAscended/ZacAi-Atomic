@@ -1,0 +1,15 @@
+{
+  "domain": "repair",
+  "sources": [
+    {
+      "name": "repair Documentation",
+      "url": "https://example.com/repair",
+      "type": "documentation",
+      "description": "Official documentation for repair",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}
