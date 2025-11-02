@@ -98,9 +98,27 @@ export class LLMTransformerBlock {
    * Matrix multiplication: A * B
    */
   private matmul(A: number[][], B: number[][]): number[][] {
+    // Safety checks
+    if (!A || A.length === 0 || !A[0]) {
+      console.error('[LLMTransformerBlock] matmul: Matrix A is invalid');
+      return [];
+    }
+    if (!B || B.length === 0 || !B[0]) {
+      console.error('[LLMTransformerBlock] matmul: Matrix B is invalid');
+      return [];
+    }
+    
     const rowsA = A.length;
     const colsA = A[0].length;
+    const rowsB = B.length;
     const colsB = B[0].length;
+    
+    // Check dimension compatibility
+    if (colsA !== rowsB) {
+      console.error(`[LLMTransformerBlock] matmul dimension mismatch: A is ${rowsA}x${colsA}, B is ${rowsB}x${colsB}`);
+      // Return identity-like result to prevent crash
+      return A;
+    }
     
     const result: number[][] = [];
     for (let i = 0; i < rowsA; i++) {
