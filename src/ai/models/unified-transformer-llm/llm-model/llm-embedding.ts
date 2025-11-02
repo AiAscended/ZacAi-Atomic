@@ -55,6 +55,26 @@ export class LLMEmbedding {
     }
     this.embeddings[tokenId] = [...newEmbedding];
   }
+  
+  /**
+   * Get all embeddings (for saving)
+   */
+  getEmbeddings(): number[][] {
+    return this.embeddings.map(emb => [...emb]);
+  }
+  
+  /**
+   * Set all embeddings (for loading)
+   */
+  setEmbeddings(embeddings: number[][]): void {
+    if (embeddings.length !== this.vocabSize) {
+      throw new Error(`Vocab size mismatch: expected ${this.vocabSize}, got ${embeddings.length}`);
+    }
+    if (embeddings[0].length !== this.embeddingDim) {
+      throw new Error(`Embedding dim mismatch: expected ${this.embeddingDim}, got ${embeddings[0].length}`);
+    }
+    this.embeddings = embeddings.map(emb => [...emb]);
+  }
 }
 
 export default LLMEmbedding;
