@@ -14,7 +14,7 @@
  */
 export function analyzeCodeComplexity(
   code: string,
-  language: string,
+  _language: string,
 ): {
   linesOfCode: number
   cyclomaticComplexity: number

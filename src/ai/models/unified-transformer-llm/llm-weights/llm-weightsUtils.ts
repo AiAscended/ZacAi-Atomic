@@ -17,7 +17,7 @@ export class LLMWeightsUtils {
    */
   async saveWeights(weights: ArrayBuffer, path: string): Promise<void> {
     // Placeholder implementation
-    console.log(\`Saving weights to \${path}\`);
+    console.log(`Saving weights to \${path}`);
   }
 
   /**

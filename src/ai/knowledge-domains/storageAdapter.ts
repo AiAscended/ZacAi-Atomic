@@ -118,7 +118,7 @@ export function getStorage(): StorageAdapter {
  * Helper functions that mimic fs API but use the storage adapter
  */
 export const storage = {
-  async readFile(path: string, encoding = "utf8"): Promise<string> {
+  async readFile(path: string, _encoding = "utf8"): Promise<string> {
     return getStorage().readFile(path)
   },
 
@@ -135,7 +135,7 @@ export const storage = {
   },
 
   // Synchronous versions for compatibility
-  readFileSync(path: string, encoding = "utf8"): string {
+  readFileSync(path: string, _encoding = "utf8"): string {
     // In browser environment, we can't do true sync, but we can return cached data
     const instance = getStorage() as InMemoryStorage
     const content = (instance as any).files.get(path)

@@ -1,4 +1,4 @@
-import { loadGeneralLearnedData, saveGeneralLearnedData } from './general_learnedDataManager';
+import { loadGeneralLearnedData, saveGeneralLearnedData } from './general_knowledge_learnedDataManager';
 
 type GeneralLearned = { notes: string[]; concepts: Record<string, unknown> };
 

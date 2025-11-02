@@ -8,7 +8,7 @@ export interface TrainingResult {
   message: string
 }
 
-export async function programmingRunTrainingEpoch(samples: any[]): Promise<TrainingResult> {
+export async function programmingRunTrainingEpoch(_samples: any[]): Promise<TrainingResult> {
   try {
     await loadProgrammingModelWeights()
     const interactions = getLearnedInteractions()

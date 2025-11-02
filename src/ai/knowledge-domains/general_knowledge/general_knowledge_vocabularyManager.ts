@@ -1,5 +1,5 @@
 import { storageAdapter } from "../storageAdapter"
-import { safeParseJSON } from "./general_utils"
+import { safeParseJSON } from "./general_knowledge_utils"
 
 export const loadGeneralSeedVocabulary = async (path = "/src/ai/data/general/general_seedVocabulary.json") => {
   try {

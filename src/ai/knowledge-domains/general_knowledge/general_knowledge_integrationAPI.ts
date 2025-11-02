@@ -1,8 +1,8 @@
 import { registerDomain } from "../registry"
-import { GENERAL_DOMAIN } from "./general_constants"
-import { loadGeneralSeedVocabulary } from "./general_vocabularyManager"
-import { generalRunInference } from "./general_inferenceController"
-import { generalRunTrainingEpoch } from "./general_trainingController"
+import { GENERAL_DOMAIN } from "./general_knowledge_constants"
+import { loadGeneralSeedVocabulary } from "./general_knowledge_vocabularyManager"
+import { generalRunInference } from "./general_knowledge_inferenceController"
+import { generalRunTrainingEpoch } from "./general_knowledge_trainingController"
 import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
 
 export const generalInit = async () => {

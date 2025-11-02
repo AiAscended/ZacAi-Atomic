@@ -8,7 +8,7 @@
 
 // Import all domain integration APIs to trigger registration
 import "./english/english_integrationAPI"
-import "./general/general_integrationAPI"
+import "./general_knowledge/general_knowledge_integrationAPI"
 import "./mathematics/mathematics_integrationAPI"
 import "./typescript/typescript_integrationAPI"
 import "./react/react_integrationAPI"

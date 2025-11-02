@@ -33,7 +33,7 @@ export async function scanDomains(): Promise<ModuleRegistry> {
 
 export async function getEnabledDomains(): Promise<ModuleManifest[]> {
   const registry = await getDomainRegistry();
-  return registry.enabledModains.map(id => registry.modules[id]).filter(Boolean);
+  return registry.enabledModules.map(id => registry.modules[id]).filter(Boolean);
 }
 
 export async function getDomain(domainId: string): Promise<ModuleManifest | null> {

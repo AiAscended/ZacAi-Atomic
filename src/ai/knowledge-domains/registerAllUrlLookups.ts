@@ -6,7 +6,7 @@
 
 // Import all domain URL lookup files to register their sources
 import "./english/english_url_lookup"
-import "./general/general_url_lookup"
+import "./general_knowledge/general_knowledge_url_lookup"
 import "./internet_search/internet_search_url_lookup"
 import "./mathematics/mathematics_url_lookup"
 import "./typescript/typescript_url_lookup"

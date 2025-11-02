@@ -1,5 +1,5 @@
 import { storageAdapter } from "../storageAdapter"
-import { safeParseJSON } from "./general_utils"
+import { safeParseJSON } from "./general_knowledge_utils"
 
 export const loadGeneralLearnedData = async (path = "/src/ai/data/general/general_learnedData.json") => {
   try {
