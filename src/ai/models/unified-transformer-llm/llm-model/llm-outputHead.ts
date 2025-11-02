@@ -63,6 +63,24 @@ export class LLMOutputHead {
     const probs = this.softmax(logits);
     return probs.indexOf(Math.max(...probs));
   }
+  
+  /**
+   * Get weight matrices (for saving)
+   */
+  getWeights(): { W: number[][], b: number[] } {
+    return {
+      W: this.weights,
+      b: new Array(this.vocabSize).fill(0), // Placeholder for bias
+    };
+  }
+  
+  /**
+   * Set weight matrices (for loading)
+   */
+  setWeights(weights: { W: number[][], b: number[] }): void {
+    this.weights = weights.W;
+    // Note: bias not currently used in forward pass, but stored for future use
+  }
 }
 
 export default LLMOutputHead;

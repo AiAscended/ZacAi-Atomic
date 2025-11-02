@@ -49,6 +49,23 @@ export class LLMDecoder {
   getNumLayers(): number {
     return this.numLayers;
   }
+  
+  /**
+   * Get all layer weights (for saving)
+   */
+  getLayerWeights() {
+    return this.layers.map(layer => layer.getWeights());
+  }
+  
+  /**
+   * Set all layer weights (for loading)
+   */
+  setLayerWeights(layerWeights: Array<ReturnType<typeof this.layers[0]['getWeights']>>): void {
+    if (layerWeights.length !== this.numLayers) {
+      throw new Error(`Layer count mismatch: expected ${this.numLayers}, got ${layerWeights.length}`);
+    }
+    this.layers.forEach((layer, i) => layer.setWeights(layerWeights[i]));
+  }
 }
 
 export default LLMDecoder;
