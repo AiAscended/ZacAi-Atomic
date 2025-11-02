@@ -9,6 +9,8 @@ export interface LLMModelConfig {
   numLayers: number;
   numHeads: number;
   hiddenSize: number;
+  embeddingDim: number; // Dimension of token embeddings
+  hiddenDim: number; // Hidden dimension for FFN
   ffnSize: number;
   vocabSize: number;
   maxSequenceLength: number;
@@ -35,6 +37,8 @@ export const defaultLLMConfig: LLMModelConfig = {
   numLayers: 12,
   numHeads: 12,
   hiddenSize: 768,
+  embeddingDim: 768, // Same as hiddenSize for unified architecture
+  hiddenDim: 3072, // 4x hiddenSize as per transformer standard
   ffnSize: 3072,
   vocabSize: 50257,
   maxSequenceLength: 2048,
