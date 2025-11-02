@@ -1,0 +1,13 @@
+{
+  "name": "@zacai-atomic/multi-modal-fusion",
+  "version": "1.0.0",
+  "description": "multi-modal-fusion for ZacAi-Atomic",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": ["ai", "ml", "multimodal"],
+  "author": "ZacAi-Atomic",
+  "license": "MIT"
+}

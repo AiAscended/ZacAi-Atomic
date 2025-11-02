@@ -8,7 +8,7 @@ import type React from "react"
 
 import type { Metadata } from "next"
 import ClientLayout from "./client-layout"
-import "@/src/styles/globals.css"
+import "@/styles/globals.css"
 
 export const metadata: Metadata = {
   title: "ZacAi Atomic - Hybrid Multi-Domain AI",

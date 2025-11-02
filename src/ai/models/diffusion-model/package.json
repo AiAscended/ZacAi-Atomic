@@ -1,0 +1,13 @@
+{
+  "name": "@zacai-atomic/diffusion-model",
+  "version": "1.0.0",
+  "description": "diffusion-model for ZacAi-Atomic",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": ["ai", "ml", "diffusion"],
+  "author": "ZacAi-Atomic",
+  "license": "MIT"
+}

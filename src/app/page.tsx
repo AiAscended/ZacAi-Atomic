@@ -16,7 +16,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ChevronDown, ChevronUp } from "lucide-react"
-import { ResponseRenderer } from "@/src/ui/components/ResponseRenderer-v2"
+import { ResponseRenderer } from "@/components/ResponseRenderer"
 
 interface Message {
   id: string
@@ -44,6 +44,7 @@ export default function HomePage() {
   const [expandedThinking, setExpandedThinking] = useState<number | null>(null)
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Auto-resize textarea input height to fit content
   const resizeInput = useCallback(() => {
@@ -52,6 +53,15 @@ export default function HomePage() {
       inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 200)}px`
     }
   }, [])
+
+  // Auto-scroll to bottom when new messages arrive
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, scrollToBottom])
 
   useEffect(() => {
     resizeInput()
@@ -129,15 +139,20 @@ export default function HomePage() {
   // Render message content including modular code/text or plain text
   const renderMessageContent = (msg: Message) => {
     if (msg.role === "assistant" && msg.contentBlocks) {
-      return <ResponseRenderer textBlocks={msg.contentBlocks.textBlocks} codeBlocks={msg.contentBlocks.codeBlocks} />
+      // Map content blocks to include type field required by ResponseRenderer
+      const textBlocks = msg.contentBlocks.textBlocks.map((block) => ({
+        ...block,
+        type: "paragraph" as const,
+      }))
+      return <ResponseRenderer textBlocks={textBlocks} codeBlocks={msg.contentBlocks.codeBlocks} />
     }
     return <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
   }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4">
-      <Card className="max-w-[1200px] w-full p-6 shadow-xl flex flex-col">
-        <header className="mb-6 border-b pb-4">
+      <Card className="max-w-[1200px] w-full h-[85vh] p-6 shadow-xl flex flex-col">
+        <header className="mb-6 border-b pb-4 flex-shrink-0">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">ZacAi Atomic</h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">Hybrid Multi-Domain Modular AI Assistant</p>
           <div className="mt-2 flex items-center gap-2">
@@ -146,7 +161,7 @@ export default function HomePage() {
           </div>
         </header>
 
-        <main className="flex-grow mb-4 space-y-4 overflow-y-auto rounded-lg bg-white dark:bg-slate-900 p-4">
+        <main className="flex-1 mb-4 space-y-4 overflow-y-auto rounded-lg bg-white dark:bg-slate-900 p-4 scroll-smooth">
           {messages.length === 0 ? (
             <p className="text-center text-slate-400">Start a conversation with the AI assistant...</p>
           ) : (
@@ -207,9 +222,10 @@ export default function HomePage() {
               AI is thinking...
             </article>
           )}
+          <div ref={messagesEndRef} />
         </main>
 
-        <form className="flex gap-3" onSubmit={handleSubmit}>
+        <form className="flex gap-3 flex-shrink-0" onSubmit={handleSubmit}>
           <textarea
             ref={inputRef}
             value={input}
