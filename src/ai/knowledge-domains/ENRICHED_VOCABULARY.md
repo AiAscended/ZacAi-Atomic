@@ -27,7 +27,7 @@ Each knowledge domain now has an `enriched/` subdirectory containing detailed vo
 
 ## Imported Files
 
-### Programming Domain (13 files)
+### Programming Domain (18 files)
 - JavaScript_vocab.json - JavaScript language vocabulary
 - coding_vocab.json, coding_vocab_2.json, coding_vocab_3.json - General programming vocabulary
 - HTML_vocab.json - HTML markup vocabulary
@@ -37,6 +37,7 @@ Each knowledge domain now has an `enriched/` subdirectory containing detailed vo
 - SVG_vocab.json - SVG graphics vocabulary
 - system_vocab.json, system_vocab_2.json, system_vocab_3.json - System programming vocabulary
 - Observability-Monitoring_vocab.json - Observability and monitoring vocabulary
+- observability_concepts.json through observability_concepts_5.json - Detailed observability concepts
 
 ### English Domain (15 files)
 - alphabet.json - Comprehensive alphabet and character vocabulary
@@ -45,6 +46,21 @@ Each knowledge domain now has an `enriched/` subdirectory containing detailed vo
 ### Grammar Domain (7 files)
 - grammar.json - Core grammar vocabulary
 - grammar_2.json through grammar_7.json - Extended grammar concepts and rules
+
+### Mathematics Domain (12 files)
+- math_concepts.json - Core mathematical concepts
+- math_concepts_2.json through math_concepts_10.json - Extended mathematical concepts
+- advanced_geometry.json - Advanced geometric concepts and theorems
+- sacred_geometry.json - Sacred geometry patterns and concepts
+
+### Security Domain (5 files)
+- security_concepts.json through security_concepts_5.json - Comprehensive security vocabulary covering authentication, encryption, threats, and best practices
+
+### Error Detection Domain (5 files)
+- repair_concepts.json through repair_concepts_5.json - Error detection, debugging, and repair strategies
+
+### Data Structures Domain (4 files)
+- data_integrity_concepts.json through data_integrity_concepts_4.json - Data integrity, validation, and consistency concepts
 
 ### React Domain (1 file)
 - React-Next-js_vocab.json - React and Next.js framework vocabulary
@@ -131,10 +147,14 @@ These vocabulary files were imported from the [ZacAi-3.0.0 repository](https://g
 
 ## Statistics
 
-- **Total vocabulary files**: 37
-- **Programming domain**: 13 files
-- **English domain**: 15 files
-- **Grammar domain**: 7 files
+- **Total vocabulary files**: 68
+- **Programming domain**: 18 files (JavaScript, HTML, CSS, system, observability concepts)
+- **English domain**: 15 files (general vocabulary seeds + alphabet)
+- **Grammar domain**: 7 files (core grammar + extensions)
+- **Mathematics domain**: 12 files (math concepts, geometry)
+- **Security domain**: 5 files (security concepts and best practices)
+- **Error Detection domain**: 5 files (repair and debugging concepts)
+- **Data Structures domain**: 4 files (data integrity concepts)
 - **React domain**: 1 file
 - **Next.js domain**: 1 file
 
