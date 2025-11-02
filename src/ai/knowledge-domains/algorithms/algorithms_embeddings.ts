@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./algorithms_weights/algorithms_pretrained_weights.json"
+import pretrained from "./algorithms_seeds/algorithms_pretrained_weights.json"
 import { ALGORITHMS_DOMAIN } from "./algorithms_constants"
 
 const EMBEDDING_DIM = 128

@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./data_structures_weights/data_structures_pretrained_weights.json"
+import pretrained from "./data_structures_seeds/data_structures_pretrained_weights.json"
 import { DATA_STRUCTURES_DOMAIN } from "./data_structures_constants"
 
 const EMBEDDING_DIM = 128

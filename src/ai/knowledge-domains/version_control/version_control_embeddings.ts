@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./version_control_weights/version_control_pretrained_weights.json"
+import pretrained from "./version_control_seeds/version_control_pretrained_weights.json"
 import { VERSION_CONTROL_DOMAIN } from "./version_control_constants"
 
 const EMBEDDING_DIM = 128
