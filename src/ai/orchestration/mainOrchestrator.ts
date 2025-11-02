@@ -39,6 +39,10 @@ import { ScientificCalculator } from "../shared/tools/shared-ScientificCalculato
 import { settingsStore } from "../shared/config/settingsStore"
 import type { OrchestratorSettings } from "../shared/types/adminSettings"
 
+// Import learning metrics tracker for continuous learning
+import { LearningMetricsTracker } from "../monitoring/learningMetricsTracker"
+import type { InferenceMetrics } from "../monitoring/learningMetricsTracker"
+
 /**
  * Main Orchestrator Response Interface
  */
@@ -78,6 +82,7 @@ export class MainOrchestrator {
   private domainQueryExecutor: DomainQueryExecutor
   private responseSynthesizer: ResponseSynthesizer
   private llmInferenceEngine: LLMInferenceEngine | null = null
+  private learningMetricsTracker: LearningMetricsTracker
   
   private initialized: boolean = false
   private availableDomains: string[] = []
@@ -91,6 +96,7 @@ export class MainOrchestrator {
     this.promptProcessor = new PromptProcessor()
     this.domainQueryExecutor = new DomainQueryExecutor()
     this.responseSynthesizer = new ResponseSynthesizer()
+    this.learningMetricsTracker = new LearningMetricsTracker()
   }
 
   /**
@@ -324,6 +330,27 @@ export class MainOrchestrator {
       })
 
       // ============================================
+      // STEP 7: RECORD METRICS FOR LEARNING
+      // ============================================
+      const metrics: InferenceMetrics = {
+        prompt,
+        preprocessedPrompt: cleanedPrompt,
+        response: synthesizedResponse.text,
+        confidence: synthesizedResponse.confidence,
+        domains: relevantDomains,
+        modelsUsed: this.availableModels,
+        processingTime,
+        tokensGenerated: llmResponse.split(' ').length,
+        sessionId,
+        timestamp: new Date().toISOString(),
+      }
+      
+      // Record asynchronously (don't wait)
+      this.learningMetricsTracker.recordInference(metrics).catch(err => {
+        logger.info("Failed to record learning metrics", { error: err })
+      })
+
+      // ============================================
       // RETURN COMPLETE RESPONSE
       // ============================================
       return {
@@ -511,7 +538,43 @@ export class MainOrchestrator {
   public getRegisteredDomains(): string[] {
     return [...this.availableDomains]
   }
+  
+  /**
+   * Get learning statistics
+   */
+  public async getLearningStatistics() {
+    return await this.learningMetricsTracker.getStatistics()
+  }
+  
+  /**
+   * Flush learning metrics to disk (call on shutdown)
+   */
+  public async flushLearningMetrics(): Promise<void> {
+    await this.learningMetricsTracker.flushToDisk()
+  }
+  
+  /**
+   * Export metrics for training
+   */
+  public async exportMetricsForTraining(minConfidence: number = 0.7, maxSamples: number = 1000) {
+    return await this.learningMetricsTracker.exportForTraining(minConfidence, maxSamples)
+  }
 }
 
 // Export singleton instance
 export const mainOrchestrator = MainOrchestrator.getInstance()
+
+// Flush metrics on process exit
+if (typeof process !== 'undefined') {
+  process.on('exit', () => {
+    mainOrchestrator.flushLearningMetrics().catch(console.error)
+  })
+  
+  process.on('SIGINT', () => {
+    mainOrchestrator.flushLearningMetrics().then(() => process.exit(0)).catch(console.error)
+  })
+  
+  process.on('SIGTERM', () => {
+    mainOrchestrator.flushLearningMetrics().then(() => process.exit(0)).catch(console.error)
+  })
+}
