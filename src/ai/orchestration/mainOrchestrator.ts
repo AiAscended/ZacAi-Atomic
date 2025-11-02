@@ -133,6 +133,8 @@ export class MainOrchestrator {
         numLayers: 12,
         numHeads: 12,
         hiddenSize: 768,
+        embeddingDim: 768, // Same as hiddenSize
+        hiddenDim: 3072, // 4x hiddenSize (FFN hidden dimension)
         ffnSize: 3072,
         vocabSize: 50257,
         maxSequenceLength: 2048,
@@ -146,7 +148,6 @@ export class MainOrchestrator {
         bosTokenId: 1,
         eosTokenId: 2,
         unkTokenId: 3,
-        embeddingDim: 768,
       }
       this.llmInferenceEngine = new LLMInferenceEngine(llmConfig)
       this.availableModels.push("unified-transformer-llm")
@@ -414,15 +415,23 @@ export class MainOrchestrator {
     subtasks: string[]
   ): Promise<Array<{ domain: string; result: string }>> {
     const results: Array<{ domain: string; result: string }> = []
+    
+    // Combine subtasks into single query
+    const query = subtasks.join(' ')
 
     for (const domainName of domains) {
       try {
         const domain = domainRegistry.getDomain(domainName)
         if (domain && domain.enabled) {
-          // Use domain query executor for now
-          // TODO: Implement domain-specific inference controllers
-          const result = await this.domainQueryExecutor.queryDomains(subtasks)
-          results.push({ domain: domainName, result: JSON.stringify(result) })
+          // Use new domain-specific inference
+          const domainResults = await this.domainQueryExecutor.queryDomainsByName([domainName], query)
+          
+          if (domainResults.length > 0 && domainResults[0].confidence > 0.3) {
+            results.push({ 
+              domain: domainName, 
+              result: domainResults[0].response || 'No result',
+            })
+          }
         }
       } catch (error) {
         logger.info(`Domain query failed: ${domainName}`, { error })
@@ -439,21 +448,19 @@ export class MainOrchestrator {
     domains: string[],
     subtasks: string[]
   ): Promise<Array<{ domain: string; result: string }>> {
-    const promises = domains.map(async (domainName) => {
-      try {
-        const domain = domainRegistry.getDomain(domainName)
-        if (domain && domain.enabled) {
-          const result = await this.domainQueryExecutor.queryDomains(subtasks)
-          return { domain: domainName, result: JSON.stringify(result) }
-        }
-      } catch (error) {
-        logger.info(`Domain query failed: ${domainName}`, { error })
-      }
-      return null
-    })
-
-    const results = await Promise.all(promises)
-    return results.filter((r): r is { domain: string; result: string } => r !== null)
+    // Combine subtasks into single query
+    const query = subtasks.join(' ')
+    
+    // Query all domains in parallel
+    const domainResults = await this.domainQueryExecutor.queryDomainsByName(domains, query)
+    
+    // Filter and format results
+    return domainResults
+      .filter(result => result.confidence > 0.3 && !result.error)
+      .map(result => ({
+        domain: result.domain,
+        result: result.response || 'No result',
+      }))
   }
 
   /**

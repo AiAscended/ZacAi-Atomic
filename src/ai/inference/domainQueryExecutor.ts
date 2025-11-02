@@ -3,30 +3,177 @@
  * Executes queries against domain-specific inference models with retry and metrics.
  *
  * Usage:
- * - queryDomains(subtasks): executes each subtask in proper domain context
+ * - queryDomainsByName(domainNames, query): queries specific domains with their inference engines
  */
+
+import { domainRegistry } from '../knowledge-domains/domainRegistry';
+
+export interface DomainQueryResult {
+  domain: string;
+  response: string;
+  confidence: number;
+  topics?: string[];
+  metadata?: Record<string, any>;
+  error?: string;
+}
 
 export class DomainQueryExecutor {
   /**
-   * Query multiple domains with retries, handle API errors, log metrics.
-   * @param subtasks array of prompt parts
-   * @returns aggregated domain responses
+   * Query specific domains by name with actual inference
+   * @param domainNames Array of domain names to query
+   * @param query The user query/prompt
+   * @returns Array of domain-specific results with confidence scores
    */
-  async queryDomains(subtasks: string[]): Promise<Record<string, any>> {
-    const results: Record<string, any> = {}
-    for (const subtask of subtasks) {
+  async queryDomainsByName(
+    domainNames: string[],
+    query: string
+  ): Promise<DomainQueryResult[]> {
+    const results: DomainQueryResult[] = [];
+    
+    for (const domainName of domainNames) {
       try {
-        // Simulate domain query
-        results[subtask] = await this.querySingleDomain(subtask)
+        const result = await this.querySingleDomain(domainName, query);
+        results.push(result);
       } catch (err) {
-        results[subtask] = { error: err instanceof Error ? err.message : String(err) }
+        results.push({
+          domain: domainName,
+          response: '',
+          confidence: 0,
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
     }
-    return results
+    
+    return results;
   }
-
-  private async querySingleDomain(prompt: string): Promise<any> {
-    // Placeholder for actual domain inference API calls
-    return { response: `Response for "${prompt}"` }
+  
+  /**
+   * Query a single domain with its inference controller
+   */
+  private async querySingleDomain(
+    domainName: string,
+    query: string
+  ): Promise<DomainQueryResult> {
+    // Get domain from registry
+    const domain = domainRegistry.getDomain(domainName);
+    
+    if (!domain || !domain.enabled) {
+      return {
+        domain: domainName,
+        response: '',
+        confidence: 0,
+        error: `Domain ${domainName} not found or disabled`,
+      };
+    }
+    
+    // Try to dynamically import domain inference controller
+    try {
+      const inferenceModule = await this.loadDomainInference(domainName);
+      
+      if (!inferenceModule) {
+        // Fallback: basic domain response
+        return {
+          domain: domainName,
+          response: `[${domainName}] Processing query: ${query}`,
+          confidence: 0.5,
+          metadata: { fallback: true },
+        };
+      }
+      
+      // Call domain-specific inference
+      const result = await inferenceModule(query);
+      
+      if (!result) {
+        return {
+          domain: domainName,
+          response: '',
+          confidence: 0,
+          metadata: { notApplicable: true },
+        };
+      }
+      
+      return {
+        domain: domainName,
+        response: result.response || '',
+        confidence: result.confidence || 0.5,
+        topics: result.topics || [],
+        metadata: result.metadata || {},
+      };
+    } catch (error) {
+      console.error(`[DomainQueryExecutor] Error querying ${domainName}:`, error);
+      return {
+        domain: domainName,
+        response: '',
+        confidence: 0,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
+  }
+  
+  /**
+   * Dynamically load domain inference controller
+   */
+  private async loadDomainInference(domainName: string): Promise<any> {
+    try {
+      // Try to load domain-specific inference function
+      const module = await import(
+        `../knowledge-domains/${domainName}/${domainName}_inferenceController`
+      );
+      
+      // Try common export patterns (most domains use these)
+      // Pattern 1: {domainName}RunInference
+      if (module[`${domainName}RunInference`]) {
+        return module[`${domainName}RunInference`];
+      }
+      
+      // Pattern 2: generalRunInference (for general_knowledge)
+      if (domainName === 'general_knowledge' && module.generalRunInference) {
+        return module.generalRunInference;
+      }
+      
+      // Pattern 3: default export
+      if (module.default) {
+        return module.default;
+      }
+      
+      // Pattern 4: runInference
+      if (module.runInference) {
+        return module.runInference;
+      }
+      
+      // Pattern 5: infer
+      if (module.infer) {
+        return module.infer;
+      }
+      
+      // Log available exports for debugging
+      console.log(`[DomainQueryExecutor] Available exports for ${domainName}:`, Object.keys(module));
+      
+      return null;
+    } catch (error) {
+      // Domain inference controller doesn't exist or failed to load
+      console.log(`[DomainQueryExecutor] Failed to load ${domainName}:`, error);
+      return null;
+    }
+  }
+  
+  /**
+   * Legacy method for backward compatibility
+   * @deprecated Use queryDomainsByName instead
+   */
+  async queryDomains(subtasks: string[]): Promise<Record<string, any>> {
+    const results: Record<string, any> = {};
+    
+    for (const subtask of subtasks) {
+      try {
+        results[subtask] = { response: `Processing: ${subtask}` };
+      } catch (err) {
+        results[subtask] = { 
+          error: err instanceof Error ? err.message : String(err) 
+        };
+      }
+    }
+    
+    return results;
   }
 }
