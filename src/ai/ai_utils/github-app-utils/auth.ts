@@ -17,8 +17,8 @@
 import jwt from "jsonwebtoken";
 import { request } from "@octokit/request";
 
-const appId = process.env.GITHUB_APP_ID!;
-const privateKey = process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g, "\n");
+const appId = process.env.GITHUB_APP_ID || "";
+const privateKey = (process.env.GITHUB_APP_PRIVATE_KEY || "").replace(/\\n/g, "\n");
 
 /**
  * Generates a signed JWT token for authenticating as GitHub App.

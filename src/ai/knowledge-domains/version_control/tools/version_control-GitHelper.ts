@@ -4,7 +4,7 @@
  */
 
 export class VersionControlGitHelper {
-  suggest(context: string): {
+  suggest(_context: string): {
     command: string;
     explanation: string;
     alternatives: string[];
