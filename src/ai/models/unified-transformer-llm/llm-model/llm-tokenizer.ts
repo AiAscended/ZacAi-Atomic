@@ -1,7 +1,10 @@
 /**
  * LLM Tokenizer
  * Handles tokenization and detokenization of input text
+ * Now uses shared vocabulary manager for consistent tokenization across all models
  */
+
+import { vocabularyManager } from '../../../shared/vocabulary/vocabularyManager';
 
 export class LLMTokenizer {
   private vocabulary: Map<string, number>;
@@ -12,19 +15,25 @@ export class LLMTokenizer {
     vocabulary?: Map<string, number>,
     specialTokens?: Record<string, string>
   ) {
-    this.vocabulary = vocabulary || new Map();
-    this.reverseVocabulary = new Map();
+    // Use shared vocabulary if no custom vocabulary provided
+    if (!vocabulary || vocabulary.size === 0) {
+      this.vocabulary = vocabularyManager.getVocabulary();
+      this.reverseVocabulary = vocabularyManager.getReverseVocabulary();
+      console.log(`[LLMTokenizer] Loaded shared vocabulary with ${this.vocabulary.size} tokens`);
+    } else {
+      this.vocabulary = vocabulary;
+      this.reverseVocabulary = new Map();
+      this.vocabulary.forEach((id, token) => {
+        this.reverseVocabulary.set(id, token);
+      });
+    }
+    
     this.specialTokens = specialTokens || {
       pad: '<PAD>',
       bos: '<BOS>',
       eos: '<EOS>',
       unk: '<UNK>',
     };
-
-    // Build reverse vocabulary
-    this.vocabulary.forEach((id, token) => {
-      this.reverseVocabulary.set(id, token);
-    });
   }
 
   /**
