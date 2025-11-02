@@ -43,8 +43,16 @@ export function NavigationWrapper({ children }: NavigationWrapperProps) {
         isExpanded={isExpanded}
         onExpandToggle={toggleExpanded}
         onNavigate={closeMenu}
+        onClose={closeMenu}
       />
-      {children}
+      <div
+        className="transition-all duration-300"
+        style={{
+          marginLeft: isOpen ? (isExpanded ? "256px" : "64px") : "0",
+        }}
+      >
+        {children}
+      </div>
     </>
   )
 }
