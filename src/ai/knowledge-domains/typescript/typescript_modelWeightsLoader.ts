@@ -7,7 +7,7 @@
  */
 
 export function loadTypescriptModelWeights(
-  path = "/src/ai/data/typescript/typescript_trainingWeights.bin",
+  _path = "/src/ai/data/typescript/typescript_trainingWeights.bin",
 ): ArrayBuffer | null {
   try {
     // In production, this would load actual binary weights
