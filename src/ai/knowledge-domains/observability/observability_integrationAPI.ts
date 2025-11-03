@@ -6,6 +6,7 @@
  */
 
 import { domainRegistry } from '../domainRegistry';
+import { observabilityRunInference } from './observability_inferenceController';
 import fs from 'fs/promises';
 import path from 'path';
 
