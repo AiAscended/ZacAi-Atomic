@@ -9,18 +9,19 @@ import path from 'path';
 
 const DOMAIN_NAME = 'system';
 const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+const SEEDS_DIR = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`);
 
 /**
  * Load seed data for inference
  */
 async function loadSeedData(): Promise<any[]> {
   try {
-    const files = await fs.readdir(DOMAIN_DIR);
+    const files = await fs.readdir(SEEDS_DIR);
     const jsonFiles = files.filter(f => f.endsWith('.json'));
     
     const allConcepts: any[] = [];
     for (const file of jsonFiles) {
-      const filePath = path.join(DOMAIN_DIR, file);
+      const filePath = path.join(SEEDS_DIR, file);
       const content = await fs.readFile(filePath, 'utf-8');
       const data = JSON.parse(content);
       
@@ -28,12 +29,6 @@ async function loadSeedData(): Promise<any[]> {
         allConcepts.push(...data.concepts);
       } else if (Array.isArray(data)) {
         allConcepts.push(...data);
-      } else if (typeof data === 'object') {
-        allConcepts.push({
-          name: file.replace('.json', ''),
-          type: 'configuration',
-          data: data
-        });
       }
     }
     
