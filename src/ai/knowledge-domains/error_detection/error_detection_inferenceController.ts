@@ -19,3 +19,5 @@ export const errorDetectionRunInference = async (input: string) => {
     response: `Error detection: Found ${sem.errorCount} errors, ${sem.potentialIssues.length} potential issues.`,
   }
 }
+
+export default errorDetectionRunInference

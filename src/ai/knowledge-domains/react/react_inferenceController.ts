@@ -113,3 +113,5 @@ function generateCodeResponse(_input: string, analysis: any): string {
 function generateGeneralResponse(_input: string, analysis: any): string {
   return `${analysis.suggestedResponse} React provides a powerful and flexible way to build modern web applications with reusable components.`
 }
+
+export default reactRunInference;
