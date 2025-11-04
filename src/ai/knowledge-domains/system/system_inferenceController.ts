@@ -1,9 +1,12 @@
 /**
  * System Domain Inference Controller
- * Handles system-level operations, configuration, time/date, location, and management queries
+ * Handles system-level operations, configuration, time/date, location, diagnostics, and management queries
+ * Enhanced with system metrics integration for AI self-awareness
  */
 
 import { DOMAIN_NAME } from './system_constants';
+import { systemMetricsIntegration } from '../../monitoring/systemMetricsIntegration';
+import { metricsCollector } from '../../monitoring/metricsCollector';
 
 export const systemRunInference = async (input: string, _context?: any) => {
   const lowerInput = input.toLowerCase();
@@ -12,6 +15,40 @@ export const systemRunInference = async (input: string, _context?: any) => {
   let confidence = 0.7;
   const sources: string[] = [];
   const metadata: any = {};
+
+  // Handle system health/status queries
+  if (
+    lowerInput.includes('health') ||
+    lowerInput.includes('status') ||
+    lowerInput.includes('diagnostics') ||
+    lowerInput.includes('metrics') ||
+    lowerInput.includes('performance') ||
+    lowerInput.includes('memory') ||
+    lowerInput.includes('cpu')
+  ) {
+    try {
+      const diagnostics = await systemMetricsIntegration.getSystemDiagnostics();
+      const formattedDiag = systemMetricsIntegration.formatForAI(diagnostics);
+      
+      responseText = `**System Diagnostics Report:**\n\n${formattedDiag}`;
+      confidence = 0.95;
+      sources.push('System Metrics Integration', 'Real-time Diagnostics');
+      metadata.systemDiagnostics = true;
+      metadata.metricsTimestamp = diagnostics.timestamp;
+      
+      return {
+        response: responseText,
+        confidence,
+        sources,
+        domain: DOMAIN_NAME,
+        metadata,
+      };
+    } catch (error) {
+      console.error('[SystemDomain] Failed to get diagnostics:', error);
+      responseText = 'Unable to retrieve system diagnostics at this time.';
+      confidence = 0.5;
+    }
+  }
 
   // Handle time/date queries - return actual system time/date
   if (
