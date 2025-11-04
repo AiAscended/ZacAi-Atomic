@@ -1,0 +1,84 @@
+
+> zacai-atomic@1.0.0 dev
+> next dev
+
+   ▲ Next.js 15.5.6
+   - Local:        http://localhost:3000
+   - Network:      http://10.0.0.178:3000
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 2.8s
+ ○ Compiling / ...
+ ✓ Compiled / in 9.4s (650 modules)
+ GET / 200 in 10469ms
+ ✓ Compiled in 1017ms (278 modules)
+ ○ Compiling /api/chat ...
+ ✓ Compiled /api/chat in 2s (866 modules)
+[React Domain] Loaded 10 vocabulary terms
+[Next.js Domain] Loaded 15 vocabulary terms
+[Programming Domain] Loaded 10 vocabulary terms
+[DataIntegrity] Initializing domain...
+[Observability] Initializing domain...
+[Repair] Initializing domain...
+[System] Initializing domain...
+[VocabularyManager] Loaded 436 base tokens
+[v0] ✅ 21 domains ready
+[v0] API route called
+[v0] Request body parsed: { action: 'initialize', hasMessage: false }
+[v0] API received action: initialize sessionId: undefined
+[v0] Initializing full AI orchestrator with all domains...
+[info] Initializing MainOrchestrator... {}
+[System] Loaded 1 concepts from 1 seed files
+[System] Domain initialized successfully
+[info] Orchestrator configuration loaded {
+  config: {
+    domainSelectionThreshold: 0.6,
+    maxDomainsPerQuery: 3,
+    enableParallelInference: true,
+    enableContextEnhancement: true,
+    enableKnowledgeRetrieval: true,
+    performance: {
+      maxConcurrentRequests: 10,
+      requestTimeoutMs: 30000,
+      enableCaching: true,
+      cacheMaxSize: 1000
+    },
+    reasoning: {
+      maxReasoningSteps: 10,
+      enableThinkingSteps: true,
+      thinkingVerbosity: 'normal'
+    }
+  }
+}
+[LLMTokenizer] Loaded shared vocabulary with 436 tokens
+[info] LLM initialized {}
+[DataIntegrity] Loaded 80 concepts from 4 seed files
+[DataIntegrity] Domain initialized successfully
+[Repair] Loaded 100 concepts from 5 seed files
+[Repair] Domain initialized successfully
+[Observability] Loaded 55 concepts from 5 seed files
+[Observability] Domain initialized successfully
+[v0] Registered 23 domains: english, repair, system, react, nextjs, programming, general_knowledge, mathematics, typescript, internet_search, grammar, science, code_review, error_detection, testing, documentation, security, algorithms, data_structures, version_control, environment, data_integrity, observability
+[info] Loaded 23 knowledge domains {
+  domains: [
+    'english',           'repair',
+    'system',            'react',
+    'nextjs',            'programming',
+    'general_knowledge', 'mathematics',
+    'typescript',        'internet_search',
+    'grammar',           'science',
+    'code_review',       'error_detection',
+    'testing',           'documentation',
+    'security',          'algorithms',
+    'data_structures',   'version_control',
+    'environment',       'data_integrity',
+    'observability'
+  ]
+}
+[info] MainOrchestrator initialized successfully { initTime: '16610ms', domains: 23, models: 1 }
+[v0] Full AI system initialized successfully
+[v0] Initialized session: session-1762278722345-qyym1pb2q Total sessions: 1
+ POST /api/chat 200 in 19002ms
+[?25h

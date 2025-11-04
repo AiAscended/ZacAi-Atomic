@@ -96,6 +96,44 @@ export interface DomainSettings {
 }
 
 // ============================================================================
+// Training Settings
+// ============================================================================
+
+export interface TrainingSettings {
+  autoTraining: {
+    enabled: boolean;
+    schedule: string; // cron expression (e.g., "0 2 * * *" for 2 AM daily)
+    minConfidenceThreshold: number; // 0.0 - 1.0
+    maxSamplesPerRun: number;
+    minSamplesRequired: number;
+  };
+  
+  pipeline: {
+    enableVocabularyUpdate: boolean;
+    enableWeightUpdate: boolean;
+    enableSeedRegeneration: boolean;
+    validationSplit: number; // 0.0 - 1.0
+    testSplit: number; // 0.0 - 1.0
+  };
+  
+  optimization: {
+    learningRate: number;
+    batchSize: number;
+    epochs: number;
+    earlyStoppingPatience: number;
+    gradientClipping: number;
+  };
+  
+  status: {
+    lastTrainingRun?: string;
+    nextScheduledRun?: string;
+    trainingInProgress: boolean;
+    lastTrainingDuration?: number; // milliseconds
+    lastTrainingSamples?: number;
+  };
+}
+
+// ============================================================================
 // GitHub App Settings
 // ============================================================================
 
