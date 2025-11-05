@@ -11,6 +11,7 @@ import { MonacoEditor, EditorFile } from './components/MonacoEditor';
 import { FileExplorer, FileNode } from './components/FileExplorer';
 import { Preview } from './components/Preview';
 import { TerminalWrapper } from './components/TerminalWrapper';
+import { AIChatPanel } from './components/AIChatPanel';
 
 // Sample files
 const sampleFiles: FileNode[] = [
@@ -156,6 +157,34 @@ export default function IDEPage() {
     // Implement command execution logic
   };
 
+  const handleInsertCode = (code: string, language: string) => {
+    // Create a new file or insert into current file
+    const fileName = `untitled.${language === 'typescript' ? 'ts' : language === 'javascript' ? 'js' : language}`;
+    const newFile: EditorFile = {
+      id: Date.now().toString(),
+      name: fileName,
+      path: `/${fileName}`,
+      language,
+      content: code,
+    };
+    setEditorFiles([...editorFiles, newFile]);
+    setActiveFileId(newFile.id);
+  };
+
+  const handlePreviewCode = (code: string, language: string) => {
+    if (language === 'html') {
+      setPreviewHtml(code);
+    } else if (language === 'css') {
+      setPreviewCss(code);
+    } else if (language === 'javascript') {
+      setPreviewJs(code);
+    }
+  };
+
+  const getCurrentFile = () => {
+    return editorFiles.find(f => f.id === activeFileId);
+  };
+
   const getLanguageFromFileName = (fileName: string): string => {
     const ext = fileName.split('.').pop()?.toLowerCase();
     const languageMap: Record<string, string> = {
@@ -207,9 +236,13 @@ export default function IDEPage() {
           <TerminalWrapper onCommand={handleCommand} />
         }
         aiChat={
-          <div className="p-4 text-muted-foreground">
-            AI Chat integration coming in Phase 5...
-          </div>
+          <AIChatPanel
+            currentFile={getCurrentFile()?.name}
+            currentCode={getCurrentFile()?.content}
+            projectContext="React TypeScript project with sample counter component"
+            onInsertCode={handleInsertCode}
+            onPreviewCode={handlePreviewCode}
+          />
         }
       />
     </div>
