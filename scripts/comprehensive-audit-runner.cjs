@@ -120,15 +120,17 @@ function phase1_criticalFunctions() {
   // 1.4 Users Seed Data
   total++;
   const usersDataPath = path.join(SETTINGS_DIR, 'users.json');
-  const usersData = readJSON(usersDataPath, { users: [] });
-  if (usersData.users && usersData.users.length > 0) {
-    success(`Users data exists: ${usersData.users.length} users`);
-    usersData.users.forEach(u => {
+  const usersData = readJSON(usersDataPath, []);
+  // Support both array format and object with users key
+  const users = Array.isArray(usersData) ? usersData : (usersData.users || []);
+  if (users.length > 0) {
+    success(`Users data exists: ${users.length} users`);
+    users.forEach(u => {
       info(`  - ${u.name} (${u.email}) [${u.role}]`);
     });
     passed++;
   } else {
-    warning('No users in users.json - run: node scripts/seed-users.ts');
+    warning('No users in users.json - run: node scripts/seed-default-users.cjs');
   }
 
   console.log(`\n📊 Phase 1 Score: ${passed}/${total} checks passed\n`);
@@ -231,8 +233,13 @@ function phase3_domainRegistration() {
 
       const seedA = path.join(domainsDir, domain, `${domain}_seedVocabulary.json`);
       const seedB = path.join(domainsDir, domain, `${domain}_seeds`, `${domain}_seedVocabulary.json`);
-      const seedFilesInSeedsDir = fs.existsSync(path.join(domainsDir, domain, `${domain}_seeds`))
-        ? fs.readdirSync(path.join(domainsDir, domain, `${domain}_seeds`)).filter(f => f.endsWith('_seedVocabulary.json'))
+      const seedDir = path.join(domainsDir, domain, `${domain}_seeds`);
+      const seedFilesInSeedsDir = fs.existsSync(seedDir)
+        ? fs.readdirSync(seedDir).filter(f => 
+            f.endsWith('_seedVocabulary.json') || 
+            f.endsWith('_concepts.json') || 
+            f.endsWith('_vocabulary.json')
+          )
         : [];
 
       const hasInference = fs.existsSync(inferenceControllerA) || fs.existsSync(inferenceControllerB);

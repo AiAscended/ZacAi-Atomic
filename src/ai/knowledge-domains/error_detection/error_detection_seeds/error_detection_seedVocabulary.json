@@ -1,7 +1,7 @@
 {
   "domain": "error_detection",
   "version": "2.0.0",
-  "lastUpdated": "2025-11-05T06:45:41.519Z",
+  "lastUpdated": "2025-11-05T07:21:35.533Z",
   "vocabulary": [
     "array_bounds",
     "assertion_failure",
