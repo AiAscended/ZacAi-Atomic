@@ -135,6 +135,58 @@ const DOMAIN_VOCABULARIES = {
     "schema_error", "migration_error", "rollback_error", "corruption_error",
     "data_loss", "consistency_error", "replication_error", "sync_error", "conflict"
   ],
+
+  data_integrity: [
+    "validation", "verification", "consistency", "accuracy", "completeness", "reliability",
+    "correctness", "quality", "constraint", "rule", "invariant", "assertion", "check",
+    "sanitization", "normalization", "standardization", "formatting", "encoding", "decoding",
+    "checksum", "hash", "digest", "signature", "fingerprint", "identifier", "key",
+    "uniqueness", "referential_integrity", "foreign_key", "primary_key", "candidate_key",
+    "entity_integrity", "domain_integrity", "user_defined_integrity", "business_rule",
+    "data_type", "schema", "structure", "format", "pattern", "regex", "range", "boundary",
+    "null_handling", "default_value", "required_field", "optional_field", "mandatory",
+    "duplicate_detection", "deduplication", "merge", "reconciliation", "synchronization",
+    "conflict_resolution", "version_control", "timestamp", "audit_trail", "changelog",
+    "transaction", "atomicity", "consistency_model", "isolation", "durability", "acid",
+    "rollback", "commit", "savepoint", "checkpoint", "recovery", "backup", "restore",
+    "corruption_detection", "error_correction", "parity", "redundancy", "replication"
+  ],
+
+  observability: [
+    "monitoring", "logging", "tracing", "metrics", "alerting", "dashboard", "visualization",
+    "telemetry", "instrumentation", "profiling", "debugging", "diagnostics", "inspection",
+    "health_check", "heartbeat", "status", "state", "availability", "uptime", "downtime",
+    "latency", "throughput", "bandwidth", "capacity", "utilization", "saturation", "errors",
+    "request_rate", "response_time", "error_rate", "success_rate", "failure_rate",
+    "distributed_tracing", "span", "trace_id", "correlation_id", "context_propagation",
+    "log_level", "severity", "priority", "timestamp", "log_aggregation", "log_analysis",
+    "structured_logging", "json_logs", "event_sourcing", "audit_log", "access_log",
+    "metric_collection", "counter", "gauge", "histogram", "summary", "percentile",
+    "time_series", "aggregation", "sampling", "cardinality", "dimensionality", "tag",
+    "label", "attribute", "property", "annotation", "context", "metadata", "payload",
+    "alert_rule", "threshold", "anomaly_detection", "baseline", "trend", "pattern",
+    "notification", "escalation", "incident", "problem", "root_cause", "investigation",
+    "service_level_objective", "service_level_indicator", "service_level_agreement",
+    "error_budget", "reliability", "availability_zone", "region", "deployment", "release"
+  ],
+
+  repair: [
+    "fix", "patch", "hotfix", "bugfix", "workaround", "solution", "resolution", "correction",
+    "remediation", "mitigation", "recovery", "restore", "rollback", "revert", "undo",
+    "debugging", "troubleshooting", "diagnosis", "root_cause_analysis", "investigation",
+    "reproduction", "isolation", "identification", "localization", "pinpointing", "analysis",
+    "refactoring", "restructuring", "redesign", "rewrite", "optimization", "improvement",
+    "cleanup", "maintenance", "upgrade", "migration", "modernization", "technical_debt",
+    "code_smell", "anti_pattern", "bad_practice", "vulnerability", "weakness", "flaw",
+    "regression", "breakage", "failure", "malfunction", "defect", "issue", "problem",
+    "error_handling", "exception_handling", "fallback", "retry", "timeout", "circuit_breaker",
+    "graceful_degradation", "fail_fast", "fail_safe", "redundancy", "backup", "failover",
+    "self_healing", "auto_recovery", "restart", "reset", "reinitialize", "reconfigure",
+    "validation", "verification", "testing", "unit_test", "integration_test", "regression_test",
+    "smoke_test", "sanity_check", "health_check", "status_check", "readiness", "liveness",
+    "monitoring", "alerting", "notification", "escalation", "incident_response", "postmortem",
+    "prevention", "mitigation_strategy", "contingency_plan", "disaster_recovery", "business_continuity"
+  ],
   
   general_knowledge: [
     "information", "knowledge", "fact", "concept", "idea", "theory", "hypothesis",
