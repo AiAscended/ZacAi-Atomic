@@ -151,3 +151,7 @@ export class DomainRegistry extends EventEmitter {
 
 // Singleton instance - the ONLY registry in the system
 export const domainRegistry = new DomainRegistry()
+
+// Helper functions for backward compatibility
+export const listDomains = () => domainRegistry.getAllDomains()
+export const getDomain = (name: string) => domainRegistry.getDomain(name)
