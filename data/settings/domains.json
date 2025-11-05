@@ -1,0 +1,62 @@
+{
+  "react": {
+    "enabled": true,
+    "confidenceThreshold": 0.7,
+    "maxTokens": 2048,
+    "temperature": 0.7,
+    "description": "",
+    "keywords": [],
+    "priority": 5,
+    "updatedAt": "2025-11-05T05:51:52.148Z"
+  },
+  "typescript": {
+    "enabled": true,
+    "confidenceThreshold": 0.7,
+    "maxTokens": 2048,
+    "temperature": 0.7,
+    "description": "",
+    "keywords": [],
+    "priority": 5,
+    "updatedAt": "2025-11-05T05:51:52.148Z"
+  },
+  "nextjs": {
+    "enabled": true,
+    "confidenceThreshold": 0.7,
+    "maxTokens": 2048,
+    "temperature": 0.7,
+    "description": "",
+    "keywords": [],
+    "priority": 5,
+    "updatedAt": "2025-11-05T05:51:52.148Z"
+  },
+  "programming": {
+    "enabled": true,
+    "confidenceThreshold": 0.7,
+    "maxTokens": 2048,
+    "temperature": 0.7,
+    "description": "",
+    "keywords": [],
+    "priority": 5,
+    "updatedAt": "2025-11-05T05:51:52.148Z"
+  },
+  "mathematics": {
+    "enabled": true,
+    "confidenceThreshold": 0.7,
+    "maxTokens": 2048,
+    "temperature": 0.7,
+    "description": "",
+    "keywords": [],
+    "priority": 5,
+    "updatedAt": "2025-11-05T05:51:52.148Z"
+  },
+  "english": {
+    "enabled": true,
+    "confidenceThreshold": 0.7,
+    "maxTokens": 2048,
+    "temperature": 0.7,
+    "description": "",
+    "keywords": [],
+    "priority": 5,
+    "updatedAt": "2025-11-05T05:51:52.148Z"
+  }
+}
