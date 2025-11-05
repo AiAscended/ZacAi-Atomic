@@ -23,6 +23,7 @@ import {
   Plug,
   MessageSquare,
   X,
+  FlaskConical,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -78,7 +79,10 @@ const menuItems: MenuItem[] = [
     id: "ai-models",
     label: "AI Models",
     icon: Brain,
-    path: "/admin/models",
+    children: [
+      { id: "models-overview", label: "Models Overview", icon: Brain, path: "/admin/models" },
+      { id: "model-layers", label: "Model Layers", icon: Layers, path: "/admin/model-layers" },
+    ],
   },
   {
     id: "training-pipelines",
@@ -109,6 +113,12 @@ const menuItems: MenuItem[] = [
     label: "System Settings",
     icon: Settings,
     path: "/admin/system",
+  },
+  {
+    id: "tests",
+    label: "System Tests",
+    icon: FlaskConical,
+    path: "/admin/tests",
   },
   {
     id: "errors",
