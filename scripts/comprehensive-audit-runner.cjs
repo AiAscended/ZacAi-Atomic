@@ -120,15 +120,17 @@ function phase1_criticalFunctions() {
   // 1.4 Users Seed Data
   total++;
   const usersDataPath = path.join(SETTINGS_DIR, 'users.json');
-  const usersData = readJSON(usersDataPath, { users: [] });
-  if (usersData.users && usersData.users.length > 0) {
-    success(`Users data exists: ${usersData.users.length} users`);
-    usersData.users.forEach(u => {
+  const usersData = readJSON(usersDataPath, []);
+  // Handle both array format and object with users property
+  const users = Array.isArray(usersData) ? usersData : (usersData.users || []);
+  if (users.length > 0) {
+    success(`Users data exists: ${users.length} users`);
+    users.forEach(u => {
       info(`  - ${u.name} (${u.email}) [${u.role}]`);
     });
     passed++;
   } else {
-    warning('No users in users.json - run: node scripts/seed-users.ts');
+    warning('No users in users.json - run: node scripts/seed-default-users.cjs');
   }
 
   console.log(`\n📊 Phase 1 Score: ${passed}/${total} checks passed\n`);
@@ -199,10 +201,17 @@ function phase3_domainRegistration() {
   let passed = 0;
   let total = 0;
 
-  const domainRegistryPath = path.join(ROOT_DIR, 'src/ai/orchestration/domainRegistry.ts');
+  // Check multiple possible locations for domainRegistry
+  const possibleRegistryPaths = [
+    path.join(ROOT_DIR, 'src/ai/orchestration/domainRegistry.ts'),
+    path.join(ROOT_DIR, 'src/ai/knowledge-domains/domainRegistry.ts')
+  ];
+  const domainRegistryPath = possibleRegistryPaths.find(p => fs.existsSync(p));
   total++;
-  if (checkFileExists(domainRegistryPath, 'Domain registry')) {
+  if (domainRegistryPath && checkFileExists(domainRegistryPath, 'Domain registry')) {
     passed++;
+  } else if (!domainRegistryPath) {
+    error('Domain registry not found in any expected location');
   }
 
   // Check for domain directories
@@ -221,16 +230,23 @@ function phase3_domainRegistration() {
     info('\nVerifying domain structure...');
     domains.forEach(domain => {
       total++;
-      const requiredFiles = [
-        `${domain}_inferenceController.ts`,
-        `${domain}_seedVocabulary.json`
+      // Check for files in both direct location and _seeds subdirectory
+      const possibleLocations = [
+        {
+          controller: path.join(domainsDir, domain, `${domain}_inferenceController.ts`),
+          vocab: path.join(domainsDir, domain, `${domain}_seedVocabulary.json`)
+        },
+        {
+          controller: path.join(domainsDir, domain, `${domain}_inferenceController.ts`),
+          vocab: path.join(domainsDir, domain, `${domain}_seeds`, `${domain}_seedVocabulary.json`)
+        }
       ];
       
-      const allExist = requiredFiles.every(f => 
-        fs.existsSync(path.join(domainsDir, domain, f))
+      const hasValidStructure = possibleLocations.some(loc => 
+        fs.existsSync(loc.controller) && fs.existsSync(loc.vocab)
       );
       
-      if (allExist) {
+      if (hasValidStructure) {
         passed++;
       } else {
         warning(`Domain ${domain} missing required files`);
@@ -273,10 +289,17 @@ function phase4_vocabularyAnalysis() {
   
   domains.forEach(domain => {
     total++;
-    const vocabPath = path.join(domainsDir, domain, `${domain}_seedVocabulary.json`);
-    const vocab = readJSON(vocabPath, { vocabulary: [] });
+    // Check both possible locations for vocabulary file
+    let vocabPath = path.join(domainsDir, domain, `${domain}_seedVocabulary.json`);
+    if (!fs.existsSync(vocabPath)) {
+      vocabPath = path.join(domainsDir, domain, `${domain}_seeds`, `${domain}_seedVocabulary.json`);
+    }
     
-    const size = vocab.vocabulary ? vocab.vocabulary.length : 0;
+    const vocab = readJSON(vocabPath, { vocabulary: [], vocab: [] });
+    
+    // Support both "vocabulary" and "vocab" keys
+    const vocabArray = vocab.vocabulary || vocab.vocab || [];
+    const size = vocabArray.length;
     vocabSizes.push({ domain, size });
     
     if (size >= 50) {
@@ -334,7 +357,11 @@ function phase5_weightsSystem() {
   
   domains.forEach(domain => {
     total++;
-    const weightsDir = path.join(domainsDir, domain, 'weights');
+    // Check both possible locations for weights
+    let weightsDir = path.join(domainsDir, domain, 'weights');
+    if (!fs.existsSync(weightsDir)) {
+      weightsDir = path.join(domainsDir, domain, `${domain}_weights`);
+    }
     
     if (!fs.existsSync(weightsDir)) {
       warning(`${domain}: No weights/ directory`);
