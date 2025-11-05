@@ -37,9 +37,12 @@ export async function POST(request: Request) {
     console.log("[v0] API route called")
 
     const body = await request.json()
-    console.log("[v0] Request body parsed:", { action: body.action, hasMessage: !!body.message })
+    console.log("[v0] Request body parsed:", { action: body.action, hasMessage: !!body.message, hasPrompt: !!body.prompt })
 
-    const { action, message, sessionId } = body
+    // Support both old format (action/message) and new format (prompt)
+    const action = body.action || (body.prompt ? "chat" : undefined)
+    const message = body.message || body.prompt
+    const { sessionId } = body
 
     console.log("[v0] API received action:", action, "sessionId:", sessionId)
 
