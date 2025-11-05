@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import meta from "./data_structures_meta.json"
+import meta from "./data_structures_seeds/data_structures_meta.json"
 import { DATA_STRUCTURES_DOMAIN } from "./data_structures_constants"
 
 export const getDomainMeta = () => ({ ...meta, name: DATA_STRUCTURES_DOMAIN })

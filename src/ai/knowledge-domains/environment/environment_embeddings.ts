@@ -12,7 +12,7 @@ import { ENVIRONMENT_DOMAIN } from "./environment_constants"
 const EMBEDDING_DIM = 128
 
 export const getEnvironmentEmbedding = (token: string): number[] => {
-  const weights = pretrained.seedWeights as Record<string, number[]>
+  const weights = pretrained.weights as Record<string, number[]>
   if (weights[token]) return weights[token]
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
 }
