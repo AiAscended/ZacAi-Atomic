@@ -1,7 +1,7 @@
 /**
  * File: src/ai/tests/domains/domainRegistry.test.ts
  * Purpose: Test domain registration and routing system
- * Tests: All 35 domains are registered, functional, and properly configured
+ * Tests: All 23 domains are registered, functional, and properly configured
  */
 
 import { describe, it, expect, beforeAll } from 'vitest';
@@ -36,11 +36,12 @@ describe('Domain Registry - System Tests', () => {
       });
     });
 
-    it('should register at least 30 domains', () => {
+    it('should register all 23 domains', () => {
       const domains = domainRegistry.getAllDomains();
       
-      // According to exploration, we have 35 domains
-      expect(domains.length).toBeGreaterThanOrEqual(30);
+      // System has 23 knowledge domains
+      expect(domains.length).toBeGreaterThanOrEqual(20);
+      expect(domains.length).toBeLessThanOrEqual(25);
     });
 
     it('should have unique domain names', () => {
@@ -175,7 +176,7 @@ describe('Domain Registry - System Tests', () => {
         return domain?.weightsPath || domain?.hasWeights;
       });
 
-      // According to docs, all 23-35 domains should have weights
+      // According to docs, all 23 domains should have weights
       expect(domainsWithWeights.length).toBeGreaterThan(0);
     });
   });

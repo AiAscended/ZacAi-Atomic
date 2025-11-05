@@ -58,7 +58,7 @@ const TEST_SUITES: TestSuite[] = [
   {
     id: 'domains',
     name: 'Domain Registry Tests',
-    description: 'All 35 knowledge domains operational',
+    description: 'All 23 knowledge domains operational',
     category: 'production',
     icon: Layers,
     status: 'idle',
@@ -318,7 +318,7 @@ export default function SystemTestsPage() {
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="space-y-1">
-            <div className="text-2xl font-bold">35</div>
+            <div className="text-2xl font-bold">23</div>
             <div className="text-xs text-muted-foreground">Domains Tested</div>
           </div>
           <div className="space-y-1">
