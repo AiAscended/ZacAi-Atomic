@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { UserPlus, Save, Check, AlertCircle, Trash2 } from "lucide-react"
+import { UserPlus, Save, Check, AlertCircle } from "lucide-react"
 import { useTheme } from "next-themes"
 
 interface UserPreferences {
@@ -43,11 +43,19 @@ export default function UsersPage() {
       if (response.ok) {
         const result = await response.json()
         if (result.success && result.data) {
-          setPreferences(result.data)
-          if (result.data.darkMode) {
-            setTheme("dark")
-          } else {
-            setTheme("light")
+          // API returns array of users, get the admin user
+          const users = Array.isArray(result.data) ? result.data : [result.data]
+          const adminUser = users.find(u => u.id === 'admin' || u.role === 'admin')
+          
+          if (adminUser && adminUser.preferences) {
+            setPreferences({
+              username: adminUser.name || 'admin',
+              email: adminUser.email || 'admin@zacai.local',
+              darkMode: adminUser.preferences.darkMode ?? true,
+              showThinking: adminUser.preferences.showThinking ?? true,
+              syntaxHighlight: adminUser.preferences.syntaxHighlight ?? true,
+            })
+            setTheme(adminUser.preferences.darkMode ? "dark" : "light")
           }
         }
       }
