@@ -4,20 +4,38 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Bot, User, Code2, FileCode, Bug, Sparkles } from 'lucide-react';
+import { Send, Bot, User, Code2, FileCode, Bug, Sparkles, Copy, FileDown, Play, Check } from 'lucide-react';
+import { aiAssistant, type IDEContext } from '@/lib/ide/aiAssistant';
+import { useEditorStore } from '@/lib/ide/editorStore';
+import { useFileSystem } from '@/lib/ide/useFileSystem';
+import Prism from 'prismjs';
+import 'prismjs/themes/prism-tomorrow.css';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-jsx';
+import 'prismjs/components/prism-tsx';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-python';
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  codeBlocks?: Array<{
+    language: string;
+    code: string;
+    filename?: string;
+  }>;
+  domains?: string[];
 }
 
 const quickActions = [
-  { icon: Code2, label: 'Explain Code', prompt: 'Explain this code' },
-  { icon: FileCode, label: 'Generate Code', prompt: 'Generate code for' },
-  { icon: Bug, label: 'Fix Bug', prompt: 'Help fix this bug' },
-  { icon: Sparkles, label: 'Optimize', prompt: 'Optimize this code' },
+  { icon: Code2, label: 'Explain Code', action: 'explain' },
+  { icon: FileCode, label: 'Generate Code', action: 'generate' },
+  { icon: Bug, label: 'Fix Bug', action: 'fix' },
+  { icon: Sparkles, label: 'Optimize', action: 'optimize' },
 ];
 
 export function AIChatPanel() {
@@ -25,13 +43,30 @@ export function AIChatPanel() {
     {
       id: '1',
       role: 'assistant',
-      content: 'Hello! I\'m your ZacAi coding assistant. I can help you with:\n\n• Code explanation and documentation\n• Bug fixing and debugging\n• Code generation and refactoring\n• Best practices and optimization\n\nWhat would you like help with?',
+      content: 'Hello! I\'m your ZacAi coding assistant powered by 23 knowledge domains and 13 AI models. I can help you with:\n\n• Code explanation and documentation\n• Bug fixing and debugging\n• Code generation and refactoring\n• Best practices and optimization\n• Testing and security analysis\n\nSelect code in the editor and use the quick actions, or just ask me anything!',
       timestamp: new Date(),
     },
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { openFiles, activeFileId, getFileById, updateFileContent } = useEditorStore();
+  const { fs, fileTree } = useFileSystem();
+
+  // Initialize AI assistant
+  useEffect(() => {
+    const initAI = async () => {
+      try {
+        await aiAssistant.initialize();
+        setIsInitialized(true);
+      } catch (error) {
+        console.error('Failed to initialize AI:', error);
+      }
+    };
+    initAI();
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -39,8 +74,30 @@ export function AIChatPanel() {
     }
   }, [messages]);
 
+  // Build IDE context
+  const getIDEContext = (): IDEContext => {
+    const activeFile = getFileById(activeFileId);
+    const projectFiles = fileTree.map((node) => node.path);
+
+    return {
+      currentFile: activeFile
+        ? {
+            path: activeFile.path,
+            content: activeFile.content,
+            language: activeFile.language,
+          }
+        : undefined,
+      openFiles: openFiles.map((file) => ({
+        path: file.path,
+        content: file.content,
+        language: file.language,
+      })),
+      projectFiles,
+    };
+  };
+
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || !isInitialized) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -53,21 +110,109 @@ export function AIChatPanel() {
     setInput('');
     setIsLoading(true);
 
-    // Phase 5: Integration with actual AI system
-    setTimeout(() => {
+    try {
+      const context = getIDEContext();
+      const response = await aiAssistant.sendMessage(input, context);
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'This is a placeholder response. Phase 5 will integrate with the full ZacAi orchestrator system, providing:\n\n• Context-aware code assistance\n• Integration with all 23 knowledge domains\n• 14 AI model capabilities\n• Real-time code analysis\n• Automated refactoring suggestions',
+        content: response.text,
+        timestamp: new Date(),
+        codeBlocks: response.codeBlocks,
+        domains: response.domains,
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, aiMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
-  const handleQuickAction = (prompt: string) => {
-    setInput(prompt + ': ');
+  const handleQuickAction = async (action: string) => {
+    const activeFile = getFileById(activeFileId);
+    
+    if (!activeFile) {
+      setInput(`${action} code for: `);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      let response;
+      const code = activeFile.content;
+      const language = activeFile.language;
+
+      switch (action) {
+        case 'explain':
+          response = await aiAssistant.explainCode(code, language);
+          break;
+        case 'fix':
+          response = await aiAssistant.fixCode(code, language);
+          break;
+        case 'optimize':
+          response = await aiAssistant.optimizeCode(code, language);
+          break;
+        case 'generate':
+          setInput('Generate code for: ');
+          setIsLoading(false);
+          return;
+        default:
+          setIsLoading(false);
+          return;
+      }
+
+      const aiMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: response.text,
+        timestamp: new Date(),
+        codeBlocks: response.codeBlocks,
+        domains: response.domains,
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Quick action error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCopyCode = (code: string, id: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(id);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  const handleInsertCode = async (code: string, filename?: string) => {
+    if (!fs) return;
+
+    if (filename) {
+      // Create new file
+      try {
+        const path = `/${filename}`;
+        await fs.write(path, code);
+        // The file system hook will refresh the tree
+      } catch (error) {
+        console.error('Failed to create file:', error);
+      }
+    } else if (activeFileId) {
+      // Insert into active file
+      const activeFile = getFileById(activeFileId);
+      if (activeFile) {
+        updateFileContent(activeFileId, code);
+      }
+    }
   };
 
   return (
@@ -102,34 +247,119 @@ export function AIChatPanel() {
       <ScrollArea className="flex-1 p-3" ref={scrollRef}>
         <div className="space-y-4">
           {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex gap-2 ${
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              {message.role === 'assistant' && (
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Bot className="h-4 w-4 text-primary" />
-                </div>
-              )}
-              
+            <div key={message.id}>
               <div
-                className={`max-w-[85%] rounded-lg p-3 ${
-                  message.role === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted'
+                className={`flex gap-2 ${
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
                 }`}
               >
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                <span className="text-xs opacity-70 mt-1 block">
-                  {message.timestamp.toLocaleTimeString()}
-                </span>
+                {message.role === 'assistant' && (
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Bot className="h-4 w-4 text-primary" />
+                  </div>
+                )}
+                
+                <div
+                  className={`max-w-[85%] rounded-lg p-3 ${
+                    message.role === 'user'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
+                  }`}
+                >
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  
+                  {message.domains && message.domains.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {message.domains.slice(0, 3).map((domain) => (
+                        <span
+                          key={domain}
+                          className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary"
+                        >
+                          {domain.replace('_', ' ')}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <span className="text-xs opacity-70 mt-1 block">
+                    {message.timestamp.toLocaleTimeString()}
+                  </span>
+                </div>
+
+                {message.role === 'user' && (
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                    <User className="h-4 w-4 text-primary-foreground" />
+                  </div>
+                )}
               </div>
 
-              {message.role === 'user' && (
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                  <User className="h-4 w-4 text-primary-foreground" />
+              {/* Code blocks with actions */}
+              {message.codeBlocks && message.codeBlocks.length > 0 && (
+                <div className="ml-10 mt-2 space-y-2">
+                  {message.codeBlocks.map((block, idx) => {
+                    const blockId = `${message.id}-${idx}`;
+                    const highlightedCode = Prism.highlight(
+                      block.code,
+                      Prism.languages[block.language] || Prism.languages.plaintext,
+                      block.language
+                    );
+
+                    return (
+                      <div
+                        key={idx}
+                        className="rounded-lg overflow-hidden border bg-background"
+                      >
+                        <div className="flex items-center justify-between px-3 py-2 bg-muted/50 border-b">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-muted-foreground">
+                              {block.language}
+                            </span>
+                            {block.filename && (
+                              <span className="text-xs text-muted-foreground">
+                                {block.filename}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-xs"
+                              onClick={() => handleCopyCode(block.code, blockId)}
+                            >
+                              {copiedCode === blockId ? (
+                                <>
+                                  <Check className="h-3 w-3 mr-1" />
+                                  Copied
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="h-3 w-3 mr-1" />
+                                  Copy
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-xs"
+                              onClick={() => handleInsertCode(block.code, block.filename)}
+                            >
+                              <FileDown className="h-3 w-3 mr-1" />
+                              {block.filename ? 'Create File' : 'Insert'}
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="p-3 overflow-x-auto">
+                          <pre className="text-xs">
+                            <code
+                              dangerouslySetInnerHTML={{ __html: highlightedCode }}
+                            />
+                          </pre>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -166,11 +396,11 @@ export function AIChatPanel() {
             }}
             placeholder="Ask me anything about your code..."
             className="min-h-[60px] max-h-[120px] resize-none"
-            disabled={isLoading}
+            disabled={isLoading || !isInitialized}
           />
           <Button
             onClick={handleSend}
-            disabled={!input.trim() || isLoading}
+            disabled={!input.trim() || isLoading || !isInitialized}
             size="icon"
             className="flex-shrink-0"
           >
@@ -178,7 +408,15 @@ export function AIChatPanel() {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          Phase 5: Full AI orchestrator integration
+          {isInitialized ? (
+            <>
+              ✅ Phase 5 Complete: AI-powered coding assistant active
+            </>
+          ) : (
+            <>
+              Initializing AI assistant...
+            </>
+          )}
         </p>
       </div>
     </div>
