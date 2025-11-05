@@ -140,21 +140,32 @@ export default function SystemTestsPage() {
     setIsRunningAll(true)
     const startTime = Date.now()
 
+    // Run all tests and collect results
+    const allResults: Array<{ passed: number; failed: number }> = []
     for (const suite of testSuites) {
       await runTest(suite.id)
     }
 
-    const duration = Date.now() - startTime
-    const results = testSuites.map(s => ({
-      passed: s.passed || 0,
-      failed: s.failed || 0,
-    }))
+    // Wait a moment for state updates to propagate
+    await new Promise(resolve => setTimeout(resolve, 100))
 
-    setOverallStatus({
-      total: results.reduce((sum, r) => sum + r.passed + r.failed, 0),
-      passed: results.reduce((sum, r) => sum + r.passed, 0),
-      failed: results.reduce((sum, r) => sum + r.failed, 0),
-      duration,
+    const duration = Date.now() - startTime
+    
+    // Get results from updated state after all tests complete
+    setTestSuites(currentSuites => {
+      const results = currentSuites.map(s => ({
+        passed: s.passed || 0,
+        failed: s.failed || 0,
+      }))
+
+      setOverallStatus({
+        total: results.reduce((sum, r) => sum + r.passed + r.failed, 0),
+        passed: results.reduce((sum, r) => sum + r.passed, 0),
+        failed: results.reduce((sum, r) => sum + r.failed, 0),
+        duration,
+      })
+
+      return currentSuites
     })
 
     setIsRunningAll(false)

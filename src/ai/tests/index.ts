@@ -18,7 +18,7 @@ export const AI_TEST_SUITES = {
   },
   domains: {
     name: 'Domain Registry Tests',
-    description: 'Tests for all 35 knowledge domains',
+    description: 'Tests for all 23 knowledge domains',
     file: './domains/domainRegistry.test.ts',
   },
   models: {
