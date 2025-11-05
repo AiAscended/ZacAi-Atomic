@@ -1,0 +1,141 @@
+***
+
+# Installation and Getting Started Guide for AiAscended Projects
+
+***
+
+## Prerequisites
+
+- Node.js 20+ and npm/yarn package manager installed
+- Git CLI or GitHub Desktop for repository cloning
+- Compatible operating system (Linux/macOS/Windows)
+- GitHub account with permissions to access selected repos and applications
+- Optional: Docker for containerized deployments
+- Recommended: Editor with TypeScript support (Visual Studio Code or GitHub Codespaces)
+
+***
+
+## Cloning the Repository
+
+```bash
+git clone https://github.com/AiAscended/your-repo-name.git
+cd your-repo-name
+```
+
+***
+
+## Environment Configuration
+
+Set up environment variables for API keys, GitHub App credentials, and runtime configuration:
+
+- Copy `.env.example` to `.env.local` (or `.env` in production):
+
+```bash
+cp .env.example .env.local
+```
+
+- Populate `.env.local` with your GitHub App credentials:
+
+```env
+GITHUB_APP_ID=your_app_id
+GITHUB_APP_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY\n-----END PRIVATE KEY-----"
+GITHUB_APP_WEBHOOK_SECRET=your_webhook_secret  # if applicable
+```
+
+- Adjust other environment variables like API base URLs, feature toggles, and tokens as needed.
+
+***
+
+## Installing Dependencies
+
+Run the following command to install dependencies using npm or yarn:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+***
+
+## Building the Project
+
+Compile TypeScript sources and generate production-ready builds:
+
+```bash
+npm run build
+# or
+yarn build
+```
+
+***
+
+## Running Locally
+
+Start the development server with hot-reloading:
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+Visit `http://localhost:3000` in your web browser to access the app UI.
+
+***
+
+## Running Tests
+
+Run unit and integration tests to verify system correctness:
+
+```bash
+npm run test
+# or
+yarn test
+```
+
+***
+
+## Deployment
+
+Deploy your AiAscended applications using supported platforms such as Vercel or any preferred infrastructure. General steps:
+
+1. Commit and push code changes to the main branch.
+2. Connect your repository to your deployment platform.
+3. Configure secrets/environment variables in your platform.
+4. Trigger automated CI/CD pipelines for build, test, and deploy.
+5. Monitor deployment status and logs.
+
+***
+
+## Advanced Usage
+
+- **GitHub App Integration:** Configure OAuth flows and repository permissions via the Admin UI.
+- **AI Model Access:** Use the API routes to query ZacAi-Hybrid-LLM and manage domain-specific models.
+- **Custom DSL:** Develop and extend AI workflows using `.zac` and `.mal` languages with provided tooling.
+- **Monitoring & Metrics:** Access live system metrics dashboards for real-time logging and health checks.
+
+***
+
+## Troubleshooting
+
+- Ensure all environment variables are set correctly.
+- Check GitHub App permissions and credentials.
+- Review build and runtime logs for errors.
+- Use VS Code or Codespaces for integrated debugging.
+- Consult `docs` folder for detailed guides and FAQs.
+
+***
+
+## Getting Help
+
+Join the AiAscended community channels and GitHub Discussions for support, feature requests, and collaboration opportunities.
+
+***
+
+Would you like help formatting this into markdown files or integrating it into your existing docs structure?
+
+Citations:
+[1] 1000002325.jpg https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/73481744/ca9e65ae-ce5d-4419-870e-e1422643512b/1000002325.jpg
+[2] 1000002326.jpg https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/73481744/516ee937-ef06-48ee-b5c0-7637d3bb12a8/1000002326.jpg
+[3] 1000002327.jpg https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/73481744/4f8bd797-6b15-4410-9736-2a26df9d491d/1000002327.jpg
