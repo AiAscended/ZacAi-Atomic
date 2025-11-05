@@ -199,9 +199,11 @@ function phase3_domainRegistration() {
   let passed = 0;
   let total = 0;
 
+  // domain registry may live in orchestration or under knowledge-domains
   const domainRegistryPath = path.join(ROOT_DIR, 'src/ai/orchestration/domainRegistry.ts');
+  const altDomainRegistryPath = path.join(ROOT_DIR, 'src/ai/knowledge-domains/domainRegistry.ts');
   total++;
-  if (checkFileExists(domainRegistryPath, 'Domain registry')) {
+  if (checkFileExists(domainRegistryPath, 'Domain registry') || checkFileExists(altDomainRegistryPath, 'Domain registry (alt)')) {
     passed++;
   }
 
@@ -217,23 +219,29 @@ function phase3_domainRegistration() {
     success(`Found ${domains.length} domain directories`);
     domains.forEach(d => info(`  - ${d}`));
     
-    // Check each domain has required files
+    // Check each domain has required files (accept multiple seed/weights layouts)
     info('\nVerifying domain structure...');
     domains.forEach(domain => {
       total++;
-      const requiredFiles = [
-        `${domain}_inferenceController.ts`,
-        `${domain}_seedVocabulary.json`
-      ];
-      
-      const allExist = requiredFiles.every(f => 
-        fs.existsSync(path.join(domainsDir, domain, f))
-      );
-      
-      if (allExist) {
+      // Possible seed locations:
+      //  - src/ai/knowledge-domains/<domain>/<domain>_seedVocabulary.json
+      //  - src/ai/knowledge-domains/<domain>/<domain>_seeds/<domain>_seedVocabulary.json
+      const inferenceControllerA = path.join(domainsDir, domain, `${domain}_inferenceController.ts`);
+      const inferenceControllerB = path.join(domainsDir, domain, `${domain}_inferenceController.js`);
+
+      const seedA = path.join(domainsDir, domain, `${domain}_seedVocabulary.json`);
+      const seedB = path.join(domainsDir, domain, `${domain}_seeds`, `${domain}_seedVocabulary.json`);
+      const seedFilesInSeedsDir = fs.existsSync(path.join(domainsDir, domain, `${domain}_seeds`))
+        ? fs.readdirSync(path.join(domainsDir, domain, `${domain}_seeds`)).filter(f => f.endsWith('_seedVocabulary.json'))
+        : [];
+
+      const hasInference = fs.existsSync(inferenceControllerA) || fs.existsSync(inferenceControllerB);
+      const hasSeed = fs.existsSync(seedA) || fs.existsSync(seedB) || seedFilesInSeedsDir.length > 0;
+
+      if (hasInference && hasSeed) {
         passed++;
       } else {
-        warning(`Domain ${domain} missing required files`);
+        warning(`Domain ${domain} missing required files (inferenceController or seed vocabulary)`);
       }
     });
   } else {
@@ -273,8 +281,18 @@ function phase4_vocabularyAnalysis() {
   
   domains.forEach(domain => {
     total++;
-    const vocabPath = path.join(domainsDir, domain, `${domain}_seedVocabulary.json`);
-    const vocab = readJSON(vocabPath, { vocabulary: [] });
+    // Check multiple possible locations for seed vocabulary
+    const vocabPath1 = path.join(domainsDir, domain, `${domain}_seedVocabulary.json`);
+    const vocabPath2 = path.join(domainsDir, domain, `${domain}_seeds`, `${domain}_seedVocabulary.json`);
+    
+    let vocab = null;
+    if (fs.existsSync(vocabPath1)) {
+      vocab = readJSON(vocabPath1, { vocabulary: [] });
+    } else if (fs.existsSync(vocabPath2)) {
+      vocab = readJSON(vocabPath2, { vocabulary: [] });
+    } else {
+      vocab = { vocabulary: [] };
+    }
     
     const size = vocab.vocabulary ? vocab.vocabulary.length : 0;
     vocabSizes.push({ domain, size });
@@ -334,28 +352,35 @@ function phase5_weightsSystem() {
   
   domains.forEach(domain => {
     total++;
-    const weightsDir = path.join(domainsDir, domain, 'weights');
+    const weightsDir = path.join(domainsDir, domain, `${domain}_weights`);
     
     if (!fs.existsSync(weightsDir)) {
       warning(`${domain}: No weights/ directory`);
       return; // Use return instead of continue in forEach
     }
     
-    const pretrainedPath = path.join(weightsDir, 'pretrained_weights.bin');
-    const trainedPattern = /trained_weights_\d+_\d{4}-\d{2}-\d{2}\.bin/;
+    // Check for new naming convention
+    const pretrainedJson = path.join(weightsDir, `${domain}_pretrained_weights.json`);
+    const pretrainedBin = path.join(weightsDir, 'pretrained_weights.bin');
+    
+    // Pattern for new trained weights: <domain>_trained_weights_v1_YYYY-MM-DD.json
+    const trainedPatternNew = new RegExp(`^${domain}_trained_weights_v\\d+_\\d{4}-\\d{2}-\\d{2}\\.json$`);
+    const trainedPatternOld = /trained_weights_\d+_\d{4}-\d{2}-\d{2}\.(bin|json)/;
+    
     const weightsFiles = fs.readdirSync(weightsDir);
     
-    const hasPretrainedWeights = fs.existsSync(pretrainedPath);
-    const trainedWeights = weightsFiles.filter(f => trainedPattern.test(f));
+    const hasPretrainedWeights = fs.existsSync(pretrainedJson) || fs.existsSync(pretrainedBin);
+    const trainedWeights = weightsFiles.filter(f => trainedPatternNew.test(f) || trainedPatternOld.test(f));
     
     if (hasPretrainedWeights) {
-      success(`${domain}: pretrained_weights.bin exists`);
+      success(`${domain}: pretrained weights exist`);
       if (trainedWeights.length > 0) {
         info(`  └─ ${trainedWeights.length} trained weight file(s)`);
+        trainedWeights.forEach(w => info(`     • ${w}`));
       }
       passed++;
     } else {
-      error(`${domain}: Missing pretrained_weights.bin`);
+      error(`${domain}: Missing pretrained weights`);
     }
   });
 
@@ -431,6 +456,60 @@ function phase7_buildVerification() {
 }
 
 // ============================================================================
+// PHASE 8: Production Hardening
+// ============================================================================
+
+function phase8_productionHardening() {
+  console.log('\n' + '='.repeat(80));
+  console.log('PHASE 8: PRODUCTION HARDENING');
+  console.log('='.repeat(80) + '\n');
+
+  let passed = 0;
+  let total = 0;
+
+  info('Checking production hardening components...\n');
+
+  // Security middleware
+  total++;
+  if (checkFileExists(path.join(ROOT_DIR, 'src/lib/productionHardening.ts'), 'Production hardening middleware')) {
+    passed++;
+  }
+
+  // Health check endpoint
+  total++;
+  if (checkFileExists(path.join(ROOT_DIR, 'src/app/api/health/route.ts'), 'Health check API')) {
+    passed++;
+  }
+
+  // Activity logging
+  total++;
+  if (checkFileExists(path.join(ROOT_DIR, 'src/lib/systemActivityLogger.cjs'), 'System activity logger')) {
+    passed++;
+  }
+
+  // Activity API
+  total++;
+  if (checkFileExists(path.join(ROOT_DIR, 'src/app/api/admin/activity/route.ts'), 'Activity API')) {
+    passed++;
+  }
+
+  // Activity page
+  total++;
+  if (checkFileExists(path.join(ROOT_DIR, 'src/app/admin/activity/page.tsx'), 'Activity admin page')) {
+    passed++;
+  }
+
+  // Smart weights loader
+  total++;
+  if (checkFileExists(path.join(ROOT_DIR, 'src/lib/smartWeightsLoader.ts'), 'Smart weights loader')) {
+    passed++;
+  }
+
+  console.log(`\n📊 Phase 8 Score: ${passed}/${total} checks passed\n`);
+  return { passed, total };
+}
+
+// ============================================================================
 // Main Execution
 // ============================================================================
 
@@ -450,6 +529,7 @@ function main() {
   results.push(phase5_weightsSystem());
   results.push(phase6_apiRoutes());
   results.push(phase7_buildVerification());
+  results.push(phase8_productionHardening());
   
   // Final Summary
   console.log('\n' + '='.repeat(80));

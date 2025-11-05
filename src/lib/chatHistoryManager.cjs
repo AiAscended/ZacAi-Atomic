@@ -8,6 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const logger = require('./systemActivityLogger.cjs');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const CHAT_HISTORY_DIR = path.join(ROOT_DIR, 'data', 'chat-history');
@@ -56,6 +57,7 @@ class ChatHistoryManager {
     };
 
     this.saveChat(chat);
+    try { logger.logEvent('chat_create', `Created chat ${chat.id}`, { userId: this.userId, title }); } catch (e) {}
     return chat;
   }
 
@@ -74,6 +76,7 @@ class ChatHistoryManager {
     chat.metadata.messageCount = chat.messages.length;
 
     fs.writeFileSync(filePath, JSON.stringify(chat, null, 2), 'utf-8');
+    try { logger.logEvent('chat_save', `Saved chat ${chat.id}`, { userId: this.userId, messageCount: chat.messages.length }); } catch (e) {}
   }
 
   /**
@@ -116,6 +119,14 @@ class ChatHistoryManager {
     }
 
     this.saveChat(chat);
+    try {
+      logger.logEvent('chat_message', `Message added to ${chat.id}`, {
+        userId: this.userId,
+        chatId: chat.id,
+        role: messageWithMeta.role,
+        domain: messageWithMeta.domain || null,
+      });
+    } catch (e) {}
     return messageWithMeta;
   }
 
