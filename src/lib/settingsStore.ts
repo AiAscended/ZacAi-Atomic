@@ -60,7 +60,7 @@ export interface UserSettings {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'user' | 'viewer';
+  role: 'admin' | 'user' | 'system';
   preferences: Record<string, any>;
   createdAt: string;
   updatedAt: string;
