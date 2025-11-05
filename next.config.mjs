@@ -3,6 +3,9 @@ const nextConfig = {
   // Production-grade: Enable strict mode for better error detection
   reactStrictMode: true,
   
+  // Docker standalone output for containerized deployment
+  output: 'standalone',
+  
   // Keep TypeScript and ESLint checks enabled for production quality
   // Remove ignoreBuildErrors and ignoreDuringBuilds for production
   eslint: {
