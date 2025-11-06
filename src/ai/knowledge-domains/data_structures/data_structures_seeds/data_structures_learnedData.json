@@ -1,0 +1,10 @@
+{
+  "notes": ["Initial data_structures domain setup"],
+  "concepts": {
+    "arrays": "Contiguous memory allocation",
+    "linkedLists": "Dynamic node-based structure",
+    "trees": "Hierarchical data organization",
+    "graphs": "Network of vertices and edges",
+    "hashTables": "Key-value pair storage with O(1) lookup"
+  }
+}

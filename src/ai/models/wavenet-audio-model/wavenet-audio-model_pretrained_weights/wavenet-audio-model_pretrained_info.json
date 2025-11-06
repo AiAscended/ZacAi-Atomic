@@ -1,0 +1,12 @@
+{
+  "model": "wavenet-audio-model",
+  "source": "initialization",
+  "method": "Xavier/He initialization",
+  "date": "2025-11-02T11:55:05.086Z",
+  "description": "Base pretrained weights for model initialization",
+  "files": [
+    "wavenet-audio-model_pretrained_embeddings.bin",
+    "wavenet-audio-model_pretrained_encoder.bin",
+    "wavenet-audio-model_pretrained_decoder.bin"
+  ]
+}

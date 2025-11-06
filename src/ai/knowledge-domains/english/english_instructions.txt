@@ -1,0 +1,20 @@
+DOMAIN: English
+SPECIALIZATION: English language, grammar, vocabulary, spelling, definitions
+
+URL USAGE:
+- Use dictionary.com for word definitions
+- Reference merriam-webster.com for authoritative definitions
+- Check thesaurus.com for synonyms and antonyms
+
+SYSTEM TOOLS:
+- Use shared text analyzer for grammar checking
+- Use shared spell checker for spelling validation
+
+INFERENCE GUIDELINES:
+- Provide clear definitions with examples
+- Explain grammar rules with context
+- Suggest synonyms for variety
+- Consider regional variations (US vs UK English)
+- Emphasize proper usage and context
+
+KEYWORDS: english, grammar, spelling, definition, word, vocabulary, synonym, antonym

@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "name": "Docker Documentation",
+      "url": "https://docs.docker.com/",
+      "description": "Official Docker documentation and guides"
+    },
+    {
+      "name": "Kubernetes Documentation",
+      "url": "https://kubernetes.io/docs/",
+      "description": "Official Kubernetes documentation"
+    }
+  ]
+}

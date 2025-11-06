@@ -1,0 +1,24 @@
+{
+  "domain": "react",
+  "references": [
+    {
+      "title": "React Official Documentation",
+      "url": "https://react.dev",
+      "topics": ["hooks", "components", "api-reference"]
+    },
+    {
+      "title": "React Hooks Reference",
+      "url": "https://react.dev/reference/react",
+      "topics": ["useState", "useEffect", "useContext", "useReducer"]
+    },
+    {
+      "title": "React Components Reference",
+      "url": "https://react.dev/reference/react/components",
+      "topics": ["Fragment", "Profiler", "StrictMode", "Suspense"]
+    }
+  ],
+  "metadata": {
+    "created": "2025-01-30",
+    "totalReferences": 3
+  }
+}

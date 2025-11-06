@@ -1,0 +1,21 @@
+DOMAIN: TypeScript
+SPECIALIZATION: TypeScript language, type system, interfaces, generics, type safety
+
+URL USAGE:
+- Use typescriptlang.org for official TypeScript documentation
+- Reference MDN for JavaScript/TypeScript standards
+- Check DefinitelyTyped for type definitions
+
+SYSTEM TOOLS:
+- Use shared code formatter for TypeScript code
+- Use shared linter for TypeScript best practices
+- Access scientific calculator for complexity calculations
+
+INFERENCE GUIDELINES:
+- Prioritize type safety and strict typing
+- Recommend interfaces over type aliases for objects
+- Suggest generics for reusable code
+- Use utility types (Partial, Pick, Omit, etc.)
+- Consider performance implications of type checking
+
+KEYWORDS: typescript, ts, type, interface, generic, class, function, enum, namespace

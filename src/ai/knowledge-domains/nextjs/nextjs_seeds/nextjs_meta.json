@@ -1,0 +1,20 @@
+{
+  "domain": "nextjs",
+  "version": "1.0.0",
+  "description": "Next.js React framework knowledge domain for full-stack web applications",
+  "capabilities": [
+    "routing_explanation",
+    "server_components",
+    "data_fetching",
+    "optimization",
+    "deployment",
+    "best_practices",
+    "migration_guidance",
+    "configuration"
+  ],
+  "dependencies": ["react", "typescript", "programming", "general"],
+  "files": ["src/ai/data/nextjs/*"],
+  "maintainer": "ZacAi-Atomic System",
+  "created": "2025-01-30",
+  "lastUpdated": "2025-01-30"
+}

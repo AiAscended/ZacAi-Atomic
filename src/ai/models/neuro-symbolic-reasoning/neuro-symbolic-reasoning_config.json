@@ -1,0 +1,25 @@
+{
+  "model": "neuro-symbolic-reasoning",
+  "version": "1.0.0",
+  "type": "neural_network",
+  "architecture": {
+    "input_dim": 512,
+    "hidden_dim": 1024,
+    "output_dim": 512,
+    "num_layers": 6,
+    "num_heads": 8,
+    "dropout": 0.1
+  },
+  "hyperparameters": {
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "max_epochs": 100,
+    "early_stopping_patience": 10
+  },
+  "paths": {
+    "seeds": "./neuro-symbolic-reasoning_seeds/",
+    "weights": "./neuro-symbolic-reasoning_weights/",
+    "pretrained": "./neuro-symbolic-reasoning_pretrained_weights/",
+    "checkpoints": "./neuro-symbolic-reasoning_checkpoints/"
+  }
+}

@@ -1,0 +1,39 @@
+# SPEECH TO TEXT Model Instructions
+
+model: speech-to-text
+version: "1.0.0"
+type: "neural_network"
+
+architecture:
+  name: "speech-to-text"
+  layers: []
+  parameters: 0
+  
+task:
+  primary: "Model-specific inference task"
+  input: "Task-specific input format"
+  output: "Task-specific output format"
+  
+training:
+  enabled: true
+  optimizer: "adam"
+  learning_rate: 0.001
+  batch_size: 32
+  epochs: 100
+  validation_split: 0.2
+  
+inference:
+  batch_size: 1
+  max_sequence_length: 512
+  temperature: 1.0
+  top_k: 50
+  top_p: 0.9
+  
+seeds:
+  location: "./speech-to-text_seeds/"
+  tokens_file: "speech-to-text_seed_tokens.json"
+  
+weights:
+  current: "./speech-to-text_weights/speech-to-text_current_weights.bin"
+  pretrained: "./speech-to-text_pretrained_weights/speech-to-text_pretrained_embeddings.bin"
+  auto_load: true

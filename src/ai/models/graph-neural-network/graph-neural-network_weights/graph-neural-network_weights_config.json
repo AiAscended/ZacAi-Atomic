@@ -1,0 +1,19 @@
+{
+  "model": "graph-neural-network",
+  "version": "1.0.0",
+  "architecture": "graph_neural_network",
+  "lastUpdated": "2025-11-02T11:55:05.053Z",
+  "weights": {
+    "current": "graph-neural-network_current_weights.bin",
+    "pretrained": "graph-neural-network_pretrained_weights.bin",
+    "checkpoint": "graph-neural-network_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}

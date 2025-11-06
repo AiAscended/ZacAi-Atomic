@@ -1,0 +1,47 @@
+{
+  "domain": "testing",
+  "version": "2.0.0",
+  "lastUpdated": "2025-11-05T06:34:16.698Z",
+  "weightFiles": [
+    {
+      "name": "testing_pretrained_weights.json",
+      "type": "pretrained",
+      "description": "Baseline pretrained weights (minimal functional)",
+      "required": true,
+      "loadPriority": 2
+    },
+    {
+      "name": "testing_trained_weights_v1_2025-11-05.json",
+      "type": "trained",
+      "description": "Production-ready trained weights v1",
+      "required": false,
+      "loadPriority": 1
+    }
+  ],
+  "loadingStrategy": {
+    "preferLatestTrained": true,
+    "fallbackToPretrained": true,
+    "versionSelection": "timestamp_descending",
+    "caching": {
+      "enabled": true,
+      "ttlMinutes": 60
+    }
+  },
+  "architecture": {
+    "embeddingDim": 512,
+    "embeddingDimCompact": 256,
+    "numLayers": 6,
+    "numHeads": 8,
+    "ffnDim": 2048,
+    "maxSeqLength": 2048,
+    "baseVocabSize": 50000,
+    "dropout": 0.1,
+    "layerNorm": true,
+    "residualConnections": true
+  },
+  "compatibility": {
+    "minVersion": "1.0.0",
+    "maxVersion": "2.0.0",
+    "backwardCompatible": true
+  }
+}

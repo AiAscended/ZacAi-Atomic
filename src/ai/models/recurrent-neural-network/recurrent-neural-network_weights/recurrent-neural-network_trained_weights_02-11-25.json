@@ -1,0 +1,89 @@
+{
+  "version": "1.1.0",
+  "type": "trained",
+  "model": "recurrent-neural-network",
+  "training_run": 1,
+  "created": "2025-11-02T12:48:51.421Z",
+  "date_stamp": "02-11-25",
+  "description": "Trained weights for recurrent-neural-network - Enhanced sequence modeling capabilities",
+  "base_weights": "pretrained.bin",
+  "architecture": {
+    "model_type": "recurrent-neural-network",
+    "total_parameters": 35000000,
+    "layers": 6,
+    "attention_heads": 0,
+    "hidden_dim": 512,
+    "task": "sequence modeling"
+  },
+  "training": {
+    "epochs": 100,
+    "batch_size": 64,
+    "learning_rate": 0.0001,
+    "optimizer": "adamw",
+    "loss_function": "cross_entropy",
+    "training_samples": 1000000,
+    "validation_split": 0.1,
+    "gradient_clipping": 1,
+    "weight_decay": 0.01,
+    "warmup_steps": 10000
+  },
+  "weights": {
+    "token_embeddings": {
+      "shape": [
+        50000,
+        512
+      ],
+      "updated": true,
+      "delta": 0.18
+    },
+    "position_embeddings": {
+      "shape": [
+        2048,
+        512
+      ],
+      "updated": true,
+      "delta": 0.12
+    },
+    "layer_weights": {
+      "count": 6,
+      "updated": true,
+      "delta": 0.25
+    },
+    "attention_weights": null,
+    "output_layer": {
+      "shape": [
+        512,
+        50000
+      ],
+      "updated": true,
+      "delta": 0.15
+    }
+  },
+  "capabilities": [
+    "Advanced sequence modeling",
+    "Complex pattern recognition",
+    "High-quality inference",
+    "Context-aware processing",
+    "Specialized task handling"
+  ],
+  "performance": {
+    "accuracy": 0.92,
+    "f1_score": 0.9,
+    "inference_time_ms": 140,
+    "throughput_samples_per_sec": 35,
+    "improvement_over_pretrained": {
+      "accuracy": "+31.4%",
+      "f1_score": "+32.4%",
+      "throughput": "+40.0%"
+    }
+  },
+  "metadata": {
+    "training_corpus": "recurrent-neural-network specialized dataset",
+    "total_parameters": 35000000,
+    "trainable_parameters": 35000000,
+    "training_duration_hours": 48,
+    "gpu_cluster": "8x NVIDIA A100",
+    "checkpoint_saved": true,
+    "best_epoch": 87
+  }
+}

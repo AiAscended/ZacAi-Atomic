@@ -1,0 +1,15 @@
+{
+  "domain": "testing",
+  "sources": [
+    {
+      "name": "testing Documentation",
+      "url": "https://example.com/testing",
+      "type": "documentation",
+      "description": "Official documentation for testing",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

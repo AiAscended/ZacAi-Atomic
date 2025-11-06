@@ -1,0 +1,15 @@
+{
+  "domain": "react",
+  "sources": [
+    {
+      "name": "react Documentation",
+      "url": "https://example.com/react",
+      "type": "documentation",
+      "description": "Official documentation for react",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

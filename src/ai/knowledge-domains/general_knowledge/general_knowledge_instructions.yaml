@@ -1,0 +1,269 @@
+# Domain Instructions: General Knowledge
+# This domain handles broad, cross-cutting knowledge that doesn't fit specific domains
+# Acts as fallback and provides common-sense reasoning, general facts, and conversational responses
+
+domain:
+  id: "general_knowledge"
+  name: "General Knowledge"
+  version: "1.0.0"
+  description: "Handles general queries, common-sense reasoning, basic facts, and conversational responses"
+  expertise:
+    - "General conversational responses"
+    - "Common-sense reasoning"
+    - "Basic facts and general knowledge"
+    - "Fallback responses when no specific domain matches"
+    - "Cross-domain integration and routing"
+    - "Context understanding and intent classification"
+
+core_principles:
+  - "Provide accurate, helpful, and contextually appropriate responses"
+  - "Use clear, natural language suitable for general audiences"
+  - "Admit uncertainty when confidence is low and suggest alternatives"
+  - "Route to specialized domains when detected (programming, math, etc.)"
+  - "Maintain conversation context and coherence"
+  - "Prioritize user safety and ethical responses"
+
+# Token Management
+tokens:
+  base_tokens:
+    # Common conversational tokens
+    - "hello"
+    - "hi"
+    - "thanks"
+    - "please"
+    - "help"
+    - "what"
+    - "how"
+    - "why"
+    - "when"
+    - "where"
+    - "who"
+    - "can"
+    - "could"
+    - "would"
+    - "should"
+    - "is"
+    - "are"
+    - "the"
+    - "a"
+    - "an"
+    - "and"
+    - "or"
+    - "but"
+    - "not"
+    - "yes"
+    - "no"
+    - "maybe"
+    - "okay"
+    - "sure"
+    
+  system_tokens:
+    - "[GENERAL]"
+    - "[CONVERSATION]"
+    - "[QUESTION]"
+    - "[RESPONSE]"
+    - "[CONTEXT]"
+    - "[FALLBACK]"
+    - "[ROUTE]"
+    - "[CLARIFY]"
+    
+  specialty_tokens:
+    - "general knowledge"
+    - "common sense"
+    - "everyday"
+    - "basic"
+    - "simple"
+    - "explain"
+    - "understand"
+    - "tell me about"
+    - "what is"
+    - "how does"
+
+# Inference Pipeline Configuration
+inference:
+  confidence_threshold: 0.3  # Lower threshold as this is a fallback domain
+  max_response_length: 500
+  temperature: 0.7  # Balanced creativity
+  
+  steps:
+    - name: "intent_classification"
+      description: "Classify user intent and detect if specific domain needed"
+      actions:
+        - "Tokenize input"
+        - "Check for domain-specific keywords (code, math, etc.)"
+        - "Classify as: question, statement, command, conversation"
+        - "Calculate confidence score"
+    
+    - name: "context_analysis"
+      description: "Analyze conversation context and history"
+      actions:
+        - "Review previous messages for context"
+        - "Identify conversation topic and flow"
+        - "Detect topic shifts or continuations"
+    
+    - name: "domain_routing"
+      description: "Determine if specialized domain should handle this"
+      actions:
+        - "Check programming keywords → route to programming domain"
+        - "Check math symbols/equations → route to mathematics domain"
+        - "Check Next.js/React keywords → route to respective domains"
+        - "If no match, continue with general_knowledge"
+      
+    - name: "knowledge_retrieval"
+      description: "Retrieve relevant knowledge from internal weights and external sources"
+      actions:
+        - "Search pretrained weights for relevant patterns"
+        - "Check learnedData.json for previously learned information"
+        - "If confidence < 0.6, consult url_lookup for verification"
+    
+    - name: "response_generation"
+      description: "Generate contextually appropriate response"
+      actions:
+        - "Formulate response based on retrieved knowledge"
+        - "Ensure clarity and natural language"
+        - "Include confidence score in metadata"
+        - "Suggest follow-up questions if relevant"
+    
+    - name: "quality_check"
+      description: "Verify response quality and safety"
+      actions:
+        - "Check for harmful/biased content"
+        - "Verify factual accuracy if making claims"
+        - "Ensure response addresses the query"
+
+# Tool Integration
+tools:
+  url_lookup:
+    enabled: true
+    usage_conditions:
+      - "Confidence score < 0.6 for factual questions"
+      - "User explicitly requests current/updated information"
+      - "Verification needed for important facts"
+    sources:
+      - name: "Wikipedia"
+        url: "https://en.wikipedia.org"
+        purpose: "General encyclopedia knowledge, facts, definitions"
+        trust_level: "high"
+      
+      - name: "Britannica"
+        url: "https://www.britannica.com"
+        purpose: "Authoritative encyclopedia content"
+        trust_level: "very_high"
+      
+      - name: "Dictionary.com"
+        url: "https://www.dictionary.com"
+        purpose: "Word definitions, synonyms, etymology"
+        trust_level: "high"
+      
+      - name: "Merriam-Webster"
+        url: "https://www.merriam-webster.com"
+        purpose: "Dictionary and thesaurus lookups"
+        trust_level: "very_high"
+  
+  conversation_manager:
+    enabled: true
+    description: "Manages conversation flow and context"
+    features:
+      - "Context window management"
+      - "Topic tracking"
+      - "Clarification requests"
+      - "Follow-up suggestions"
+
+# Training Configuration
+training:
+  enabled: true
+  schedule: "continuous"  # Learn from every interaction
+  
+  data_sources:
+    primary:
+      - "Conversation logs (anonymized)"
+      - "User feedback signals"
+      - "Successful response patterns"
+    
+    external:
+      - "Common sense reasoning datasets"
+      - "FAQ databases"
+      - "General knowledge corpora"
+  
+  learning_objectives:
+    - "Improve intent classification accuracy"
+    - "Better domain routing decisions"
+    - "More natural conversational responses"
+    - "Reduced hallucination on factual queries"
+  
+  pipeline:
+    - name: "data_collection"
+      description: "Collect interaction data for learning"
+      outputs: "learnedData.json"
+      
+    - name: "pattern_extraction"
+      description: "Extract successful patterns and common queries"
+      
+    - name: "weight_update"
+      description: "Update model weights based on learned patterns"
+      inputs: "learnedData.json"
+      outputs: "trainingWeights.bin"
+      frequency: "daily"
+      
+    - name: "validation"
+      description: "Validate learned patterns don't degrade performance"
+      
+    - name: "weight_merge"
+      description: "Merge training weights into pretrained weights"
+      condition: "validation_passed && confidence > 0.8"
+
+# Scoring and Evaluation
+scoring:
+  metrics:
+    - name: "confidence"
+      range: [0.0, 1.0]
+      threshold: 0.3
+      
+    - name: "relevance"
+      range: [0.0, 1.0]
+      threshold: 0.5
+      
+    - name: "coherence"
+      range: [0.0, 1.0]
+      threshold: 0.6
+      
+    - name: "user_satisfaction"
+      range: [0.0, 1.0]
+      source: "feedback"
+  
+  tracking:
+    successful_routes: true
+    failed_queries: true
+    low_confidence_responses: true
+    user_corrections: true
+
+# Response Templates
+response_templates:
+  high_confidence: |
+    {response}
+    
+  medium_confidence: |
+    Based on my understanding: {response}
+    Would you like me to look up more specific information?
+    
+  low_confidence: |
+    I'm not entirely certain, but {response}
+    I can search for more accurate information if you'd like.
+    
+  no_match: |
+    I don't have specific information about that. Would you like me to:
+    1. Search online sources for current information
+    2. Redirect to a specialized domain (if applicable)
+    3. Clarify your question
+
+# Metadata
+metadata:
+  author: "ZacAi-Atomic System"
+  created: "2025-11-01"
+  last_updated: "2025-11-01"
+  status: "production"
+  priority: "medium"  # Acts as fallback, so not highest priority
+  dependencies:
+    - "url_lookup_tool"
+    - "conversation_manager"
+    - "domain_router"

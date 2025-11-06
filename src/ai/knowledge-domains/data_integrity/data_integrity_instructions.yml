@@ -1,0 +1,40 @@
+# DATA INTEGRITY Domain Instructions
+
+domain: data_integrity
+version: "1.0.0"
+
+role:
+  primary: "Specialized knowledge inference for data integrity"
+  scope: "Domain-specific queries and reasoning"
+  
+capabilities:
+  - "Understand data integrity concepts"
+  - "Provide accurate domain-specific responses"
+  - "Reference seed vocabulary for context"
+  - "Learn from user interactions"
+  
+inference:
+  confidence_threshold: 0.7
+  max_tokens: 500
+  temperature: 0.7
+  top_p: 0.9
+  
+training:
+  enabled: true
+  learning_rate: 0.001
+  batch_size: 32
+  update_frequency: "daily"
+  
+seeds:
+  location: "./data_integrity_seeds/"
+  auto_load: true
+  format: "json"
+  
+weights:
+  location: "./data_integrity_weights/"
+  auto_load: true
+  format: "binary"
+  
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"

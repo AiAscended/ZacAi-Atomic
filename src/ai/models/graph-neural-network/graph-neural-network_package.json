@@ -1,0 +1,13 @@
+{
+  "name": "@zacai-atomic/graph-neural-network",
+  "version": "1.0.0",
+  "description": "graph-neural-network for ZacAi-Atomic",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": ["ai", "ml", "gnn"],
+  "author": "ZacAi-Atomic",
+  "license": "MIT"
+}

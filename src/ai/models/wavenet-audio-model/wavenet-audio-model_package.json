@@ -1,0 +1,13 @@
+{
+  "name": "@zacai-atomic/wavenet-audio-model",
+  "version": "1.0.0",
+  "description": "wavenet-audio-model for ZacAi-Atomic",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": ["ai", "ml", "wavenet"],
+  "author": "ZacAi-Atomic",
+  "license": "MIT"
+}

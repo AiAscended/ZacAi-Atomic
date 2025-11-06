@@ -1,0 +1,15 @@
+{
+  "domain": "documentation",
+  "sources": [
+    {
+      "name": "documentation Documentation",
+      "url": "https://example.com/documentation",
+      "type": "documentation",
+      "description": "Official documentation for documentation",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

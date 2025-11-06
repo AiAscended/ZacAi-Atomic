@@ -1,0 +1,19 @@
+{
+  "model": "multi-modal-fusion",
+  "version": "1.0.0",
+  "architecture": "multi_modal_fusion",
+  "lastUpdated": "2025-11-02T11:55:05.057Z",
+  "weights": {
+    "current": "multi-modal-fusion_current_weights.bin",
+    "pretrained": "multi-modal-fusion_pretrained_weights.bin",
+    "checkpoint": "multi-modal-fusion_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}

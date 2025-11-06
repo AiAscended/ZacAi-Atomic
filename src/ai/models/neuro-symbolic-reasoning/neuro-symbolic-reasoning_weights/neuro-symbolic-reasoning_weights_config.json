@@ -1,0 +1,19 @@
+{
+  "model": "neuro-symbolic-reasoning",
+  "version": "1.0.0",
+  "architecture": "neuro_symbolic_reasoning",
+  "lastUpdated": "2025-11-02T11:55:05.061Z",
+  "weights": {
+    "current": "neuro-symbolic-reasoning_current_weights.bin",
+    "pretrained": "neuro-symbolic-reasoning_pretrained_weights.bin",
+    "checkpoint": "neuro-symbolic-reasoning_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}

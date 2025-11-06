@@ -1,0 +1,13 @@
+{
+  "name": "grammar",
+  "version": "0.1",
+  "description": "Grammar analysis domain (parts of speech, syntax, punctuation, sentence structure).",
+  "author": "auto-generated",
+  "files": [
+    "grammar_seedVocabulary.json",
+    "grammar_learnedData.json",
+    "grammar_webDocReferences.json",
+    "grammar_trainingWeights.bin",
+    "src/ai/data/grammar/*"
+  ]
+}

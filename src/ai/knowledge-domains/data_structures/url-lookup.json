@@ -1,0 +1,15 @@
+{
+  "domain": "data_structures",
+  "sources": [
+    {
+      "name": "data structures Documentation",
+      "url": "https://example.com/data_structures",
+      "type": "documentation",
+      "description": "Official documentation for data structures",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

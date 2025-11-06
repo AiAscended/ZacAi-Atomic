@@ -22,4 +22,8 @@ export class CacheManager<T> {
     const cutoff = Date.now() - ms;
     for (const [k, v] of this.store.entries()) if (v.ts < cutoff) this.store.delete(k);
   }
+
+  clear() {
+    this.store.clear();
+  }
 }

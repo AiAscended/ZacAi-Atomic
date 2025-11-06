@@ -1,0 +1,19 @@
+{
+  "model": "unified-transformer-llm",
+  "version": "1.0.0",
+  "architecture": "unified_transformer_llm",
+  "lastUpdated": "2025-11-02T11:55:05.076Z",
+  "weights": {
+    "current": "unified-transformer-llm_current_weights.bin",
+    "pretrained": "unified-transformer-llm_pretrained_weights.bin",
+    "checkpoint": "unified-transformer-llm_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}

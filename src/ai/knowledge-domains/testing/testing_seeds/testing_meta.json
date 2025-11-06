@@ -1,0 +1,13 @@
+{
+  "name": "testing",
+  "version": "0.1",
+  "description": "Testing domain (unit tests, integration tests, assertions, test coverage, TDD/BDD).",
+  "author": "auto-generated",
+  "files": [
+    "testing_seedVocabulary.json",
+    "testing_learnedData.json",
+    "testing_webDocReferences.json",
+    "testing_trainingWeights.bin",
+    "src/ai/data/testing/*"
+  ]
+}

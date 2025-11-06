@@ -1,0 +1,13 @@
+{
+  "name": "@zacai-atomic/generative-adversarial-network",
+  "version": "1.0.0",
+  "description": "generative-adversarial-network for ZacAi-Atomic",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": ["ai", "ml", "gan"],
+  "author": "ZacAi-Atomic",
+  "license": "MIT"
+}

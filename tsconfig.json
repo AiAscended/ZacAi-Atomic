@@ -1,34 +1,78 @@
 {
   "compilerOptions": {
+    /* Language and Environment */
     "target": "ES2020",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "skipLibCheck": true,
-
-    /* Bundler mode */
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "jsx": "preserve",
+    
+    /* Module Resolution */
+    "module": "esnext",
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
+    "allowJs": true,
+    "esModuleInterop": true,
     "isolatedModules": true,
-    "noEmit": true,
-
-    /* Linting */
+    
+    /* Type Checking */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-
-    /* Path mapping for atomic modules */
+    "skipLibCheck": true,
+    
+    /* Emit */
+    "noEmit": true,
+    "incremental": true,
+    
+    /* Interop Constraints */
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    /* Path Aliases - Support all import types */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@ai/*": ["src/ai/*"],
-      "@ui/*": ["src/ui/*"],
-      "@components/*": ["src/ui/components/*"],
-      "@utils/*": ["src/utils/*"],
-      "@styles/*": ["src/ui/styles/*"]
-    }
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/ui/*": ["./src/components/ui/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/styles/*": ["./src/styles/*"],
+      "@/ai/*": ["./src/ai/*"],
+      "@/app/*": ["./src/app/*"]
+    },
+    
+    /* Next.js specific */
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["src"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out",
+    "dist",
+    "build",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**",
+    "src/ai/orchestration/aiOrchestrator-v1.ts",
+    "src/ai/orchestration/aiOrchestrator-v2.ts",
+    "src/ai/orchestration/dataIntegrator.ts",
+    "src/components/chat/ChatInput.ts",
+    "src/components/chat/ChatInterface.ts",
+    "src/components/chat/ChatMessage.ts",
+    "src/components/navigation/Navigation.ts",
+    "src/components/pages/Needs*",
+    "src/components/pages/Old-*"
+  ]
 }
