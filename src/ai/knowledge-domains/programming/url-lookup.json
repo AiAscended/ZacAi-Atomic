@@ -1,0 +1,15 @@
+{
+  "domain": "programming",
+  "sources": [
+    {
+      "name": "programming Documentation",
+      "url": "https://example.com/programming",
+      "type": "documentation",
+      "description": "Official documentation for programming",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

@@ -1,0 +1,63 @@
+{
+  "domain": "react",
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-30",
+  "officialSources": [
+    {
+      "name": "React Official Documentation",
+      "url": "https://react.dev",
+      "type": "documentation",
+      "priority": 1,
+      "sections": [
+        "https://react.dev/learn",
+        "https://react.dev/reference/react",
+        "https://react.dev/reference/react-dom"
+      ]
+    },
+    {
+      "name": "React GitHub Repository",
+      "url": "https://github.com/facebook/react",
+      "type": "source_code",
+      "priority": 2
+    },
+    {
+      "name": "React Blog",
+      "url": "https://react.dev/blog",
+      "type": "blog",
+      "priority": 3
+    }
+  ],
+  "communityResources": [
+    {
+      "name": "React TypeScript Cheatsheet",
+      "url": "https://react-typescript-cheatsheet.netlify.app",
+      "type": "guide",
+      "priority": 4
+    },
+    {
+      "name": "Awesome React",
+      "url": "https://github.com/enaqx/awesome-react",
+      "type": "curated_list",
+      "priority": 5
+    }
+  ],
+  "apiReferences": [
+    {
+      "name": "React Hooks API",
+      "url": "https://react.dev/reference/react/hooks",
+      "topics": ["useState", "useEffect", "useContext", "useReducer", "useCallback", "useMemo", "useRef"]
+    },
+    {
+      "name": "React Components API",
+      "url": "https://react.dev/reference/react/components",
+      "topics": ["Component", "PureComponent", "memo", "Fragment", "Suspense"]
+    }
+  ],
+  "examples": [
+    {
+      "name": "React Examples",
+      "url": "https://github.com/facebook/react/tree/main/fixtures",
+      "type": "code_examples"
+    }
+  ]
+}

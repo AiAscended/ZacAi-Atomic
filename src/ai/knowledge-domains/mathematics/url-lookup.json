@@ -1,0 +1,15 @@
+{
+  "domain": "mathematics",
+  "sources": [
+    {
+      "name": "mathematics Documentation",
+      "url": "https://example.com/mathematics",
+      "type": "documentation",
+      "description": "Official documentation for mathematics",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

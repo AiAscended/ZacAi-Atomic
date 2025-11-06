@@ -1,0 +1,19 @@
+{
+  "model": "wavenet-audio-model",
+  "version": "1.0.0",
+  "architecture": "wavenet_audio_model",
+  "lastUpdated": "2025-11-02T11:55:05.085Z",
+  "weights": {
+    "current": "wavenet-audio-model_current_weights.bin",
+    "pretrained": "wavenet-audio-model_pretrained_weights.bin",
+    "checkpoint": "wavenet-audio-model_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}

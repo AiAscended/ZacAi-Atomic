@@ -1,0 +1,12 @@
+{
+  "model": "recurrent-neural-network",
+  "source": "initialization",
+  "method": "Xavier/He initialization",
+  "date": "2025-11-02T11:55:05.066Z",
+  "description": "Base pretrained weights for model initialization",
+  "files": [
+    "recurrent-neural-network_pretrained_embeddings.bin",
+    "recurrent-neural-network_pretrained_encoder.bin",
+    "recurrent-neural-network_pretrained_decoder.bin"
+  ]
+}

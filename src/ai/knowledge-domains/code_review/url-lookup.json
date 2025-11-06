@@ -1,0 +1,15 @@
+{
+  "domain": "code_review",
+  "sources": [
+    {
+      "name": "code review Documentation",
+      "url": "https://example.com/code_review",
+      "type": "documentation",
+      "description": "Official documentation for code review",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

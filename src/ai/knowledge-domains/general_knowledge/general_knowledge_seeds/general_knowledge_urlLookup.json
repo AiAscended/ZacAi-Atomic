@@ -1,0 +1,160 @@
+{
+  "domain": "general_knowledge",
+  "version": "1.0.0",
+  "sources": [
+    {
+      "id": "wikipedia",
+      "name": "Wikipedia",
+      "url": "https://en.wikipedia.org",
+      "apiEndpoint": "https://en.wikipedia.org/w/api.php",
+      "type": "encyclopedia",
+      "purpose": "General encyclopedia knowledge, facts, definitions, historical information",
+      "trustLevel": "high",
+      "rateLimit": "200/hour",
+      "requiresAuth": false,
+      "searchable": true,
+      "useCases": [
+        "Factual queries",
+        "Historical information",
+        "General knowledge verification",
+        "Definitions and explanations"
+      ]
+    },
+    {
+      "id": "britannica",
+      "name": "Encyclopedia Britannica",
+      "url": "https://www.britannica.com",
+      "type": "encyclopedia",
+      "purpose": "Authoritative encyclopedia content, academic references",
+      "trustLevel": "very_high",
+      "rateLimit": "100/hour",
+      "requiresAuth": false,
+      "searchable": true,
+      "useCases": [
+        "Academic research",
+        "Verified facts",
+        "In-depth explanations"
+      ]
+    },
+    {
+      "id": "dictionary",
+      "name": "Dictionary.com",
+      "url": "https://www.dictionary.com",
+      "type": "dictionary",
+      "purpose": "Word definitions, synonyms, etymology, usage examples",
+      "trustLevel": "high",
+      "rateLimit": "500/hour",
+      "requiresAuth": false,
+      "searchable": true,
+      "useCases": [
+        "Word definitions",
+        "Synonyms and antonyms",
+        "Word origins",
+        "Usage examples"
+      ]
+    },
+    {
+      "id": "merriam_webster",
+      "name": "Merriam-Webster Dictionary",
+      "url": "https://www.merriam-webster.com",
+      "apiEndpoint": "https://www.dictionaryapi.com/api/v3",
+      "type": "dictionary",
+      "purpose": "Dictionary and thesaurus lookups, authoritative definitions",
+      "trustLevel": "very_high",
+      "rateLimit": "1000/day",
+      "requiresAuth": true,
+      "apiKeyRequired": true,
+      "searchable": true,
+      "useCases": [
+        "Precise word definitions",
+        "Thesaurus lookups",
+        "Pronunciation guides",
+        "Word history"
+      ]
+    },
+    {
+      "id": "wiktionary",
+      "name": "Wiktionary",
+      "url": "https://en.wiktionary.org",
+      "apiEndpoint": "https://en.wiktionary.org/w/api.php",
+      "type": "dictionary",
+      "purpose": "Multi-language dictionary, etymology, translations",
+      "trustLevel": "high",
+      "rateLimit": "200/hour",
+      "requiresAuth": false,
+      "searchable": true,
+      "useCases": [
+        "Multi-language translations",
+        "Etymology research",
+        "Alternative definitions"
+      ]
+    },
+    {
+      "id": "wolframalpha",
+      "name": "Wolfram Alpha",
+      "url": "https://www.wolframalpha.com",
+      "apiEndpoint": "https://api.wolframalpha.com/v2",
+      "type": "computational",
+      "purpose": "Computational knowledge, calculations, data analysis",
+      "trustLevel": "very_high",
+      "rateLimit": "2000/month",
+      "requiresAuth": true,
+      "apiKeyRequired": true,
+      "searchable": true,
+      "useCases": [
+        "Computational queries",
+        "Data and statistics",
+        "Scientific calculations",
+        "General knowledge queries with computational needs"
+      ]
+    },
+    {
+      "id": "common_crawl",
+      "name": "Common Crawl",
+      "url": "https://commoncrawl.org",
+      "type": "web_corpus",
+      "purpose": "Large-scale web data for training and reference",
+      "trustLevel": "medium",
+      "rateLimit": "unlimited",
+      "requiresAuth": false,
+      "searchable": false,
+      "useCases": [
+        "Training data source",
+        "Web content patterns",
+        "Language model training"
+      ]
+    }
+  ],
+  "lookupStrategy": {
+    "default": "wikipedia",
+    "fallback": ["britannica", "wiktionary"],
+    "highPrecision": "britannica",
+    "quickLookup": "dictionary",
+    "computational": "wolframalpha"
+  },
+  "usageGuidelines": {
+    "confidenceThreshold": 0.6,
+    "alwaysLookup": [
+      "current events",
+      "recent data",
+      "specific statistics",
+      "precise dates"
+    ],
+    "neverLookup": [
+      "personal opinions",
+      "creative tasks",
+      "general conversation"
+    ],
+    "preferLocal": [
+      "common words",
+      "basic facts",
+      "well-known information"
+    ]
+  },
+  "caching": {
+    "enabled": true,
+    "ttl": 86400,
+    "maxEntries": 1000,
+    "strategy": "lru"
+  }
+}

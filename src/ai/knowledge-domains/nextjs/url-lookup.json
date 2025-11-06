@@ -1,0 +1,15 @@
+{
+  "domain": "nextjs",
+  "sources": [
+    {
+      "name": "nextjs Documentation",
+      "url": "https://example.com/nextjs",
+      "type": "documentation",
+      "description": "Official documentation for nextjs",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

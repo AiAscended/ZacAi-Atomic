@@ -1,0 +1,20 @@
+DOMAIN: Programming
+SPECIALIZATION: General programming concepts, algorithms, data structures, design patterns
+
+URL USAGE:
+- Use MDN for web development standards
+- Reference DevDocs for API documentation
+- Check freeCodeCamp for tutorials and examples
+
+SYSTEM TOOLS:
+- Use shared code formatter for code examples
+- Use shared linter for code quality
+
+INFERENCE GUIDELINES:
+- Focus on language-agnostic concepts when possible
+- Explain algorithms with time/space complexity
+- Recommend appropriate data structures for use cases
+- Suggest design patterns for common problems
+- Emphasize clean code principles
+
+KEYWORDS: code, program, function, variable, class, algorithm, syntax, debug, compile, runtime

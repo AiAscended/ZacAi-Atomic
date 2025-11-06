@@ -1,0 +1,81 @@
+{
+  "domain": "nextjs",
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-30",
+  "officialSources": [
+    {
+      "name": "Next.js Official Documentation",
+      "url": "https://nextjs.org/docs",
+      "type": "documentation",
+      "priority": 1,
+      "sections": [
+        "https://nextjs.org/docs/app",
+        "https://nextjs.org/docs/pages",
+        "https://nextjs.org/docs/app/building-your-application/routing",
+        "https://nextjs.org/docs/app/building-your-application/data-fetching",
+        "https://nextjs.org/docs/app/building-your-application/rendering"
+      ]
+    },
+    {
+      "name": "Next.js GitHub Repository",
+      "url": "https://github.com/vercel/next.js",
+      "type": "source_code",
+      "priority": 2
+    },
+    {
+      "name": "Next.js Blog",
+      "url": "https://nextjs.org/blog",
+      "type": "blog",
+      "priority": 3
+    },
+    {
+      "name": "Vercel Documentation",
+      "url": "https://vercel.com/docs",
+      "type": "platform_docs",
+      "priority": 4
+    }
+  ],
+  "communityResources": [
+    {
+      "name": "Next.js Examples",
+      "url": "https://github.com/vercel/next.js/tree/canary/examples",
+      "type": "code_examples",
+      "priority": 5
+    },
+    {
+      "name": "Awesome Next.js",
+      "url": "https://github.com/unicodeveloper/awesome-nextjs",
+      "type": "curated_list",
+      "priority": 6
+    }
+  ],
+  "apiReferences": [
+    {
+      "name": "App Router API",
+      "url": "https://nextjs.org/docs/app/api-reference",
+      "topics": ["page", "layout", "loading", "error", "route", "middleware"]
+    },
+    {
+      "name": "Server Actions",
+      "url": "https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations",
+      "topics": ["use server", "revalidatePath", "revalidateTag", "redirect"]
+    },
+    {
+      "name": "Next.js Config",
+      "url": "https://nextjs.org/docs/app/api-reference/next-config-js",
+      "topics": ["images", "env", "redirects", "rewrites", "headers"]
+    }
+  ],
+  "examples": [
+    {
+      "name": "Next.js Commerce",
+      "url": "https://github.com/vercel/commerce",
+      "type": "full_application"
+    },
+    {
+      "name": "Next.js AI Chatbot",
+      "url": "https://github.com/vercel/ai-chatbot",
+      "type": "full_application"
+    }
+  ]
+}

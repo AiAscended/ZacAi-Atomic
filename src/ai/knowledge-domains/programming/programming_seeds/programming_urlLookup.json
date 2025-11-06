@@ -1,0 +1,73 @@
+{
+  "domain": "programming",
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-30",
+  "officialSources": [
+    {
+      "name": "MDN Web Docs",
+      "url": "https://developer.mozilla.org",
+      "type": "documentation",
+      "priority": 1,
+      "sections": [
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+        "https://developer.mozilla.org/en-US/docs/Web/API"
+      ]
+    },
+    {
+      "name": "TypeScript Documentation",
+      "url": "https://www.typescriptlang.org/docs",
+      "type": "documentation",
+      "priority": 2
+    },
+    {
+      "name": "Python Documentation",
+      "url": "https://docs.python.org/3",
+      "type": "documentation",
+      "priority": 3
+    }
+  ],
+  "communityResources": [
+    {
+      "name": "Stack Overflow",
+      "url": "https://stackoverflow.com",
+      "type": "community",
+      "priority": 4
+    },
+    {
+      "name": "GitHub",
+      "url": "https://github.com",
+      "type": "source_code",
+      "priority": 5
+    },
+    {
+      "name": "Dev.to",
+      "url": "https://dev.to",
+      "type": "blog",
+      "priority": 6
+    }
+  ],
+  "designPatterns": [
+    {
+      "name": "Refactoring Guru",
+      "url": "https://refactoring.guru/design-patterns",
+      "topics": ["creational", "structural", "behavioral"]
+    },
+    {
+      "name": "Patterns.dev",
+      "url": "https://www.patterns.dev",
+      "topics": ["design_patterns", "rendering_patterns", "performance_patterns"]
+    }
+  ],
+  "bestPractices": [
+    {
+      "name": "Clean Code Principles",
+      "url": "https://github.com/ryanmcdermott/clean-code-javascript",
+      "type": "guide"
+    },
+    {
+      "name": "SOLID Principles",
+      "url": "https://en.wikipedia.org/wiki/SOLID",
+      "type": "principles"
+    }
+  ]
+}

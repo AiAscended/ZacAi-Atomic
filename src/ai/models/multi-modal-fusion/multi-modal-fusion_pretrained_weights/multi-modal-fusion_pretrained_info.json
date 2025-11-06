@@ -1,0 +1,12 @@
+{
+  "model": "multi-modal-fusion",
+  "source": "initialization",
+  "method": "Xavier/He initialization",
+  "date": "2025-11-02T11:55:05.058Z",
+  "description": "Base pretrained weights for model initialization",
+  "files": [
+    "multi-modal-fusion_pretrained_embeddings.bin",
+    "multi-modal-fusion_pretrained_encoder.bin",
+    "multi-modal-fusion_pretrained_decoder.bin"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "domain": "system",
+  "sources": [
+    {
+      "name": "system Documentation",
+      "url": "https://example.com/system",
+      "type": "documentation",
+      "description": "Official documentation for system",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

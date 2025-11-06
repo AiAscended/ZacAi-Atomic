@@ -1,0 +1,15 @@
+{
+  "domain": "version_control",
+  "sources": [
+    {
+      "name": "version control Documentation",
+      "url": "https://example.com/version_control",
+      "type": "documentation",
+      "description": "Official documentation for version control",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

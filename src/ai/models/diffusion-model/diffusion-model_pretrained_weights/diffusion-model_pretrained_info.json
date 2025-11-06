@@ -1,0 +1,12 @@
+{
+  "model": "diffusion-model",
+  "source": "initialization",
+  "method": "Xavier/He initialization",
+  "date": "2025-11-02T11:55:05.047Z",
+  "description": "Base pretrained weights for model initialization",
+  "files": [
+    "diffusion-model_pretrained_embeddings.bin",
+    "diffusion-model_pretrained_encoder.bin",
+    "diffusion-model_pretrained_decoder.bin"
+  ]
+}

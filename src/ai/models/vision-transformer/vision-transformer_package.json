@@ -1,0 +1,13 @@
+{
+  "name": "@zacai-atomic/vision-transformer",
+  "version": "1.0.0",
+  "description": "vision-transformer for ZacAi-Atomic",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": ["ai", "ml", "vit"],
+  "author": "ZacAi-Atomic",
+  "license": "MIT"
+}

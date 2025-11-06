@@ -1,0 +1,15 @@
+{
+  "domain": "general_knowledge",
+  "sources": [
+    {
+      "name": "general knowledge Documentation",
+      "url": "https://example.com/general_knowledge",
+      "type": "documentation",
+      "description": "Official documentation for general knowledge",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

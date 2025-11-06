@@ -1,0 +1,273 @@
+# Mathematics Domain Instructions
+# Purpose: Governance, guidelines, and operational instructions for mathematics domain
+
+domain:
+  id: mathematics
+  name: Mathematics
+  version: "1.0.0"
+  description: "Expert mathematics domain with computational and theoretical knowledge"
+
+# Core Principles
+principles:
+  - name: "Order of Operations"
+    rule: "PEMDAS/BODMAS - Parentheses, Exponents, Multiplication/Division, Addition/Subtraction"
+    priority: 1
+  
+  - name: "Precision"
+    rule: "Maintain exact values when possible; specify precision for approximations"
+    priority: 2
+  
+  - name: "Proof Verification"
+    rule: "Verify mathematical proofs step-by-step; cite theorems used"
+    priority: 3
+  
+  - name: "Notation Standards"
+    rule: "Use standard mathematical notation; explain non-standard symbols"
+    priority: 4
+
+# Domain-Specific Knowledge
+foundational_concepts:
+  arithmetic:
+    - "Basic operations: +, -, ×, ÷"
+    - "Properties: commutative, associative, distributive"
+    - "Number types: natural, integer, rational, irrational, real, complex"
+  
+  algebra:
+    - "Variables and expressions"
+    - "Equations and inequalities"
+    - "Functions and graphing"
+    - "Polynomials and factoring"
+  
+  calculus:
+    - "Limits and continuity"
+    - "Derivatives and differentiation rules"
+    - "Integrals and integration techniques"
+    - "Series and sequences"
+  
+  geometry:
+    - "Euclidean geometry principles"
+    - "Coordinate geometry"
+    - "Trigonometry and trigonometric identities"
+    - "Solid geometry and volumes"
+  
+  statistics:
+    - "Descriptive statistics: mean, median, mode"
+    - "Probability theory"
+    - "Distributions: normal, binomial, Poisson"
+    - "Hypothesis testing and confidence intervals"
+
+# Tool Configuration
+tools:
+  url_lookup:
+    enabled: true
+    sources:
+      - "Wolfram MathWorld"
+      - "Math Stack Exchange"
+      - "OEIS"
+    usage_guidelines:
+      - "Use for theorem verification"
+      - "Look up formula definitions"
+      - "Find examples of mathematical concepts"
+  
+  scientific_calculator:
+    enabled: true
+    capabilities:
+      - "Arithmetic operations"
+      - "Trigonometric functions"
+      - "Logarithmic and exponential functions"
+      - "Complex number calculations"
+      - "Matrix operations"
+    usage_guidelines:
+      - "Use for numerical computations"
+      - "Verify algebraic manipulations"
+      - "Calculate definite integrals numerically"
+  
+  symbolic_solver:
+    enabled: true
+    capabilities:
+      - "Solve equations symbolically"
+      - "Perform algebraic simplifications"
+      - "Compute derivatives and integrals"
+      - "Factor polynomials"
+    usage_guidelines:
+      - "Prefer symbolic solutions over numerical"
+      - "Show step-by-step solutions"
+      - "Explain algebraic manipulations"
+
+# Inference Guidelines
+inference:
+  input_processing:
+    - "Parse mathematical notation correctly"
+    - "Identify equation types and problem categories"
+    - "Extract variables and constants"
+    - "Recognize mathematical symbols and operators"
+  
+  reasoning_steps:
+    - "Break complex problems into smaller steps"
+    - "Apply relevant theorems and formulas"
+    - "Verify each step before proceeding"
+    - "Check units and dimensional analysis"
+  
+  output_formatting:
+    - "Use LaTeX for mathematical expressions"
+    - "Show intermediate steps clearly"
+    - "Provide final answer with appropriate precision"
+    - "Include units when applicable"
+  
+  validation:
+    - "Verify answer makes sense (sanity check)"
+    - "Check dimensional consistency"
+    - "Test with edge cases when possible"
+    - "Cross-reference with known results"
+
+# Training Guidelines
+training:
+  data_sources:
+    - "Mathematical textbooks"
+    - "Academic papers"
+    - "Problem sets with solutions"
+    - "Theorem proofs"
+  
+  focus_areas:
+    - "Problem-solving strategies"
+    - "Proof techniques"
+    - "Formula derivations"
+    - "Error pattern recognition"
+  
+  evaluation_metrics:
+    - "Accuracy of solutions"
+    - "Completeness of proofs"
+    - "Clarity of explanations"
+    - "Appropriate use of notation"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Tokenize mathematical expressions"
+    - "Normalize notation (e.g., × to *, ÷ to /)"
+    - "Identify special symbols and functions"
+  
+  processing:
+    - "Apply domain-specific transformations"
+    - "Use symbolic computation when beneficial"
+    - "Maintain precision throughout calculation"
+  
+  postprocessing:
+    - "Format output in readable notation"
+    - "Round appropriately based on context"
+    - "Add explanatory text for complex steps"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Division by zero"
+      action: "Check for zero denominators; handle undefined cases"
+    
+    - error: "Domain violations"
+      action: "Verify input is in valid domain (e.g., √(-1) in real numbers)"
+    
+    - error: "Overflow/underflow"
+      action: "Use appropriate numerical methods or symbolic computation"
+    
+    - error: "Convergence failures"
+      action: "Try alternative methods or adjust parameters"
+  
+  recovery_strategies:
+    - "Simplify problem formulation"
+    - "Use numerical approximation if symbolic fails"
+    - "Consult reference sources via URL lookup"
+    - "Request clarification from user"
+
+# Integration Guidelines
+integration:
+  with_llm:
+    - "Use LLM for natural language problem interpretation"
+    - "LLM generates step-by-step reasoning"
+    - "Mathematics domain verifies calculations"
+  
+  with_other_domains:
+    - physics: "Provide mathematical models and solutions"
+    - engineering: "Supply formulas and computational methods"
+    - programming: "Generate algorithms and pseudocode"
+  
+  orchestrator_routing:
+    keywords:
+      - "calculate"
+      - "solve"
+      - "equation"
+      - "formula"
+      - "derivative"
+      - "integral"
+      - "proof"
+      - "theorem"
+    priority: "High for explicit math queries, medium for implicit"
+
+# Admin Configuration
+admin:
+  editable_fields:
+    - "sources in url_lookup"
+    - "tool enablement flags"
+    - "precision settings"
+    - "notation preferences"
+  
+  upload_capabilities:
+    - "Custom formula libraries (JSON)"
+    - "Additional instruction files (YAML)"
+    - "Domain-specific tokenizer configs (XML)"
+  
+  settings_location: "/admin/domains/mathematics"
+
+# Tokenizer Configuration
+tokenizer:
+  special_tokens:
+    - "∫" # Integral
+    - "∑" # Summation
+    - "∏" # Product
+    - "√" # Square root
+    - "∞" # Infinity
+    - "π" # Pi
+    - "θ" # Theta
+    - "α" # Alpha
+    - "β" # Beta
+    - "γ" # Gamma
+    - "Δ" # Delta
+    - "∂" # Partial derivative
+    - "∇" # Nabla/gradient
+  
+  operator_tokens:
+    - "+" # Addition
+    - "-" # Subtraction
+    - "×" # Multiplication
+    - "÷" # Division
+    - "=" # Equals
+    - "≠" # Not equal
+    - "<" # Less than
+    - ">" # Greater than
+    - "≤" # Less than or equal
+    - "≥" # Greater than or equal
+    - "≈" # Approximately equal
+  
+  function_tokens:
+    - "sin" # Sine
+    - "cos" # Cosine
+    - "tan" # Tangent
+    - "log" # Logarithm
+    - "ln" # Natural log
+    - "exp" # Exponential
+    - "abs" # Absolute value
+    - "max" # Maximum
+    - "min" # Minimum
+
+# Quality Assurance
+quality:
+  verification_steps:
+    - "Check mathematical correctness"
+    - "Verify notation consistency"
+    - "Ensure step-by-step clarity"
+    - "Validate final answer"
+  
+  performance_metrics:
+    - "Solution accuracy"
+    - "Response time"
+    - "Explanation quality"
+    - "User satisfaction"

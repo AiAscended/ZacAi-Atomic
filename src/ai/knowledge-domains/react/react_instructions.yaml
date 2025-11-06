@@ -1,0 +1,240 @@
+# React Domain Instructions
+# Purpose: Governance, guidelines, and operational instructions for React domain
+
+domain:
+  id: react
+  name: React
+  version: "1.0.0"
+  description: "Expert React domain with modern hooks, patterns, and 2025 best practices"
+
+# Core Principles
+principles:
+  - name: "Functional Components"
+    rule: "Use functional components with hooks; avoid class components"
+    priority: 1
+  
+  - name: "Component Composition"
+    rule: "Build UIs through composition; keep components focused and reusable"
+    priority: 2
+  
+  - name: "Declarative UI"
+    rule: "Describe what the UI should look like, not how to change it"
+    priority: 3
+  
+  - name: "Immutable State"
+    rule: "Never mutate state directly; use setState or state update functions"
+    priority: 4
+
+# Supported Versions
+versions:
+  current: "18.2+"
+  minimum_supported: "18.0"
+  features: ["Concurrent rendering", "Automatic batching", "Transitions"]
+
+# Domain-Specific Knowledge
+foundational_concepts:
+  core_concepts:
+    - "JSX syntax"
+    - "Components and props"
+    - "State and lifecycle"
+    - "Events and handlers"
+    - "Conditional rendering"
+    - "Lists and keys"
+  
+  hooks:
+    - "useState - State management"
+    - "useEffect - Side effects"
+    - "useContext - Context API"
+    - "useReducer - Complex state"
+    - "useCallback - Memoized callbacks"
+    - "useMemo - Memoized values"
+    - "useRef - DOM refs and mutable values"
+    - "useId - Unique IDs"
+    - "useTransition - Concurrent features"
+    - "useDeferredValue - Deferred updates"
+  
+  advanced_patterns:
+    - "Custom hooks"
+    - "Render props"
+    - "Higher-order components"
+    - "Compound components"
+    - "Controlled vs uncontrolled components"
+  
+  performance:
+    - "React.memo for component memoization"
+    - "useCallback and useMemo"
+    - "Code splitting with lazy and Suspense"
+    - "Virtual scrolling for lists"
+  
+  state_management:
+    - "Context API"
+    - "useState and useReducer"
+    - "External libraries: Zustand, Jotai, Redux"
+
+# Tool Configuration
+tools:
+  url_lookup:
+    enabled: true
+    sources:
+      - "React Official Docs"
+      - "React GitHub"
+      - "React Dev Tools"
+      - "React Patterns"
+    usage_guidelines:
+      - "Look up API documentation"
+      - "Find hook usage examples"
+      - "Check component patterns"
+      - "Verify best practices"
+  
+  code_analyzer:
+    enabled: true
+    capabilities:
+      - "React linting (eslint-plugin-react)"
+      - "Hooks rules checking"
+      - "Performance analysis"
+      - "Accessibility validation"
+    usage_guidelines:
+      - "Validate hook dependencies"
+      - "Check component structure"
+      - "Identify performance issues"
+
+# Inference Guidelines
+inference:
+  input_processing:
+    - "Identify component type needed"
+    - "Parse state requirements"
+    - "Recognize hook usage patterns"
+    - "Extract props interface"
+  
+  reasoning_steps:
+    - "Determine state management approach"
+    - "Select appropriate hooks"
+    - "Apply proper event handlers"
+    - "Implement error boundaries if needed"
+  
+  output_formatting:
+    - "Use TypeScript for props types"
+    - "Include proper imports"
+    - "Add accessibility attributes"
+    - "Provide usage examples"
+  
+  validation:
+    - "Check hook rules compliance"
+    - "Verify key props in lists"
+    - "Ensure proper cleanup in useEffect"
+    - "Validate accessibility"
+
+# Code Generation Guidelines
+code_generation:
+  structure:
+    - "Define props interface first"
+    - "Use functional component syntax"
+    - "Group related hooks together"
+    - "Return JSX at the end"
+  
+  style:
+    - "Use arrow functions for components"
+    - "Destructure props in parameters"
+    - "Use const for component definition"
+    - "Follow React naming conventions (PascalCase)"
+  
+  best_practices:
+    - "Extract reusable logic into custom hooks"
+    - "Keep components small and focused"
+    - "Use TypeScript for type safety"
+    - "Add meaningful prop defaults"
+
+# Training Guidelines
+training:
+  data_sources:
+    - "React official documentation"
+    - "React GitHub repository"
+    - "React patterns and best practices"
+    - "Popular React libraries source code"
+    - "React conference talks"
+  
+  focus_areas:
+    - "Hook patterns and usage"
+    - "Component composition"
+    - "Performance optimization"
+    - "Accessibility best practices"
+  
+  evaluation_metrics:
+    - "Code correctness"
+    - "Hook usage compliance"
+    - "Component reusability"
+    - "Performance efficiency"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Parse JSX syntax"
+    - "Identify component boundaries"
+    - "Extract state and effect dependencies"
+  
+  processing:
+    - "Apply React transformations"
+    - "Maintain component hierarchy"
+    - "Track prop flow"
+  
+  postprocessing:
+    - "Format JSX with Prettier"
+    - "Organize imports"
+    - "Add type annotations"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Hook dependency warnings"
+      action: "Add missing dependencies or use eslint-disable with explanation"
+    
+    - error: "Missing key prop in list"
+      action: "Add stable unique key to each list item"
+    
+    - error: "Mutating state directly"
+      action: "Use setState or state update function"
+    
+    - error: "Conditional hooks"
+      action: "Move hooks to top level; use conditions inside hooks"
+  
+  recovery_strategies:
+    - "Consult React documentation via URL lookup"
+    - "Check React DevTools for component tree"
+    - "Review hook rules"
+    - "Test component isolation"
+
+# URL Lookup Configuration
+url_lookup_config:
+  primary_sources:
+    - name: "React Documentation"
+      url: "https://react.dev"
+      use_for: ["API reference", "hooks", "patterns"]
+    
+    - name: "React GitHub"
+      url: "https://github.com/facebook/react"
+      use_for: ["source code", "issues", "RFCs"]
+    
+    - name: "React Patterns"
+      url: "https://reactpatterns.com"
+      use_for: ["design patterns", "best practices"]
+  
+  reference_triggers:
+    - "When unsure about hook usage"
+    - "For component pattern examples"
+    - "To verify React version features"
+    - "For performance optimization guidance"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "principles"
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+  
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"

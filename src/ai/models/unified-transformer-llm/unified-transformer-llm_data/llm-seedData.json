@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "description": "Seed data for unified transformer LLM",
+  "vocabulary": {
+    "size": 50000,
+    "specialTokens": {
+      "pad": "<PAD>",
+      "bos": "<BOS>",
+      "eos": "<EOS>",
+      "unk": "<UNK>"
+    }
+  },
+  "seedExamples": []
+}

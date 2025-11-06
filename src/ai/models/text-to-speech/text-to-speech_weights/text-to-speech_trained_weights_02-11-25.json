@@ -1,0 +1,93 @@
+{
+  "version": "1.1.0",
+  "type": "trained",
+  "model": "text-to-speech",
+  "training_run": 1,
+  "created": "2025-11-02T12:48:51.423Z",
+  "date_stamp": "02-11-25",
+  "description": "Trained weights for text-to-speech - Enhanced speech synthesis capabilities",
+  "base_weights": "pretrained.bin",
+  "architecture": {
+    "model_type": "text-to-speech",
+    "total_parameters": 80000000,
+    "layers": 12,
+    "attention_heads": 8,
+    "hidden_dim": 512,
+    "task": "speech synthesis"
+  },
+  "training": {
+    "epochs": 100,
+    "batch_size": 64,
+    "learning_rate": 0.0001,
+    "optimizer": "adamw",
+    "loss_function": "cross_entropy",
+    "training_samples": 1000000,
+    "validation_split": 0.1,
+    "gradient_clipping": 1,
+    "weight_decay": 0.01,
+    "warmup_steps": 10000
+  },
+  "weights": {
+    "token_embeddings": {
+      "shape": [
+        50000,
+        512
+      ],
+      "updated": true,
+      "delta": 0.18
+    },
+    "position_embeddings": {
+      "shape": [
+        2048,
+        512
+      ],
+      "updated": true,
+      "delta": 0.12
+    },
+    "layer_weights": {
+      "count": 12,
+      "updated": true,
+      "delta": 0.25
+    },
+    "attention_weights": {
+      "heads": 8,
+      "updated": true,
+      "delta": 0.2
+    },
+    "output_layer": {
+      "shape": [
+        512,
+        50000
+      ],
+      "updated": true,
+      "delta": 0.15
+    }
+  },
+  "capabilities": [
+    "Advanced speech synthesis",
+    "Complex pattern recognition",
+    "High-quality inference",
+    "Context-aware processing",
+    "Specialized task handling"
+  ],
+  "performance": {
+    "accuracy": 0.92,
+    "f1_score": 0.9,
+    "inference_time_ms": 140,
+    "throughput_samples_per_sec": 35,
+    "improvement_over_pretrained": {
+      "accuracy": "+31.4%",
+      "f1_score": "+32.4%",
+      "throughput": "+40.0%"
+    }
+  },
+  "metadata": {
+    "training_corpus": "text-to-speech specialized dataset",
+    "total_parameters": 80000000,
+    "trainable_parameters": 80000000,
+    "training_duration_hours": 48,
+    "gpu_cluster": "8x NVIDIA A100",
+    "checkpoint_saved": true,
+    "best_epoch": 87
+  }
+}

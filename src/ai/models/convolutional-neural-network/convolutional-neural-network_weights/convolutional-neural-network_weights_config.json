@@ -1,0 +1,19 @@
+{
+  "model": "convolutional-neural-network",
+  "version": "1.0.0",
+  "architecture": "convolutional_neural_network",
+  "lastUpdated": "2025-11-02T11:55:05.042Z",
+  "weights": {
+    "current": "convolutional-neural-network_current_weights.bin",
+    "pretrained": "convolutional-neural-network_pretrained_weights.bin",
+    "checkpoint": "convolutional-neural-network_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}
