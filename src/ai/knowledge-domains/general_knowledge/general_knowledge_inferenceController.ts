@@ -46,7 +46,7 @@ const stopWords = [
   "your",
 ]
 
-export const generalRunInference = async (input: string, _context?: any) => {
+export const generalRunInference = async (input: string, _context?: unknown) => {
   const tokens = _context?.tokens || []
   const embeddings = _context?.embeddings || []
   const inferenceResults = _context?.inferenceResults
@@ -161,7 +161,7 @@ export const generalRunInference = async (input: string, _context?: any) => {
       const queryKeywords = tokens
         .filter((t: string) => {
           const token = t.toLowerCase()
-          return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token)
+          return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token);
         })
         .slice(0, 5)
 
@@ -191,7 +191,7 @@ export const generalRunInference = async (input: string, _context?: any) => {
       const queryKeywords = tokens
         .filter((t: string) => {
           const token = t.toLowerCase()
-          return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token)
+          return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token);
         })
         .slice(0, 5)
 

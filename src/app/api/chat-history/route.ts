@@ -117,7 +117,7 @@ async function getAllChatFiles(dir: string): Promise<string[]> {
       const fullPath = path.join(dir, entry.name);
       
       if (entry.isDirectory()) {
-        files.push(...await getAllChatFiles(fullPath));
+        files.push(...(await getAllChatFiles(fullPath)));
       } else if (entry.name.endsWith('.json') && entry.name.startsWith('chat-')) {
         files.push(fullPath);
       }

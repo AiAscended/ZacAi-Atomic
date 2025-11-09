@@ -31,4 +31,6 @@ export const persistInternetSearchWeights = (weights: Record<string, number[]>) 
   }
 };
 
-export default { getInternetSearchEmbedding, persistInternetSearchWeights };
+const internet_search_embeddings_bundle = { getInternetSearchEmbedding, persistInternetSearchWeights };
+
+export default internet_search_embeddings_bundle;

@@ -3,7 +3,7 @@
  */
 
 export class CODETrainer {
-  train(data: any): void {
+  train(data: unknown): void {
     console.log('Training code-transformer...');
   }
 }

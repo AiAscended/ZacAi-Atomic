@@ -5,7 +5,7 @@
 
 import { DOMAIN_NAME } from './data_integrity_constants';
 
-export const dataIntegrityRunInference = async (input: string, _context?: any) => {
+export const dataIntegrityRunInference = async (input: string, _context?: unknown) => {
   const lowerInput = input.toLowerCase();
   
   let responseText = '';

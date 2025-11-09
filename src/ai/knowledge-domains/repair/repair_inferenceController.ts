@@ -5,7 +5,7 @@
 
 import { DOMAIN_NAME } from './repair_constants';
 
-export const repairRunInference = async (input: string, _context?: any) => {
+export const repairRunInference = async (input: string, _context?: unknown) => {
   const lowerInput = input.toLowerCase();
   
   let responseText = '';

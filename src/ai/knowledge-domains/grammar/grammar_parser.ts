@@ -25,7 +25,7 @@ export const grammarParser = (text: string) => {
       text: trimmed,
       type: isQuestion ? "interrogative" : isExclamation ? "exclamatory" : isImperative ? "imperative" : "declarative",
       wordCount: trimmed.split(/\s+/).length,
-    }
+    };
   })
 
   return { sentences: analysis, count: sentences.length }

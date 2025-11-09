@@ -42,6 +42,6 @@ const llmConstants = {
   TOKEN_IDS: LLM_TOKEN_IDS,
   MODEL_VERSIONS: LLM_MODEL_VERSIONS,
   MAX_SEQUENCE_LENGTHS: LLM_MAX_SEQUENCE_LENGTHS,
-};
+}; export default exportBundle;
 
 export default llmConstants;

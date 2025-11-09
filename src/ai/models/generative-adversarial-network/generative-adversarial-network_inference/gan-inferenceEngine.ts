@@ -3,7 +3,7 @@
  */
 
 export class GANInferenceEngine {
-  predict(input: any): any {
+  predict(input: unknown): unknown {
     return input;
   }
 }

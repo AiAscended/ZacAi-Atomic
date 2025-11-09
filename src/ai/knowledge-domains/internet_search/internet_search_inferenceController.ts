@@ -22,10 +22,10 @@ import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 
 interface InferenceContext {
   tokens: string[]
-  inferenceResults?: any
-  sentiment?: any
-  slots?: any
-  userProfile?: any
+  inferenceResults?: unknown
+  sentiment?: unknown
+  slots?: unknown
+  userProfile?: unknown
 }
 
 /**
@@ -71,7 +71,7 @@ function calculateConfidence(tokens: string[], input: string): number {
 /**
  * Extract search query from user input
  */
-function extractSearchQuery(input: string, _semantics: any): string {
+function extractSearchQuery(input: string, _semantics: unknown): string {
   // Simply clean up the query by removing common prefixes
   const query = input
     .replace(/^(can you |could you |please |would you )/i, "")
@@ -112,7 +112,7 @@ export async function internetSearchRunInference(input: string, _context?: Infer
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} extracted query:`, searchQuery)
 
   const searchEngines = findSources(INTERNET_SEARCH_DOMAIN)
-  const results: any[] = []
+  const results: unknown[] = []
 
   for (const engine of searchEngines) {
     try {

@@ -37,4 +37,6 @@ export const persistGeneralWeights = (weights: Record<string, number[]>) => {
   }
 };
 
-export default { getGeneralEmbedding, getGeneralEmbeddingsForTokens, persistGeneralWeights };
+const general_knowledge_embeddings_bundle = { getGeneralEmbedding, getGeneralEmbeddingsForTokens, persistGeneralWeights };
+
+export default general_knowledge_embeddings_bundle;

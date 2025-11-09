@@ -219,9 +219,9 @@ export class MonacoAdvancedFeatures {
           (props: P): JSX.Element | null;
         }
         export function useState<T>(initialState: T): [T, (newState: T) => void];
-        export function useEffect(effect: () => void | (() => void), deps?: any[]): void;
-        export function useCallback<T extends (...args: any[]) => any>(callback: T, deps: any[]): T;
-        export function useMemo<T>(factory: () => T, deps: any[]): T;
+        export function useEffect(effect: () => void | (() => void), deps?: unknown[]): void;
+        export function useCallback<T extends (...args: unknown[]) => any>(callback: T, deps: unknown[]): T;
+        export function useMemo<T>(factory: () => T, deps: unknown[]): T;
       }
       `,
       'ts:react.d.ts'

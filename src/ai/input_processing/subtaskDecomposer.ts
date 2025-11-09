@@ -18,6 +18,6 @@ export class SubtaskDecomposer {
       throw new Error("Invalid prompt to decompose")
     }
     // Basic split, extend for NLP parse for complex prompts
-    return prompt.split(/[.!?]\s/).filter(Boolean)
+    return prompt.split(/[.!?]\s/).filter(Boolean);
   }
 }

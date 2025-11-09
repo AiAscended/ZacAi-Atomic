@@ -12,11 +12,11 @@ import pretrainedWeights from "./typescript_weights/typescript_pretrained_weight
 
 interface InferenceContext {
   tokens: string[]
-  inferenceResults?: any
-  sentiment?: any
-  slots?: any
-  userProfile?: any
-  dialogueState?: any
+  inferenceResults?: unknown
+  sentiment?: unknown
+  slots?: unknown
+  userProfile?: unknown
+  dialogueState?: unknown
 }
 
 function calculateConfidence(tokens: string[], input: string): number {
@@ -582,7 +582,7 @@ function binarySearch<T>(
 }
 
 // Memoization decorator
-function memoize<T extends (...args: any[]) => any>(fn: T): T {
+function memoize<T extends (...args: unknown[]) => any>(fn: T): T {
   const cache = new Map<string, ReturnType<T>>();
   
   return ((...args: Parameters<T>) => {

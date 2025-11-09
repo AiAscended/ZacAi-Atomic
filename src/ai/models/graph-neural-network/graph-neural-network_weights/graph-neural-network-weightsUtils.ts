@@ -2,8 +2,10 @@
  * Graph-neural-network - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
+export function loadWeights(path: string): unknown {
   return {};
 }
 
-export default { loadWeights };
+const graph_neural_network_weightsUtils_bundle = { loadWeights };
+
+export default graph_neural_network_weightsUtils_bundle;
