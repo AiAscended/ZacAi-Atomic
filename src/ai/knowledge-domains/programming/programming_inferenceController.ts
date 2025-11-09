@@ -184,7 +184,7 @@ export async function programmingRunInference(
       lowerInput.includes("how to");
 
     // Find relevant code example based on keywords
-    if (requestsExample || parseResult.type === "example") {
+    if (requestsExample) {
       for (const [key, example] of Object.entries(CODE_EXAMPLES)) {
         if (lowerInput.includes(key)) {
           codeExample = example;
@@ -222,7 +222,6 @@ export async function programmingRunInference(
         intent: semanticAnalysis.intent,
         complexity: semanticAnalysis.complexity,
         parseType: parseResult.type,
-        hasCodeExample: !!codeExample,
       },
     };
   } catch (error) {

@@ -19,7 +19,7 @@ import { ThinkingTracker } from "./thinkingTracker";
 import { PromptProcessor } from "../input_processing/promptProcessor";
 import { DomainQueryExecutor } from "../inference/domainQueryExecutor";
 import { ResponseSynthesizer } from "../output_generation/responseSynthesizer";
-import { InteractionLogger } from "../context_management/interactionLogger";
+import { InteractionLogger } from "../context_management/interactionLogger-v1";
 
 export class AIOrchestrator {
   private thinkingTracker: ThinkingTracker;

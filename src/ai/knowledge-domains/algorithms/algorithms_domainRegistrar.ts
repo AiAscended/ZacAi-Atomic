@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import meta from "./algorithms_meta.json";
+import meta from "./algorithms_seeds/algorithms_meta.json";
 import { ALGORITHMS_DOMAIN } from "./algorithms_constants";
 
 export const getDomainMeta = () => ({ ...meta, name: ALGORITHMS_DOMAIN });
