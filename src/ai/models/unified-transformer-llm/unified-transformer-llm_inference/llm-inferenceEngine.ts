@@ -9,6 +9,21 @@ import { LLMDecoder } from '../unified-transformer-llm_model/llm-decoder';
 import { LLMOutputHead } from '../unified-transformer-llm_model/llm-outputHead';
 import type { LLMModelConfig } from '../unified-transformer-llm_config/llm-modelConfig';
 
+export interface LLMLayerWeights {
+  Wq: number[][][];
+  Wk: number[][][];
+  Wv: number[][][];
+  Wo: number[][];
+  W1: number[][];
+  b1: number[];
+  W2: number[][];
+  b2: number[];
+  gamma1: number[];
+  beta1: number[];
+  gamma2: number[];
+  beta2: number[];
+}
+
 export class LLMInferenceEngine {
   private config: LLMModelConfig;
   private tokenizer: LLMTokenizer;
@@ -46,7 +61,7 @@ export class LLMInferenceEngine {
     topP: number = 0.9
   ): Promise<string> {
     // Encode prompt to token IDs
-    let tokenIds = this.tokenizer.encode(prompt);
+    const tokenIds = this.tokenizer.encode(prompt);
     const eosTokenId = 2; // End of sequence token
     const maxLength = tokenIds.length + maxTokens;
     
@@ -196,7 +211,7 @@ export class LLMInferenceEngine {
    */
   loadWeights(weights: {
     embeddings: number[][];
-    decoderLayers: any[];
+    decoderLayers: LLMLayerWeights[];
     outputHead: { W: number[][], b: number[] };
   }): void {
     this.embedding.setEmbeddings(weights.embeddings);

@@ -3,7 +3,7 @@
  */
 
 export class VITTrainer {
-  train(data: any): void {
+  train(data: unknown): void {
     console.log('Training vision-transformer...');
   }
 }

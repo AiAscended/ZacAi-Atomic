@@ -2,7 +2,7 @@
  * Wavenet-audio-model - Loss Function
  */
 
-export function wavenetLoss(predictions: any, targets: any): number {
+export function wavenetLoss(_predictions: unknown, _targets: unknown): number {
   return 0;
 }
 

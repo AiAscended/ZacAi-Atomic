@@ -48,7 +48,7 @@ export interface DomainSettings {
 export interface ModelSettings {
   enabled: boolean;
   type: string;
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
   performance: {
     maxLatency: number;
     cacheEnabled: boolean;
@@ -61,7 +61,7 @@ export interface UserSettings {
   name: string;
   email: string;
   role: 'admin' | 'user' | 'system';
-  preferences: Record<string, any>;
+  preferences: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
 }

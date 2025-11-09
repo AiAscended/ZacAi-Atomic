@@ -3,7 +3,7 @@
  */
 
 export class RNNTrainer {
-  train(data: any): void {
+  train(data: unknown): void {
     console.log('Training recurrent-neural-network...');
   }
 }

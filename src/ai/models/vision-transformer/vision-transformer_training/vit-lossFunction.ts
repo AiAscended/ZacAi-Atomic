@@ -2,7 +2,7 @@
  * Vision-transformer - Loss Function
  */
 
-export function vitLoss(predictions: any, targets: any): number {
+export function vitLoss(_predictions: unknown, _targets: unknown): number {
   return 0;
 }
 

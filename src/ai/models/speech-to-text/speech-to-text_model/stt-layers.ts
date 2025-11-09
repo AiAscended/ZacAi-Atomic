@@ -3,7 +3,7 @@
  */
 
 export class STTLayer {
-  forward(input: any): any {
+  forward(input: unknown): unknown {
     return input;
   }
 }

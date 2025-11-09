@@ -3,7 +3,7 @@
  */
 
 export class RNNInferenceEngine {
-  predict(input: any): any {
+  predict(input: unknown): unknown {
     return input;
   }
 }

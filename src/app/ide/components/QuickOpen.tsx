@@ -18,10 +18,16 @@ interface QuickOpenProps {
   onOpenChange: (open: boolean) => void;
 }
 
+interface FileSearchResult {
+  path: string;
+  content: string;
+  language: string;
+}
+
 export function QuickOpen({ open, onOpenChange }: QuickOpenProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<FileSearchResult[]>([]);
   const { searchFiles } = useFileSystem();
   const { openFile } = useEditorStore();
 
@@ -64,7 +70,7 @@ export function QuickOpen({ open, onOpenChange }: QuickOpenProps) {
     }
   };
 
-  const handleSelectFile = async (file: any) => {
+  const handleSelectFile = async (file: FileSearchResult) => {
     try {
       const fileName = file.path.split('/').pop() || file.path;
       openFile(file.path, fileName, file.content, file.language);

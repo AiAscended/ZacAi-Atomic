@@ -15,4 +15,6 @@ export function cosineSchedule(step: number, totalSteps: number, minLR: number =
   return minLR + 0.5 * (1 - minLR) * (1 + Math.cos(Math.PI * step / totalSteps));
 }
 
-export default { clipGradients, cosineSchedule };
+const llmTrainingUtils = { clipGradients, cosineSchedule };
+
+export default llmTrainingUtils;

@@ -2,8 +2,10 @@
  * Recurrent-neural-network - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
+export function loadWeights(path: string): unknown {
   return {};
 }
 
-export default { loadWeights };
+const recurrentNeuralNetworkWeightsUtils = { loadWeights };
+
+export default recurrentNeuralNetworkWeightsUtils;

@@ -51,10 +51,10 @@ export async function GET(request: NextRequest) {
     const installations = await response.json();
 
     // Transform to our format
-    const formatted = installations.map((install: any) => ({
-      installationId: install.id.toString(),
-      accountLogin: install.account.login,
-      accountType: install.account.type,
+    const formatted = installations.map((install: Record<string, unknown>) => ({
+      installationId: (install.id as number).toString(),
+      accountLogin: (install.account as Record<string, unknown>).login,
+      accountType: (install.account as Record<string, unknown>).type,
       installedAt: install.created_at,
       repositories: [], // Will be populated on-demand
       permissions: install.permissions || {},

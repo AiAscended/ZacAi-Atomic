@@ -68,7 +68,7 @@ export function clip(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-export default {
+const llmUtilities = {
   matMul,
   add,
   transpose,
@@ -77,3 +77,5 @@ export default {
   normalize,
   clip,
 };
+
+export default llmUtilities;

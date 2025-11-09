@@ -2,7 +2,7 @@
  * Multi-modal-fusion - Loss Function
  */
 
-export function multimodalLoss(predictions: any, targets: any): number {
+export function multimodalLoss(predictions: unknown, targets: unknown): number {
   return 0;
 }
 

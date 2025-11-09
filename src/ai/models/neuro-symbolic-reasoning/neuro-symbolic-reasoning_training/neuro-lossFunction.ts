@@ -2,7 +2,7 @@
  * Neuro-symbolic-reasoning - Loss Function
  */
 
-export function neuroLoss(predictions: any, targets: any): number {
+export function neuroLoss(_predictions: unknown, _targets: unknown): number {
   return 0;
 }
 

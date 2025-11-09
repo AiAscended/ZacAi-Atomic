@@ -1,3 +1,4 @@
 /** LLM Evaluation */
-export function calculateAccuracy(predictions: number[], targets: number[]): number { return 0; }
-export default { calculateAccuracy };
+export function calculateAccuracy(_predictions: number[], _targets: number[]): number { return 0; }
+const llmEvaluation = { calculateAccuracy };
+export default llmEvaluation;

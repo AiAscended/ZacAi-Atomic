@@ -3,7 +3,7 @@
  */
 
 export class VITLayer {
-  forward(input: any): any {
+  forward(input: unknown): unknown {
     return input;
   }
 }

@@ -50,10 +50,10 @@ class CodeExecutionService {
     try {
       // Create a sandboxed console
       const sandboxConsole = {
-        log: (...args: any[]) => this.logs.push(args.map(String).join(' ')),
-        error: (...args: any[]) => this.logs.push('ERROR: ' + args.map(String).join(' ')),
-        warn: (...args: any[]) => this.logs.push('WARN: ' + args.map(String).join(' ')),
-        info: (...args: any[]) => this.logs.push('INFO: ' + args.map(String).join(' ')),
+        log: (...args: unknown[]) => this.logs.push(args.map(String).join(' ')),
+        error: (...args: unknown[]) => this.logs.push('ERROR: ' + args.map(String).join(' ')),
+        warn: (...args: unknown[]) => this.logs.push('WARN: ' + args.map(String).join(' ')),
+        info: (...args: unknown[]) => this.logs.push('INFO: ' + args.map(String).join(' ')),
       };
 
       // Execute in sandboxed environment

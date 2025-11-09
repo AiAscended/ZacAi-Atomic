@@ -2,8 +2,10 @@
  * Speech-to-text - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
+export function loadWeights(path: string): unknown {
   return {};
 }
 
-export default { loadWeights };
+const speechToTextWeightsUtils = { loadWeights };
+
+export default speechToTextWeightsUtils;

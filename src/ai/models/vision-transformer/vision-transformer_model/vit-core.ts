@@ -3,13 +3,13 @@
  */
 
 export class VITModel {
-  private config: any;
+  private config: unknown;
   
-  constructor(config: any) {
+  constructor(config: unknown) {
     this.config = config;
   }
   
-  forward(input: any): any {
+  forward(input: unknown): unknown {
     // Model forward pass implementation
     return input;
   }

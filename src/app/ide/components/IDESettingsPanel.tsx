@@ -152,7 +152,7 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                 <Label htmlFor="wordWrap">Word Wrap</Label>
                 <Select
                   value={settings.editor.wordWrap}
-                  onValueChange={(value: any) => updateEditorSettings({ wordWrap: value })}
+                  onValueChange={(value) => updateEditorSettings({ wordWrap: value as 'off' | 'on' | 'bounded' })}
                 >
                   <SelectTrigger id="wordWrap">
                     <SelectValue />
@@ -190,7 +190,7 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Label htmlFor="editorTheme">Editor Theme</Label>
               <Select
                 value={settings.theme.editorTheme}
-                onValueChange={(value: any) => updateThemeSettings({ editorTheme: value })}
+                onValueChange={(value) => updateThemeSettings({ editorTheme: value as 'vs-dark' | 'vs-light' | 'hc-black' })}
               >
                 <SelectTrigger id="editorTheme">
                   <SelectValue />
@@ -207,7 +207,7 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Label htmlFor="uiTheme">UI Theme</Label>
               <Select
                 value={settings.theme.uiTheme}
-                onValueChange={(value: any) => updateThemeSettings({ uiTheme: value })}
+                onValueChange={(value) => updateThemeSettings({ uiTheme: value as 'dark' | 'light' | 'system' })}
               >
                 <SelectTrigger id="uiTheme">
                   <SelectValue />
@@ -308,7 +308,7 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Label htmlFor="autoSave">Auto Save</Label>
               <Select
                 value={settings.files.autoSave}
-                onValueChange={(value: any) => updateFileSettings({ autoSave: value })}
+                onValueChange={(value) => updateFileSettings({ autoSave: value as 'off' | 'afterDelay' | 'onFocusChange' })}
               >
                 <SelectTrigger id="autoSave">
                   <SelectValue />

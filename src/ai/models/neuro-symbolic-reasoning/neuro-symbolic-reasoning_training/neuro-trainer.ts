@@ -3,7 +3,7 @@
  */
 
 export class NEUROTrainer {
-  train(data: any): void {
+  train(_data: unknown): void {
     console.log('Training neuro-symbolic-reasoning...');
   }
 }

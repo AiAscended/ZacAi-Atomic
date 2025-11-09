@@ -4,4 +4,6 @@
 
 export function wavenetUtility(): void {}
 
-export default { wavenetUtility };
+const wavenetUtils = { wavenetUtility };
+
+export default wavenetUtils;

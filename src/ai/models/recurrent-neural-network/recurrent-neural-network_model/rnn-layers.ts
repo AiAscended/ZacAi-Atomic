@@ -3,7 +3,7 @@
  */
 
 export class RNNLayer {
-  forward(input: any): any {
+  forward(input: unknown): unknown {
     return input;
   }
 }

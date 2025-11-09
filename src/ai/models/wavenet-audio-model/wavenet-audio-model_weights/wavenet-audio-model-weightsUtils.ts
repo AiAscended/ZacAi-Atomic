@@ -6,4 +6,6 @@ export function loadWeights(_path: string): unknown {
   return {};
 }
 
-export default { loadWeights };
+const wavenetAudioModelWeightsUtils = { loadWeights };
+
+export default wavenetAudioModelWeightsUtils;
