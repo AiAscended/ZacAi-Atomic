@@ -5,7 +5,7 @@ export interface ProgrammingInferenceResult {
   response: string
   confidence: number
   topics: string[]
-  metadata: { intent: string; complexity: string; parseType: string }
+  metadata: { intent: string; complexity: string; parseType: string; hasCodeExample?: boolean }
 }
 
 // Code examples library
@@ -170,7 +170,7 @@ export async function programmingRunInference(input: string): Promise<Programmin
                            lowerInput.includes("how to")
 
     // Find relevant code example based on keywords
-    if (requestsExample || parseResult.type === "example") {
+    if (requestsExample || (parseResult.type as string) === "example") {
       for (const [key, example] of Object.entries(CODE_EXAMPLES)) {
         if (lowerInput.includes(key)) {
           codeExample = example

@@ -12,8 +12,10 @@ import { ENVIRONMENT_DOMAIN } from "./environment_constants"
 const EMBEDDING_DIM = 128
 
 export const getEnvironmentEmbedding = (token: string): number[] => {
-  const weights = pretrained.seedWeights as Record<string, number[]>
-  if (weights[token]) return weights[token]
+  // Check if the pretrained weights have the seedWeights format (legacy)
+  const weights = (pretrained as any).seedWeights as Record<string, number[]> | undefined;
+  if (weights && weights[token]) return weights[token];
+  
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
 }
 
@@ -25,11 +27,13 @@ export const persistEnvironmentWeights = (weights: Record<string, number[]>) => 
     null,
     2,
   )
-  const { updateFile } = require("../../orchestration/fileWatcher")
-  updateFile(ENVIRONMENT_DOMAIN, "src/ai/knowledge-domains/environment/environment_weights/environment_pretrained_weights.json", content)
+  // TODO: Implement proper file writing mechanism
+  // This functionality should be handled by a dedicated file management service
+  console.warn('[environment_embeddings] persistEnvironmentWeights: File writing not implemented yet')
   return {
-    success: true,
+    success: false,
     path: "src/ai/knowledge-domains/environment/environment_weights/environment_pretrained_weights.json",
+    error: "File writing not implemented"
   }
 }
 

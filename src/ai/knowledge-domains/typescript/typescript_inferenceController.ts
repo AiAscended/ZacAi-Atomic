@@ -749,7 +749,10 @@ console.log(user);
 }
 
 export async function typescriptRunInference(input: string, _context?: InferenceContext): Promise<any> {
-  const tokens = _context?.tokens || typescriptTokenizer(input)
+  const contextTokens = (_context && typeof _context === 'object' && 'tokens' in _context) 
+    ? (_context as { tokens: string[] }).tokens 
+    : undefined;
+  const tokens = contextTokens || typescriptTokenizer(input)
   const semantics = typescriptSemanticAnalyzer(input)
 
   const confidence = calculateConfidence(tokens, input)

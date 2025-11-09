@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+// This is a standalone Node.js script for populating seed data
+// It uses CommonJS require() which is appropriate for scripts not part of the Next.js build
+
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');

@@ -20,6 +20,13 @@ import { findSources } from "../url_lookup"
 import { scrapeURL } from "../../shared/tools/webScraper"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 
+interface SearchResult {
+  title: string;
+  source: string;
+  snippet: string;
+  url: string;
+}
+
 interface InferenceContext {
   tokens: string[]
   inferenceResults?: unknown
@@ -33,7 +40,7 @@ interface InferenceContext {
  */
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
-  const vocabulary = pretrainedWeights.vocabulary as Record<string, number>
+  const vocabulary = (pretrainedWeights as any).vocabulary as Record<string, number> | undefined
 
   let tokenScore = 0
   let matchCount = 0
@@ -41,7 +48,7 @@ function calculateConfidence(tokens: string[], input: string): number {
   // Calculate token-based confidence
   for (const token of tokens) {
     const lowerToken = token.toLowerCase()
-    if (vocabulary[lowerToken]) {
+    if (vocabulary && vocabulary[lowerToken]) {
       tokenScore += vocabulary[lowerToken]
       matchCount++
     }
@@ -61,9 +68,11 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   semanticScore = Math.min(semanticScore / 2, 1.0)
 
-  // Combine scores
-  const thresholds = pretrainedWeights.thresholds
-  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
+  // Combine scores with default weights if thresholds not available
+  const thresholds = (pretrainedWeights as any).thresholds as { token_match_weight?: number; semantic_weight?: number } | undefined
+  const tokenWeight = thresholds?.token_match_weight ?? 0.6
+  const semanticWeight = thresholds?.semantic_weight ?? 0.4
+  const finalConfidence = avgTokenScore * tokenWeight + semanticScore * semanticWeight
 
   return Math.min(finalConfidence, 1.0)
 }
@@ -112,7 +121,7 @@ export async function internetSearchRunInference(input: string, _context?: Infer
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} extracted query:`, searchQuery)
 
   const searchEngines = findSources(INTERNET_SEARCH_DOMAIN)
-  const results: unknown[] = []
+  const results: SearchResult[] = []
 
   for (const engine of searchEngines) {
     try {
