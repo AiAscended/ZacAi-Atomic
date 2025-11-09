@@ -134,8 +134,9 @@ export default function EnhancedHomePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: 'chat',
           sessionId,
-          prompt: finalPrompt,
+          message: finalPrompt,
         }),
       });
 

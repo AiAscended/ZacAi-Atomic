@@ -7,10 +7,32 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+interface TrainingStatus {
+  isTraining: boolean;
+  currentTraining: {
+    mode: string;
+    timestamp: string;
+    duration: number;
+  } | null;
+}
+
+interface TrainingHistoryItem {
+  id: string;
+  status: 'completed' | 'failed' | 'running';
+  timestamp: string;
+  mode: string;
+  duration: number;
+}
+
+interface TrainingSettings {
+  schedule: string;
+  confidenceThreshold: number;
+}
+
 export default function TrainingDashboard() {
-  const [status, setStatus] = useState<any>(null);
-  const [history, setHistory] = useState<any[]>([]);
-  const [settings, setSettings] = useState<any>(null);
+  const [status, setStatus] = useState<TrainingStatus | null>(null);
+  const [history, setHistory] = useState<TrainingHistoryItem[]>([]);
+  const [settings, setSettings] = useState<TrainingSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [triggering, setTriggering] = useState(false);
 

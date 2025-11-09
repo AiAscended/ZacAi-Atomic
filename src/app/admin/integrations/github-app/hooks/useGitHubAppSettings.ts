@@ -31,8 +31,12 @@ export function useGitHubAppSettings() {
       if (!res.ok) throw new Error("Failed to load settings")
       const data = await res.json()
       setSettings(data)
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     } finally {
       setLoading(false)
     }
@@ -51,8 +55,12 @@ export function useGitHubAppSettings() {
       if (!res.ok) throw new Error("Failed to update settings")
       const data = await res.json()
       setSettings(data)
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     } finally {
       setLoading(false)
     }

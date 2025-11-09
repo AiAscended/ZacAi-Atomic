@@ -18,15 +18,15 @@ export interface WeightMetadata {
   date_stamp?: string;
   training_run?: number;
   description: string;
-  architecture: Record<string, any>;
-  weights: Record<string, any>;
+  architecture: Record<string, unknown>;
+  weights: Record<string, unknown>;
   capabilities: string[];
   performance: {
     accuracy: number;
     f1_score: number;
-    [key: string]: any;
+    [key: string]: unknown;
   };
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface WeightEntry {

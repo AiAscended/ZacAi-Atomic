@@ -135,7 +135,7 @@ export default function SettingsPage() {
     }
   };
 
-  const updateSetting = (category: keyof SystemSettings, key: string, value: any) => {
+  const updateSetting = (category: keyof SystemSettings, key: string, value: unknown) => {
     if (!settings) return;
     setSettings({
       ...settings,

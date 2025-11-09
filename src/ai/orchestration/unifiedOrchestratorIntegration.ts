@@ -57,10 +57,10 @@ export class UnifiedOrchestrator {
    */
   async processRequest(request: {
     query: string;
-    context?: any;
+    context?: unknown;
     preferredModel?: string;
     preferredDomain?: string;
-  }): Promise<any> {
+  }): Promise<unknown> {
     if (!this.initialized) {
       await this.initialize();
     }
@@ -142,7 +142,7 @@ export class UnifiedOrchestrator {
   /**
    * Execute request with model
    */
-  private async executeWithModel(model: LoadedModule, request: any): Promise<any> {
+  private async executeWithModel(model: LoadedModule, request: { query: string; context?: unknown }): Promise<unknown> {
     console.log(`🤖 Using model: ${model.manifest.displayName}`);
     
     // Call model's inference engine
@@ -161,7 +161,7 @@ export class UnifiedOrchestrator {
   /**
    * Execute request with domain
    */
-  private async executeWithDomain(domain: LoadedModule, request: any): Promise<any> {
+  private async executeWithDomain(domain: LoadedModule, request: { query: string; context?: unknown }): Promise<unknown> {
     console.log(`📚 Using domain: ${domain.manifest.displayName}`);
     
     // Call domain's integration API
@@ -215,8 +215,8 @@ export class UnifiedOrchestrator {
    */
   async getStatus(): Promise<{
     initialized: boolean;
-    registry: any;
-    loadedModules: any;
+    registry: unknown;
+    loadedModules: unknown;
   }> {
     const registry = await getUnifiedRegistry();
     const { models, domains, stats } = this.loader.getModulesForOrchestrator();

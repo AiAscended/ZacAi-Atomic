@@ -6,9 +6,9 @@
  * Features: Save conversations, folder management, cross-chat memory retrieval
  */
 
-const fs = require('fs');
-const path = require('path');
-const logger = require('./systemActivityLogger.cjs');
+import fs from 'fs';
+import path from 'path';
+import logger from './systemActivityLogger.cjs';
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const CHAT_HISTORY_DIR = path.join(ROOT_DIR, 'data', 'chat-history');

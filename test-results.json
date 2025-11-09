@@ -1,0 +1,398 @@
+{
+  "total": 78,
+  "passed": 68,
+  "failed": 10,
+  "skipped": 0,
+  "tests": [
+    {
+      "name": "VFS Core Module: fileSystem.ts",
+      "status": "FAIL",
+      "details": "File not found: /workspaces/ZacAi-Atomic/src/lib/ide/fileSystem.ts"
+    },
+    {
+      "name": "VFS uses IndexedDB",
+      "status": "FAIL",
+      "details": "Error reading file: ENOENT: no such file or directory, open '/workspaces/ZacAi-Atomic/src/lib/ide/fileSystem.ts'"
+    },
+    {
+      "name": "VFS has createFile method",
+      "status": "FAIL",
+      "details": "Error reading file: ENOENT: no such file or directory, open '/workspaces/ZacAi-Atomic/src/lib/ide/fileSystem.ts'"
+    },
+    {
+      "name": "VFS has updateFile method",
+      "status": "FAIL",
+      "details": "Error reading file: ENOENT: no such file or directory, open '/workspaces/ZacAi-Atomic/src/lib/ide/fileSystem.ts'"
+    },
+    {
+      "name": "VFS has deleteFile method",
+      "status": "FAIL",
+      "details": "Error reading file: ENOENT: no such file or directory, open '/workspaces/ZacAi-Atomic/src/lib/ide/fileSystem.ts'"
+    },
+    {
+      "name": "VFS has searchFiles method",
+      "status": "FAIL",
+      "details": "Error reading file: ENOENT: no such file or directory, open '/workspaces/ZacAi-Atomic/src/lib/ide/fileSystem.ts'"
+    },
+    {
+      "name": "Command Processor Module: commandProcessor.ts",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: pwd",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: ls",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: cd",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: cat",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: echo",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: mkdir",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: rm",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: mv",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: touch",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: clear",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: history",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: env",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: whoami",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: help",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: node",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command implemented: npm",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Terminal UI Component: TerminalPanel.tsx",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Terminal uses XTerm.js",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "AI Integration Module: aiIDEIntegration.ts",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "AI Feature: Code Explanation",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "AI Feature: Bug Fixing",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "AI Feature: Code Optimization",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "AI Feature: Code Generation",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "AI Feature: Code Refactoring",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "AI Feature: Documentation Generation",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "AI Feature: Code Review",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "AI connects to ZacAi API",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "AI Chat UI Component: AIChatPanel.tsx",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Code Execution Service: codeExecutionService.ts",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "HTML Execution",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "JavaScript Execution",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "React Component Execution",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "VFS File Execution",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Code execution is sandboxed",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Preview Panel Component: PreviewPanel.tsx",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "GitHub Integration Module: githubIntegration.ts",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Uses Octokit for GitHub API",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Can clone repositories",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Can browse repository contents",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "GitHub Browser UI Component: GitHubBrowser.tsx",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "IDE Settings Store: ideSettings.ts",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Settings category: editor",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Settings category: theme",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Settings category: terminal",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Settings category: ai",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Settings category: files",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Settings category: git",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Settings category: preview",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Settings category: keybindings",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Settings can be exported",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Settings can be imported",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Settings UI Component: IDESettingsPanel.tsx",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Monaco Configuration Module: monacoConfig.ts",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Custom theme defined",
+      "status": "FAIL",
+      "details": "Text not found in /workspaces/ZacAi-Atomic/src/lib/ide/monacoConfig.ts"
+    },
+    {
+      "name": "Custom snippets configured",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Keyboard commands registered",
+      "status": "FAIL",
+      "details": "Text not found in /workspaces/ZacAi-Atomic/src/lib/ide/monacoConfig.ts"
+    },
+    {
+      "name": "Code Editor Component: CodeEditor.tsx",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "IDE Main Page: page.tsx",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "IDE Layout Component: IDELayout.tsx",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "File Explorer Component: FileExplorer.tsx",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "State Store: editorStore.ts: editorStore.ts",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "State Store: terminalStore.ts: terminalStore.ts",
+      "status": "FAIL",
+      "details": "File not found: /workspaces/ZacAi-Atomic/src/lib/ide/terminalStore.ts"
+    },
+    {
+      "name": "State Store: previewStore.ts: previewStore.ts",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "IDE README Documentation: IDE_README.md",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Implementation Status: IDE_IMPLEMENTATION_STATUS.md",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Integration Plan: IDE_INTEGRATION_PLAN.md",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "README has Quick Start section",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "README has Usage Examples",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Next.js Build Directory: .next",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Build ID File: BUILD_ID",
+      "status": "FAIL",
+      "details": "File not found: /workspaces/ZacAi-Atomic/.next/BUILD_ID"
+    },
+    {
+      "name": "Server Build Output",
+      "status": "PASS",
+      "details": ""
+    }
+  ]
+}

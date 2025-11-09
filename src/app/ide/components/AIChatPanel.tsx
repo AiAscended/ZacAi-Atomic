@@ -4,7 +4,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Bot, User, Code2, FileCode, Bug, Sparkles } from 'lucide-react';
+import { Send, Bot, User, Code2, FileCode, Bug, Sparkles, Copy, Check } from 'lucide-react';
+import { useAIIDE } from '@/lib/ide/aiIDEIntegration';
+import { useEditorStore } from '@/lib/ide/editorStore';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   id: string;
@@ -25,13 +28,18 @@ export function AIChatPanel() {
     {
       id: '1',
       role: 'assistant',
-      content: 'Hello! I\'m your ZacAi coding assistant. I can help you with:\n\n• Code explanation and documentation\n• Bug fixing and debugging\n• Code generation and refactoring\n• Best practices and optimization\n\nWhat would you like help with?',
+      content: 'Hello! I\'m your ZacAi Hybrid LLM coding assistant powered by 23 knowledge domains and 14 AI models. I can help you with:\n\n• Code explanation and documentation\n• Bug fixing and debugging\n• Code generation and refactoring\n• Best practices and optimization\n• Multi-language support\n• Real-time code analysis\n\nWhat would you like help with?',
       timestamp: new Date(),
     },
   ]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+  
+  // Use AI IDE integration
+  const { isInitialized, isLoading, sendMessage, explainCode, fixCode, optimizeCode, generateCode } = useAIIDE();
+  const { getActiveTab } = useEditorStore();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -50,24 +58,120 @@ export function AIChatPanel() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const userInput = input;
     setInput('');
-    setIsLoading(true);
 
-    // Phase 5: Integration with actual AI system
-    setTimeout(() => {
+    try {
+      // Get current editor context
+      const activeTab = getActiveTab();
+      const context = activeTab ? {
+        currentFile: {
+          path: activeTab.path,
+          content: activeTab.content,
+          language: activeTab.language,
+          cursorPosition: activeTab.cursorPosition,
+        },
+        openFiles: useEditorStore.getState().tabs.map(t => t.path),
+      } : undefined;
+
+      // Send to AI with full context
+      const response = await sendMessage(userInput, context);
+      
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'This is a placeholder response. Phase 5 will integrate with the full ZacAi orchestrator system, providing:\n\n• Context-aware code assistance\n• Integration with all 23 knowledge domains\n• 14 AI model capabilities\n• Real-time code analysis\n• Automated refactoring suggestions',
+        content: response.content,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMessage]);
-      setIsLoading(false);
-    }, 1000);
+
+      // Handle code blocks and actions
+      if (response.code && response.code.length > 0) {
+        toast({
+          title: 'Code Generated',
+          description: `${response.code.length} code snippet(s) available`,
+        });
+      }
+    } catch (error) {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'I apologize, but I encountered an error processing your request. Please try again.',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+      
+      toast({
+        title: 'Error',
+        description: 'Failed to get AI response',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleQuickAction = (prompt: string) => {
     setInput(prompt + ': ');
+  };
+
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+    toast({
+      title: 'Copied!',
+      description: 'Code copied to clipboard',
+    });
+  };
+
+  const renderMessageContent = (content: string) => {
+    // Parse code blocks and render them with syntax highlighting
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = codeBlockRegex.exec(content)) !== null) {
+      // Add text before code block
+      if (match.index > lastIndex) {
+        parts.push(content.substring(lastIndex, match.index));
+      }
+
+      const language = match[1] || 'plaintext';
+      const code = match[2].trim();
+
+      // Add code block with copy button
+      parts.push(
+        <div key={match.index} className="my-2 rounded-md overflow-hidden border">
+          <div className="flex items-center justify-between bg-muted/50 px-3 py-1 border-b">
+            <span className="text-xs text-muted-foreground">{language}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2"
+              onClick={() => handleCopyCode(code)}
+            >
+              {copiedCode === code ? (
+                <Check className="h-3 w-3 text-green-500" />
+              ) : (
+                <Copy className="h-3 w-3" />
+              )}
+            </Button>
+          </div>
+          <pre className="p-3 overflow-x-auto bg-muted/30">
+            <code className="text-xs">{code}</code>
+          </pre>
+        </div>
+      );
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < content.length) {
+      parts.push(content.substring(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : content;
   };
 
   return (
@@ -121,7 +225,9 @@ export function AIChatPanel() {
                     : 'bg-muted'
                 }`}
               >
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                <div className="text-sm whitespace-pre-wrap">
+                  {renderMessageContent(message.content)}
+                </div>
                 <span className="text-xs opacity-70 mt-1 block">
                   {message.timestamp.toLocaleTimeString()}
                 </span>

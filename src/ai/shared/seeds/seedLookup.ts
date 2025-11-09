@@ -93,10 +93,12 @@ export function getExamples(key: string, domain?: string): string[] {
   const examples = entry.fullData.examples || entry.fullData.example;
   
   if (Array.isArray(examples)) {
-    return examples.map((ex: any) => {
+    return examples.map((ex: unknown) => {
       if (typeof ex === 'string') return ex;
-      if (ex.code) return ex.code;
-      if (ex.example) return ex.example;
+      if (typeof ex === 'object' && ex !== null) {
+        if ('code' in ex && typeof (ex as { code: unknown }).code === 'string') return (ex as { code: string }).code;
+        if ('example' in ex && typeof (ex as { example: unknown }).example === 'string') return (ex as { example: string }).example;
+      }
       return JSON.stringify(ex);
     });
   }

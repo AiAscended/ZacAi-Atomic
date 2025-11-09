@@ -235,17 +235,18 @@ export function validateAdminSettings(data: unknown) {
 // Secret Redaction Utility
 // ============================================================================
 
-export function redactSecrets<T extends Record<string, any>>(obj: T): T {
-  const redacted = { ...obj } as any;
+export function redactSecrets<T extends Record<string, unknown>>(obj: T): T {
+  const redacted: Record<string, unknown> = {};
   const secretKeys = ["privateKey", "webhookSecret", "apiKey", "secret", "password", "token"];
 
-  for (const key of Object.keys(redacted)) {
+  for (const key of Object.keys(obj)) {
     if (secretKeys.some(sk => key.toLowerCase().includes(sk.toLowerCase()))) {
       redacted[key] = "***REDACTED***";
-    } else if (typeof redacted[key] === "object" && redacted[key] !== null) {
-      redacted[key] = redactSecrets(redacted[key]);
+    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+      redacted[key] = redactSecrets(obj[key] as Record<string, unknown>);
+    } else {
+      redacted[key] = obj[key];
     }
   }
-
   return redacted as T;
 }

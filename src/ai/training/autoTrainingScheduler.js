@@ -15,8 +15,8 @@
  *   0 2 * * * cd /app && node src/ai/training/autoTrainingScheduler.js
  */
 
-const fs = require('fs').promises;
-const path = require('path');
+import { promises as fs } from 'fs';
+import path from 'path';
 
 class AutoTrainingScheduler {
   constructor() {
