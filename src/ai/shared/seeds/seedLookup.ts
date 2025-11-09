@@ -77,9 +77,9 @@ export function getDefinition(key: string, domain?: string): string | null {
   const entry = seedRegistry.lookup(key, domain);
   if (!entry?.fullData) return null;
   
-  return entry.fullData.definition || 
-         entry.fullData.description || 
-         entry.fullData.explanation || 
+  return entry.fullData?.definition || 
+         entry.fullData?.description || 
+         entry.fullData?.explanation || 
          null;
 }
 
@@ -90,7 +90,7 @@ export function getExamples(key: string, domain?: string): string[] {
   const entry = seedRegistry.lookup(key, domain);
   if (!entry?.fullData) return [];
   
-  const examples = entry.fullData.examples || entry.fullData.example;
+  const examples = entry.fullData?.examples || entry.fullData?.example;
   
   if (Array.isArray(examples)) {
     return examples.map((ex: unknown) => {
@@ -115,7 +115,7 @@ export function getRelated(key: string, domain?: string): string[] {
   const entry = seedRegistry.lookup(key, domain);
   if (!entry?.fullData?.related) return [];
   
-  return Array.isArray(entry.fullData.related) ? entry.fullData.related : [];
+  return Array.isArray(entry.fullData?.related) ? entry.fullData?.related : [];
 }
 
 /**

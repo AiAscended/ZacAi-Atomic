@@ -105,14 +105,14 @@ export async function performSemanticInference(
       if (seed && seed.fullData) {
         matchedSeeds.push(seed.fullData);
         console.log(`[SemanticInference] Found seed for "${term}":`, {
-          concept: seed.fullData.word || seed.fullData.concept,
-          priority: seed.fullData.priority,
-          category: seed.fullData.category
+          concept: seed.fullData?.word || seed.fullData?.concept,
+          priority: seed.fullData?.priority,
+          category: seed.fullData?.category
         });
         
         // Extract code examples if available
-        if (seed.fullData.examples) {
-          seed.fullData.examples.forEach((ex: string) => {
+        if (seed.fullData?.examples) {
+          seed.fullData?.examples.forEach((ex: string) => {
             if (ex.includes('{') || ex.includes('function') || ex.includes('const') || ex.includes('import')) {
               codeExamples.push(ex);
             }
@@ -204,13 +204,13 @@ export async function searchCodeExamples(
   for (const keyword of keywords) {
     try {
       const seed = await seedRegistry.lookup(keyword, domain);
-      if (seed && seed.fullData && seed.fullData.examples) {
-        seed.fullData.examples.forEach((ex: string) => {
+      if (seed && seed.fullData && seed.fullData?.examples) {
+        seed.fullData?.examples.forEach((ex: string) => {
           if (ex.includes('{') || ex.includes('function') || ex.includes('const')) {
             examples.push({
               code: ex,
-              concept: seed.fullData.word || seed.fullData.concept,
-              language: seed.fullData.language || 'typescript'
+              concept: seed.fullData?.word || seed.fullData?.concept,
+              language: seed.fullData?.language || 'typescript'
             });
           }
         });
@@ -233,7 +233,7 @@ export async function getRelatedConcepts(
   try {
     const seed = await seedRegistry.lookup(term, domain);
     if (seed && seed.fullData) {
-      return seed.fullData.relatedConcepts || seed.fullData.related || [];
+      return seed.fullData?.relatedConcepts || seed.fullData?.related || [];
     }
   } catch (error) {
     // Seed not found
