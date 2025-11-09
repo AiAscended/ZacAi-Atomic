@@ -77,7 +77,7 @@ class TrainingScheduler {
   };
 
   private history: TrainingHistory[] = [];
-  private cronJob: any | null = null; // cron.ScheduledTask
+  private cronJob: { stop: () => void } | null = null; // cron.ScheduledTask
   private currentTraining: TrainingHistory | null = null;
 
   constructor() {

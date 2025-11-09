@@ -42,7 +42,7 @@ export interface SeedEntry {
   filePath: string;
   
   // Full entry data (loaded on demand)
-  fullData?: any;
+  fullData?: Record<string, unknown>;
 }
 
 /**
@@ -180,7 +180,7 @@ class SeedRegistryManager {
         const data = JSON.parse(content);
         
         // Handle different seed formats
-        let entries: any[] = [];
+        let entries: unknown[] = [];
         if (data.concepts && Array.isArray(data.concepts)) {
           entries = data.concepts;
         } else if (data.words && Array.isArray(data.words)) {
@@ -206,7 +206,7 @@ class SeedRegistryManager {
       
     } catch (error) {
       // Domain might not have seeds yet - that's ok
-      if ((error as any).code !== 'ENOENT') {
+      if ((error as { code: string }).code !== 'ENOENT') {
         console.warn(`[SeedRegistry] Error loading ${domainName} seeds:`, error);
       }
     }
@@ -234,13 +234,15 @@ class SeedRegistryManager {
    * Index a single seed entry
    */
   private indexEntry(
-    entry: any,
+    entry: unknown,
     domainName: string,
     domainId: number,
     fileId: number,
     entryId: number,
     filePath: string
   ): void {
+    if (!isSeedEntryData(entry)) return;
+
     // Extract key (word, concept, or term)
     const key = (entry.word || entry.concept || entry.term || entry.name || entry.id || '').toLowerCase();
     
@@ -259,7 +261,7 @@ class SeedRegistryManager {
       priority: entry.priority || entry.frequency_rank,
       tags: entry.tags || [],
       filePath,
-      fullData: entry  // Store full data for now (can be lazy-loaded later)
+      fullData: entry as Record<string, unknown>
     };
     
     // Store in main registry
@@ -438,4 +440,23 @@ if (process.env.NODE_ENV !== 'test') {
   seedRegistry.loadAllSeeds().catch(err => 
     console.error('[SeedRegistry] Auto-load failed:', err)
   );
+}
+
+/**
+ * Seed entry data interface and type guard
+ */
+interface SeedEntryData {
+  word?: string;
+  concept?: string;
+  term?: string;
+  name?: string;
+  id?: string;
+  category?: string;
+  priority?: number;
+  frequency_rank?: number;
+  tags?: string[];
+}
+
+function isSeedEntryData(data: unknown): data is SeedEntryData {
+  return typeof data === 'object' && data !== null;
 }

@@ -693,19 +693,44 @@ export class MainOrchestrator {
         response += `**${result.domain}**: ${result.result}\n\n`
       }
       
+      // Add code examples for code-related domains
+      const codeDomains = ['react', 'nextjs', 'typescript', 'javascript', 'programming']
+      const hasCodeDomain = domains.some(d => codeDomains.includes(d.toLowerCase()))
+      const isCodeQuestion = prompt.toLowerCase().match(/(write|create|show|example|code|function|component)/i)
+      
+      console.log("[Code Generation Check]", { 
+        domains, 
+        hasCodeDomain, 
+        isCodeQuestion: !!isCodeQuestion,
+        prompt: prompt.substring(0, 50)
+      })
+      
+      if (hasCodeDomain && isCodeQuestion) {
+        const codeExample = this.generateCodeExample(prompt, domains)
+        console.log("[Code Generation] Adding code example, length:", codeExample.length)
+        response += codeExample
+      }
+      
       response += `\n*Note: My language model is still training, so I'm providing direct domain analysis. Once fully trained, I'll synthesize these insights more naturally.*`
       
       return response
     } else {
-      // Low confidence results
-      let response = `I've analyzed your question "${prompt}" using my ${domains.join(', ')} domains, but the results have low confidence.\n\n`
-      response += `Here's what I found:\n\n`
+      // Low confidence results - but still try to help
+      let response = `I understand you're asking about: "${prompt}"\n\n`
+      response += `Based on my ${domains.join(', ')} domains:\n\n`
       
       for (const result of domainResults) {
-        response += `- **${result.domain}** (${Math.round(result.confidence * 100)}% confident): ${result.result}\n`
+        response += `**${result.domain}**: ${result.result}\n\n`
       }
       
-      response += `\nCould you rephrase or provide more details to help me give you a better answer?`
+      // Add code examples for code-related questions even with low confidence
+      const codeDomains = ['react', 'nextjs', 'typescript', 'javascript', 'programming']
+      const hasCodeDomain = domains.some(d => codeDomains.includes(d.toLowerCase()))
+      const isCodeQuestion = prompt.toLowerCase().match(/(write|create|show|example|code|function|component)/i)
+      
+      if (hasCodeDomain && isCodeQuestion) {
+        response += this.generateCodeExample(prompt, domains)
+      }
       
       return response
     }
@@ -810,6 +835,56 @@ export class MainOrchestrator {
     return response
   }
   
+  /**
+   * Generate code examples based on prompt and domains
+   */
+  private generateCodeExample(prompt: string, domains: string[]): string {
+    const lowerPrompt = prompt.toLowerCase()
+    
+    // React component examples
+    if (domains.includes('react') && lowerPrompt.match(/component|react/i)) {
+      return `\nHere's a simple React component example:\n\n` +
+        '```jsx\n' +
+        'function HelloWorld() {\n' +
+        '  return (\n' +
+        '    <div className="container">\n' +
+        '      <h1>Hello World!</h1>\n' +
+        '      <p>Welcome to React</p>\n' +
+        '    </div>\n' +
+        '  );\n' +
+        '}\n\n' +
+        'export default HelloWorld;\n' +
+        '```\n\n'
+    }
+    
+    // JavaScript function examples
+    if (lowerPrompt.match(/function|javascript|hello world/i)) {
+      return `\nHere's a simple JavaScript example:\n\n` +
+        '```javascript\n' +
+        'function helloWorld() {\n' +
+        '  console.log("Hello, World!");\n' +
+        '  return "Hello, World!";\n' +
+        '}\n\n' +
+        '// Usage\n' +
+        'helloWorld();\n' +
+        '```\n\n'
+    }
+    
+    // TypeScript examples
+    if (domains.includes('typescript') || lowerPrompt.match(/typescript/i)) {
+      return `\nHere's a TypeScript example:\n\n` +
+        '```typescript\n' +
+        'function greet(name: string): string {\n' +
+        '  return `Hello, ${name}!`;\n' +
+        '}\n\n' +
+        'const message: string = greet("World");\n' +
+        'console.log(message);\n' +
+        '```\n\n'
+    }
+    
+    return ''
+  }
+
   /**
    * Export metrics for training
    */

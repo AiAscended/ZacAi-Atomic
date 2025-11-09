@@ -12,6 +12,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
+import fs from 'fs';
+import path from 'path';
 
 // ============================================================================
 // Rate Limiting (In-Memory Token Bucket)
@@ -214,8 +216,6 @@ export function captureError(error: Error, context: ErrorContext): void {
   
   // Write to error log file
   try {
-    const fs = require('fs');
-    const path = require('path');
     const logPath = path.join(process.cwd(), 'data', 'error.log');
     const logEntry = JSON.stringify({
       timestamp: context.timestamp,
@@ -256,7 +256,8 @@ export function getClientIp(request: NextRequest): string {
   }
   
   // Fallback to connection IP
-  return request.ip || 'unknown';
+  // Use 'x-forwarded-for' header or fallback to a generic string
+  return request.headers.get('x-forwarded-for') || 'unknown';
 }
 
 // ============================================================================
@@ -395,8 +396,6 @@ export async function getHealthStatus(): Promise<HealthStatus> {
   
   // Check storage (file system)
   try {
-    const fs = require('fs');
-    const path = require('path');
     const testPath = path.join(process.cwd(), 'data', '.health-check');
     fs.writeFileSync(testPath, 'OK', 'utf-8');
     fs.unlinkSync(testPath);

@@ -18,15 +18,15 @@ import { mean } from "./mean"
  */
 export function variance(...numbers: number[]): number
 export function variance(sample: boolean, ...numbers: number[]): number
-export function variance(...args: any[]): number {
+export function variance(...args: (number | boolean)[]): number {
   let sample = false
   let numbers: number[]
 
   if (typeof args[0] === "boolean") {
     sample = args[0]
-    numbers = args.slice(1)
+    numbers = args.slice(1) as number[]
   } else {
-    numbers = args
+    numbers = args as number[]
   }
 
   if (numbers.length === 0) {

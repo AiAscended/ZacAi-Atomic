@@ -7,15 +7,13 @@ const nextConfig = {
   output: 'standalone',
   
   // Keep TypeScript and ESLint checks enabled for production quality
-  // Remove ignoreBuildErrors and ignoreDuringBuilds for production
   eslint: {
-    // Only ignore during builds if absolutely necessary (not recommended for production)
-    // ignoreDuringBuilds: false,
-    dirs: ['src'], // Run ESLint on src directory
+    // Run ESLint on src directory
+    dirs: ['src'],
   },
   typescript: {
-    // Temporarily ignore build errors to test the build
-    ignoreBuildErrors: true,
+    // Enable TypeScript checking in production
+    ignoreBuildErrors: false,
   },
   
   // Image optimization

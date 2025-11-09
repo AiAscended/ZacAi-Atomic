@@ -14,6 +14,21 @@ import { seedRegistry } from '../seeds/seedRegistry';
 import { cosineSimilarity } from '@/ai/models/unified-transformer-llm/unified-transformer-llm_model/llm-utilities';
 import { l2Normalize } from '@/ai/embedding/embeddingNormalizer';
 
+export interface SeedData {
+  word?: string;
+  concept?: string;
+  term?: string;
+  priority?: number;
+  category?: string;
+  definitions?: { meaning: string; example: string }[];
+  definition?: string;
+  bestPractice?: string;
+  examples?: string[];
+  relatedConcepts?: string[];
+  related?: string[];
+  language?: string;
+}
+
 export interface SemanticInferenceResult {
   response: string;
   confidence: number;
@@ -73,11 +88,11 @@ function extractKeyTerms(text: string): string[] {
 export async function performSemanticInference(
   query: string,
   domain: string,
-  context?: any
+  context?: unknown
 ): Promise<SemanticInferenceResult> {
   
   const keyTerms = extractKeyTerms(query);
-  const matchedSeeds: any[] = [];
+  const matchedSeeds: SeedData[] = [];
   const codeExamples: string[] = [];
   
   console.log(`[SemanticInference] Analyzing query for ${domain}: "${query.substring(0, 50)}..."`);
@@ -121,24 +136,26 @@ export async function performSemanticInference(
     // Build response from seed data
     matchedSeeds.forEach(seed => {
       const concept = seed.word || seed.concept || seed.term;
-      concepts.push(concept);
-      sources.push(`${domain} seed: ${concept}`);
-      
-      // Add definition
-      if (seed.definitions && seed.definitions.length > 0) {
-        response += `**${concept}**: ${seed.definitions[0].meaning}\n\n`;
-      } else if (seed.definition) {
-        response += `**${concept}**: ${seed.definition}\n\n`;
-      }
-      
-      // Add example
-      if (seed.definitions && seed.definitions.length > 0 && seed.definitions[0].example) {
-        response += `*Example*: ${seed.definitions[0].example}\n\n`;
-      }
-      
-      // Add best practice if available
-      if (seed.bestPractice) {
-        response += `💡 *Best Practice*: ${seed.bestPractice}\n\n`;
+      if (concept) {
+        concepts.push(concept);
+        sources.push(`${domain} seed: ${concept}`);
+        
+        // Add definition
+        if (seed.definitions && seed.definitions.length > 0) {
+          response += `**${concept}**: ${seed.definitions[0].meaning}\n\n`;
+        } else if (seed.definition) {
+          response += `**${concept}**: ${seed.definition}\n\n`;
+        }
+        
+        // Add example
+        if (seed.definitions && seed.definitions.length > 0 && seed.definitions[0].example) {
+          response += `*Example*: ${seed.definitions[0].example}\n\n`;
+        }
+        
+        // Add best practice if available
+        if (seed.bestPractice) {
+          response += `💡 *Best Practice*: ${seed.bestPractice}\n\n`;
+        }
       }
     });
     

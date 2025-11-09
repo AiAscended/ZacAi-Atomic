@@ -2,7 +2,7 @@
  * Wavenet-audio-model - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
+export function loadWeights(_path: string): unknown {
   return {};
 }
 

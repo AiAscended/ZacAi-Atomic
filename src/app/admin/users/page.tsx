@@ -316,7 +316,7 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle>Add New User</DialogTitle>
             <DialogDescription>
-              Create a new user account. Use role "system" for AI self-awareness.
+              Create a new user account. Use role &quot;system&quot; for AI self-awareness.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -432,7 +432,7 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle>Delete User</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete user "{currentUser?.name}"? This action cannot be undone.
+              Are you sure you want to delete user &quot;{currentUser?.name}&quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

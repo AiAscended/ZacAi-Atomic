@@ -22,7 +22,7 @@ export async function lookupAndLearn(
 ): Promise<{
   found: boolean;
   fromExisting: boolean;
-  data: LearnedItem | any;
+  data: LearnedItem | unknown;
   source: 'seed' | 'learned' | 'url-lookup';
 }> {
   // 1. Check if already in seed vocabulary
@@ -49,8 +49,8 @@ export async function lookupAndLearn(
 
   // 3. Perform URL lookup (simulated - you'd integrate with actual URL lookup)
   const urlLookupResult = await performURLLookup(domain, term);
-  
-  if (urlLookupResult.found) {
+
+  if (urlLookupResult.found && isUrlLookupData(urlLookupResult.data)) {
     // Learn the new term
     const learned = learningMemory.learnItem(
       sessionId,
@@ -91,7 +91,7 @@ export async function lookupAndLearn(
 async function performURLLookup(
   domain: string,
   term: string
-): Promise<{ found: boolean; data?: any }> {
+): Promise<{ found: boolean; data?: unknown }> {
   // This would integrate with your actual URL lookup tools
   // For now, return a simulated response
   
@@ -110,11 +110,13 @@ async function performURLLookup(
 /**
  * Determine category based on term and data
  */
-function determineCategory(term: string, data: any): LearnedItem['category'] {
+function determineCategory(term: string, data: unknown): LearnedItem['category'] {
   if (term.match(/[+\-*/=]/)) return 'equation';
-  if (data?.type === 'concept') return 'concept';
-  if (data?.type === 'fact') return 'fact';
-  if (data?.type === 'procedure') return 'procedure';
+  if (isUrlLookupData(data)) {
+    if (data.type === 'concept') return 'concept';
+    if (data.type === 'fact') return 'fact';
+    if (data.type === 'procedure') return 'procedure';
+  }
   return 'vocabulary';
 }
 
@@ -395,5 +397,30 @@ export function learnFromSearch(
       verified: false,
       learnedFrom: 'search',
     }
+  );
+}
+
+// ============================================================================
+// Type Definitions
+// ============================================================================
+
+interface UrlLookupData {
+  definition: string;
+  source: string;
+  examples: string[];
+  related: string[];
+  type?: 'concept' | 'fact' | 'procedure';
+}
+
+function isUrlLookupData(data: unknown): data is UrlLookupData {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+  const d = data as UrlLookupData;
+  return (
+    typeof d.definition === 'string' &&
+    typeof d.source === 'string' &&
+    Array.isArray(d.examples) &&
+    Array.isArray(d.related)
   );
 }

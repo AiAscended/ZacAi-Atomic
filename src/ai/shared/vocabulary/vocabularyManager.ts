@@ -27,7 +27,7 @@ export class VocabularyManager {
    * Load base vocabulary from JSON
    */
   private loadBaseVocabulary(): void {
-    const vocab = baseVocabulary as any
+    const vocab = baseVocabulary as Record<string, unknown>;
     
     // Load all token categories
     const categories = [

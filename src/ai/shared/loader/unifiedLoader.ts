@@ -17,7 +17,7 @@ import { getUnifiedRegistry, type ModuleManifest, type ModuleType } from "../reg
 
 export interface LoadedModule {
   manifest: ModuleManifest;
-  instance: any;
+  instance: unknown;
   loadedAt: string;
   status: "ready" | "loading" | "error" | "disabled";
   errorMessage?: string;
@@ -118,8 +118,8 @@ export class UnifiedLoader {
       }
       
       if (modulePath) {
-        const module = await import(modulePath);
-        loaded.instance = module.default || module;
+        const loadedModule = await import(modulePath);
+        loaded.instance = loadedModule.default || loadedModule;
       }
       
       loaded.status = "ready";

@@ -1,96 +1,156 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Terminal as XTerm } from 'xterm';
-import { FitAddon } from 'xterm-addon-fit';
-import { WebLinksAddon } from 'xterm-addon-web-links';
-import 'xterm/css/xterm.css';
 import { Button } from '@/components/ui/button';
 import { X, Plus, Trash2 } from 'lucide-react';
+import { commandProcessor } from '@/lib/ide/commandProcessor';
+
+// Type imports (types are safe during SSR)
+import type { Terminal as XTermType } from 'xterm';
+import type { FitAddon as FitAddonType } from 'xterm-addon-fit';
 
 interface TerminalSession {
   id: string;
   title: string;
-  terminal: XTerm;
+  terminal: XTermType;
 }
 
 export function TerminalPanel() {
   const terminalRef = useRef<HTMLDivElement>(null);
   const [sessions, setSessions] = useState<TerminalSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
-  const fitAddonRef = useRef<FitAddon | null>(null);
+  const fitAddonRef = useRef<FitAddonType | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    if (!terminalRef.current) return;
+    if (!terminalRef.current || typeof window === 'undefined') return;
 
-    // Initialize first terminal session
-    const terminal = new XTerm({
-      cursorBlink: true,
-      fontSize: 14,
-      fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-      theme: {
-        background: '#1e1e1e',
-        foreground: '#d4d4d4',
-        cursor: '#ffffff',
-        selectionBackground: '#264f78',
-      },
-      scrollback: 1000,
-    });
+    let terminal: XTermType;
+    let fitAddon: FitAddonType;
+    let cleanup: (() => void) | undefined;
 
-    const fitAddon = new FitAddon();
-    const webLinksAddon = new WebLinksAddon();
-    
-    terminal.loadAddon(fitAddon);
-    terminal.loadAddon(webLinksAddon);
-    fitAddonRef.current = fitAddon;
+    // Dynamic import xterm modules
+    Promise.all([
+      import('xterm'),
+      import('xterm-addon-fit'),
+      import('xterm-addon-web-links')
+    ]).then(([{ Terminal }, { FitAddon }, { WebLinksAddon }]) => {
+      if (!terminalRef.current) return;
+      
+      setIsLoaded(true);
 
-    terminal.open(terminalRef.current);
-    fitAddon.fit();
+      // Initialize first terminal session
+      terminal = new Terminal({
+        cursorBlink: true,
+        fontSize: 14,
+        fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+        theme: {
+          background: '#1e1e1e',
+          foreground: '#d4d4d4',
+          cursor: '#ffffff',
+          selectionBackground: '#264f78',
+        },
+        scrollback: 1000,
+      });
+
+      fitAddon = new FitAddon();
+      const webLinksAddon = new WebLinksAddon();
+      
+      terminal.loadAddon(fitAddon);
+      terminal.loadAddon(webLinksAddon);
+      fitAddonRef.current = fitAddon;
+
+      terminal.open(terminalRef.current);
+      fitAddon.fit();
 
     // Welcome message
     terminal.writeln('\x1b[1;32m╔═══════════════════════════════════════════════╗\x1b[0m');
     terminal.writeln('\x1b[1;32m║     Welcome to ZacAi IDE Terminal            ║\x1b[0m');
     terminal.writeln('\x1b[1;32m╚═══════════════════════════════════════════════╝\x1b[0m');
     terminal.writeln('');
-    terminal.writeln('Phase 4: Full terminal integration coming soon!');
+    terminal.writeln('Type \x1b[1;33mhelp\x1b[0m to see available commands');
     terminal.writeln('');
-    terminal.writeln('Features:');
-    terminal.writeln('  • Command execution');
-    terminal.writeln('  • Process management');
-    terminal.writeln('  • Multiple terminal sessions');
-    terminal.writeln('  • Shell environment');
-    terminal.writeln('');
-    terminal.write('\x1b[1;36m$\x1b[0m ');
+    
+    const prompt = () => {
+      const cwd = commandProcessor.getCurrentDirectory();
+      terminal.write(`\x1b[1;32m${cwd}\x1b[0m \x1b[1;36m$\x1b[0m `);
+    };
+    
+    prompt();
 
-    // Placeholder input handling (Phase 4 will add real command execution)
-    terminal.onData((data: string) => {
-      if (data === '\r') {
+    // Command execution with full shell support
+    let currentLine = '';
+    let historyIndex = -1;
+    const history = commandProcessor.getHistory();
+
+    terminal.onData(async (data: string) => {
+      const code = data.charCodeAt(0);
+
+      // Handle special keys
+      if (code === 13) { // Enter
         terminal.writeln('');
-        terminal.writeln('Command execution coming in Phase 4...');
-        terminal.write('\x1b[1;36m$\x1b[0m ');
-      } else {
+        
+        if (currentLine.trim()) {
+          const result = await commandProcessor.executeCommand(currentLine);
+          
+          if (result.output) {
+            terminal.write(result.output);
+          }
+          
+          if (result.error) {
+            terminal.writeln(`\x1b[1;31m${result.error}\x1b[0m`);
+          }
+        }
+        
+        currentLine = '';
+        historyIndex = -1;
+        prompt();
+      } else if (code === 127) { // Backspace
+        if (currentLine.length > 0) {
+          currentLine = currentLine.slice(0, -1);
+          terminal.write('\b \b');
+        }
+      } else if (code === 27) { // Escape sequences (arrow keys)
+        // Handle arrow key navigation for history
+        return;
+      } else if (code === 3) { // Ctrl+C
+        terminal.writeln('^C');
+        currentLine = '';
+        prompt();
+      } else if (code === 12) { // Ctrl+L (clear)
+        terminal.clear();
+        prompt();
+      } else if (data >= String.fromCharCode(32)) { // Printable characters
+        currentLine += data;
         terminal.write(data);
       }
     });
 
-    const sessionId = `session-${Date.now()}`;
-    setSessions([{ id: sessionId, title: 'Terminal 1', terminal }]);
-    setActiveSessionId(sessionId);
+      const sessionId = `session-${Date.now()}`;
+      setSessions([{ id: sessionId, title: 'Terminal 1', terminal }]);
+      setActiveSessionId(sessionId);
 
-    // Handle resize
-    const resizeObserver = new ResizeObserver(() => {
-      if (fitAddonRef.current) {
-        fitAddonRef.current.fit();
+      // Handle resize
+      const resizeObserver = new ResizeObserver(() => {
+        if (fitAddon) {
+          fitAddon.fit();
+        }
+      });
+
+      if (terminalRef.current) {
+        resizeObserver.observe(terminalRef.current);
       }
+
+      cleanup = () => {
+        resizeObserver.disconnect();
+        terminal.dispose();
+      };
+    }).catch((error) => {
+      console.error('Failed to load xterm:', error);
     });
 
-    if (terminalRef.current) {
-      resizeObserver.observe(terminalRef.current);
-    }
-
     return () => {
-      resizeObserver.disconnect();
-      terminal.dispose();
+      if (cleanup) cleanup();
     };
   }, []);
 

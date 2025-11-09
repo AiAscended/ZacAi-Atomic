@@ -48,7 +48,8 @@ export function formatResponse(rawResponse: string): FormattedResponse {
   const textBlocks: TextBlock[] = []
   const languages = new Set<string>()
 
-  const codeBlockRegex = /``````/g
+  // Fixed regex to properly match code blocks with 3 backticks
+  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g
   let match,
     lastIndex = 0,
     blockId = 0
@@ -71,7 +72,17 @@ export function formatResponse(rawResponse: string): FormattedResponse {
 
     const language = match[1] || detectLanguage(match[2])
     const code = match[2].trim()
-    const formattedCode = formatCode(code, { language })
+    
+    // Format code, fallback to original if formatting fails
+    let formattedCode = code
+    try {
+      const formatted = formatCode(code, { language })
+      if (formatted && typeof formatted === 'string') {
+        formattedCode = formatted
+      }
+    } catch (error) {
+      console.warn('[ResponseFormatter] Code formatting failed, using original:', error)
+    }
 
     languages.add(language)
     codeBlocks.push({

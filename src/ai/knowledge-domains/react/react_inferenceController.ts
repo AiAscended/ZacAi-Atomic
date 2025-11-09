@@ -106,8 +106,92 @@ function generateQuestionResponse(_input: string, analysis: any): string {
   return `${analysis.suggestedResponse} React is a JavaScript library for building user interfaces, focusing on component-based architecture and declarative programming.`
 }
 
-function generateCodeResponse(_input: string, analysis: any): string {
-  return `Here's guidance for React code: ${analysis.suggestedResponse} React uses JSX syntax to describe UI, and components manage their own state and props.`
+function generateCodeResponse(input: string, analysis: any): string {
+  const lowerInput = input.toLowerCase();
+  
+  // Generate actual code examples based on the request
+  let codeExample = '';
+  
+  if (lowerInput.includes('hello world') || lowerInput.includes('simple component')) {
+    codeExample = `
+
+Here's a simple React component example:
+
+\`\`\`jsx
+import React from 'react';
+
+export default function HelloWorld() {
+  return (
+    <div>
+      <h1>Hello, World!</h1>
+      <p>Welcome to React!</p>
+    </div>
+  );
+}
+\`\`\``;
+  } else if (lowerInput.includes('state') || lowerInput.includes('usestate')) {
+    codeExample = `
+
+Here's a React component with state:
+
+\`\`\`jsx
+import React, { useState } from 'react';
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+  
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>
+        Increment
+      </button>
+    </div>
+  );
+}
+\`\`\``;
+  } else if (lowerInput.includes('props')) {
+    codeExample = `
+
+Here's a React component with props:
+
+\`\`\`jsx
+import React from 'react';
+
+export default function Greeting({ name, message }) {
+  return (
+    <div>
+      <h2>Hello, {name}!</h2>
+      <p>{message}</p>
+    </div>
+  );
+}
+
+// Usage:
+// <Greeting name="Alice" message="Welcome to React!" />
+\`\`\``;
+  } else if (lowerInput.includes('component') || lowerInput.includes('create')) {
+    codeExample = `
+
+Here's a basic React functional component:
+
+\`\`\`jsx
+import React from 'react';
+
+export default function MyComponent() {
+  return (
+    <div className="my-component">
+      <h2>My Component</h2>
+      <p>This is a reusable React component.</p>
+    </div>
+  );
+}
+\`\`\``;
+  }
+  
+  return `${analysis.suggestedResponse}${codeExample}
+
+React uses JSX syntax to describe UI, and components manage their own state and props.`;
 }
 
 function generateGeneralResponse(_input: string, analysis: any): string {
