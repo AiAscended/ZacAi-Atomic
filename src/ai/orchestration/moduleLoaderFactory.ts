@@ -3,7 +3,7 @@
  * Purpose: Factory that returns module instances or singletons. Minimal implementation for MVP.
  */
 
-import { registerModule, getModule } from './moduleRegistry';
+import { registerModule, getModule } from "./moduleRegistry";
 
 const singletons = new Map<string, unknown>();
 

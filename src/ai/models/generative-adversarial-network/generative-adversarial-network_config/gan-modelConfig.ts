@@ -14,8 +14,8 @@ export interface GANModelConfig {
 }
 
 export const defaultGANConfig: GANModelConfig = {
-  modelName: 'generative-adversarial-network',
-  version: '1.0.0',
+  modelName: "generative-adversarial-network",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

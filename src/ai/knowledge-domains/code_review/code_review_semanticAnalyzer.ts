@@ -6,22 +6,25 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { codeReviewParser } from "./code_review_parser"
+import { codeReviewParser } from "./code_review_parser";
 
 /**
  * Analyze code for review insights and recommendations
  */
 export const codeReviewSemanticAnalyzer = (code: string) => {
   // TODO: Use tokenizer for advanced semantic analysis
-  const parsed = codeReviewParser(code)
+  const parsed = codeReviewParser(code);
 
   // Generate recommendations
-  const recommendations: string[] = []
-  if (parsed.complexity > 15) recommendations.push("REFACTOR: Reduce complexity")
-  if (parsed.smells.includes("LONG_METHOD")) recommendations.push("EXTRACT: Break into smaller methods")
-  if (parsed.commentRatio < 0.1) recommendations.push("DOCUMENT: Add more comments")
-  if (!parsed.hasTests) recommendations.push("TEST: Add unit tests")
-  if (!parsed.hasTypes) recommendations.push("TYPE: Add type annotations")
+  const recommendations: string[] = [];
+  if (parsed.complexity > 15)
+    recommendations.push("REFACTOR: Reduce complexity");
+  if (parsed.smells.includes("LONG_METHOD"))
+    recommendations.push("EXTRACT: Break into smaller methods");
+  if (parsed.commentRatio < 0.1)
+    recommendations.push("DOCUMENT: Add more comments");
+  if (!parsed.hasTests) recommendations.push("TEST: Add unit tests");
+  if (!parsed.hasTypes) recommendations.push("TYPE: Add type annotations");
 
   return {
     complexity: parsed.complexity,
@@ -34,5 +37,5 @@ export const codeReviewSemanticAnalyzer = (code: string) => {
       hasTests: parsed.hasTests,
       hasTypes: parsed.hasTypes,
     },
-  }
-}
+  };
+};

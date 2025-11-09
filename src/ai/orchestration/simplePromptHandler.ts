@@ -3,17 +3,21 @@
  * Purpose: Simplified prompt handler for browser-based preview environment
  */
 
-import { SimpleOrchestrator, type SimplePrompt, type SimpleResponse } from "./simpleOrchestrator"
+import {
+  SimpleOrchestrator,
+  type SimplePrompt,
+  type SimpleResponse,
+} from "./simpleOrchestrator";
 
 export class SimplePromptHandler {
-  private orchestrator: SimpleOrchestrator
+  private orchestrator: SimpleOrchestrator;
 
   constructor() {
-    this.orchestrator = SimpleOrchestrator.getInstance()
+    this.orchestrator = SimpleOrchestrator.getInstance();
   }
 
   public async initialize(): Promise<void> {
-    await this.orchestrator.initialize()
+    await this.orchestrator.initialize();
   }
 
   public async handlePrompt(
@@ -26,14 +30,14 @@ export class SimplePromptHandler {
       sessionId,
       timestamp: Date.now(),
       metadata,
-    }
+    };
 
-    return await this.orchestrator.processPrompt(prompt)
+    return await this.orchestrator.processPrompt(prompt);
   }
 
   public createSession(): string {
-    return this.orchestrator.createSession()
+    return this.orchestrator.createSession();
   }
 }
 
-export const simplePromptHandler = new SimplePromptHandler()
+export const simplePromptHandler = new SimplePromptHandler();

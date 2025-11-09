@@ -33,14 +33,16 @@ export function add(a: number[][], b: number[][]): number[][] {
  * Transpose a matrix
  */
 export function transpose(matrix: number[][]): number[][] {
-  return matrix[0].map((_, i) => matrix.map(row => row[i]));
+  return matrix[0].map((_, i) => matrix.map((row) => row[i]));
 }
 
 /**
  * Apply dropout to a matrix
  */
 export function dropout(matrix: number[][], rate: number): number[][] {
-  return matrix.map(row => row.map(val => Math.random() > rate ? val / (1 - rate) : 0));
+  return matrix.map((row) =>
+    row.map((val) => (Math.random() > rate ? val / (1 - rate) : 0)),
+  );
 }
 
 /**
@@ -58,7 +60,7 @@ export function cosineSimilarity(a: number[], b: number[]): number {
  */
 export function normalize(vector: number[]): number[] {
   const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
-  return vector.map(val => val / magnitude);
+  return vector.map((val) => val / magnitude);
 }
 
 /**

@@ -3,15 +3,21 @@
  * Purpose: Response Aggregator configuration for combining multi-domain outputs
  */
 
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
-import { useState } from "react"
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { useState } from "react";
 
 export default function ResponseAggregatorPage() {
   const [settings, setSettings] = useState({
@@ -20,7 +26,7 @@ export default function ResponseAggregatorPage() {
     enableConflictResolution: true,
     enableDeduplication: true,
     minResponseQuality: 0.6,
-  })
+  });
 
   return (
     <div className="space-y-6">
@@ -31,7 +37,12 @@ export default function ResponseAggregatorPage() {
         <div className="space-y-6">
           <div className="space-y-2">
             <Label>Aggregation Strategy</Label>
-            <Select value={settings.strategy} onValueChange={(value) => setSettings({ ...settings, strategy: value })}>
+            <Select
+              value={settings.strategy}
+              onValueChange={(value) =>
+                setSettings({ ...settings, strategy: value })
+              }
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -48,10 +59,14 @@ export default function ResponseAggregatorPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>Confidence Weighting: {settings.confidenceWeighting.toFixed(2)}</Label>
+            <Label>
+              Confidence Weighting: {settings.confidenceWeighting.toFixed(2)}
+            </Label>
             <Slider
               value={[settings.confidenceWeighting]}
-              onValueChange={([value]) => setSettings({ ...settings, confidenceWeighting: value })}
+              onValueChange={([value]) =>
+                setSettings({ ...settings, confidenceWeighting: value })
+              }
               min={0}
               max={1}
               step={0.1}
@@ -62,10 +77,14 @@ export default function ResponseAggregatorPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>Min Response Quality: {settings.minResponseQuality.toFixed(2)}</Label>
+            <Label>
+              Min Response Quality: {settings.minResponseQuality.toFixed(2)}
+            </Label>
             <Slider
               value={[settings.minResponseQuality]}
-              onValueChange={([value]) => setSettings({ ...settings, minResponseQuality: value })}
+              onValueChange={([value]) =>
+                setSettings({ ...settings, minResponseQuality: value })
+              }
               min={0}
               max={1}
               step={0.05}
@@ -84,7 +103,9 @@ export default function ResponseAggregatorPage() {
             </div>
             <Switch
               checked={settings.enableConflictResolution}
-              onCheckedChange={(checked) => setSettings({ ...settings, enableConflictResolution: checked })}
+              onCheckedChange={(checked) =>
+                setSettings({ ...settings, enableConflictResolution: checked })
+              }
             />
           </div>
 
@@ -97,7 +118,9 @@ export default function ResponseAggregatorPage() {
             </div>
             <Switch
               checked={settings.enableDeduplication}
-              onCheckedChange={(checked) => setSettings({ ...settings, enableDeduplication: checked })}
+              onCheckedChange={(checked) =>
+                setSettings({ ...settings, enableDeduplication: checked })
+              }
             />
           </div>
         </div>
@@ -107,15 +130,21 @@ export default function ResponseAggregatorPage() {
         <h2 className="text-xl font-semibold mb-4">Aggregation Metrics</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 border rounded-lg">
-            <div className="text-sm text-muted-foreground mb-1">Avg Response Quality</div>
+            <div className="text-sm text-muted-foreground mb-1">
+              Avg Response Quality
+            </div>
             <div className="text-2xl font-bold">87.3%</div>
           </div>
           <div className="p-4 border rounded-lg">
-            <div className="text-sm text-muted-foreground mb-1">Conflicts Resolved</div>
+            <div className="text-sm text-muted-foreground mb-1">
+              Conflicts Resolved
+            </div>
             <div className="text-2xl font-bold">234</div>
           </div>
           <div className="p-4 border rounded-lg">
-            <div className="text-sm text-muted-foreground mb-1">Avg Domains Used</div>
+            <div className="text-sm text-muted-foreground mb-1">
+              Avg Domains Used
+            </div>
             <div className="text-2xl font-bold">2.4</div>
           </div>
         </div>
@@ -123,5 +152,5 @@ export default function ResponseAggregatorPage() {
 
       <Button>Save Configuration</Button>
     </div>
-  )
+  );
 }

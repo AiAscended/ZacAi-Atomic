@@ -1,7 +1,7 @@
 /**
  * File: src/app/admin/integrations/github-app/page.tsx
  * Purpose: Complete GitHub App integration admin UI
- * 
+ *
  * Features:
  * - Configure GitHub App credentials (App ID, Client ID)
  * - View installations and repositories
@@ -12,7 +12,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -58,7 +64,9 @@ export default function GitHubAppAdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [installations, setInstallations] = useState<Installation[]>([]);
   const [loadingInstallations, setLoadingInstallations] = useState(false);
-  const [selectedInstallation, setSelectedInstallation] = useState<string | null>(null);
+  const [selectedInstallation, setSelectedInstallation] = useState<
+    string | null
+  >(null);
   const [repositories, setRepositories] = useState<Repository[]>([]);
 
   useEffect(() => {
@@ -70,11 +78,11 @@ export default function GitHubAppAdminPage() {
       setLoading(true);
       setError(null);
       const response = await fetch("/api/admin/github-app/settings");
-      
+
       if (!response.ok) {
         throw new Error(`Failed to load settings: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
       setSettings(data);
     } catch (err) {
@@ -90,17 +98,17 @@ export default function GitHubAppAdminPage() {
     try {
       setSaving(true);
       setError(null);
-      
+
       const response = await fetch("/api/admin/github-app/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
-      
+
       if (!response.ok) {
         throw new Error(`Failed to save settings: ${response.statusText}`);
       }
-      
+
       const updated = await response.json();
       setSettings(updated);
       alert("Settings saved successfully!");
@@ -117,13 +125,13 @@ export default function GitHubAppAdminPage() {
     try {
       setLoadingInstallations(true);
       setError(null);
-      
+
       const response = await fetch("/api/admin/github-app/installations");
-      
+
       if (!response.ok) {
         throw new Error(`Failed to load installations: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
       setInstallations(data);
     } catch (err) {
@@ -137,13 +145,15 @@ export default function GitHubAppAdminPage() {
     try {
       setError(null);
       setSelectedInstallation(installationId);
-      
-      const response = await fetch(`/api/admin/github-app/repositories?installationId=${installationId}`);
-      
+
+      const response = await fetch(
+        `/api/admin/github-app/repositories?installationId=${installationId}`,
+      );
+
       if (!response.ok) {
         throw new Error(`Failed to load repositories: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
       setRepositories(data);
     } catch (err) {
@@ -160,7 +170,11 @@ export default function GitHubAppAdminPage() {
   }
 
   if (!settings) {
-    return <div className="p-6 text-red-600">Failed to load settings. Please check your configuration.</div>;
+    return (
+      <div className="p-6 text-red-600">
+        Failed to load settings. Please check your configuration.
+      </div>
+    );
   }
 
   return (
@@ -193,8 +207,9 @@ export default function GitHubAppAdminPage() {
             <CardHeader>
               <CardTitle>App Credentials</CardTitle>
               <CardDescription>
-                Configure your GitHub App credentials. Set GITHUB_APP_ID, GITHUB_APP_CLIENT_ID, 
-                GITHUB_APP_PRIVATE_KEY, and GITHUB_APP_WEBHOOK_SECRET as environment variables.
+                Configure your GitHub App credentials. Set GITHUB_APP_ID,
+                GITHUB_APP_CLIENT_ID, GITHUB_APP_PRIVATE_KEY, and
+                GITHUB_APP_WEBHOOK_SECRET as environment variables.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -203,17 +218,21 @@ export default function GitHubAppAdminPage() {
                 <Input
                   id="appId"
                   value={settings.appId}
-                  onChange={(e) => setSettings({ ...settings, appId: e.target.value })}
+                  onChange={(e) =>
+                    setSettings({ ...settings, appId: e.target.value })
+                  }
                   placeholder="123456"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="clientId">Client ID</Label>
                 <Input
                   id="clientId"
                   value={settings.clientId}
-                  onChange={(e) => setSettings({ ...settings, clientId: e.target.value })}
+                  onChange={(e) =>
+                    setSettings({ ...settings, clientId: e.target.value })
+                  }
                   placeholder="Iv1.abc123..."
                 />
               </div>
@@ -223,7 +242,9 @@ export default function GitHubAppAdminPage() {
                 <Input
                   id="webhookUrl"
                   value={settings.webhookUrl || ""}
-                  onChange={(e) => setSettings({ ...settings, webhookUrl: e.target.value })}
+                  onChange={(e) =>
+                    setSettings({ ...settings, webhookUrl: e.target.value })
+                  }
                   placeholder="https://your-app.com/api/github-app/webhook"
                 />
               </div>
@@ -233,7 +254,9 @@ export default function GitHubAppAdminPage() {
                 <Input
                   id="defaultBranch"
                   value={settings.defaultBranch}
-                  onChange={(e) => setSettings({ ...settings, defaultBranch: e.target.value })}
+                  onChange={(e) =>
+                    setSettings({ ...settings, defaultBranch: e.target.value })
+                  }
                   placeholder="main"
                 />
               </div>
@@ -243,7 +266,12 @@ export default function GitHubAppAdminPage() {
                 <Input
                   id="commitPrefix"
                   value={settings.commitMessagePrefix}
-                  onChange={(e) => setSettings({ ...settings, commitMessagePrefix: e.target.value })}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      commitMessagePrefix: e.target.value,
+                    })
+                  }
                   placeholder="[AI]"
                 />
               </div>
@@ -270,12 +298,17 @@ export default function GitHubAppAdminPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button onClick={loadInstallations} disabled={loadingInstallations}>
+              <Button
+                onClick={loadInstallations}
+                disabled={loadingInstallations}
+              >
                 {loadingInstallations ? "Loading..." : "Refresh Installations"}
               </Button>
 
               {installations.length === 0 && !loadingInstallations && (
-                <p className="text-muted-foreground">No installations found. Connect your GitHub App first.</p>
+                <p className="text-muted-foreground">
+                  No installations found. Connect your GitHub App first.
+                </p>
               )}
 
               {installations.map((install) => (
@@ -284,19 +317,24 @@ export default function GitHubAppAdminPage() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-semibold">{install.accountLogin}</h3>
+                          <h3 className="font-semibold">
+                            {install.accountLogin}
+                          </h3>
                           <Badge variant="outline">{install.accountType}</Badge>
                         </div>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => loadRepositories(install.installationId)}
+                          onClick={() =>
+                            loadRepositories(install.installationId)
+                          }
                         >
                           View Repositories
                         </Button>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Installed: {new Date(install.installedAt).toLocaleDateString()}
+                        Installed:{" "}
+                        {new Date(install.installedAt).toLocaleDateString()}
                       </p>
                     </div>
                   </CardContent>
@@ -311,14 +349,21 @@ export default function GitHubAppAdminPage() {
                   <CardContent>
                     <div className="space-y-2">
                       {repositories.map((repo) => (
-                        <div key={repo.id} className="flex items-center justify-between p-2 border rounded">
+                        <div
+                          key={repo.id}
+                          className="flex items-center justify-between p-2 border rounded"
+                        >
                           <div>
                             <p className="font-medium">{repo.fullName}</p>
                             {repo.description && (
-                              <p className="text-sm text-muted-foreground">{repo.description}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {repo.description}
+                              </p>
                             )}
                           </div>
-                          <Badge variant={repo.private ? "secondary" : "outline"}>
+                          <Badge
+                            variant={repo.private ? "secondary" : "outline"}
+                          >
                             {repo.private ? "Private" : "Public"}
                           </Badge>
                         </div>

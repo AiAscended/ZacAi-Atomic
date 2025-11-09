@@ -6,13 +6,15 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { storageAdapter } from "../storageAdapter"
+import { storageAdapter } from "../storageAdapter";
 
-export const grammarLoadWeights = async (path = "/src/ai/knowledge-domains/grammar/grammar_weights/grammar_trainingWeights.bin") => {
+export const grammarLoadWeights = async (
+  path = "/src/ai/knowledge-domains/grammar/grammar_weights/grammar_trainingWeights.bin",
+) => {
   try {
-    const raw = await storageAdapter.readFile(path)
-    return raw
+    const raw = await storageAdapter.readFile(path);
+    return raw;
   } catch (e) {
-    return null
+    return null;
   }
-}
+};

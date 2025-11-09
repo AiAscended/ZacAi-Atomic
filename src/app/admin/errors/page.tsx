@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { AlertTriangle, CheckCircle, XCircle, RefreshCw } from "lucide-react"
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, CheckCircle, XCircle, RefreshCw } from "lucide-react";
 
 export default function ErrorsPage() {
   const errors = [
@@ -27,7 +27,7 @@ export default function ErrorsPage() {
       severity: "error",
       timestamp: "10 minutes ago",
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -73,14 +73,25 @@ export default function ErrorsPage() {
         <h2 className="text-xl font-semibold mb-4">Recent Issues</h2>
         <div className="space-y-3">
           {errors.map((error) => (
-            <div key={error.id} className="flex items-start gap-3 p-3 border rounded-lg">
-              {error.severity === "error" && <XCircle className="h-5 w-5 text-red-500 mt-0.5" />}
-              {error.severity === "warning" && <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5" />}
-              {error.severity === "info" && <CheckCircle className="h-5 w-5 text-blue-500 mt-0.5" />}
+            <div
+              key={error.id}
+              className="flex items-start gap-3 p-3 border rounded-lg"
+            >
+              {error.severity === "error" && (
+                <XCircle className="h-5 w-5 text-red-500 mt-0.5" />
+              )}
+              {error.severity === "warning" && (
+                <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5" />
+              )}
+              {error.severity === "info" && (
+                <CheckCircle className="h-5 w-5 text-blue-500 mt-0.5" />
+              )}
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-medium">{error.domain}</span>
-                  <span className="text-xs text-muted-foreground">{error.timestamp}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {error.timestamp}
+                  </span>
                 </div>
                 <p className="text-sm text-muted-foreground">{error.message}</p>
               </div>
@@ -92,5 +103,5 @@ export default function ErrorsPage() {
         </div>
       </Card>
     </div>
-  )
+  );
 }

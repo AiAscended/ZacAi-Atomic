@@ -4,7 +4,7 @@
 
 export class MULTIMODALTrainer {
   train(data: any): void {
-    console.log('Training multi-modal-fusion...');
+    console.log("Training multi-modal-fusion...");
   }
 }
 

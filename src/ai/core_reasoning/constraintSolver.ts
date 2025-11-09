@@ -5,7 +5,7 @@
 
 export const solveBooleanConstraints = (
   vars: string[],
-  predicate: (assignment: Record<string, boolean>) => boolean
+  predicate: (assignment: Record<string, boolean>) => boolean,
 ): Record<string, boolean> | null => {
   const n = vars.length;
   for (let m = 0; m < 1 << n; m++) {

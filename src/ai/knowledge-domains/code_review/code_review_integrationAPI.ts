@@ -6,31 +6,37 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import path from 'path'
+import path from "path";
 
-import { domainRegistry } from '../domainRegistry'
-import { CODE_REVIEW_DOMAIN } from "./code_review_constants"
-import { loadCodeReviewSeedVocabulary } from "./code_review_vocabularyManager"
-import { codeReviewRunInference } from "./code_review_inferenceController"
-import { codeReviewRunTrainingEpoch } from "./code_review_trainingController"
+import { domainRegistry } from "../domainRegistry";
+import { CODE_REVIEW_DOMAIN } from "./code_review_constants";
+import { loadCodeReviewSeedVocabulary } from "./code_review_vocabularyManager";
+import { codeReviewRunInference } from "./code_review_inferenceController";
+import { codeReviewRunTrainingEpoch } from "./code_review_trainingController";
 
-const DOMAIN_NAME = 'code_review';
-const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+const DOMAIN_NAME = "code_review";
+const DOMAIN_DIR = path.join(
+  process.cwd(),
+  "src",
+  "ai",
+  "knowledge-domains",
+  DOMAIN_NAME,
+);
 
 export const codeReviewInit = async () => {
-  await loadCodeReviewSeedVocabulary()
+  await loadCodeReviewSeedVocabulary();
 
   domainRegistry.registerDomain({
-  name: CODE_REVIEW_DOMAIN,
-  displayName: 'Code Review',
-  description: 'Code quality analysis, best practices, and review feedback',
-  atomicLevel: 'organ',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
-}
+    name: CODE_REVIEW_DOMAIN,
+    displayName: "Code Review",
+    description: "Code quality analysis, best practices, and review feedback",
+    atomicLevel: "organ",
+    modules: [],
+    seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+    learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+    weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+    enabled: true,
+  });
+};
 
-void codeReviewInit()
+void codeReviewInit();

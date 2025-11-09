@@ -6,23 +6,28 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { safeParseJSON } from "./testing_utils"
-import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./testing_utils";
+import { storageAdapter } from "../storageAdapter";
 
-export const loadTestingLearnedData = async (path = "/src/ai/knowledge-domains/testing/testing_learned/testing_learnedData.json") => {
+export const loadTestingLearnedData = async (
+  path = "/src/ai/knowledge-domains/testing/testing_learned/testing_learnedData.json",
+) => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { notes: [], concepts: {} })
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { notes: [], concepts: {} });
   } catch (e) {
-    return { notes: [], concepts: {} }
+    return { notes: [], concepts: {} };
   }
-}
+};
 
-export const saveTestingLearnedData = async (data: unknown, path = "/src/ai/knowledge-domains/testing/testing_learned/testing_learnedData.json") => {
+export const saveTestingLearnedData = async (
+  data: unknown,
+  path = "/src/ai/knowledge-domains/testing/testing_learned/testing_learnedData.json",
+) => {
   try {
-    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
-    return true
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2));
+    return true;
   } catch (e) {
-    return false
+    return false;
   }
-}
+};

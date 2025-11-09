@@ -18,7 +18,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const { appId, privateKey } = req.body;
 
     if (!appId || !privateKey) {
-      res.status(400).json({ error: "Missing required fields: appId and privateKey." });
+      res
+        .status(400)
+        .json({ error: "Missing required fields: appId and privateKey." });
       return;
     }
 

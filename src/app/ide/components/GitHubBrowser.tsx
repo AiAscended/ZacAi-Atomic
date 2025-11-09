@@ -1,19 +1,27 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Github, Search, GitBranch, Star, GitFork, Loader2, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import React, { useState, useEffect } from "react";
+import {
+  Github,
+  Search,
+  GitBranch,
+  Star,
+  GitFork,
+  Loader2,
+  Download,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { github } from '@/lib/ide/githubIntegration';
-import { useToast } from '@/hooks/use-toast';
+} from "@/components/ui/dialog";
+import { github } from "@/lib/ide/githubIntegration";
+import { useToast } from "@/hooks/use-toast";
 
 interface GitHubBrowserProps {
   open: boolean;
@@ -21,11 +29,15 @@ interface GitHubBrowserProps {
   onCloneRepo?: (path: string) => void;
 }
 
-export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowserProps) {
+export function GitHubBrowser({
+  open,
+  onOpenChange,
+  onCloneRepo,
+}: GitHubBrowserProps) {
   const [repos, setRepos] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [token, setToken] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [token, setToken] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
   const { toast } = useToast();
 
@@ -38,9 +50,9 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
   const handleAuthenticate = () => {
     if (!token.trim()) {
       toast({
-        title: 'Error',
-        description: 'Please enter a GitHub token',
-        variant: 'destructive',
+        title: "Error",
+        description: "Please enter a GitHub token",
+        variant: "destructive",
       });
       return;
     }
@@ -49,14 +61,14 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
       github.setToken(token);
       setAuthenticated(true);
       toast({
-        title: 'Success',
-        description: 'Authenticated with GitHub',
+        title: "Success",
+        description: "Authenticated with GitHub",
       });
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to authenticate',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to authenticate",
+        variant: "destructive",
       });
     }
   };
@@ -68,9 +80,9 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
       setRepos(data);
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to load repositories',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to load repositories",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -89,9 +101,9 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
       setRepos(data);
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Search failed',
-        variant: 'destructive',
+        title: "Error",
+        description: "Search failed",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -103,16 +115,16 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
     try {
       const path = await github.cloneRepositoryToVFS(owner, repoName);
       toast({
-        title: 'Success',
+        title: "Success",
         description: `Cloned ${owner}/${repoName} to ${path}`,
       });
       onCloneRepo?.(path);
       onOpenChange(false);
     } catch (error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: `Failed to clone ${owner}/${repoName}`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -129,7 +141,8 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
               GitHub Authentication
             </DialogTitle>
             <DialogDescription className="text-gray-400">
-              Enter your GitHub Personal Access Token to browse and clone repositories.
+              Enter your GitHub Personal Access Token to browse and clone
+              repositories.
             </DialogDescription>
           </DialogHeader>
 
@@ -140,11 +153,11 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
                 placeholder="ghp_xxxxxxxxxxxx"
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAuthenticate()}
+                onKeyDown={(e) => e.key === "Enter" && handleAuthenticate()}
                 className="bg-[#3c3c3c] border-[#3e3e42] text-gray-200"
               />
               <p className="text-xs text-gray-500 mt-2">
-                Create a token at{' '}
+                Create a token at{" "}
                 <a
                   href="https://github.com/settings/tokens"
                   target="_blank"
@@ -185,12 +198,16 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
                 placeholder="Search repositories..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 className="pl-10 bg-[#3c3c3c] border-[#3e3e42] text-gray-200"
               />
             </div>
             <Button onClick={handleSearch} disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+              {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Search className="w-4 h-4" />
+              )}
             </Button>
           </div>
 

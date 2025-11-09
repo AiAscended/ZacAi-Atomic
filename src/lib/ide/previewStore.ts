@@ -1,7 +1,7 @@
-import React from 'react';
-import { create } from 'zustand';
-import { useEditorStore } from './editorStore';
-import { codeExecutor, ExecutionResult } from './codeExecutionEngine';
+import React from "react";
+import { create } from "zustand";
+import { useEditorStore } from "./editorStore";
+import { codeExecutor, ExecutionResult } from "./codeExecutionEngine";
 
 export interface PreviewState {
   htmlContent: string;
@@ -9,25 +9,28 @@ export interface PreviewState {
   errors: string[];
   isLoading: boolean;
   autoRefresh: boolean;
-  deviceMode: 'mobile' | 'tablet' | 'desktop';
+  deviceMode: "mobile" | "tablet" | "desktop";
   showConsole: boolean;
-  
+
   // Actions
   refreshPreview: () => Promise<void>;
-  setDeviceMode: (mode: 'mobile' | 'tablet' | 'desktop') => void;
+  setDeviceMode: (mode: "mobile" | "tablet" | "desktop") => void;
   toggleAutoRefresh: () => void;
   toggleConsole: () => void;
   clearConsole: () => void;
-  addConsoleLog: (message: string, type?: 'log' | 'error' | 'warn' | 'info') => void;
+  addConsoleLog: (
+    message: string,
+    type?: "log" | "error" | "warn" | "info",
+  ) => void;
 }
 
 export const usePreviewStore = create<PreviewState>((set, get) => ({
-  htmlContent: '',
+  htmlContent: "",
   consoleOutput: [],
   errors: [],
   isLoading: false,
   autoRefresh: true,
-  deviceMode: 'desktop',
+  deviceMode: "desktop",
   showConsole: true,
 
   refreshPreview: async () => {
@@ -39,23 +42,24 @@ export const usePreviewStore = create<PreviewState>((set, get) => ({
 
       if (!activeTab) {
         set({
-          htmlContent: '<div style="padding: 20px; text-align: center;">No file open</div>',
+          htmlContent:
+            '<div style="padding: 20px; text-align: center;">No file open</div>',
           isLoading: false,
         });
         return;
       }
 
       // Build preview based on file type
-      let previewHTML = '';
+      let previewHTML = "";
       const { language, content } = activeTab;
 
-      if (language === 'html') {
+      if (language === "html") {
         previewHTML = await generateHTMLPreview(content);
-      } else if (language === 'javascript' || language === 'typescript') {
+      } else if (language === "javascript" || language === "typescript") {
         previewHTML = await generateJavaScriptPreview(content);
-      } else if (language === 'css') {
+      } else if (language === "css") {
         previewHTML = await generateCSSPreview(content);
-      } else if (language === 'markdown') {
+      } else if (language === "markdown") {
         previewHTML = await generateMarkdownPreview(content);
       } else {
         previewHTML = `
@@ -69,22 +73,30 @@ export const usePreviewStore = create<PreviewState>((set, get) => ({
       set({ htmlContent: previewHTML, isLoading: false });
     } catch (error) {
       set({
-        errors: [error instanceof Error ? error.message : 'Unknown error'],
+        errors: [error instanceof Error ? error.message : "Unknown error"],
         isLoading: false,
       });
     }
   },
 
   setDeviceMode: (mode) => set({ deviceMode: mode }),
-  
-  toggleAutoRefresh: () => set((state) => ({ autoRefresh: !state.autoRefresh })),
-  
+
+  toggleAutoRefresh: () =>
+    set((state) => ({ autoRefresh: !state.autoRefresh })),
+
   toggleConsole: () => set((state) => ({ showConsole: !state.showConsole })),
-  
+
   clearConsole: () => set({ consoleOutput: [], errors: [] }),
-  
-  addConsoleLog: (message, type = 'log') => {
-    const prefix = type === 'error' ? '❌' : type === 'warn' ? '⚠️' : type === 'info' ? 'ℹ️' : '▶';
+
+  addConsoleLog: (message, type = "log") => {
+    const prefix =
+      type === "error"
+        ? "❌"
+        : type === "warn"
+          ? "⚠️"
+          : type === "info"
+            ? "ℹ️"
+            : "▶";
     set((state) => ({
       consoleOutput: [...state.consoleOutput, `${prefix} ${message}`],
     }));
@@ -95,7 +107,7 @@ export const usePreviewStore = create<PreviewState>((set, get) => ({
 async function generateHTMLPreview(html: string): Promise<string> {
   // Execute any inline scripts
   const result = await codeExecutor.execute({
-    language: 'html',
+    language: "html",
     code: html,
   });
 
@@ -165,7 +177,7 @@ async function generateHTMLPreview(html: string): Promise<string> {
 // Generate JavaScript preview
 async function generateJavaScriptPreview(code: string): Promise<string> {
   const result = await codeExecutor.execute({
-    language: 'javascript',
+    language: "javascript",
     code: code,
   });
 
@@ -196,15 +208,19 @@ async function generateJavaScriptPreview(code: string): Promise<string> {
     </head>
     <body>
       <h2>Execution Output:</h2>
-      ${result.error ? `
+      ${
+        result.error
+          ? `
         <div class="output error">
           <strong>Error:</strong><br>${result.error}
         </div>
-      ` : `
+      `
+          : `
         <div class="output success">
-          ${result.output || '(No output)'}
+          ${result.output || "(No output)"}
         </div>
-      `}
+      `
+      }
       <small>Execution time: ${result.executionTime.toFixed(2)}ms</small>
       
       <script>
@@ -266,21 +282,24 @@ async function generateMarkdownPreview(markdown: string): Promise<string> {
   // Simple markdown to HTML conversion
   const html = markdown
     // Headers
-    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+    .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+    .replace(/^# (.*$)/gim, "<h1>$1</h1>")
     // Bold
-    .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+    .replace(/\*\*(.*)\*\*/gim, "<strong>$1</strong>")
     // Italic
-    .replace(/\*(.*)\*/gim, '<em>$1</em>')
+    .replace(/\*(.*)\*/gim, "<em>$1</em>")
     // Links
     .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2">$1</a>')
     // Code blocks
-    .replace(/```(\w+)?\n([\s\S]*?)```/gim, '<pre><code class="language-$1">$2</code></pre>')
+    .replace(
+      /```(\w+)?\n([\s\S]*?)```/gim,
+      '<pre><code class="language-$1">$2</code></pre>',
+    )
     // Inline code
-    .replace(/`([^`]+)`/gim, '<code>$1</code>')
+    .replace(/`([^`]+)`/gim, "<code>$1</code>")
     // Line breaks
-    .replace(/\n/gim, '<br>');
+    .replace(/\n/gim, "<br>");
 
   return `
     <!DOCTYPE html>
@@ -336,22 +355,26 @@ export function useHotReload() {
   React.useEffect(() => {
     if (!autoRefresh) return;
 
-    const unsubscribe = useEditorStore.subscribe(
-      (state, prevState) => {
-        const activeTab = state.tabs.find(t => t.id === state.activeTabId);
-        const prevActiveTab = prevState.tabs.find(t => t.id === prevState.activeTabId);
+    const unsubscribe = useEditorStore.subscribe((state, prevState) => {
+      const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
+      const prevActiveTab = prevState.tabs.find(
+        (t) => t.id === prevState.activeTabId,
+      );
 
-        // Refresh if active tab content changed
-        if (activeTab && prevActiveTab && activeTab.content !== prevActiveTab.content) {
-          // Debounce refresh
-          const timeoutId = setTimeout(() => {
-            refreshPreview();
-          }, 500);
+      // Refresh if active tab content changed
+      if (
+        activeTab &&
+        prevActiveTab &&
+        activeTab.content !== prevActiveTab.content
+      ) {
+        // Debounce refresh
+        const timeoutId = setTimeout(() => {
+          refreshPreview();
+        }, 500);
 
-          return () => clearTimeout(timeoutId);
-        }
+        return () => clearTimeout(timeoutId);
       }
-    );
+    });
 
     return unsubscribe;
   }, [autoRefresh, refreshPreview]);

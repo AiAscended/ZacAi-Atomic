@@ -1,7 +1,7 @@
 /**
  * File: src/app/api/admin/ide-mode/route.ts
  * Purpose: API endpoint for IDE mode settings
- * 
+ *
  * GET  - Get current IDE mode settings
  * POST - Update IDE mode settings
  */
@@ -23,7 +23,7 @@ export async function GET() {
     console.error("Failed to get IDE mode settings:", error);
     return NextResponse.json(
       { error: "Failed to retrieve IDE mode settings" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     console.error("Failed to update IDE mode settings:", error);
     return NextResponse.json(
       { error: "Failed to update IDE mode settings" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

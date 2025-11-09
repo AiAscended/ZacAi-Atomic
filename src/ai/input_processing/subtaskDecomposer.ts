@@ -15,9 +15,9 @@ export class SubtaskDecomposer {
    */
   async decompose(prompt: string): Promise<string[]> {
     if (!prompt || typeof prompt !== "string") {
-      throw new Error("Invalid prompt to decompose")
+      throw new Error("Invalid prompt to decompose");
     }
     // Basic split, extend for NLP parse for complex prompts
-    return prompt.split(/[.!?]\s/).filter(Boolean)
+    return prompt.split(/[.!?]\s/).filter(Boolean);
   }
 }

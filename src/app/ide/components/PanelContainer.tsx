@@ -1,12 +1,12 @@
 "use client";
 
-import React, { ReactNode } from 'react';
-import { WindowControls } from './WindowControls';
-import { useLayoutStore } from '@/lib/ide/layoutStore';
-import { cn } from '@/lib/utils';
+import React, { ReactNode } from "react";
+import { WindowControls } from "./WindowControls";
+import { useLayoutStore } from "@/lib/ide/layoutStore";
+import { cn } from "@/lib/utils";
 
 interface PanelContainerProps {
-  panelKey: 'files' | 'editor' | 'preview' | 'terminal' | 'aiChat';
+  panelKey: "files" | "editor" | "preview" | "terminal" | "aiChat";
   title: string;
   children: ReactNode;
   className?: string;
@@ -29,13 +29,13 @@ export function PanelContainer({
   return (
     <div
       className={cn(
-        'flex flex-col bg-background border border-border rounded-md overflow-hidden',
-        panel.maximized && 'fixed inset-4 z-50',
-        panel.minimized && 'h-10',
-        className
+        "flex flex-col bg-background border border-border rounded-md overflow-hidden",
+        panel.maximized && "fixed inset-4 z-50",
+        panel.minimized && "h-10",
+        className,
       )}
       style={{
-        transition: 'all 0.2s ease-in-out',
+        transition: "all 0.2s ease-in-out",
       }}
     >
       <WindowControls

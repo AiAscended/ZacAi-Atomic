@@ -3,26 +3,29 @@
  * Handles data validation, consistency checks, and data quality queries
  */
 
-import { DOMAIN_NAME } from './data_integrity_constants';
+import { DOMAIN_NAME } from "./data_integrity_constants";
 
-export const dataIntegrityRunInference = async (input: string, _context?: any) => {
+export const dataIntegrityRunInference = async (
+  input: string,
+  _context?: any,
+) => {
   const lowerInput = input.toLowerCase();
-  
-  let responseText = '';
+
+  let responseText = "";
   let confidence = 0.7;
   const sources: string[] = [];
 
   // Detect data integrity keywords
   if (
-    lowerInput.includes('data') ||
-    lowerInput.includes('valid') ||
-    lowerInput.includes('integrity') ||
-    lowerInput.includes('consistency') ||
-    lowerInput.includes('quality') ||
-    lowerInput.includes('corrupt')
+    lowerInput.includes("data") ||
+    lowerInput.includes("valid") ||
+    lowerInput.includes("integrity") ||
+    lowerInput.includes("consistency") ||
+    lowerInput.includes("quality") ||
+    lowerInput.includes("corrupt")
   ) {
     confidence = 0.85;
-    
+
     responseText = `I can help with data integrity and validation. Key concepts:
 
 **Data Validation:**

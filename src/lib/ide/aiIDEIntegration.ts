@@ -1,5 +1,5 @@
-import React from 'react';
-import { useEditorStore } from './editorStore';
+import React from "react";
+import { useEditorStore } from "./editorStore";
 
 export interface AIIDEContext {
   currentFile?: {
@@ -14,7 +14,7 @@ export interface AIIDEContext {
 }
 
 export interface AICodeAction {
-  type: 'explain' | 'fix' | 'optimize' | 'generate' | 'refactor' | 'document';
+  type: "explain" | "fix" | "optimize" | "generate" | "refactor" | "document";
   context: AIIDEContext;
   userPrompt: string;
 }
@@ -27,7 +27,7 @@ export interface AIResponse {
     filename?: string;
   }[];
   actions?: {
-    type: 'create-file' | 'update-file' | 'open-file';
+    type: "create-file" | "update-file" | "open-file";
     path: string;
     content?: string;
   }[];
@@ -38,10 +38,10 @@ class AIIDEIntegration {
 
   async initialize(): Promise<string | null> {
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'initialize' }),
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "initialize" }),
       });
 
       if (!response.ok) {
@@ -49,23 +49,23 @@ class AIIDEIntegration {
       }
 
       const data = await response.json();
-      if (typeof data.sessionId !== 'string') {
-        console.error('Failed to retrieve a valid session ID from API.');
+      if (typeof data.sessionId !== "string") {
+        console.error("Failed to retrieve a valid session ID from API.");
         this.sessionId = null;
         return null;
       }
-      
+
       this.sessionId = data.sessionId;
       return this.sessionId;
     } catch (error) {
-      console.error('Failed to initialize AI session:', error);
+      console.error("Failed to initialize AI session:", error);
       throw error;
     }
   }
 
   async sendMessage(
     message: string,
-    context?: AIIDEContext
+    context?: AIIDEContext,
   ): Promise<AIResponse> {
     if (!this.sessionId) {
       await this.initialize();
@@ -78,15 +78,15 @@ class AIIDEIntegration {
       // Enhance message with IDE context
       const enhancedMessage = this.buildContextualPrompt(message, context);
 
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'message',
+          action: "message",
           sessionId: this.sessionId,
           message: enhancedMessage,
           context: {
-            environment: 'ide',
+            environment: "ide",
             currentFile: context?.currentFile?.path,
             language: context?.currentFile?.language,
           },
@@ -100,7 +100,7 @@ class AIIDEIntegration {
       const data = await response.json();
       return this.parseAIResponse(data.response);
     } catch (error) {
-      console.error('Failed to send message to AI:', error);
+      console.error("Failed to send message to AI:", error);
       throw error;
     }
   }
@@ -109,16 +109,20 @@ class AIIDEIntegration {
     const context = this.getCurrentContext();
     const response = await this.sendMessage(
       `Explain this ${language} code:\n\n\`\`\`${language}\n${code}\n\`\`\``,
-      context
+      context,
     );
     return response.content;
   }
 
-  async fixCode(code: string, error: string, language: string): Promise<AIResponse> {
+  async fixCode(
+    code: string,
+    error: string,
+    language: string,
+  ): Promise<AIResponse> {
     const context = this.getCurrentContext();
     const response = await this.sendMessage(
       `Fix this ${language} code that has the following error:\n\nError: ${error}\n\nCode:\n\`\`\`${language}\n${code}\n\`\`\`\n\nProvide the corrected code.`,
-      context
+      context,
     );
     return response;
   }
@@ -127,26 +131,30 @@ class AIIDEIntegration {
     const context = this.getCurrentContext();
     const response = await this.sendMessage(
       `Optimize this ${language} code for better performance and readability:\n\n\`\`\`${language}\n${code}\n\`\`\``,
-      context
+      context,
     );
     return response;
   }
 
   async generateCode(prompt: string, language?: string): Promise<AIResponse> {
     const context = this.getCurrentContext();
-    const langHint = language ? ` in ${language}` : '';
+    const langHint = language ? ` in ${language}` : "";
     const response = await this.sendMessage(
       `Generate code${langHint} for: ${prompt}\n\nProvide complete, production-ready code with comments.`,
-      context
+      context,
     );
     return response;
   }
 
-  async refactorCode(code: string, language: string, goal: string): Promise<AIResponse> {
+  async refactorCode(
+    code: string,
+    language: string,
+    goal: string,
+  ): Promise<AIResponse> {
     const context = this.getCurrentContext();
     const response = await this.sendMessage(
       `Refactor this ${language} code to ${goal}:\n\n\`\`\`${language}\n${code}\n\`\`\``,
-      context
+      context,
     );
     return response;
   }
@@ -155,7 +163,7 @@ class AIIDEIntegration {
     const context = this.getCurrentContext();
     const response = await this.sendMessage(
       `Add comprehensive documentation and comments to this ${language} code:\n\n\`\`\`${language}\n${code}\n\`\`\``,
-      context
+      context,
     );
     return response;
   }
@@ -164,7 +172,7 @@ class AIIDEIntegration {
     const context = this.getCurrentContext();
     const response = await this.sendMessage(
       `I'm getting this error in my code:\n\n${errorMessage}\n\nWhat might be causing this and how can I fix it?`,
-      context
+      context,
     );
     return response.content;
   }
@@ -173,7 +181,7 @@ class AIIDEIntegration {
     const context = this.getCurrentContext();
     const response = await this.sendMessage(
       `Review this ${language} code for:\n- Best practices\n- Potential bugs\n- Performance issues\n- Security concerns\n- Code style\n\n\`\`\`${language}\n${code}\n\`\`\``,
-      context
+      context,
     );
     return response.content;
   }
@@ -183,17 +191,22 @@ class AIIDEIntegration {
     const activeTab = editorStore.getActiveTab();
 
     return {
-      currentFile: activeTab ? {
-        path: activeTab.path,
-        content: activeTab.content,
-        language: activeTab.language,
-        cursorPosition: activeTab.cursorPosition,
-      } : undefined,
-      openFiles: editorStore.tabs.map(tab => tab.path),
+      currentFile: activeTab
+        ? {
+            path: activeTab.path,
+            content: activeTab.content,
+            language: activeTab.language,
+            cursorPosition: activeTab.cursorPosition,
+          }
+        : undefined,
+      openFiles: editorStore.tabs.map((tab) => tab.path),
     };
   }
 
-  private buildContextualPrompt(message: string, context?: AIIDEContext): string {
+  private buildContextualPrompt(
+    message: string,
+    context?: AIIDEContext,
+  ): string {
     let prompt = message;
 
     if (context?.currentFile) {
@@ -201,12 +214,14 @@ class AIIDEIntegration {
       if (context.currentFile.cursorPosition) {
         prompt += ` at line ${context.currentFile.cursorPosition.line}`;
       }
-      prompt += ']';
+      prompt += "]";
     }
 
     if (context?.openFiles && context.openFiles.length > 1) {
-      prompt += `\n[Open files: ${context.openFiles.slice(0, 5).join(', ')}${
-        context.openFiles.length > 5 ? `, +${context.openFiles.length - 5} more` : ''
+      prompt += `\n[Open files: ${context.openFiles.slice(0, 5).join(", ")}${
+        context.openFiles.length > 5
+          ? `, +${context.openFiles.length - 5} more`
+          : ""
       }]`;
     }
 
@@ -214,7 +229,7 @@ class AIIDEIntegration {
   }
 
   private parseAIResponse(rawResponse: string | any): AIResponse {
-    if (typeof rawResponse !== 'string') {
+    if (typeof rawResponse !== "string") {
       // If the response is already an object, assume it's structured and return it.
       // This handles cases where the API directly returns JSON.
       return {
@@ -235,9 +250,9 @@ class AIIDEIntegration {
     let match;
 
     while ((match = codeBlockRegex.exec(rawResponse)) !== null) {
-      const language = match[1] || 'plaintext';
+      const language = match[1] || "plaintext";
       const content = match[2].trim();
-      
+
       if (!response.code) response.code = [];
       response.code.push({
         language,
@@ -251,10 +266,17 @@ class AIIDEIntegration {
       const actionType = match[1].toLowerCase();
       const filePath = match[2].trim();
 
-      if (actionType === 'create' || actionType === 'update' || actionType === 'open') {
+      if (
+        actionType === "create" ||
+        actionType === "update" ||
+        actionType === "open"
+      ) {
         if (!response.actions) response.actions = [];
         response.actions.push({
-          type: `${actionType}-file` as 'create-file' | 'update-file' | 'open-file',
+          type: `${actionType}-file` as
+            | "create-file"
+            | "update-file"
+            | "open-file",
           path: filePath,
         });
       }
@@ -285,7 +307,7 @@ export function useAIIDE() {
         await aiIDE.initialize();
         setIsInitialized(true);
       } catch (error) {
-        console.error('Failed to initialize AI IDE:', error);
+        console.error("Failed to initialize AI IDE:", error);
       }
     };
     init();

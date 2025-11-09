@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 /**
  * File: src/app/client-layout.tsx
@@ -7,28 +7,28 @@
  * Note: ThemeToggle removed from fixed overlay - now in settings page
  */
 
-import { ReactNode, useState, useEffect } from "react"
-import { ThemeProvider } from "@/components/theme-provider"
-import { NavigationWrapper } from "@/components/navigation/NavigationWrapper"
+import { ReactNode, useState, useEffect } from "react";
+import { ThemeProvider } from "@/components/theme-provider";
+import { NavigationWrapper } from "@/components/navigation/NavigationWrapper";
 
 interface ClientLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export default function ClientLayout({ children }: ClientLayoutProps) {
-  const [theme, setTheme] = useState<"light" | "dark">("dark")
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   // Load theme preference from localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme")
+    const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "light" || savedTheme === "dark") {
-      setTheme(savedTheme)
+      setTheme(savedTheme);
     }
-  }, [])
+  }, []);
 
   return (
     <ThemeProvider attribute="class" defaultTheme={theme}>
       <NavigationWrapper>{children}</NavigationWrapper>
     </ThemeProvider>
-  )
+  );
 }

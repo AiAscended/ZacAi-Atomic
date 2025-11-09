@@ -9,6 +9,6 @@ export const textNormalizer = (input: string): string => {
   return input
     .trim()
     .toLowerCase()
-    .replace(/[\u200B-\u200D\uFEFF]/g, '') // invisible chars
-    .replace(/[\s]+/g, ' ');
+    .replace(/[\u200B-\u200D\uFEFF]/g, "") // invisible chars
+    .replace(/[\s]+/g, " ");
 };

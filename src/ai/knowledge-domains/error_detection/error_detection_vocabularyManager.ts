@@ -6,16 +6,16 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { safeParseJSON } from "./error_detection_utils"
-import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./error_detection_utils";
+import { storageAdapter } from "../storageAdapter";
 
 export const loadErrorDetectionSeedVocabulary = async (
   path = "/src/ai/knowledge-domains/error_detection/error_detection_seeds/error_detection_seedVocabulary.json",
 ) => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { errorTypes: [] }) as { errorTypes: string[] }
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { errorTypes: [] }) as { errorTypes: string[] };
   } catch (e) {
-    return { errorTypes: [] }
+    return { errorTypes: [] };
   }
-}
+};

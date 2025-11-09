@@ -6,21 +6,22 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { NEXTJS_DOMAIN } from "./nextjs_constants"
+import { NEXTJS_DOMAIN } from "./nextjs_constants";
 
 export interface NextjsDomainMetadata {
-  name: string
-  version: string
-  description: string
-  capabilities: string[]
-  keywords: string[]
+  name: string;
+  version: string;
+  description: string;
+  capabilities: string[];
+  keywords: string[];
 }
 
 export function getNextjsDomainMetadata(): NextjsDomainMetadata {
   return {
     name: NEXTJS_DOMAIN,
     version: "1.0.0",
-    description: "Next.js React framework knowledge domain for full-stack web applications",
+    description:
+      "Next.js React framework knowledge domain for full-stack web applications",
     capabilities: [
       "routing_explanation",
       "server_components",
@@ -45,5 +46,5 @@ export function getNextjsDomainMetadata(): NextjsDomainMetadata {
       "ssg",
       "isr",
     ],
-  }
+  };
 }

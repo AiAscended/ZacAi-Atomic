@@ -1,15 +1,19 @@
 "use client";
 
-import React from 'react';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { PanelContainer } from './PanelContainer';
-import { FileExplorer } from './FileExplorer';
-import { CodeEditor } from './CodeEditor';
-import { PreviewPanel } from './PreviewPanel';
-import { TerminalPanel } from './TerminalPanel';
-import { AIChatPanel } from './AIChatPanel';
-import { IDEToolbar } from './IDEToolbar';
-import { useLayoutStore } from '@/lib/ide/layoutStore';
+import React from "react";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable";
+import { PanelContainer } from "./PanelContainer";
+import { FileExplorer } from "./FileExplorer";
+import { CodeEditor } from "./CodeEditor";
+import { PreviewPanel } from "./PreviewPanel";
+import { TerminalPanel } from "./TerminalPanel";
+import { AIChatPanel } from "./AIChatPanel";
+import { IDEToolbar } from "./IDEToolbar";
+import { useLayoutStore } from "@/lib/ide/layoutStore";
 
 export function IDELayout() {
   const layout = useLayoutStore((state) => ({
@@ -32,8 +36,16 @@ export function IDELayout() {
           {/* Files Panel */}
           {layout.files.visible && (
             <>
-              <ResizablePanel defaultSize={layout.files.size} minSize={10} maxSize={30}>
-                <PanelContainer panelKey="files" title="Explorer" className="h-full">
+              <ResizablePanel
+                defaultSize={layout.files.size}
+                minSize={10}
+                maxSize={30}
+              >
+                <PanelContainer
+                  panelKey="files"
+                  title="Explorer"
+                  className="h-full"
+                >
                   <FileExplorer />
                 </PanelContainer>
               </ResizablePanel>
@@ -46,7 +58,11 @@ export function IDELayout() {
             <ResizablePanelGroup direction="vertical">
               {/* Code Editor */}
               <ResizablePanel defaultSize={70} minSize={30}>
-                <PanelContainer panelKey="editor" title="Editor" className="h-full">
+                <PanelContainer
+                  panelKey="editor"
+                  title="Editor"
+                  className="h-full"
+                >
                   <CodeEditor />
                 </PanelContainer>
               </ResizablePanel>
@@ -56,7 +72,11 @@ export function IDELayout() {
                 <>
                   <ResizableHandle />
                   <ResizablePanel defaultSize={30} minSize={15} maxSize={50}>
-                    <PanelContainer panelKey="terminal" title="Terminal" className="h-full">
+                    <PanelContainer
+                      panelKey="terminal"
+                      title="Terminal"
+                      className="h-full"
+                    >
                       <TerminalPanel />
                     </PanelContainer>
                   </ResizablePanel>
@@ -69,8 +89,16 @@ export function IDELayout() {
           {layout.preview.visible && (
             <>
               <ResizableHandle />
-              <ResizablePanel defaultSize={layout.preview.size} minSize={15} maxSize={50}>
-                <PanelContainer panelKey="preview" title="Preview" className="h-full">
+              <ResizablePanel
+                defaultSize={layout.preview.size}
+                minSize={15}
+                maxSize={50}
+              >
+                <PanelContainer
+                  panelKey="preview"
+                  title="Preview"
+                  className="h-full"
+                >
                   <PreviewPanel />
                 </PanelContainer>
               </ResizablePanel>
@@ -81,8 +109,16 @@ export function IDELayout() {
           {layout.aiChat.visible && (
             <>
               <ResizableHandle />
-              <ResizablePanel defaultSize={layout.aiChat.size} minSize={15} maxSize={40}>
-                <PanelContainer panelKey="aiChat" title="ZacAi Assistant" className="h-full">
+              <ResizablePanel
+                defaultSize={layout.aiChat.size}
+                minSize={15}
+                maxSize={40}
+              >
+                <PanelContainer
+                  panelKey="aiChat"
+                  title="ZacAi Assistant"
+                  className="h-full"
+                >
                   <AIChatPanel />
                 </PanelContainer>
               </ResizablePanel>

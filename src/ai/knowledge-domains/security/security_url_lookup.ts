@@ -6,10 +6,20 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerSource } from "../url_lookup"
+import { registerSource } from "../url_lookup";
 
-registerSource("security", "OWASP", "https://owasp.org", "Web application security")
-registerSource("security", "Snyk", "https://snyk.io/learn", "Security vulnerability database")
+registerSource(
+  "security",
+  "OWASP",
+  "https://owasp.org",
+  "Web application security",
+);
+registerSource(
+  "security",
+  "Snyk",
+  "https://snyk.io/learn",
+  "Security vulnerability database",
+);
 
-export const securitySources = () => registerSource
-export default securitySources
+export const securitySources = () => registerSource;
+export default securitySources;

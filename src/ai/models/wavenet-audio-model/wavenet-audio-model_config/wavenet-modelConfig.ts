@@ -14,8 +14,8 @@ export interface WAVENETModelConfig {
 }
 
 export const defaultWAVENETConfig: WAVENETModelConfig = {
-  modelName: 'wavenet-audio-model',
-  version: '1.0.0',
+  modelName: "wavenet-audio-model",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

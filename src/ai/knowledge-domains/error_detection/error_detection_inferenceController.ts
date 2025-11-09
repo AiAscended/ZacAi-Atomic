@@ -6,18 +6,18 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { errorDetectionTokenizer } from "./error_detection_tokenizer"
-import { errorDetectionSemanticAnalyzer } from "./error_detection_semanticAnalyzer"
+import { errorDetectionTokenizer } from "./error_detection_tokenizer";
+import { errorDetectionSemanticAnalyzer } from "./error_detection_semanticAnalyzer";
 
 export const errorDetectionRunInference = async (input: string) => {
-  const t = errorDetectionTokenizer(input)
-  const sem = errorDetectionSemanticAnalyzer(input)
+  const t = errorDetectionTokenizer(input);
+  const sem = errorDetectionSemanticAnalyzer(input);
   return {
     tokens: t.tokens,
     tokenCount: t.length,
     semantics: sem,
     response: `Error detection: Found ${sem.errorCount} errors, ${sem.potentialIssues.length} potential issues.`,
-  }
-}
+  };
+};
 
-export default errorDetectionRunInference
+export default errorDetectionRunInference;

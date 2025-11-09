@@ -4,13 +4,16 @@
  */
 
 export class DataStructuresVisualizer {
-  visualize(_structure: any, type: string): {
+  visualize(
+    _structure: any,
+    type: string,
+  ): {
     visualization: string;
     metadata: Record<string, any>;
   } {
     // Placeholder implementation
     return {
-      visualization: '',
+      visualization: "",
       metadata: { type },
     };
   }

@@ -13,7 +13,7 @@
  * @example atan(1) // returns Math.PI / 4
  */
 export function atan(value: number): number {
-  return Math.atan(value)
+  return Math.atan(value);
 }
 
 /**
@@ -22,7 +22,7 @@ export function atan(value: number): number {
  * @returns Angle in degrees
  */
 export function atanDeg(value: number): number {
-  return (Math.atan(value) * 180) / Math.PI
+  return (Math.atan(value) * 180) / Math.PI;
 }
 
 /**
@@ -32,5 +32,5 @@ export function atanDeg(value: number): number {
  * @returns Angle in radians
  */
 export function atan2(y: number, x: number): number {
-  return Math.atan2(y, x)
+  return Math.atan2(y, x);
 }

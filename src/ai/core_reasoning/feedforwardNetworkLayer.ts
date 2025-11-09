@@ -7,7 +7,7 @@ export const dense = (
   input: number[],
   weights: number[][],
   bias: number[],
-  activation?: (x: number) => number
+  activation?: (x: number) => number,
 ): number[] => {
   const out = weights.map((row, i) => {
     let s = bias[i] || 0;

@@ -4,7 +4,7 @@
 
 export class WAVENETTrainer {
   train(_data: unknown): void {
-    console.log('Training wavenet-audio-model...');
+    console.log("Training wavenet-audio-model...");
   }
 }
 

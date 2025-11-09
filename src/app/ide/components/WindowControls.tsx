@@ -1,8 +1,8 @@
 "use client";
 
-import React from 'react';
-import { Minimize2, Maximize2, X, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Minimize2, Maximize2, X, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface WindowControlsProps {
   onMinimize?: () => void;

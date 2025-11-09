@@ -6,5 +6,6 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-export const DOCUMENTATION_DOMAIN = "documentation"
-export const DOCUMENTATION_VOCAB_PATH = "/src/ai/knowledge-domains/documentation/documentation_seeds/documentation_seedVocabulary.json"
+export const DOCUMENTATION_DOMAIN = "documentation";
+export const DOCUMENTATION_VOCAB_PATH =
+  "/src/ai/knowledge-domains/documentation/documentation_seeds/documentation_seedVocabulary.json";

@@ -15,9 +15,9 @@
  */
 export function asin(value: number): number {
   if (value < -1 || value > 1) {
-    throw new Error("Arcsine input must be between -1 and 1")
+    throw new Error("Arcsine input must be between -1 and 1");
   }
-  return Math.asin(value)
+  return Math.asin(value);
 }
 
 /**
@@ -27,7 +27,7 @@ export function asin(value: number): number {
  */
 export function asinDeg(value: number): number {
   if (value < -1 || value > 1) {
-    throw new Error("Arcsine input must be between -1 and 1")
+    throw new Error("Arcsine input must be between -1 and 1");
   }
-  return (Math.asin(value) * 180) / Math.PI
+  return (Math.asin(value) * 180) / Math.PI;
 }

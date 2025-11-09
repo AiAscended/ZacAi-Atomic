@@ -1,13 +1,13 @@
 /**
  * Admin Training Management API
- * 
+ *
  * Control automated training pipeline
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { trainingScheduler } from '@/ai/training/trainingManager';
+import { NextRequest, NextResponse } from "next/server";
+import { trainingScheduler } from "@/ai/training/trainingManager";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,22 +15,24 @@ export async function POST(request: NextRequest) {
     const { action, params } = body;
 
     switch (action) {
-      case 'trigger':
-        const result = await trainingScheduler.runTraining(params?.mode || 'full');
+      case "trigger":
+        const result = await trainingScheduler.runTraining(
+          params?.mode || "full",
+        );
         return NextResponse.json({
           success: true,
           data: result,
-          message: 'Training triggered successfully',
+          message: "Training triggered successfully",
         });
 
-      case 'stop':
+      case "stop":
         await trainingScheduler.stopTraining();
         return NextResponse.json({
           success: true,
-          message: 'Training stopped',
+          message: "Training stopped",
         });
 
-      case 'export':
+      case "export":
         const exportedData = await trainingScheduler.exportMetrics();
         return NextResponse.json({
           success: true,
@@ -39,19 +41,19 @@ export async function POST(request: NextRequest) {
 
       default:
         return NextResponse.json(
-          { success: false, error: 'Invalid action' },
-          { status: 400 }
+          { success: false, error: "Invalid action" },
+          { status: 400 },
         );
     }
   } catch (error) {
-    console.error('[Admin Training API] Error:', error);
+    console.error("[Admin Training API] Error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Training operation failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Training operation failed",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -59,24 +61,24 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const view = searchParams.get('view') || 'status';
+    const view = searchParams.get("view") || "status";
 
     switch (view) {
-      case 'status':
+      case "status":
         const status = trainingScheduler.getStatus();
         return NextResponse.json({
           success: true,
           data: status,
         });
 
-      case 'history':
+      case "history":
         const history = trainingScheduler.getHistory();
         return NextResponse.json({
           success: true,
           data: history,
         });
 
-      case 'settings':
+      case "settings":
         const settings = trainingScheduler.getSettings();
         return NextResponse.json({
           success: true,
@@ -85,19 +87,19 @@ export async function GET(request: NextRequest) {
 
       default:
         return NextResponse.json(
-          { success: false, error: 'Invalid view parameter' },
-          { status: 400 }
+          { success: false, error: "Invalid view parameter" },
+          { status: 400 },
         );
     }
   } catch (error) {
-    console.error('[Admin Training API] Error:', error);
+    console.error("[Admin Training API] Error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to retrieve training data',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to retrieve training data",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -109,8 +111,8 @@ export async function PUT(request: NextRequest) {
 
     if (!settings) {
       return NextResponse.json(
-        { success: false, error: 'Settings are required' },
-        { status: 400 }
+        { success: false, error: "Settings are required" },
+        { status: 400 },
       );
     }
 
@@ -118,18 +120,18 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Training settings updated successfully',
+      message: "Training settings updated successfully",
       data: settings,
     });
   } catch (error) {
-    console.error('[Admin Training API] Error updating settings:', error);
+    console.error("[Admin Training API] Error updating settings:", error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to update settings',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to update settings",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -12,8 +12,8 @@ export class AlgorithmsComplexityAnalyzer {
     // Placeholder implementation
     // TODO: Implement actual complexity analysis using _code
     return {
-      timeComplexity: 'O(n)',
-      spaceComplexity: 'O(1)',
+      timeComplexity: "O(n)",
+      spaceComplexity: "O(1)",
       confidence: 0.5,
     };
   }

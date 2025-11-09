@@ -52,6 +52,6 @@ export const TESTING_CORE_TOKENS = [
   "TOKEN_13",
   "TOKEN_14",
   "TOKEN_15",
-]
+];
 
-export default TESTING_CORE_TOKENS
+export default TESTING_CORE_TOKENS;

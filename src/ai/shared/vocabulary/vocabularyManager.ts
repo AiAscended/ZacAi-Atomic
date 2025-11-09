@@ -4,130 +4,147 @@
  * Loads and manages the shared base vocabulary plus domain-specific extensions
  */
 
-import baseVocabulary from './base-vocabulary.json'
+import baseVocabulary from "./base-vocabulary.json";
 
 export interface VocabularyMetadata {
-  version: string
-  description: string
-  tokenCount: number
-  updated: string
+  version: string;
+  description: string;
+  tokenCount: number;
+  updated: string;
 }
 
 export class VocabularyManager {
-  private vocabulary: Map<string, number> = new Map()
-  private reverseVocabulary: Map<number, string> = new Map()
-  private metadata: VocabularyMetadata
-  
+  private vocabulary: Map<string, number> = new Map();
+  private reverseVocabulary: Map<number, string> = new Map();
+  private metadata: VocabularyMetadata;
+
   constructor() {
-    this.metadata = baseVocabulary.metadata
-    this.loadBaseVocabulary()
+    this.metadata = baseVocabulary.metadata;
+    this.loadBaseVocabulary();
   }
-  
+
   /**
    * Load base vocabulary from JSON
    */
   private loadBaseVocabulary(): void {
     const vocab = baseVocabulary as Record<string, unknown>;
-    
+
     // Load all token categories
     const categories = [
-      'special_tokens',
-      'system_tokens',
-      'common_words',
-      'ai_domain_terms',
-      'programming_terms',
-      'mathematics_terms'
-    ]
-    
+      "special_tokens",
+      "system_tokens",
+      "common_words",
+      "ai_domain_terms",
+      "programming_terms",
+      "mathematics_terms",
+    ];
+
     for (const category of categories) {
       if (vocab[category]) {
         for (const [token, id] of Object.entries(vocab[category])) {
-          this.vocabulary.set(token.toLowerCase(), id as number)
-          this.reverseVocabulary.set(id as number, token.toLowerCase())
+          this.vocabulary.set(token.toLowerCase(), id as number);
+          this.reverseVocabulary.set(id as number, token.toLowerCase());
         }
       }
     }
-    
-    console.log(`[VocabularyManager] Loaded ${this.vocabulary.size} base tokens`)
+
+    console.log(
+      `[VocabularyManager] Loaded ${this.vocabulary.size} base tokens`,
+    );
   }
-  
+
   /**
    * Extend vocabulary with domain-specific terms
    */
-  public extendVocabulary(domainName: string, tokens: Record<string, number>): void {
-    let added = 0
+  public extendVocabulary(
+    domainName: string,
+    tokens: Record<string, number>,
+  ): void {
+    let added = 0;
     for (const [token, id] of Object.entries(tokens)) {
       if (!this.vocabulary.has(token.toLowerCase())) {
-        this.vocabulary.set(token.toLowerCase(), id)
-        this.reverseVocabulary.set(id, token.toLowerCase())
-        added++
+        this.vocabulary.set(token.toLowerCase(), id);
+        this.reverseVocabulary.set(id, token.toLowerCase());
+        added++;
       }
     }
-    console.log(`[VocabularyManager] Extended with ${added} tokens from ${domainName} domain`)
+    console.log(
+      `[VocabularyManager] Extended with ${added} tokens from ${domainName} domain`,
+    );
   }
-  
+
   /**
    * Get token ID for a word
    */
   public getTokenId(token: string): number {
-    return this.vocabulary.get(token.toLowerCase()) ?? this.vocabulary.get('<UNK>') ?? 3
+    return (
+      this.vocabulary.get(token.toLowerCase()) ??
+      this.vocabulary.get("<UNK>") ??
+      3
+    );
   }
-  
+
   /**
    * Get word for a token ID
    */
   public getToken(id: number): string {
-    return this.reverseVocabulary.get(id) ?? '<UNK>'
+    return this.reverseVocabulary.get(id) ?? "<UNK>";
   }
-  
+
   /**
    * Get vocabulary map for direct use
    */
   public getVocabulary(): Map<string, number> {
-    return new Map(this.vocabulary)
+    return new Map(this.vocabulary);
   }
-  
+
   /**
    * Get reverse vocabulary map
    */
   public getReverseVocabulary(): Map<number, string> {
-    return new Map(this.reverseVocabulary)
+    return new Map(this.reverseVocabulary);
   }
-  
+
   /**
    * Get vocabulary size
    */
   public getVocabSize(): number {
-    return this.vocabulary.size
+    return this.vocabulary.size;
   }
-  
+
   /**
    * Get metadata
    */
   public getMetadata(): VocabularyMetadata {
-    return { ...this.metadata }
+    return { ...this.metadata };
   }
-  
+
   /**
    * Check if token exists
    */
   public hasToken(token: string): boolean {
-    return this.vocabulary.has(token.toLowerCase())
+    return this.vocabulary.has(token.toLowerCase());
   }
-  
+
   /**
    * Get special token IDs
    */
-  public getSpecialTokens(): { pad: number; bos: number; eos: number; unk: number; mask: number } {
+  public getSpecialTokens(): {
+    pad: number;
+    bos: number;
+    eos: number;
+    unk: number;
+    mask: number;
+  } {
     return {
-      pad: this.getTokenId('<PAD>'),
-      bos: this.getTokenId('<BOS>'),
-      eos: this.getTokenId('<EOS>'),
-      unk: this.getTokenId('<UNK>'),
-      mask: this.getTokenId('<MASK>')
-    }
+      pad: this.getTokenId("<PAD>"),
+      bos: this.getTokenId("<BOS>"),
+      eos: this.getTokenId("<EOS>"),
+      unk: this.getTokenId("<UNK>"),
+      mask: this.getTokenId("<MASK>"),
+    };
   }
 }
 
 // Singleton instance
-export const vocabularyManager = new VocabularyManager()
+export const vocabularyManager = new VocabularyManager();

@@ -13,7 +13,7 @@
  * @example tan(Math.PI / 4) // returns 1
  */
 export function tan(angleRadians: number): number {
-  return Math.tan(angleRadians)
+  return Math.tan(angleRadians);
 }
 
 /**
@@ -23,5 +23,5 @@ export function tan(angleRadians: number): number {
  * @example tanDeg(45) // returns 1
  */
 export function tanDeg(angleDegrees: number): number {
-  return Math.tan((angleDegrees * Math.PI) / 180)
+  return Math.tan((angleDegrees * Math.PI) / 180);
 }

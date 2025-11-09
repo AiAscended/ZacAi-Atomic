@@ -4,7 +4,7 @@
 
 export class CNNTrainer {
   train(data: any): void {
-    console.log('Training convolutional-neural-network...');
+    console.log("Training convolutional-neural-network...");
   }
 }
 

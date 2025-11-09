@@ -1,29 +1,34 @@
 /**
  * File: src/ai/knowledge-domains/index.ts
  * Purpose: Convenience API for domain registry and loading
- * 
+ *
  * Usage in orchestrator:
  * import { loadAllDomains, getReadyDomains, getDomain } from "@/ai/knowledge-domains";
  */
 
 import { domainScannerConfig } from "./config";
 import { getRegistry, scanAndUpdate } from "../shared/registry/moduleRegistry";
-import { 
-  getLoader, 
-  loadAllModules, 
-  loadModule, 
+import {
+  getLoader,
+  loadAllModules,
+  loadModule,
   getLoadedModule,
   getAllLoadedModules,
-  getReadyModules 
+  getReadyModules,
 } from "../shared/registry/moduleLoader";
-import type { ModuleRegistry, ModuleManifest } from "../shared/registry/moduleRegistry";
+import type {
+  ModuleRegistry,
+  ModuleManifest,
+} from "../shared/registry/moduleRegistry";
 import type { LoadedModule } from "../shared/registry/moduleLoader";
 
 // ============================================================================
 // Registry APIs
 // ============================================================================
 
-export async function getDomainRegistry(forceRefresh = false): Promise<ModuleRegistry> {
+export async function getDomainRegistry(
+  forceRefresh = false,
+): Promise<ModuleRegistry> {
   return await getRegistry(domainScannerConfig, forceRefresh);
 }
 
@@ -33,10 +38,14 @@ export async function scanDomains(): Promise<ModuleRegistry> {
 
 export async function getEnabledDomains(): Promise<ModuleManifest[]> {
   const registry = await getDomainRegistry();
-  return registry.enabledModules.map(id => registry.modules[id]).filter(Boolean);
+  return registry.enabledModules
+    .map((id) => registry.modules[id])
+    .filter(Boolean);
 }
 
-export async function getDomain(domainId: string): Promise<ModuleManifest | null> {
+export async function getDomain(
+  domainId: string,
+): Promise<ModuleManifest | null> {
   const registry = await getDomainRegistry();
   return registry.modules[domainId] || null;
 }
@@ -84,5 +93,8 @@ export function getDomainLoaderStats() {
 // Type Exports
 // ============================================================================
 
-export type { ModuleManifest as DomainManifest, ModuleRegistry as DomainRegistry };
+export type {
+  ModuleManifest as DomainManifest,
+  ModuleRegistry as DomainRegistry,
+};
 export type { LoadedModule as LoadedDomain };

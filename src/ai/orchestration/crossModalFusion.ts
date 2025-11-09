@@ -1,50 +1,50 @@
 /**
  * File: src/ai/orchestration/crossModalFusion.ts
- * 
+ *
  * Handles fusion of multi-modal data (text, image, audio, code) for
  * integrated multi-modal reasoning and understanding.
- * 
+ *
  * Integration:
  * - Called by: mainOrchestrator.ts
  * - Uses: Multi-modal fusion model, cross-attention mechanisms
  * - Coordinates: Text, vision, audio, code models
  */
 
-import { logger } from "./logger"
+import { logger } from "./logger";
 
 export interface ModalityData {
-  modality: "text" | "image" | "audio" | "code" | "graph"
-  content: unknown
-  embedding?: Float32Array
+  modality: "text" | "image" | "audio" | "code" | "graph";
+  content: unknown;
+  embedding?: Float32Array;
   metadata: {
-    source: string
-    confidence: number
-    [key: string]: unknown
-  }
+    source: string;
+    confidence: number;
+    [key: string]: unknown;
+  };
 }
 
 export interface FusedOutput {
-  unifiedRepresentation: Float32Array
-  modalityWeights: Map<string, number>
-  fusedContent: string
+  unifiedRepresentation: Float32Array;
+  modalityWeights: Map<string, number>;
+  fusedContent: string;
   metadata: {
-    modalitiesUsed: string[]
-    fusionStrategy: string
-    confidence: number
-  }
+    modalitiesUsed: string[];
+    fusionStrategy: string;
+    confidence: number;
+  };
 }
 
 /**
  * CrossModalFusion Class
- * 
+ *
  * Integrates multiple modalities for comprehensive understanding
  */
 export class CrossModalFusion {
-  private fusionStrategies: Map<string, (data: ModalityData[]) => FusedOutput>
+  private fusionStrategies: Map<string, (data: ModalityData[]) => FusedOutput>;
 
   constructor() {
-    this.fusionStrategies = new Map()
-    this.initializeFusionStrategies()
+    this.fusionStrategies = new Map();
+    this.initializeFusionStrategies();
   }
 
   /**
@@ -52,16 +52,18 @@ export class CrossModalFusion {
    */
   private initializeFusionStrategies(): void {
     // Early fusion: Combine at input level
-    this.fusionStrategies.set("early", (data) => this.earlyFusion(data))
+    this.fusionStrategies.set("early", (data) => this.earlyFusion(data));
 
     // Late fusion: Combine at output level
-    this.fusionStrategies.set("late", (data) => this.lateFusion(data))
+    this.fusionStrategies.set("late", (data) => this.lateFusion(data));
 
     // Hybrid fusion: Combine at multiple levels
-    this.fusionStrategies.set("hybrid", (data) => this.hybridFusion(data))
+    this.fusionStrategies.set("hybrid", (data) => this.hybridFusion(data));
 
     // Attention-based fusion: Use cross-attention
-    this.fusionStrategies.set("attention", (data) => this.attentionFusion(data))
+    this.fusionStrategies.set("attention", (data) =>
+      this.attentionFusion(data),
+    );
   }
 
   /**
@@ -69,34 +71,36 @@ export class CrossModalFusion {
    */
   public fuse(
     modalityData: ModalityData[],
-    strategy: "early" | "late" | "hybrid" | "attention" = "hybrid"
+    strategy: "early" | "late" | "hybrid" | "attention" = "hybrid",
   ): FusedOutput {
     logger.info("CrossModalFusion", "Fusing modalities", {
       modalityCount: modalityData.length,
       modalities: modalityData.map((d) => d.modality),
       strategy,
-    })
+    });
 
     if (modalityData.length === 0) {
-      return this.getEmptyFusion()
+      return this.getEmptyFusion();
     }
 
     if (modalityData.length === 1) {
-      return this.singleModalityFusion(modalityData[0])
+      return this.singleModalityFusion(modalityData[0]);
     }
 
     // Get fusion strategy
-    const strategyFn = this.fusionStrategies.get(strategy) || this.fusionStrategies.get("hybrid")!
+    const strategyFn =
+      this.fusionStrategies.get(strategy) ||
+      this.fusionStrategies.get("hybrid")!;
 
     // Apply fusion
-    const fused = strategyFn(modalityData)
+    const fused = strategyFn(modalityData);
 
     logger.info("CrossModalFusion", "Fusion complete", {
       modalitiesUsed: fused.metadata.modalitiesUsed.length,
       confidence: fused.metadata.confidence,
-    })
+    });
 
-    return fused
+    return fused;
   }
 
   /**
@@ -104,28 +108,28 @@ export class CrossModalFusion {
    */
   private earlyFusion(data: ModalityData[]): FusedOutput {
     // Concatenate embeddings from all modalities
-    const embeddings: Float32Array[] = []
-    const modalityWeights = new Map<string, number>()
+    const embeddings: Float32Array[] = [];
+    const modalityWeights = new Map<string, number>();
 
     for (const modalityData of data) {
       if (modalityData.embedding) {
-        embeddings.push(modalityData.embedding)
-        modalityWeights.set(modalityData.modality, 1.0 / data.length)
+        embeddings.push(modalityData.embedding);
+        modalityWeights.set(modalityData.modality, 1.0 / data.length);
       }
     }
 
     // Concatenate all embeddings
-    const totalLength = embeddings.reduce((sum, emb) => sum + emb.length, 0)
-    const unified = new Float32Array(totalLength)
+    const totalLength = embeddings.reduce((sum, emb) => sum + emb.length, 0);
+    const unified = new Float32Array(totalLength);
 
-    let offset = 0
+    let offset = 0;
     for (const embedding of embeddings) {
-      unified.set(embedding, offset)
-      offset += embedding.length
+      unified.set(embedding, offset);
+      offset += embedding.length;
     }
 
     // Generate fused content description
-    const fusedContent = this.generateFusedDescription(data)
+    const fusedContent = this.generateFusedDescription(data);
 
     return {
       unifiedRepresentation: unified,
@@ -136,7 +140,7 @@ export class CrossModalFusion {
         fusionStrategy: "early",
         confidence: this.calculateAverageConfidence(data),
       },
-    }
+    };
   }
 
   /**
@@ -144,13 +148,13 @@ export class CrossModalFusion {
    */
   private lateFusion(data: ModalityData[]): FusedOutput {
     // Process each modality independently, then combine
-    const modalityWeights = this.calculateModalityWeights(data)
+    const modalityWeights = this.calculateModalityWeights(data);
 
     // Weighted average of embeddings
-    const unified = this.weightedAverageEmbeddings(data, modalityWeights)
+    const unified = this.weightedAverageEmbeddings(data, modalityWeights);
 
     // Combine content with weights
-    const fusedContent = this.weightedCombineContent(data, modalityWeights)
+    const fusedContent = this.weightedCombineContent(data, modalityWeights);
 
     return {
       unifiedRepresentation: unified,
@@ -161,7 +165,7 @@ export class CrossModalFusion {
         fusionStrategy: "late",
         confidence: this.calculateWeightedConfidence(data, modalityWeights),
       },
-    }
+    };
   }
 
   /**
@@ -169,13 +173,16 @@ export class CrossModalFusion {
    */
   private hybridFusion(data: ModalityData[]): FusedOutput {
     // Combine early and late fusion
-    const earlyFused = this.earlyFusion(data)
-    const lateFused = this.lateFusion(data)
+    const earlyFused = this.earlyFusion(data);
+    const lateFused = this.lateFusion(data);
 
     // Merge the two approaches
-    const unified = this.mergeEmbeddings(earlyFused.unifiedRepresentation, lateFused.unifiedRepresentation)
+    const unified = this.mergeEmbeddings(
+      earlyFused.unifiedRepresentation,
+      lateFused.unifiedRepresentation,
+    );
 
-    const fusedContent = `${earlyFused.fusedContent}\n\n${lateFused.fusedContent}`
+    const fusedContent = `${earlyFused.fusedContent}\n\n${lateFused.fusedContent}`;
 
     return {
       unifiedRepresentation: unified,
@@ -184,9 +191,10 @@ export class CrossModalFusion {
       metadata: {
         modalitiesUsed: data.map((d) => d.modality),
         fusionStrategy: "hybrid",
-        confidence: (earlyFused.metadata.confidence + lateFused.metadata.confidence) / 2,
+        confidence:
+          (earlyFused.metadata.confidence + lateFused.metadata.confidence) / 2,
       },
-    }
+    };
   }
 
   /**
@@ -194,14 +202,17 @@ export class CrossModalFusion {
    */
   private attentionFusion(data: ModalityData[]): FusedOutput {
     // Calculate attention weights between modalities
-    const attentionMatrix = this.calculateCrossAttention(data)
+    const attentionMatrix = this.calculateCrossAttention(data);
 
     // Apply attention to combine modalities
-    const unified = this.applyAttention(data, attentionMatrix)
+    const unified = this.applyAttention(data, attentionMatrix);
 
-    const modalityWeights = this.extractModalityWeights(attentionMatrix)
+    const modalityWeights = this.extractModalityWeights(attentionMatrix);
 
-    const fusedContent = this.generateAttentionBasedDescription(data, modalityWeights)
+    const fusedContent = this.generateAttentionBasedDescription(
+      data,
+      modalityWeights,
+    );
 
     return {
       unifiedRepresentation: unified,
@@ -212,22 +223,25 @@ export class CrossModalFusion {
         fusionStrategy: "attention",
         confidence: this.calculateAttentionConfidence(data, attentionMatrix),
       },
-    }
+    };
   }
 
   /**
    * Calculate modality weights based on confidence
    */
   private calculateModalityWeights(data: ModalityData[]): Map<string, number> {
-    const weights = new Map<string, number>()
-    const totalConfidence = data.reduce((sum, d) => sum + d.metadata.confidence, 0)
+    const weights = new Map<string, number>();
+    const totalConfidence = data.reduce(
+      (sum, d) => sum + d.metadata.confidence,
+      0,
+    );
 
     for (const modalityData of data) {
-      const weight = modalityData.metadata.confidence / totalConfidence
-      weights.set(modalityData.modality, weight)
+      const weight = modalityData.metadata.confidence / totalConfidence;
+      weights.set(modalityData.modality, weight);
     }
 
-    return weights
+    return weights;
   }
 
   /**
@@ -235,25 +249,25 @@ export class CrossModalFusion {
    */
   private weightedAverageEmbeddings(
     data: ModalityData[],
-    weights: Map<string, number>
+    weights: Map<string, number>,
   ): Float32Array {
     if (data.length === 0 || !data[0].embedding) {
-      return new Float32Array(512) // Default size
+      return new Float32Array(512); // Default size
     }
 
-    const embeddingSize = data[0].embedding.length
-    const averaged = new Float32Array(embeddingSize)
+    const embeddingSize = data[0].embedding.length;
+    const averaged = new Float32Array(embeddingSize);
 
     for (const modalityData of data) {
       if (modalityData.embedding) {
-        const weight = weights.get(modalityData.modality) || 0
+        const weight = weights.get(modalityData.modality) || 0;
         for (let i = 0; i < embeddingSize; i++) {
-          averaged[i] += modalityData.embedding[i] * weight
+          averaged[i] += modalityData.embedding[i] * weight;
         }
       }
     }
 
-    return averaged
+    return averaged;
   }
 
   /**
@@ -261,16 +275,16 @@ export class CrossModalFusion {
    */
   private weightedCombineContent(
     data: ModalityData[],
-    weights: Map<string, number>
+    weights: Map<string, number>,
   ): string {
     const sorted = data.sort(
-      (a, b) => (weights.get(b.modality) || 0) - (weights.get(a.modality) || 0)
-    )
+      (a, b) => (weights.get(b.modality) || 0) - (weights.get(a.modality) || 0),
+    );
 
-    const descriptions: string[] = []
+    const descriptions: string[] = [];
 
     for (const modalityData of sorted) {
-      const weight = weights.get(modalityData.modality) || 0
+      const weight = weights.get(modalityData.modality) || 0;
       if (weight > 0.1) {
         // Only include significant modalities
         descriptions.push(
@@ -278,74 +292,77 @@ export class CrossModalFusion {
             typeof modalityData.content === "string"
               ? modalityData.content
               : JSON.stringify(modalityData.content)
-          }`
-        )
+          }`,
+        );
       }
     }
 
-    return descriptions.join("\n\n")
+    return descriptions.join("\n\n");
   }
 
   /**
    * Generate fused description
    */
   private generateFusedDescription(data: ModalityData[]): string {
-    const modalities = data.map((d) => d.modality).join(", ")
-    return `Fused representation combining ${modalities} modalities for comprehensive understanding.`
+    const modalities = data.map((d) => d.modality).join(", ");
+    return `Fused representation combining ${modalities} modalities for comprehensive understanding.`;
   }
 
   /**
    * Calculate cross-attention matrix
    */
   private calculateCrossAttention(data: ModalityData[]): number[][] {
-    const n = data.length
+    const n = data.length;
     const matrix: number[][] = Array(n)
       .fill(0)
-      .map(() => Array(n).fill(0))
+      .map(() => Array(n).fill(0));
 
     // Simplified attention: based on confidence similarity
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
         if (i === j) {
-          matrix[i][j] = 1.0
+          matrix[i][j] = 1.0;
         } else {
           const confDiff = Math.abs(
-            data[i].metadata.confidence - data[j].metadata.confidence
-          )
-          matrix[i][j] = Math.exp(-confDiff) // Exponential decay
+            data[i].metadata.confidence - data[j].metadata.confidence,
+          );
+          matrix[i][j] = Math.exp(-confDiff); // Exponential decay
         }
       }
     }
 
-    return matrix
+    return matrix;
   }
 
   /**
    * Apply attention to combine embeddings
    */
-  private applyAttention(data: ModalityData[], attention: number[][]): Float32Array {
+  private applyAttention(
+    data: ModalityData[],
+    attention: number[][],
+  ): Float32Array {
     if (data.length === 0 || !data[0].embedding) {
-      return new Float32Array(512)
+      return new Float32Array(512);
     }
 
-    const embeddingSize = data[0].embedding.length
-    const combined = new Float32Array(embeddingSize)
+    const embeddingSize = data[0].embedding.length;
+    const combined = new Float32Array(embeddingSize);
 
     for (let i = 0; i < data.length; i++) {
       if (data[i].embedding) {
-        let attentionWeight = 0
+        let attentionWeight = 0;
         for (let j = 0; j < data.length; j++) {
-          attentionWeight += attention[i][j]
+          attentionWeight += attention[i][j];
         }
-        attentionWeight = attentionWeight / data.length
+        attentionWeight = attentionWeight / data.length;
 
         for (let k = 0; k < embeddingSize; k++) {
-          combined[k] += data[i].embedding![k] * attentionWeight
+          combined[k] += data[i].embedding![k] * attentionWeight;
         }
       }
     }
 
-    return combined
+    return combined;
   }
 
   /**
@@ -353,8 +370,8 @@ export class CrossModalFusion {
    */
   private extractModalityWeights(attention: number[][]): Map<string, number> {
     // Simplified: average attention scores
-    const weights = new Map<string, number>()
-    return weights
+    const weights = new Map<string, number>();
+    return weights;
   }
 
   /**
@@ -362,18 +379,18 @@ export class CrossModalFusion {
    */
   private generateAttentionBasedDescription(
     data: ModalityData[],
-    weights: Map<string, number>
+    weights: Map<string, number>,
   ): string {
-    return this.generateFusedDescription(data)
+    return this.generateFusedDescription(data);
   }
 
   /**
    * Calculate average confidence
    */
   private calculateAverageConfidence(data: ModalityData[]): number {
-    if (data.length === 0) return 0
-    const sum = data.reduce((acc, d) => acc + d.metadata.confidence, 0)
-    return sum / data.length
+    if (data.length === 0) return 0;
+    const sum = data.reduce((acc, d) => acc + d.metadata.confidence, 0);
+    return sum / data.length;
   }
 
   /**
@@ -381,35 +398,41 @@ export class CrossModalFusion {
    */
   private calculateWeightedConfidence(
     data: ModalityData[],
-    weights: Map<string, number>
+    weights: Map<string, number>,
   ): number {
-    let weightedSum = 0
+    let weightedSum = 0;
     for (const modalityData of data) {
-      const weight = weights.get(modalityData.modality) || 0
-      weightedSum += modalityData.metadata.confidence * weight
+      const weight = weights.get(modalityData.modality) || 0;
+      weightedSum += modalityData.metadata.confidence * weight;
     }
-    return weightedSum
+    return weightedSum;
   }
 
   /**
    * Calculate attention-based confidence
    */
-  private calculateAttentionConfidence(data: ModalityData[], attention: number[][]): number {
-    return this.calculateAverageConfidence(data)
+  private calculateAttentionConfidence(
+    data: ModalityData[],
+    attention: number[][],
+  ): number {
+    return this.calculateAverageConfidence(data);
   }
 
   /**
    * Merge two embeddings
    */
-  private mergeEmbeddings(emb1: Float32Array, emb2: Float32Array): Float32Array {
-    const minLength = Math.min(emb1.length, emb2.length)
-    const merged = new Float32Array(minLength)
+  private mergeEmbeddings(
+    emb1: Float32Array,
+    emb2: Float32Array,
+  ): Float32Array {
+    const minLength = Math.min(emb1.length, emb2.length);
+    const merged = new Float32Array(minLength);
 
     for (let i = 0; i < minLength; i++) {
-      merged[i] = (emb1[i] + emb2[i]) / 2
+      merged[i] = (emb1[i] + emb2[i]) / 2;
     }
 
-    return merged
+    return merged;
   }
 
   /**
@@ -420,13 +443,15 @@ export class CrossModalFusion {
       unifiedRepresentation: data.embedding || new Float32Array(512),
       modalityWeights: new Map([[data.modality, 1.0]]),
       fusedContent:
-        typeof data.content === "string" ? data.content : JSON.stringify(data.content),
+        typeof data.content === "string"
+          ? data.content
+          : JSON.stringify(data.content),
       metadata: {
         modalitiesUsed: [data.modality],
         fusionStrategy: "single",
         confidence: data.metadata.confidence,
       },
-    }
+    };
   }
 
   /**
@@ -442,8 +467,8 @@ export class CrossModalFusion {
         fusionStrategy: "none",
         confidence: 0,
       },
-    }
+    };
   }
 }
 
-export default CrossModalFusion
+export default CrossModalFusion;

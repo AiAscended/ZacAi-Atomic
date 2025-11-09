@@ -14,8 +14,8 @@ export interface GNNModelConfig {
 }
 
 export const defaultGNNConfig: GNNModelConfig = {
-  modelName: 'graph-neural-network',
-  version: '1.0.0',
+  modelName: "graph-neural-network",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

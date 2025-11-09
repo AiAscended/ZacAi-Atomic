@@ -1,4 +1,4 @@
-import { vfs } from './virtualFileSystem';
+import { vfs } from "./virtualFileSystem";
 
 export interface CommandResult {
   output: string;
@@ -14,22 +14,22 @@ export interface CommandContext {
 
 class CommandProcessor {
   private context: CommandContext = {
-    currentDirectory: '/',
+    currentDirectory: "/",
     environment: {
-      HOME: '/',
-      USER: 'zacai',
-      PATH: '/usr/local/bin:/usr/bin:/bin',
-      SHELL: '/bin/bash',
-      TERM: 'xterm-256color',
+      HOME: "/",
+      USER: "zacai",
+      PATH: "/usr/local/bin:/usr/bin:/bin",
+      SHELL: "/bin/bash",
+      TERM: "xterm-256color",
     },
     history: [],
   };
 
   async executeCommand(command: string): Promise<CommandResult> {
     const trimmedCommand = command.trim();
-    
+
     if (!trimmedCommand) {
-      return { output: '', exitCode: 0 };
+      return { output: "", exitCode: 0 };
     }
 
     // Add to history
@@ -42,50 +42,50 @@ class CommandProcessor {
     // Execute command
     try {
       switch (cmd) {
-        case 'pwd':
+        case "pwd":
           return await this.pwd();
-        case 'ls':
+        case "ls":
           return await this.ls(args);
-        case 'cd':
-          return await this.cd(args[0] || '/');
-        case 'cat':
+        case "cd":
+          return await this.cd(args[0] || "/");
+        case "cat":
           return await this.cat(args[0]);
-        case 'echo':
-          return await this.echo(args.join(' '));
-        case 'mkdir':
+        case "echo":
+          return await this.echo(args.join(" "));
+        case "mkdir":
           return await this.mkdir(args[0]);
-        case 'rm':
+        case "rm":
           return await this.rm(args);
-        case 'mv':
+        case "mv":
           return await this.mv(args[0], args[1]);
-        case 'touch':
+        case "touch":
           return await this.touch(args[0]);
-        case 'clear':
-          return { output: '\x1b[2J\x1b[H', exitCode: 0 };
-        case 'history':
+        case "clear":
+          return { output: "\x1b[2J\x1b[H", exitCode: 0 };
+        case "history":
           return await this.history();
-        case 'env':
+        case "env":
           return await this.env();
-        case 'whoami':
-          return { output: this.context.environment.USER + '\n', exitCode: 0 };
-        case 'help':
+        case "whoami":
+          return { output: this.context.environment.USER + "\n", exitCode: 0 };
+        case "help":
           return await this.help();
-        case 'node':
+        case "node":
           return await this.executeNode(args);
-        case 'npm':
+        case "npm":
           return await this.executeNpm(args);
         default:
           return {
             output: `bash: ${cmd}: command not found\n`,
             exitCode: 127,
-            error: 'Command not found',
+            error: "Command not found",
           };
       }
     } catch (error) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -93,23 +93,23 @@ class CommandProcessor {
   private parseCommand(command: string): string[] {
     // Simple parsing - split by spaces, respecting quotes
     const parts: string[] = [];
-    let current = '';
+    let current = "";
     let inQuotes = false;
-    let quoteChar = '';
+    let quoteChar = "";
 
     for (let i = 0; i < command.length; i++) {
       const char = command[i];
-      
+
       if ((char === '"' || char === "'") && !inQuotes) {
         inQuotes = true;
         quoteChar = char;
       } else if (char === quoteChar && inQuotes) {
         inQuotes = false;
-        quoteChar = '';
-      } else if (char === ' ' && !inQuotes) {
+        quoteChar = "";
+      } else if (char === " " && !inQuotes) {
         if (current) {
           parts.push(current);
-          current = '';
+          current = "";
         }
       } else {
         current += char;
@@ -125,53 +125,54 @@ class CommandProcessor {
 
   private async pwd(): Promise<CommandResult> {
     return {
-      output: this.context.currentDirectory + '\n',
+      output: this.context.currentDirectory + "\n",
       exitCode: 0,
     };
   }
 
   private async ls(args: string[]): Promise<CommandResult> {
-    const showAll = args.includes('-a') || args.includes('--all');
-    const longFormat = args.includes('-l') || args.includes('--long');
-    
-    const path = args.find(arg => !arg.startsWith('-')) || this.context.currentDirectory;
+    const showAll = args.includes("-a") || args.includes("--all");
+    const longFormat = args.includes("-l") || args.includes("--long");
+
+    const path =
+      args.find((arg) => !arg.startsWith("-")) || this.context.currentDirectory;
     const fullPath = this.resolvePath(path);
 
     try {
       const files = await vfs.listDirectory(fullPath);
-      
+
       if (files.length === 0) {
-        return { output: '', exitCode: 0 };
+        return { output: "", exitCode: 0 };
       }
 
-      let output = '';
-      
+      let output = "";
+
       if (longFormat) {
         for (const file of files) {
-          const type = file.type === 'directory' ? 'd' : '-';
-          const perms = file.type === 'directory' ? 'rwxr-xr-x' : 'rw-r--r--';
+          const type = file.type === "directory" ? "d" : "-";
+          const perms = file.type === "directory" ? "rwxr-xr-x" : "rw-r--r--";
           const size = file.size.toString().padStart(8);
-          const date = new Date(file.updatedAt).toLocaleDateString('en-US', {
-            month: 'short',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
+          const date = new Date(file.updatedAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
           });
-          const name = file.path.split('/').pop();
+          const name = file.path.split("/").pop();
           output += `${type}${perms} 1 ${this.context.environment.USER} ${size} ${date} ${name}\n`;
         }
       } else {
-        const names = files.map(f => {
-          const name = f.path.split('/').pop() || '';
-          return f.type === 'directory' ? `\x1b[34m${name}/\x1b[0m` : name;
+        const names = files.map((f) => {
+          const name = f.path.split("/").pop() || "";
+          return f.type === "directory" ? `\x1b[34m${name}/\x1b[0m` : name;
         });
-        output = names.join('  ') + '\n';
+        output = names.join("  ") + "\n";
       }
 
       return { output, exitCode: 0 };
     } catch (error) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
         error: `ls: cannot access '${path}': No such file or directory`,
       };
@@ -179,37 +180,37 @@ class CommandProcessor {
   }
 
   private async cd(path: string): Promise<CommandResult> {
-    if (!path || path === '~') {
+    if (!path || path === "~") {
       this.context.currentDirectory = this.context.environment.HOME;
-      return { output: '', exitCode: 0 };
+      return { output: "", exitCode: 0 };
     }
 
     const fullPath = this.resolvePath(path);
-    
+
     try {
       const file = await vfs.readFile(fullPath);
-      
+
       if (!file) {
         return {
-          output: '',
+          output: "",
           exitCode: 1,
           error: `cd: no such file or directory: ${path}`,
         };
       }
 
-      if (file.type !== 'directory') {
+      if (file.type !== "directory") {
         return {
-          output: '',
+          output: "",
           exitCode: 1,
           error: `cd: not a directory: ${path}`,
         };
       }
 
       this.context.currentDirectory = fullPath;
-      return { output: '', exitCode: 0 };
+      return { output: "", exitCode: 0 };
     } catch (error) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
         error: `cd: no such file or directory: ${path}`,
       };
@@ -219,37 +220,37 @@ class CommandProcessor {
   private async cat(path: string): Promise<CommandResult> {
     if (!path) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
-        error: 'cat: missing file operand',
+        error: "cat: missing file operand",
       };
     }
 
     const fullPath = this.resolvePath(path);
-    
+
     try {
       const file = await vfs.readFile(fullPath);
-      
+
       if (!file) {
         return {
-          output: '',
+          output: "",
           exitCode: 1,
           error: `cat: ${path}: No such file or directory`,
         };
       }
 
-      if (file.type === 'directory') {
+      if (file.type === "directory") {
         return {
-          output: '',
+          output: "",
           exitCode: 1,
           error: `cat: ${path}: Is a directory`,
         };
       }
 
-      return { output: file.content + '\n', exitCode: 0 };
+      return { output: file.content + "\n", exitCode: 0 };
     } catch (error) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
         error: `cat: ${path}: No such file or directory`,
       };
@@ -257,72 +258,72 @@ class CommandProcessor {
   }
 
   private async echo(text: string): Promise<CommandResult> {
-    return { output: text + '\n', exitCode: 0 };
+    return { output: text + "\n", exitCode: 0 };
   }
 
   private async mkdir(path: string): Promise<CommandResult> {
     if (!path) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
-        error: 'mkdir: missing operand',
+        error: "mkdir: missing operand",
       };
     }
 
     const fullPath = this.resolvePath(path);
-    
+
     try {
       await vfs.createDirectory(fullPath);
-      return { output: '', exitCode: 0 };
+      return { output: "", exitCode: 0 };
     } catch (error) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
-        error: error instanceof Error ? error.message : 'mkdir failed',
+        error: error instanceof Error ? error.message : "mkdir failed",
       };
     }
   }
 
   private async rm(args: string[]): Promise<CommandResult> {
-    const recursive = args.includes('-r') || args.includes('-rf');
-    const path = args.find(arg => !arg.startsWith('-'));
+    const recursive = args.includes("-r") || args.includes("-rf");
+    const path = args.find((arg) => !arg.startsWith("-"));
 
     if (!path) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
-        error: 'rm: missing operand',
+        error: "rm: missing operand",
       };
     }
 
     const fullPath = this.resolvePath(path);
-    
+
     try {
       const file = await vfs.readFile(fullPath);
-      
+
       if (!file) {
         return {
-          output: '',
+          output: "",
           exitCode: 1,
           error: `rm: cannot remove '${path}': No such file or directory`,
         };
       }
 
-      if (file.type === 'directory' && !recursive) {
+      if (file.type === "directory" && !recursive) {
         return {
-          output: '',
+          output: "",
           exitCode: 1,
           error: `rm: cannot remove '${path}': Is a directory`,
         };
       }
 
       await vfs.deleteFile(fullPath);
-      return { output: '', exitCode: 0 };
+      return { output: "", exitCode: 0 };
     } catch (error) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
-        error: error instanceof Error ? error.message : 'rm failed',
+        error: error instanceof Error ? error.message : "rm failed",
       };
     }
   }
@@ -330,23 +331,23 @@ class CommandProcessor {
   private async mv(source: string, dest: string): Promise<CommandResult> {
     if (!source || !dest) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
-        error: 'mv: missing file operand',
+        error: "mv: missing file operand",
       };
     }
 
     const sourcePath = this.resolvePath(source);
     const destPath = this.resolvePath(dest);
-    
+
     try {
       await vfs.renameFile(sourcePath, destPath);
-      return { output: '', exitCode: 0 };
+      return { output: "", exitCode: 0 };
     } catch (error) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
-        error: error instanceof Error ? error.message : 'mv failed',
+        error: error instanceof Error ? error.message : "mv failed",
       };
     }
   }
@@ -354,40 +355,41 @@ class CommandProcessor {
   private async touch(path: string): Promise<CommandResult> {
     if (!path) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
-        error: 'touch: missing file operand',
+        error: "touch: missing file operand",
       };
     }
 
     const fullPath = this.resolvePath(path);
-    
+
     try {
       const existing = await vfs.readFile(fullPath);
       if (!existing) {
-        await vfs.createFile(fullPath, '');
+        await vfs.createFile(fullPath, "");
       }
-      return { output: '', exitCode: 0 };
+      return { output: "", exitCode: 0 };
     } catch (error) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
-        error: error instanceof Error ? error.message : 'touch failed',
+        error: error instanceof Error ? error.message : "touch failed",
       };
     }
   }
 
   private async history(): Promise<CommandResult> {
-    const output = this.context.history
-      .map((cmd, i) => `${i + 1}  ${cmd}`)
-      .join('\n') + '\n';
+    const output =
+      this.context.history.map((cmd, i) => `${i + 1}  ${cmd}`).join("\n") +
+      "\n";
     return { output, exitCode: 0 };
   }
 
   private async env(): Promise<CommandResult> {
-    const output = Object.entries(this.context.environment)
-      .map(([key, value]) => `${key}=${value}`)
-      .join('\n') + '\n';
+    const output =
+      Object.entries(this.context.environment)
+        .map(([key, value]) => `${key}=${value}`)
+        .join("\n") + "\n";
     return { output, exitCode: 0 };
   }
 
@@ -417,19 +419,20 @@ Available commands:
   private async executeNode(args: string[]): Promise<CommandResult> {
     if (args.length === 0) {
       return {
-        output: 'Node.js REPL not yet implemented. Specify a file to execute.\n',
+        output:
+          "Node.js REPL not yet implemented. Specify a file to execute.\n",
         exitCode: 1,
       };
     }
 
     const filePath = this.resolvePath(args[0]);
-    
+
     try {
       const file = await vfs.readFile(filePath);
-      
+
       if (!file) {
         return {
-          output: '',
+          output: "",
           exitCode: 1,
           error: `node: cannot find file '${args[0]}'`,
         };
@@ -437,25 +440,25 @@ Available commands:
 
       // Simple eval execution (unsafe, for demo only)
       // In production, use WebAssembly or WebContainers
-      let output = '';
+      let output = "";
       const consoleLog = (...args: any[]) => {
-        output += args.map(String).join(' ') + '\n';
+        output += args.map(String).join(" ") + "\n";
       };
 
       try {
-        const func = new Function('console', file.content);
+        const func = new Function("console", file.content);
         func({ log: consoleLog, error: consoleLog, warn: consoleLog });
         return { output, exitCode: 0 };
       } catch (error) {
         return {
-          output: '',
+          output: "",
           exitCode: 1,
-          error: error instanceof Error ? error.message : 'Execution failed',
+          error: error instanceof Error ? error.message : "Execution failed",
         };
       }
     } catch (error) {
       return {
-        output: '',
+        output: "",
         exitCode: 1,
         error: `node: cannot find file '${args[0]}'`,
       };
@@ -466,18 +469,18 @@ Available commands:
     const [subcommand] = args;
 
     switch (subcommand) {
-      case 'init':
+      case "init":
         return {
-          output: 'npm init: Creating package.json...\n',
+          output: "npm init: Creating package.json...\n",
           exitCode: 0,
         };
-      case 'install':
-      case 'i':
+      case "install":
+      case "i":
         return {
           output: `npm: Installing packages...\n(Note: This is a simulated environment)\n`,
           exitCode: 0,
         };
-      case 'run':
+      case "run":
         return {
           output: `npm run: Script execution not yet implemented\n`,
           exitCode: 1,
@@ -491,38 +494,38 @@ Available commands:
   }
 
   private resolvePath(path: string): string {
-    if (path.startsWith('/')) {
+    if (path.startsWith("/")) {
       return path;
     }
 
-    if (path === '.') {
+    if (path === ".") {
       return this.context.currentDirectory;
     }
 
-    if (path === '..') {
-      const parts = this.context.currentDirectory.split('/').filter(Boolean);
+    if (path === "..") {
+      const parts = this.context.currentDirectory.split("/").filter(Boolean);
       parts.pop();
-      return '/' + parts.join('/');
+      return "/" + parts.join("/");
     }
 
-    if (path.startsWith('./')) {
+    if (path.startsWith("./")) {
       path = path.slice(2);
     }
 
-    if (path.startsWith('../')) {
+    if (path.startsWith("../")) {
       let result = this.context.currentDirectory;
-      while (path.startsWith('../')) {
-        const parts = result.split('/').filter(Boolean);
+      while (path.startsWith("../")) {
+        const parts = result.split("/").filter(Boolean);
         parts.pop();
-        result = '/' + parts.join('/');
+        result = "/" + parts.join("/");
         path = path.slice(3);
       }
-      return result + (path ? '/' + path : '');
+      return result + (path ? "/" + path : "");
     }
 
-    return this.context.currentDirectory === '/' 
-      ? '/' + path 
-      : this.context.currentDirectory + '/' + path;
+    return this.context.currentDirectory === "/"
+      ? "/" + path
+      : this.context.currentDirectory + "/" + path;
   }
 
   getCurrentDirectory(): string {

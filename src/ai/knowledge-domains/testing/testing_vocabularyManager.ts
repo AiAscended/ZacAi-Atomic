@@ -6,14 +6,16 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { safeParseJSON } from "./testing_utils"
-import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./testing_utils";
+import { storageAdapter } from "../storageAdapter";
 
-export const loadTestingSeedVocabulary = async (path = "/src/ai/knowledge-domains/testing/testing_seeds/testing_seedVocabulary.json") => {
+export const loadTestingSeedVocabulary = async (
+  path = "/src/ai/knowledge-domains/testing/testing_seeds/testing_seedVocabulary.json",
+) => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { frameworks: [] }) as { frameworks: string[] }
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { frameworks: [] }) as { frameworks: string[] };
   } catch (e) {
-    return { frameworks: [] }
+    return { frameworks: [] };
   }
-}
+};

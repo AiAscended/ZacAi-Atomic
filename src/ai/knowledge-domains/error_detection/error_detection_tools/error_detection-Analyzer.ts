@@ -8,7 +8,7 @@ export class ErrorDetectionAnalyzer {
     errors: Array<{
       line: number;
       message: string;
-      severity: 'error' | 'warning';
+      severity: "error" | "warning";
     }>;
     suggestions: string[];
   } {

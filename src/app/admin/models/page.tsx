@@ -4,10 +4,10 @@
  * Features: Hierarchical display, status indicators, configuration links
  */
 
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { useRouter } from "next/navigation"
+import { Card } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 import {
   Brain,
   Target,
@@ -23,24 +23,30 @@ import {
   Wand2,
   FileOutput,
   AlertCircle,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AIModel {
-  id: string
-  name: string
-  description: string
-  icon: React.ComponentType<{ className?: string }>
-  status: "active" | "inactive" | "training"
-  path: string
-  category: "orchestration" | "inference" | "training" | "monitoring" | "utility"
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  status: "active" | "inactive" | "training";
+  path: string;
+  category:
+    | "orchestration"
+    | "inference"
+    | "training"
+    | "monitoring"
+    | "utility";
 }
 
 const models: AIModel[] = [
   {
     id: "orchestrator",
     name: "Main Orchestrator",
-    description: "Coordinates all AI models, routes queries to appropriate domains",
+    description:
+      "Coordinates all AI models, routes queries to appropriate domains",
     icon: Brain,
     status: "active",
     path: "/admin/models/orchestrator",
@@ -58,7 +64,8 @@ const models: AIModel[] = [
   {
     id: "domain-router",
     name: "Domain Router",
-    description: "Routes queries to relevant knowledge domains based on content analysis",
+    description:
+      "Routes queries to relevant knowledge domains based on content analysis",
     icon: Route,
     status: "active",
     path: "/admin/models/domain-router",
@@ -76,7 +83,8 @@ const models: AIModel[] = [
   {
     id: "context-enhancer",
     name: "Context Enhancer",
-    description: "Enriches prompts with session history and contextual information",
+    description:
+      "Enriches prompts with session history and contextual information",
     icon: Sparkles,
     status: "active",
     path: "/admin/models/context-enhancer",
@@ -85,7 +93,8 @@ const models: AIModel[] = [
   {
     id: "knowledge-retriever",
     name: "Knowledge Retriever",
-    description: "RAG system for retrieving relevant information from knowledge base",
+    description:
+      "RAG system for retrieving relevant information from knowledge base",
     icon: Database,
     status: "active",
     path: "/admin/models/knowledge-retriever",
@@ -94,7 +103,8 @@ const models: AIModel[] = [
   {
     id: "safety-validator",
     name: "Safety Validator",
-    description: "Validates inputs and outputs for safety, content policy compliance",
+    description:
+      "Validates inputs and outputs for safety, content policy compliance",
     icon: Shield,
     status: "active",
     path: "/admin/models/safety-validator",
@@ -130,7 +140,8 @@ const models: AIModel[] = [
   {
     id: "tool-registry",
     name: "Tool Registry",
-    description: "Manages available tools and their execution for function calling",
+    description:
+      "Manages available tools and their execution for function calling",
     icon: Wrench,
     status: "active",
     path: "/admin/models/tool-registry",
@@ -139,7 +150,8 @@ const models: AIModel[] = [
   {
     id: "prompt-builder",
     name: "Prompt Builder",
-    description: "Constructs optimized prompts for different models and contexts",
+    description:
+      "Constructs optimized prompts for different models and contexts",
     icon: Wand2,
     status: "active",
     path: "/admin/models/prompt-builder",
@@ -148,7 +160,8 @@ const models: AIModel[] = [
   {
     id: "output-formatter",
     name: "Output Formatter",
-    description: "Formats responses for optimal display with code/text separation",
+    description:
+      "Formats responses for optimal display with code/text separation",
     icon: FileOutput,
     status: "active",
     path: "/admin/models/output-formatter",
@@ -163,7 +176,7 @@ const models: AIModel[] = [
     path: "/admin/models/error-handler",
     category: "utility",
   },
-]
+];
 
 const categories = {
   orchestration: { label: "Orchestration", color: "text-purple-500" },
@@ -171,26 +184,26 @@ const categories = {
   training: { label: "Training", color: "text-orange-500" },
   monitoring: { label: "Monitoring", color: "text-green-500" },
   utility: { label: "Utility", color: "text-gray-500" },
-}
+};
 
 const statusColors = {
   active: "bg-green-500",
   inactive: "bg-gray-400",
   training: "bg-orange-500",
-}
+};
 
 export default function ModelsPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleModelClick = (path: string) => {
-    router.push(path)
-  }
+    router.push(path);
+  };
 
   const modelsByCategory = Object.keys(categories).map((category) => ({
     category,
     label: categories[category as keyof typeof categories].label,
     models: models.filter((m) => m.category === category),
-  }))
+  }));
 
   return (
     <div className="space-y-6">
@@ -198,7 +211,8 @@ export default function ModelsPage() {
         <div>
           <h1 className="text-3xl font-bold">AI Models</h1>
           <p className="text-muted-foreground mt-1">
-            {models.filter((m) => m.status === "active").length} active models • {models.length} total
+            {models.filter((m) => m.status === "active").length} active models •{" "}
+            {models.length} total
           </p>
         </div>
       </div>
@@ -206,12 +220,17 @@ export default function ModelsPage() {
       {modelsByCategory.map(({ category, label, models: categoryModels }) =>
         categoryModels.length > 0 ? (
           <div key={category} className="space-y-3">
-            <h2 className={cn("text-xl font-semibold", categories[category as keyof typeof categories].color)}>
+            <h2
+              className={cn(
+                "text-xl font-semibold",
+                categories[category as keyof typeof categories].color,
+              )}
+            >
               {label}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {categoryModels.map((model) => {
-                const Icon = model.icon
+                const Icon = model.icon;
                 return (
                   <Card
                     key={model.id}
@@ -224,19 +243,28 @@ export default function ModelsPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-sm truncate">{model.name}</h3>
-                          <div className={cn("h-2 w-2 rounded-full flex-shrink-0", statusColors[model.status])} />
+                          <h3 className="font-semibold text-sm truncate">
+                            {model.name}
+                          </h3>
+                          <div
+                            className={cn(
+                              "h-2 w-2 rounded-full flex-shrink-0",
+                              statusColors[model.status],
+                            )}
+                          />
                         </div>
-                        <p className="text-xs text-muted-foreground line-clamp-2">{model.description}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {model.description}
+                        </p>
                       </div>
                     </div>
                   </Card>
-                )
+                );
               })}
             </div>
           </div>
         ) : null,
       )}
     </div>
-  )
+  );
 }

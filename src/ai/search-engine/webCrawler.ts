@@ -7,11 +7,11 @@
  */
 
 export interface CrawlResult {
-  url: string
-  title: string
-  content: string
-  links: string[]
-  timestamp: number
+  url: string;
+  title: string;
+  content: string;
+  links: string[];
+  timestamp: number;
 }
 
 /**
@@ -21,12 +21,12 @@ export interface CrawlResult {
  */
 export async function crawlUrl(url: string): Promise<CrawlResult> {
   try {
-    const response = await fetch(url)
-    const html = await response.text()
+    const response = await fetch(url);
+    const html = await response.text();
 
     // Extract title
-    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i)
-    const title = titleMatch ? titleMatch[1].trim() : "Untitled"
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    const title = titleMatch ? titleMatch[1].trim() : "Untitled";
 
     // Extract text content (remove HTML tags)
     const content = html
@@ -35,14 +35,14 @@ export async function crawlUrl(url: string): Promise<CrawlResult> {
       .replace(/<[^>]+>/g, " ")
       .replace(/\s+/g, " ")
       .trim()
-      .substring(0, 5000) // Limit content length
+      .substring(0, 5000); // Limit content length
 
     // Extract links
-    const linkMatches = html.matchAll(/<a[^>]+href=["']([^"']+)["']/gi)
+    const linkMatches = html.matchAll(/<a[^>]+href=["']([^"']+)["']/gi);
     const links = Array.from(linkMatches)
       .map((match) => match[1])
       .filter((link) => link.startsWith("http"))
-      .slice(0, 50) // Limit links
+      .slice(0, 50); // Limit links
 
     return {
       url,
@@ -50,15 +50,15 @@ export async function crawlUrl(url: string): Promise<CrawlResult> {
       content,
       links,
       timestamp: Date.now(),
-    }
+    };
   } catch (error) {
-    console.error(`[webCrawler] Failed to crawl ${url}:`, error)
+    console.error(`[webCrawler] Failed to crawl ${url}:`, error);
     return {
       url,
       title: "Error",
       content: "",
       links: [],
       timestamp: Date.now(),
-    }
+    };
   }
 }

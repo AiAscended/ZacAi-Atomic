@@ -3,27 +3,27 @@
  * Handles error detection, debugging, and code repair queries
  */
 
-import { DOMAIN_NAME } from './repair_constants';
+import { DOMAIN_NAME } from "./repair_constants";
 
 export const repairRunInference = async (input: string, _context?: any) => {
   const lowerInput = input.toLowerCase();
-  
-  let responseText = '';
+
+  let responseText = "";
   let confidence = 0.7;
   const sources: string[] = [];
 
   // Detect repair/debugging keywords
   if (
-    lowerInput.includes('error') ||
-    lowerInput.includes('bug') ||
-    lowerInput.includes('fix') ||
-    lowerInput.includes('debug') ||
-    lowerInput.includes('repair') ||
-    lowerInput.includes('broken') ||
-    lowerInput.includes('not working')
+    lowerInput.includes("error") ||
+    lowerInput.includes("bug") ||
+    lowerInput.includes("fix") ||
+    lowerInput.includes("debug") ||
+    lowerInput.includes("repair") ||
+    lowerInput.includes("broken") ||
+    lowerInput.includes("not working")
   ) {
     confidence = 0.85;
-    
+
     responseText = `I can help you debug and fix issues. To provide the best assistance, please share:
 
 1. **Error Message**: What error are you seeing?

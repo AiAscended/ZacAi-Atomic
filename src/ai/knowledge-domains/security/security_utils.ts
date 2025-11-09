@@ -8,18 +8,23 @@
 
 export const safeParseJSON = <T = unknown>(s: string, fallback: T): T => {
   try {
-    return JSON.parse(s) as T
+    return JSON.parse(s) as T;
   } catch (e) {
-    return fallback
+    return fallback;
   }
-}
+};
 
-export const normalizeText = (t: string) => t.replace(/\s+/g, " ").trim()
+export const normalizeText = (t: string) => t.replace(/\s+/g, " ").trim();
 
 export const detectSecurityIssues = (code: string): string[] => {
-  const issues: string[] = []
-  if (/eval\(|innerHTML|dangerouslySetInnerHTML/.test(code)) issues.push("XSS")
-  if (/SELECT.*FROM.*WHERE/i.test(code) && !/prepared|parameterized/i.test(code)) issues.push("SQL_INJECTION")
-  if (/password|secret|api_key/i.test(code) && /=\s*["'][^"']+["']/.test(code)) issues.push("HARDCODED_SECRET")
-  return issues
-}
+  const issues: string[] = [];
+  if (/eval\(|innerHTML|dangerouslySetInnerHTML/.test(code)) issues.push("XSS");
+  if (
+    /SELECT.*FROM.*WHERE/i.test(code) &&
+    !/prepared|parameterized/i.test(code)
+  )
+    issues.push("SQL_INJECTION");
+  if (/password|secret|api_key/i.test(code) && /=\s*["'][^"']+["']/.test(code))
+    issues.push("HARDCODED_SECRET");
+  return issues;
+};

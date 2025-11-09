@@ -7,8 +7,8 @@
  */
 
 export const normalizeText = (text: string): string => {
-  return text.trim().replace(/\s+/g, " ").toLowerCase()
-}
+  return text.trim().replace(/\s+/g, " ").toLowerCase();
+};
 
 export const detectGitPatterns = (code: string) => {
   const patterns = {
@@ -18,21 +18,21 @@ export const detectGitPatterns = (code: string) => {
     rebase: /git rebase|rebase -i|rebase --continue/gi,
     pull: /git pull|pull --rebase|pull origin/gi,
     push: /git push|push origin|push -f/gi,
-  }
+  };
 
-  const detected: string[] = []
+  const detected: string[] = [];
   for (const [operation, pattern] of Object.entries(patterns)) {
     if (pattern.test(code)) {
-      detected.push(operation)
+      detected.push(operation);
     }
   }
-  return detected
-}
+  return detected;
+};
 
 export const safeParseJSON = (text: string, fallback: unknown = {}) => {
   try {
-    return JSON.parse(text)
+    return JSON.parse(text);
   } catch {
-    return fallback
+    return fallback;
   }
-}
+};

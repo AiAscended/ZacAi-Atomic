@@ -14,8 +14,8 @@ export interface CODEModelConfig {
 }
 
 export const defaultCODEConfig: CODEModelConfig = {
-  modelName: 'code-transformer',
-  version: '1.0.0',
+  modelName: "code-transformer",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

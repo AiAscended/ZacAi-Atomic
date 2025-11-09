@@ -1,20 +1,25 @@
-import { storageAdapter } from "../storageAdapter"
-import { safeParseJSON } from "./general_knowledge_utils"
+import { storageAdapter } from "../storageAdapter";
+import { safeParseJSON } from "./general_knowledge_utils";
 
-export const loadGeneralLearnedData = async (path = "/src/ai/knowledge-domains/general/general_learned/general_learnedData.json") => {
+export const loadGeneralLearnedData = async (
+  path = "/src/ai/knowledge-domains/general/general_learned/general_learnedData.json",
+) => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { notes: [], concepts: {} })
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { notes: [], concepts: {} });
   } catch (e) {
-    return { notes: [], concepts: {} }
+    return { notes: [], concepts: {} };
   }
-}
+};
 
-export const saveGeneralLearnedData = async (data: unknown, path = "/src/ai/knowledge-domains/general/general_learned/general_learnedData.json") => {
+export const saveGeneralLearnedData = async (
+  data: unknown,
+  path = "/src/ai/knowledge-domains/general/general_learned/general_learnedData.json",
+) => {
   try {
-    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
-    return true
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2));
+    return true;
   } catch (e) {
-    return false
+    return false;
   }
-}
+};

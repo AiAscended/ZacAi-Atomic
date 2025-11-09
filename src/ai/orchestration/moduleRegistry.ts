@@ -12,7 +12,11 @@ interface RegistryEntry {
 
 const registry = new Map<string, RegistryEntry>();
 
-export const registerModule = (name: string, factory: ModuleFactory, version?: string) => {
+export const registerModule = (
+  name: string,
+  factory: ModuleFactory,
+  version?: string,
+) => {
   registry.set(name, { name, version, factory });
 };
 

@@ -6,50 +6,56 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { nextjsTokenMap } from "./nextjs_tokenMap"
-import { NEXTJS_SPECIAL_TOKENS } from "./nextjs_tokens"
+import { nextjsTokenMap } from "./nextjs_tokenMap";
+import { NEXTJS_SPECIAL_TOKENS } from "./nextjs_tokens";
 
 export interface TokenizedNextjsInput {
-  tokens: string[]
-  tokenIds: number[]
-  originalText: string
+  tokens: string[];
+  tokenIds: number[];
+  originalText: string;
 }
 
 export function tokenizeNextjsInput(input: string): TokenizedNextjsInput {
-  const normalized = input.toLowerCase().trim()
+  const normalized = input.toLowerCase().trim();
 
-  const rawTokens = normalized.split(/[\s,;.(){}[\]<>]+/).filter((t) => t.length > 0)
+  const rawTokens = normalized
+    .split(/[\s,;.(){}[\]<>]+/)
+    .filter((t) => t.length > 0);
 
-  const tokens: string[] = []
-  const tokenIds: number[] = [NEXTJS_SPECIAL_TOKENS.BOS]
+  const tokens: string[] = [];
+  const tokenIds: number[] = [NEXTJS_SPECIAL_TOKENS.BOS];
 
   for (const rawToken of rawTokens) {
-    tokens.push(rawToken)
-    tokenIds.push(nextjsTokenMap.getTokenId(rawToken))
+    tokens.push(rawToken);
+    tokenIds.push(nextjsTokenMap.getTokenId(rawToken));
   }
 
-  tokenIds.push(NEXTJS_SPECIAL_TOKENS.EOS)
+  tokenIds.push(NEXTJS_SPECIAL_TOKENS.EOS);
 
   return {
     tokens,
     tokenIds,
     originalText: input,
-  }
+  };
 }
 
 export function detokenizeNextjsOutput(tokenIds: number[]): string {
-  const tokens: string[] = []
+  const tokens: string[] = [];
 
   for (const id of tokenIds) {
-    if (id === NEXTJS_SPECIAL_TOKENS.PAD || id === NEXTJS_SPECIAL_TOKENS.BOS || id === NEXTJS_SPECIAL_TOKENS.EOS) {
-      continue
+    if (
+      id === NEXTJS_SPECIAL_TOKENS.PAD ||
+      id === NEXTJS_SPECIAL_TOKENS.BOS ||
+      id === NEXTJS_SPECIAL_TOKENS.EOS
+    ) {
+      continue;
     }
 
-    const token = nextjsTokenMap.getToken(id)
+    const token = nextjsTokenMap.getToken(id);
     if (token) {
-      tokens.push(token.text)
+      tokens.push(token.text);
     }
   }
 
-  return tokens.join(" ")
+  return tokens.join(" ");
 }

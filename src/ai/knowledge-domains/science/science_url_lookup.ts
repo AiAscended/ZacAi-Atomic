@@ -6,12 +6,27 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerSource } from "../url_lookup"
+import { registerSource } from "../url_lookup";
 
-registerSource("science", "Khan Academy", "https://www.khanacademy.org/science", "Science education")
-registerSource("science", "Nature", "https://www.nature.com", "Scientific research journal")
-registerSource("science", "ScienceDirect", "https://www.sciencedirect.com", "Scientific database")
+registerSource(
+  "science",
+  "Khan Academy",
+  "https://www.khanacademy.org/science",
+  "Science education",
+);
+registerSource(
+  "science",
+  "Nature",
+  "https://www.nature.com",
+  "Scientific research journal",
+);
+registerSource(
+  "science",
+  "ScienceDirect",
+  "https://www.sciencedirect.com",
+  "Scientific database",
+);
 
-export const scienceSources = () => registerSource
+export const scienceSources = () => registerSource;
 
-export default scienceSources
+export default scienceSources;

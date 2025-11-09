@@ -1,2 +1,4 @@
 /** LLM Inference Tests */
-test("inference generation", () => { expect(true).toBe(true); });
+test("inference generation", () => {
+  expect(true).toBe(true);
+});

@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface EditorTab {
   id: string;
@@ -14,9 +14,14 @@ export interface EditorTab {
 interface EditorState {
   tabs: EditorTab[];
   activeTabId: string | null;
-  
+
   // Actions
-  openFile: (path: string, title: string, content: string, language: string) => void;
+  openFile: (
+    path: string,
+    title: string,
+    content: string,
+    language: string,
+  ) => void;
   closeTab: (tabId: string) => void;
   closeAllTabs: () => void;
   closeOtherTabs: (tabId: string) => void;
@@ -37,7 +42,7 @@ export const useEditorStore = create<EditorState>()(
 
       openFile: (path, title, content, language) => {
         const state = get();
-        
+
         // Check if file is already open
         const existingTab = state.tabs.find((tab) => tab.path === path);
         if (existingTab) {
@@ -103,7 +108,7 @@ export const useEditorStore = create<EditorState>()(
       updateTabContent: (tabId, content) => {
         set((state) => ({
           tabs: state.tabs.map((tab) =>
-            tab.id === tabId ? { ...tab, content, isDirty: true } : tab
+            tab.id === tabId ? { ...tab, content, isDirty: true } : tab,
           ),
         }));
       },
@@ -111,7 +116,7 @@ export const useEditorStore = create<EditorState>()(
       markTabDirty: (tabId, isDirty) => {
         set((state) => ({
           tabs: state.tabs.map((tab) =>
-            tab.id === tabId ? { ...tab, isDirty } : tab
+            tab.id === tabId ? { ...tab, isDirty } : tab,
           ),
         }));
       },
@@ -121,7 +126,7 @@ export const useEditorStore = create<EditorState>()(
           tabs: state.tabs.map((tab) =>
             tab.id === tabId
               ? { ...tab, cursorPosition: { line, column } }
-              : tab
+              : tab,
           ),
         }));
       },
@@ -141,14 +146,14 @@ export const useEditorStore = create<EditorState>()(
       },
     }),
     {
-      name: 'zacai-editor-store',
+      name: "zacai-editor-store",
       partialize: (state) => ({
-        tabs: state.tabs.map(tab => ({
+        tabs: state.tabs.map((tab) => ({
           ...tab,
-          content: '', // Don't persist content to avoid localStorage quota
+          content: "", // Don't persist content to avoid localStorage quota
         })),
         activeTabId: state.activeTabId,
       }),
-    }
-  )
+    },
+  ),
 );

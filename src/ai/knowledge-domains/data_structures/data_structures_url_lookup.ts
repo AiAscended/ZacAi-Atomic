@@ -6,15 +6,20 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-const { registerSource } = require("../url_lookup")
+import { registerSource } from "../url_lookup";
 
 registerSource(
   "data_structures",
   "GeeksforGeeks DS",
   "https://www.geeksforgeeks.org/data-structures/",
   "Data structures",
-)
-registerSource("data_structures", "Visualgo", "https://visualgo.net/", "Data structure visualizations")
+);
+registerSource(
+  "data_structures",
+  "Visualgo",
+  "https://visualgo.net/",
+  "Data structure visualizations",
+);
 
-export const dataStructuresSources = () => registerSource
-export default dataStructuresSources
+export const dataStructuresSources = () => registerSource;
+export default dataStructuresSources;

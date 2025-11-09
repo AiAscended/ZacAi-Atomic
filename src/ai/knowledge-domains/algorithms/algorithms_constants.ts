@@ -6,5 +6,6 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-export const ALGORITHMS_DOMAIN = "algorithms"
-export const ALGORITHMS_VOCAB_PATH = "/src/ai/knowledge-domains/algorithms/algorithms_seeds/algorithms_seedVocabulary.json"
+export const ALGORITHMS_DOMAIN = "algorithms";
+export const ALGORITHMS_VOCAB_PATH =
+  "/src/ai/knowledge-domains/algorithms/algorithms_seeds/algorithms_seedVocabulary.json";

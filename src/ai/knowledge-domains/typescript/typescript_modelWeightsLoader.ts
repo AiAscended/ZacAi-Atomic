@@ -12,9 +12,9 @@ export function loadTypescriptModelWeights(
   try {
     // In production, this would load actual binary weights
     // For MVP, return null to indicate no weights loaded yet
-    return null
+    return null;
   } catch (error) {
-    console.error("[TypeScript] Failed to load model weights:", error)
-    return null
+    console.error("[TypeScript] Failed to load model weights:", error);
+    return null;
   }
 }

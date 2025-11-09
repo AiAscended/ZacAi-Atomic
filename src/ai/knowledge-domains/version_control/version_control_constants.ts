@@ -6,5 +6,6 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-export const VERSION_CONTROL_DOMAIN = "version_control"
-export const VERSION_CONTROL_VOCAB_PATH = "/src/ai/knowledge-domains/version_control/version_control_seeds/version_control_seedVocabulary.json"
+export const VERSION_CONTROL_DOMAIN = "version_control";
+export const VERSION_CONTROL_VOCAB_PATH =
+  "/src/ai/knowledge-domains/version_control/version_control_seeds/version_control_seedVocabulary.json";

@@ -3,13 +3,13 @@
  * Orchestrates model training and fine-tuning
  */
 
-"use client"
+"use client";
 
-import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage"
+import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage";
 
 export default function TrainingCoordinatorPage() {
   return (
-    <ModelSettingsPage 
+    <ModelSettingsPage
       modelName="training-coordinator"
       modelTitle="Training Coordinator"
       modelDescription="Coordinates and schedules training jobs across models and domains"
@@ -19,8 +19,8 @@ export default function TrainingCoordinatorPage() {
         maxEpochs: 10,
         checkpointInterval: 1000,
         enableDistributed: false,
-        gpuAllocation: "auto"
+        gpuAllocation: "auto",
       }}
     />
-  )
+  );
 }

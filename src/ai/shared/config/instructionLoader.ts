@@ -1,7 +1,7 @@
 /**
  * File: src/ai/shared/config/instructionLoader.ts
  * Purpose: Load and parse domain/model/orchestrator instruction files
- * 
+ *
  * Supports: YAML, JSON, XML
  * Used by: Inference engines, tokenizers, training pipelines, orchestrator
  */
@@ -68,23 +68,25 @@ export interface BaseTokens {
 export class InstructionLoader {
   private cache: Map<string, { data: unknown; timestamp: number }> = new Map();
   private cacheTTL = 300000; // 5 minutes
-  
+
   /**
    * Load domain instructions (YAML)
    */
-  async loadDomainInstructions(domainId: string): Promise<InstructionSet | null> {
+  async loadDomainInstructions(
+    domainId: string,
+  ): Promise<InstructionSet | null> {
     const filePath = path.join(
       process.cwd(),
       "src",
       "ai",
       "knowledge-domains",
       domainId,
-      "domain-instructions.yaml"
+      "domain-instructions.yaml",
     );
-    
+
     return await this.loadYAML<InstructionSet>(filePath);
   }
-  
+
   /**
    * Load domain URL configuration (JSON)
    */
@@ -95,12 +97,12 @@ export class InstructionLoader {
       "ai",
       "knowledge-domains",
       domainId,
-      "url-lookup.json"
+      "url-lookup.json",
     );
-    
+
     return await this.loadJSON<URLConfig>(filePath);
   }
-  
+
   /**
    * Load model instructions (YAML)
    */
@@ -111,12 +113,12 @@ export class InstructionLoader {
       "ai",
       "models",
       modelId,
-      "model-instructions.yaml"
+      "model-instructions.yaml",
     );
-    
+
     return await this.loadYAML<InstructionSet>(filePath);
   }
-  
+
   /**
    * Load orchestrator system instructions (YAML)
    */
@@ -126,12 +128,12 @@ export class InstructionLoader {
       "src",
       "ai",
       "orchestration",
-      "system-instructions.yaml"
+      "system-instructions.yaml",
     );
-    
+
     return await this.loadYAML<InstructionSet>(filePath);
   }
-  
+
   /**
    * Load orchestrator base tokens (JSON)
    */
@@ -141,38 +143,39 @@ export class InstructionLoader {
       "src",
       "ai",
       "orchestration",
-      "system-base-tokens.json"
+      "system-base-tokens.json",
     );
-    
+
     return await this.loadJSON<BaseTokens>(filePath);
   }
-  
+
   /**
    * Load custom uploaded instructions (any format)
    */
   async loadCustomInstructions(
     moduleType: "domain" | "model" | "orchestrator",
     moduleId: string,
-    filename: string
+    filename: string,
   ): Promise<unknown | null> {
-    const baseDir = moduleType === "domain" 
-      ? "knowledge-domains"
-      : moduleType === "model"
-      ? "models"
-      : "orchestration";
-    
+    const baseDir =
+      moduleType === "domain"
+        ? "knowledge-domains"
+        : moduleType === "model"
+          ? "models"
+          : "orchestration";
+
     const filePath = path.join(
       process.cwd(),
       "src",
       "ai",
       baseDir,
       moduleType === "orchestrator" ? "" : moduleId,
-      filename
+      filename,
     );
-    
+
     // Determine format from extension
     const ext = path.extname(filename).toLowerCase();
-    
+
     switch (ext) {
       case ".yaml":
       case ".yml":
@@ -185,7 +188,7 @@ export class InstructionLoader {
         return await this.loadText(filePath);
     }
   }
-  
+
   /**
    * Load YAML file
    */
@@ -193,21 +196,21 @@ export class InstructionLoader {
     // Check cache first
     const cached = this.getFromCache(filePath);
     if (cached) return cached as T;
-    
+
     try {
       const content = await fs.readFile(filePath, "utf8");
       const data = yaml.parse(content);
-      
+
       // Add to cache
       this.addToCache(filePath, data);
-      
+
       return data as T;
     } catch (error) {
       console.warn(`Failed to load YAML file: ${filePath}`, error);
       return null;
     }
   }
-  
+
   /**
    * Load JSON file
    */
@@ -215,21 +218,21 @@ export class InstructionLoader {
     // Check cache first
     const cached = this.getFromCache(filePath);
     if (cached) return cached as T;
-    
+
     try {
       const content = await fs.readFile(filePath, "utf8");
       const data = JSON.parse(content);
-      
+
       // Add to cache
       this.addToCache(filePath, data);
-      
+
       return data as T;
     } catch (error) {
       console.warn(`Failed to load JSON file: ${filePath}`, error);
       return null;
     }
   }
-  
+
   /**
    * Load XML file (basic parsing)
    */
@@ -237,24 +240,24 @@ export class InstructionLoader {
     // Check cache first
     const cached = this.getFromCache(filePath);
     if (cached) return cached;
-    
+
     try {
       const content = await fs.readFile(filePath, "utf8");
-      
+
       // Basic XML to JSON conversion (simplified)
       // For production, use a proper XML parser like 'fast-xml-parser'
       const data = { raw: content };
-      
+
       // Add to cache
       this.addToCache(filePath, data);
-      
+
       return data;
     } catch (error) {
       console.warn(`Failed to load XML file: ${filePath}`, error);
       return null;
     }
   }
-  
+
   /**
    * Load text file
    */
@@ -266,24 +269,24 @@ export class InstructionLoader {
       return null;
     }
   }
-  
+
   /**
    * Get from cache
    */
   private getFromCache(key: string): unknown | null {
     const cached = this.cache.get(key);
-    
+
     if (!cached) return null;
-    
+
     const now = Date.now();
     if (now - cached.timestamp > this.cacheTTL) {
       this.cache.delete(key);
       return null;
     }
-    
+
     return cached.data;
   }
-  
+
   /**
    * Add to cache
    */
@@ -293,21 +296,24 @@ export class InstructionLoader {
       timestamp: Date.now(),
     });
   }
-  
+
   /**
    * Clear cache
    */
   clearCache(): void {
     this.cache.clear();
   }
-  
+
   /**
    * Get instruction field (helper)
    */
-  getInstructionField(instructions: InstructionSet, fieldPath: string): unknown {
+  getInstructionField(
+    instructions: InstructionSet,
+    fieldPath: string,
+  ): unknown {
     const parts = fieldPath.split(".");
     let current: unknown = instructions;
-    
+
     for (const part of parts) {
       if (current && typeof current === "object" && part in current) {
         current = (current as Record<string, unknown>)[part];
@@ -315,7 +321,7 @@ export class InstructionLoader {
         return null;
       }
     }
-    
+
     return current;
   }
 }
@@ -345,7 +351,7 @@ export async function loadDomainConfig(domainId: string): Promise<{
   urlConfig: URLConfig | null;
 }> {
   const loader = getInstructionLoader();
-  
+
   return {
     instructions: await loader.loadDomainInstructions(domainId),
     urlConfig: await loader.loadURLConfig(domainId),
@@ -360,7 +366,7 @@ export async function loadOrchestratorConfig(): Promise<{
   tokens: BaseTokens | null;
 }> {
   const loader = getInstructionLoader();
-  
+
   return {
     instructions: await loader.loadSystemInstructions(),
     tokens: await loader.loadSystemTokens(),

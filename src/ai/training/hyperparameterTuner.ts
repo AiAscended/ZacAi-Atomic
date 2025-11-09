@@ -7,19 +7,19 @@
  */
 
 export interface HyperparameterConfig {
-  learningRate?: number[]
-  batchSize?: number[]
-  epochs?: number[]
-  dropout?: number[]
-  hiddenSize?: number[]
-  numLayers?: number[]
-  [key: string]: number[] | undefined
+  learningRate?: number[];
+  batchSize?: number[];
+  epochs?: number[];
+  dropout?: number[];
+  hiddenSize?: number[];
+  numLayers?: number[];
+  [key: string]: number[] | undefined;
 }
 
 export interface TuningResult {
-  params: Record<string, number>
-  score: number
-  metrics?: Record<string, number>
+  params: Record<string, number>;
+  score: number;
+  metrics?: Record<string, number>;
 }
 
 /**
@@ -32,29 +32,34 @@ export function gridSearch(
   searchSpace: HyperparameterConfig,
   evalFn: (params: Record<string, number>) => number,
 ): TuningResult[] {
-  const keys = Object.keys(searchSpace).filter((k) => searchSpace[k] !== undefined)
-  const results: TuningResult[] = []
+  const keys = Object.keys(searchSpace).filter(
+    (k) => searchSpace[k] !== undefined,
+  );
+  const results: TuningResult[] = [];
 
-  function recursiveSearch(idx: number, currentParams: Record<string, number>): void {
+  function recursiveSearch(
+    idx: number,
+    currentParams: Record<string, number>,
+  ): void {
     if (idx === keys.length) {
-      const score = evalFn(currentParams)
-      results.push({ params: { ...currentParams }, score })
-      return
+      const score = evalFn(currentParams);
+      results.push({ params: { ...currentParams }, score });
+      return;
     }
 
-    const key = keys[idx]
-    const values = searchSpace[key]
-    if (!values) return
+    const key = keys[idx];
+    const values = searchSpace[key];
+    if (!values) return;
 
     for (const value of values) {
-      currentParams[key] = value
-      recursiveSearch(idx + 1, currentParams)
+      currentParams[key] = value;
+      recursiveSearch(idx + 1, currentParams);
     }
   }
 
-  recursiveSearch(0, {})
-  results.sort((a, b) => b.score - a.score)
-  return results
+  recursiveSearch(0, {});
+  results.sort((a, b) => b.score - a.score);
+  return results;
 }
 
 /**
@@ -69,26 +74,28 @@ export function randomSearch(
   evalFn: (params: Record<string, number>) => number,
   numTrials = 20,
 ): TuningResult[] {
-  const keys = Object.keys(searchSpace).filter((k) => searchSpace[k] !== undefined)
-  const results: TuningResult[] = []
+  const keys = Object.keys(searchSpace).filter(
+    (k) => searchSpace[k] !== undefined,
+  );
+  const results: TuningResult[] = [];
 
   for (let i = 0; i < numTrials; i++) {
-    const params: Record<string, number> = {}
+    const params: Record<string, number> = {};
 
     for (const key of keys) {
-      const values = searchSpace[key]
+      const values = searchSpace[key];
       if (values && values.length > 0) {
-        const randomIndex = Math.floor(Math.random() * values.length)
-        params[key] = values[randomIndex]
+        const randomIndex = Math.floor(Math.random() * values.length);
+        params[key] = values[randomIndex];
       }
     }
 
-    const score = evalFn(params)
-    results.push({ params, score })
+    const score = evalFn(params);
+    results.push({ params, score });
   }
 
-  results.sort((a, b) => b.score - a.score)
-  return results
+  results.sort((a, b) => b.score - a.score);
+  return results;
 }
 
 /**
@@ -96,9 +103,9 @@ export function randomSearch(
  */
 export function getBestParams(results: TuningResult[]): Record<string, number> {
   if (results.length === 0) {
-    return {}
+    return {};
   }
-  return results[0].params
+  return results[0].params;
 }
 
 /**
@@ -111,4 +118,4 @@ export const defaultSearchSpace: HyperparameterConfig = {
   dropout: [0.1, 0.2, 0.3],
   hiddenSize: [128, 256, 512],
   numLayers: [2, 4, 6],
-}
+};

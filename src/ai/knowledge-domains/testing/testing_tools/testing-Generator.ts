@@ -4,13 +4,16 @@
  */
 
 export class TestingGenerator {
-  generate(_code: string, _framework: string = 'jest'): {
+  generate(
+    _code: string,
+    _framework: string = "jest",
+  ): {
     tests: string;
     coverage: number;
   } {
     // Placeholder implementation
     return {
-      tests: '',
+      tests: "",
       coverage: 0,
     };
   }

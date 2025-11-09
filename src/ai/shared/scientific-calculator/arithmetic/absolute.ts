@@ -13,7 +13,7 @@
  * @example abs(-5) // returns 5
  */
 export function abs(n: number): number {
-  return Math.abs(n)
+  return Math.abs(n);
 }
 
 /**
@@ -22,5 +22,5 @@ export function abs(n: number): number {
  * @returns 1 if positive, -1 if negative, 0 if zero
  */
 export function sign(n: number): number {
-  return Math.sign(n)
+  return Math.sign(n);
 }

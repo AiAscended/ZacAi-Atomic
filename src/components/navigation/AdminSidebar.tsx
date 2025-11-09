@@ -4,11 +4,11 @@
  * UX: X button inside menu, stays open for quick navigation, pushes content
  */
 
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { usePathname, useRouter } from "next/navigation"
+import type React from "react";
+import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Database,
@@ -23,16 +23,16 @@ import {
   Plug,
   MessageSquare,
   X,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface MenuItem {
-  id: string
-  label: string
-  icon: React.ComponentType<{ className?: string }>
-  path?: string
-  children?: MenuItem[]
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  path?: string;
+  children?: MenuItem[];
 }
 
 const menuItems: MenuItem[] = [
@@ -53,25 +53,120 @@ const menuItems: MenuItem[] = [
     label: "Knowledge Domains",
     icon: Database,
     children: [
-      { id: "react", label: "React", icon: Database, path: "/admin/domains/react" },
-      { id: "nextjs", label: "Next.js", icon: Database, path: "/admin/domains/nextjs" },
-      { id: "programming", label: "Programming", icon: Database, path: "/admin/domains/programming" },
-      { id: "typescript", label: "TypeScript", icon: Database, path: "/admin/domains/typescript" },
-      { id: "english", label: "English", icon: Database, path: "/admin/domains/english" },
-      { id: "mathematics", label: "Mathematics", icon: Database, path: "/admin/domains/mathematics" },
-      { id: "internet-search", label: "Internet Search", icon: Database, path: "/admin/domains/internet-search" },
-      { id: "grammar", label: "Grammar", icon: Database, path: "/admin/domains/grammar" },
-      { id: "science", label: "Science", icon: Database, path: "/admin/domains/science" },
-      { id: "code-review", label: "Code Review", icon: Database, path: "/admin/domains/code-review" },
-      { id: "error-detection", label: "Error Detection", icon: Database, path: "/admin/domains/error-detection" },
-      { id: "testing", label: "Testing", icon: Database, path: "/admin/domains/testing" },
-      { id: "documentation", label: "Documentation", icon: Database, path: "/admin/domains/documentation" },
-      { id: "security", label: "Security", icon: Database, path: "/admin/domains/security" },
-      { id: "algorithms", label: "Algorithms", icon: Database, path: "/admin/domains/algorithms" },
-      { id: "data-structures", label: "Data Structures", icon: Database, path: "/admin/domains/data-structures" },
-      { id: "version-control", label: "Version Control", icon: Database, path: "/admin/domains/version-control" },
-      { id: "environment", label: "Environment", icon: Database, path: "/admin/domains/environment" },
-      { id: "general", label: "General", icon: Database, path: "/admin/domains/general" },
+      {
+        id: "react",
+        label: "React",
+        icon: Database,
+        path: "/admin/domains/react",
+      },
+      {
+        id: "nextjs",
+        label: "Next.js",
+        icon: Database,
+        path: "/admin/domains/nextjs",
+      },
+      {
+        id: "programming",
+        label: "Programming",
+        icon: Database,
+        path: "/admin/domains/programming",
+      },
+      {
+        id: "typescript",
+        label: "TypeScript",
+        icon: Database,
+        path: "/admin/domains/typescript",
+      },
+      {
+        id: "english",
+        label: "English",
+        icon: Database,
+        path: "/admin/domains/english",
+      },
+      {
+        id: "mathematics",
+        label: "Mathematics",
+        icon: Database,
+        path: "/admin/domains/mathematics",
+      },
+      {
+        id: "internet-search",
+        label: "Internet Search",
+        icon: Database,
+        path: "/admin/domains/internet-search",
+      },
+      {
+        id: "grammar",
+        label: "Grammar",
+        icon: Database,
+        path: "/admin/domains/grammar",
+      },
+      {
+        id: "science",
+        label: "Science",
+        icon: Database,
+        path: "/admin/domains/science",
+      },
+      {
+        id: "code-review",
+        label: "Code Review",
+        icon: Database,
+        path: "/admin/domains/code-review",
+      },
+      {
+        id: "error-detection",
+        label: "Error Detection",
+        icon: Database,
+        path: "/admin/domains/error-detection",
+      },
+      {
+        id: "testing",
+        label: "Testing",
+        icon: Database,
+        path: "/admin/domains/testing",
+      },
+      {
+        id: "documentation",
+        label: "Documentation",
+        icon: Database,
+        path: "/admin/domains/documentation",
+      },
+      {
+        id: "security",
+        label: "Security",
+        icon: Database,
+        path: "/admin/domains/security",
+      },
+      {
+        id: "algorithms",
+        label: "Algorithms",
+        icon: Database,
+        path: "/admin/domains/algorithms",
+      },
+      {
+        id: "data-structures",
+        label: "Data Structures",
+        icon: Database,
+        path: "/admin/domains/data-structures",
+      },
+      {
+        id: "version-control",
+        label: "Version Control",
+        icon: Database,
+        path: "/admin/domains/version-control",
+      },
+      {
+        id: "environment",
+        label: "Environment",
+        icon: Database,
+        path: "/admin/domains/environment",
+      },
+      {
+        id: "general",
+        label: "General",
+        icon: Database,
+        path: "/admin/domains/general",
+      },
     ],
   },
   {
@@ -96,7 +191,14 @@ const menuItems: MenuItem[] = [
     id: "integrations",
     label: "Integrations",
     icon: Plug,
-    children: [{ id: "github-app", label: "GitHub App", icon: Plug, path: "/admin/integrations/github-app" }],
+    children: [
+      {
+        id: "github-app",
+        label: "GitHub App",
+        icon: Plug,
+        path: "/admin/integrations/github-app",
+      },
+    ],
   },
   {
     id: "users",
@@ -116,48 +218,53 @@ const menuItems: MenuItem[] = [
     icon: AlertTriangle,
     path: "/admin/errors",
   },
-]
+];
 
 interface AdminSidebarProps {
-  isOpen: boolean
-  isExpanded: boolean
-  onExpandToggle: () => void
-  onClose: () => void
+  isOpen: boolean;
+  isExpanded: boolean;
+  onExpandToggle: () => void;
+  onClose: () => void;
 }
 
-export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onClose }: AdminSidebarProps) {
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
-  const pathname = usePathname()
-  const router = useRouter()
+export function AdminSidebar({
+  isOpen,
+  isExpanded,
+  onExpandToggle,
+  onClose,
+}: AdminSidebarProps) {
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const pathname = usePathname();
+  const router = useRouter();
 
   const toggleExpanded = (id: string) => {
-    const newExpanded = new Set(expandedItems)
+    const newExpanded = new Set(expandedItems);
     if (newExpanded.has(id)) {
-      newExpanded.delete(id)
+      newExpanded.delete(id);
     } else {
-      newExpanded.add(id)
+      newExpanded.add(id);
     }
-    setExpandedItems(newExpanded)
-  }
+    setExpandedItems(newExpanded);
+  };
 
   const handleItemClick = (item: MenuItem) => {
     if (item.children) {
-      toggleExpanded(item.id)
+      toggleExpanded(item.id);
       // Expand menu if collapsed when clicking parent items
       if (!isExpanded) {
-        onExpandToggle()
+        onExpandToggle();
       }
     } else if (item.path) {
-      router.push(item.path)
+      router.push(item.path);
       // Don't auto-close - let users navigate quickly between pages
     }
-  }
+  };
 
   const renderMenuItem = (item: MenuItem, depth = 0) => {
-    const Icon = item.icon
-    const isActive = pathname === item.path
-    const isItemExpanded = expandedItems.has(item.id)
-    const hasChildren = item.children && item.children.length > 0
+    const Icon = item.icon;
+    const isActive = pathname === item.path;
+    const isItemExpanded = expandedItems.has(item.id);
+    const hasChildren = item.children && item.children.length > 0;
 
     return (
       <div key={item.id}>
@@ -177,7 +284,11 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onClose }: Ad
               <span className="flex-1 text-left text-sm">{item.label}</span>
               {hasChildren && (
                 <span className="flex-shrink-0 transition-transform duration-200">
-                  {isItemExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                  {isItemExpanded ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
                 </span>
               )}
             </>
@@ -189,8 +300,8 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onClose }: Ad
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <aside
@@ -228,12 +339,17 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onClose }: Ad
               className="w-full justify-start"
               aria-label={isExpanded ? "Collapse menu" : "Expand menu"}
             >
-              <ChevronRight className={cn("h-4 w-4 transition-transform", isExpanded && "rotate-180")} />
+              <ChevronRight
+                className={cn(
+                  "h-4 w-4 transition-transform",
+                  isExpanded && "rotate-180",
+                )}
+              />
               {isExpanded && <span className="ml-2 text-xs">Collapse</span>}
             </Button>
           </div>
         )}
       </div>
     </aside>
-  )
+  );
 }

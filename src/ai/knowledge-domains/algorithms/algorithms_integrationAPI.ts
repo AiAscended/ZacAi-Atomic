@@ -6,31 +6,37 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import path from 'path'
+import path from "path";
 
-import { domainRegistry } from '../domainRegistry'
-import { ALGORITHMS_DOMAIN } from "./algorithms_constants"
-import { loadAlgorithmsSeedVocabulary } from "./algorithms_vocabularyManager"
-import { algorithmsRunInference } from "./algorithms_inferenceController"
-import { algorithmsRunTrainingEpoch } from "./algorithms_trainingController"
+import { domainRegistry } from "../domainRegistry";
+import { ALGORITHMS_DOMAIN } from "./algorithms_constants";
+import { loadAlgorithmsSeedVocabulary } from "./algorithms_vocabularyManager";
+import { algorithmsRunInference } from "./algorithms_inferenceController";
+import { algorithmsRunTrainingEpoch } from "./algorithms_trainingController";
 
-const DOMAIN_NAME = 'algorithms';
-const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+const DOMAIN_NAME = "algorithms";
+const DOMAIN_DIR = path.join(
+  process.cwd(),
+  "src",
+  "ai",
+  "knowledge-domains",
+  DOMAIN_NAME,
+);
 
 export const algorithmsInit = async () => {
-  await loadAlgorithmsSeedVocabulary()
+  await loadAlgorithmsSeedVocabulary();
 
   domainRegistry.registerDomain({
-  name: ALGORITHMS_DOMAIN,
-  displayName: 'Algorithms',
-  description: 'Algorithm design, complexity analysis, and optimization',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
-}
+    name: ALGORITHMS_DOMAIN,
+    displayName: "Algorithms",
+    description: "Algorithm design, complexity analysis, and optimization",
+    atomicLevel: "molecule",
+    modules: [],
+    seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+    learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+    weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+    enabled: true,
+  });
+};
 
-void algorithmsInit()
+void algorithmsInit();

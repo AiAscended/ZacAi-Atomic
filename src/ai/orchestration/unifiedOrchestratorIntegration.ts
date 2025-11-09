@@ -1,7 +1,7 @@
 /**
  * File: src/ai/orchestration/unifiedOrchestratorIntegration.ts
  * Purpose: Example integration of unified registry with orchestrator
- * 
+ *
  * This shows how the orchestrator should use the unified registry system
  * to dynamically discover, load, and route requests to models/domains.
  */
@@ -26,32 +26,36 @@ import {
 export class UnifiedOrchestrator {
   private loader = getUnifiedLoader();
   private initialized = false;
-  
+
   /**
    * Initialize orchestrator - load all available modules
    */
   async initialize(): Promise<void> {
     if (this.initialized) return;
-    
+
     console.log("🎯 Initializing Unified Orchestrator...");
-    
+
     await initializeAISystem();
-    
+
     this.initialized = true;
-    
+
     // Display available modules
     const { models, domains, stats } = this.loader.getModulesForOrchestrator();
-    
+
     console.log("\n📊 Available Modules:");
     console.log(`   Models: ${stats.readyModels}`);
-    models.forEach(m => console.log(`     - ${m.manifest.displayName} (${m.manifest.moduleId})`));
-    
+    models.forEach((m) =>
+      console.log(`     - ${m.manifest.displayName} (${m.manifest.moduleId})`),
+    );
+
     console.log(`   Domains: ${stats.readyDomains}`);
-    domains.forEach(d => console.log(`     - ${d.manifest.displayName} (${d.manifest.moduleId})`));
-    
+    domains.forEach((d) =>
+      console.log(`     - ${d.manifest.displayName} (${d.manifest.moduleId})`),
+    );
+
     console.log("\n✅ Orchestrator ready");
   }
-  
+
   /**
    * Process request - orchestrator determines which models/domains to use
    */
@@ -64,9 +68,9 @@ export class UnifiedOrchestrator {
     if (!this.initialized) {
       await this.initialize();
     }
-    
+
     const { models, domains } = this.loader.getModulesForOrchestrator();
-    
+
     // Strategy 1: Use preferred model/domain if specified
     if (request.preferredModel) {
       const model = this.loader.getLoadedModule(request.preferredModel);
@@ -74,35 +78,35 @@ export class UnifiedOrchestrator {
         return await this.executeWithModel(model, request);
       }
     }
-    
+
     if (request.preferredDomain) {
       const domain = this.loader.getLoadedModule(request.preferredDomain);
       if (domain?.status === "ready") {
         return await this.executeWithDomain(domain, request);
       }
     }
-    
+
     // Strategy 2: Intelligent routing based on query analysis
     const route = await this.analyzeAndRoute(request.query, models, domains);
-    
+
     if (route.type === "model") {
       return await this.executeWithModel(route.module, request);
     } else {
       return await this.executeWithDomain(route.module, request);
     }
   }
-  
+
   /**
    * Analyze query and determine best model/domain
    */
   private async analyzeAndRoute(
     query: string,
     models: LoadedModule[],
-    domains: LoadedModule[]
+    domains: LoadedModule[],
   ): Promise<{ type: "model" | "domain"; module: LoadedModule }> {
     // Simple keyword-based routing (enhance with ML later)
     const queryLower = query.toLowerCase();
-    
+
     // Check domain keywords
     for (const domain of domains) {
       const domainName = domain.manifest.moduleId.toLowerCase();
@@ -110,7 +114,7 @@ export class UnifiedOrchestrator {
         return { type: "domain", module: domain };
       }
     }
-    
+
     // Check model types
     for (const model of models) {
       const modelType = model.manifest.modelType?.toLowerCase();
@@ -121,13 +125,13 @@ export class UnifiedOrchestrator {
         return { type: "model", module: model };
       }
     }
-    
+
     // Default: use first available LLM or any model
-    const llm = models.find(m => m.manifest.modelType === "llm");
+    const llm = models.find((m) => m.manifest.modelType === "llm");
     if (llm) {
       return { type: "model", module: llm };
     }
-    
+
     // Fallback to first available
     if (models.length > 0) {
       return { type: "model", module: models[0] };
@@ -135,21 +139,24 @@ export class UnifiedOrchestrator {
     if (domains.length > 0) {
       return { type: "domain", module: domains[0] };
     }
-    
+
     throw new Error("No models or domains available");
   }
-  
+
   /**
    * Execute request with model
    */
-  private async executeWithModel(model: LoadedModule, request: { query: string; context?: unknown }): Promise<unknown> {
+  private async executeWithModel(
+    model: LoadedModule,
+    request: { query: string; context?: unknown },
+  ): Promise<unknown> {
     console.log(`🤖 Using model: ${model.manifest.displayName}`);
-    
+
     // Call model's inference engine
     if (model.instance && typeof model.instance.infer === "function") {
       return await model.instance.infer(request.query, request.context);
     }
-    
+
     // Fallback implementation
     return {
       model: model.manifest.displayName,
@@ -157,18 +164,21 @@ export class UnifiedOrchestrator {
       query: request.query,
     };
   }
-  
+
   /**
    * Execute request with domain
    */
-  private async executeWithDomain(domain: LoadedModule, request: { query: string; context?: unknown }): Promise<unknown> {
+  private async executeWithDomain(
+    domain: LoadedModule,
+    request: { query: string; context?: unknown },
+  ): Promise<unknown> {
     console.log(`📚 Using domain: ${domain.manifest.displayName}`);
-    
+
     // Call domain's integration API
     if (domain.instance && typeof domain.instance.query === "function") {
       return await domain.instance.query(request.query, request.context);
     }
-    
+
     // Fallback implementation
     return {
       domain: domain.manifest.displayName,
@@ -176,23 +186,23 @@ export class UnifiedOrchestrator {
       query: request.query,
     };
   }
-  
+
   /**
    * Get available models (for UI/API)
    */
   getAvailableModels(): ModuleManifest[] {
     const { models } = this.loader.getModulesForOrchestrator();
-    return models.map(m => m.manifest);
+    return models.map((m) => m.manifest);
   }
-  
+
   /**
    * Get available domains (for UI/API)
    */
   getAvailableDomains(): ModuleManifest[] {
     const { domains } = this.loader.getModulesForOrchestrator();
-    return domains.map(d => d.manifest);
+    return domains.map((d) => d.manifest);
   }
-  
+
   /**
    * Hot-reload specific module
    */
@@ -200,7 +210,7 @@ export class UnifiedOrchestrator {
     console.log(`🔄 Reloading module: ${moduleId}`);
     await this.loader.reloadModule(moduleId);
   }
-  
+
   /**
    * Hot-reload all modules
    */
@@ -209,7 +219,7 @@ export class UnifiedOrchestrator {
     await this.loader.reloadAllModules();
     console.log("✅ All modules reloaded");
   }
-  
+
   /**
    * Get system status
    */
@@ -220,7 +230,7 @@ export class UnifiedOrchestrator {
   }> {
     const registry = await getUnifiedRegistry();
     const { models, domains, stats } = this.loader.getModulesForOrchestrator();
-    
+
     return {
       initialized: this.initialized,
       registry: {
@@ -230,13 +240,13 @@ export class UnifiedOrchestrator {
       },
       loadedModules: {
         stats,
-        models: models.map(m => ({
+        models: models.map((m) => ({
           id: m.manifest.moduleId,
           name: m.manifest.displayName,
           type: m.manifest.modelType,
           status: m.status,
         })),
-        domains: domains.map(d => ({
+        domains: domains.map((d) => ({
           id: d.manifest.moduleId,
           name: d.manifest.displayName,
           status: d.status,

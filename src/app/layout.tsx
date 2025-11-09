@@ -1,4 +1,4 @@
-import type React from "react"
+import type React from "react";
 /**
  * File: src/app/layout.tsx
  * Application root layout for ZacAi Atomic
@@ -6,17 +6,21 @@ import type React from "react"
  * and light/dark theme toggle with persistent storage.
  */
 
-import type { Metadata } from "next"
-import "@/styles/globals.css"
-import ClientLayout from "./client-layout"
+import type { Metadata } from "next";
+import "@/styles/globals.css";
+import ClientLayout from "./client-layout";
 
 export const metadata: Metadata = {
   title: "ZacAi Atomic - Hybrid Multi-Domain AI",
   description: "Modular AI Assistant with 19 Knowledge Domains",
   generator: "v0.app",
-}
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
@@ -24,5 +28,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
-  )
+  );
 }

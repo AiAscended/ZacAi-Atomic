@@ -6,15 +6,22 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { loadCodeReviewLearnedData, saveCodeReviewLearnedData } from "./code_review_learnedDataManager"
+import {
+  loadCodeReviewLearnedData,
+  saveCodeReviewLearnedData,
+} from "./code_review_learnedDataManager";
 
-type CodeReviewLearned = { notes: string[]; concepts: Record<string, unknown> }
+type CodeReviewLearned = { notes: string[]; concepts: Record<string, unknown> };
 
-export const codeReviewRunTrainingEpoch = async (opts?: { epochs?: number }) => {
-  const data = (await loadCodeReviewLearnedData()) as CodeReviewLearned
-  const epoch = opts?.epochs ?? 1
-  data.notes = data.notes || []
-  data.notes.push(`code_review trained ${epoch} epoch(s) at ${new Date().toISOString()}`)
-  await saveCodeReviewLearnedData(data)
-  return { ok: true, epoch }
-}
+export const codeReviewRunTrainingEpoch = async (opts?: {
+  epochs?: number;
+}) => {
+  const data = (await loadCodeReviewLearnedData()) as CodeReviewLearned;
+  const epoch = opts?.epochs ?? 1;
+  data.notes = data.notes || [];
+  data.notes.push(
+    `code_review trained ${epoch} epoch(s) at ${new Date().toISOString()}`,
+  );
+  await saveCodeReviewLearnedData(data);
+  return { ok: true, epoch };
+};

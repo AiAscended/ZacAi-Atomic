@@ -1,4 +1,4 @@
-import { mathematicsTokenizer } from "./mathematics_tokenizer"
+import { mathematicsTokenizer } from "./mathematics_tokenizer";
 
 export const mathematicsSemanticAnalyzer = (text: string) => {
   const { tokens } = mathematicsTokenizer(text);

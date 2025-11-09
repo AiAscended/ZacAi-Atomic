@@ -8,14 +8,14 @@
  */
 export function crossEntropyLoss(
   logits: Float32Array,
-  targetTokenId: number
+  targetTokenId: number,
 ): number {
   // Apply softmax
   const maxLogit = Math.max(...Array.from(logits));
-  const expLogits = logits.map(x => Math.exp(x - maxLogit));
+  const expLogits = logits.map((x) => Math.exp(x - maxLogit));
   const sumExp = expLogits.reduce((a, b) => a + b, 0);
-  const probs = expLogits.map(x => x / sumExp);
-  
+  const probs = expLogits.map((x) => x / sumExp);
+
   // Negative log-likelihood
   const targetProb = probs[targetTokenId];
   return -Math.log(targetProb + 1e-10);
@@ -26,17 +26,17 @@ export function crossEntropyLoss(
  */
 export function batchCrossEntropyLoss(
   batchLogits: Float32Array[],
-  batchTargets: number[]
+  batchTargets: number[],
 ): number {
   if (batchLogits.length !== batchTargets.length) {
-    throw new Error('Batch size mismatch');
+    throw new Error("Batch size mismatch");
   }
-  
+
   let totalLoss = 0;
   for (let i = 0; i < batchLogits.length; i++) {
     totalLoss += crossEntropyLoss(batchLogits[i], batchTargets[i]);
   }
-  
+
   return totalLoss / batchLogits.length;
 }
 

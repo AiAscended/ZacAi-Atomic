@@ -4,13 +4,16 @@
  */
 
 export class DocumentationGenerator {
-  generate(_code: string, _format: string = 'markdown'): {
+  generate(
+    _code: string,
+    _format: string = "markdown",
+  ): {
     documentation: string;
     sections: string[];
   } {
     // Placeholder implementation
     return {
-      documentation: '',
+      documentation: "",
       sections: [],
     };
   }

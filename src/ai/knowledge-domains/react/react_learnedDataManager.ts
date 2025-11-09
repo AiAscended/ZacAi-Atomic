@@ -1,23 +1,23 @@
 interface LearnedInteraction {
-  prompt: string
-  response: string
-  timestamp: number
-  confidence: number
+  prompt: string;
+  response: string;
+  timestamp: number;
+  confidence: number;
 }
 
-let learnedData: LearnedInteraction[] = []
+let learnedData: LearnedInteraction[] = [];
 
 export function addLearnedInteraction(interaction: LearnedInteraction): void {
-  learnedData.push(interaction)
+  learnedData.push(interaction);
 
   // Keep only last 100 interactions
   if (learnedData.length > 100) {
-    learnedData = learnedData.slice(-100)
+    learnedData = learnedData.slice(-100);
   }
 }
 
 export function getLearnedInteractions(): LearnedInteraction[] {
-  return [...learnedData]
+  return [...learnedData];
 }
 
 export function saveLearnedData(): string {
@@ -32,5 +32,5 @@ export function saveLearnedData(): string {
     },
     null,
     2,
-  )
+  );
 }

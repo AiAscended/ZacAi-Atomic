@@ -4,10 +4,10 @@
  * Dependencies: textNormalizer
  */
 
-import { textNormalizer } from './textNormalizer';
+import { textNormalizer } from "./textNormalizer";
 
 export const noiseFilter = (text: string): string => {
   const clean = textNormalizer(text);
   // remove repeated punctuation sequences
-  return clean.replace(/[-=_]{2,}/g, ' ');
+  return clean.replace(/[-=_]{2,}/g, " ");
 };

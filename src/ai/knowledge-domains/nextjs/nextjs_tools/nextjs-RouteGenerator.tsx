@@ -13,12 +13,18 @@
  * @param hasDynamicRoute - Whether it has dynamic route params
  * @returns Generated Next.js page code
  */
-export function generateNextJSPage(pageName: string, isServerComponent = true, hasDynamicRoute = false): string {
-  const useClient = !isServerComponent ? "'use client'\n\n" : ""
+export function generateNextJSPage(
+  pageName: string,
+  isServerComponent = true,
+  hasDynamicRoute = false,
+): string {
+  const useClient = !isServerComponent ? "'use client'\n\n" : "";
   const paramsType = hasDynamicRoute
     ? `\ninterface PageProps {\n  params: { id: string };\n  searchParams: { [key: string]: string | string[] | undefined };\n}\n\n`
-    : ""
-  const paramsArg = hasDynamicRoute ? "{ params, searchParams }: PageProps" : ""
+    : "";
+  const paramsArg = hasDynamicRoute
+    ? "{ params, searchParams }: PageProps"
+    : "";
 
   return `${useClient}${paramsType}export default ${isServerComponent ? "async " : ""}function ${pageName}Page(${paramsArg}) {
   ${hasDynamicRoute ? "const { id } = params;\n  " : ""}
@@ -29,7 +35,7 @@ export function generateNextJSPage(pageName: string, isServerComponent = true, h
     </div>
   );
 }
-`
+`;
 }
 
 /**
@@ -38,8 +44,13 @@ export function generateNextJSPage(pageName: string, isServerComponent = true, h
  * @param hasParams - Whether it has dynamic route params
  * @returns Generated route handler code
  */
-export function generateNextJSRouteHandler(method = "GET", hasParams = false): string {
-  const paramsType = hasParams ? `, { params }: { params: { id: string } }` : ""
+export function generateNextJSRouteHandler(
+  method = "GET",
+  hasParams = false,
+): string {
+  const paramsType = hasParams
+    ? `, { params }: { params: { id: string } }`
+    : "";
 
   return `import { NextRequest, NextResponse } from 'next/server';
 
@@ -56,7 +67,7 @@ export async function ${method}(request: NextRequest${paramsType}) {
     );
   }
 }
-`
+`;
 }
 
 /**
@@ -86,5 +97,5 @@ export async function ${actionName}(formData: FormData) {
     return { success: false, error: 'Failed to process action' };
   }
 }
-`
+`;
 }

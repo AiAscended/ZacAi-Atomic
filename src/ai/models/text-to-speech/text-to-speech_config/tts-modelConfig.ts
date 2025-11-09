@@ -14,8 +14,8 @@ export interface TTSModelConfig {
 }
 
 export const defaultTTSConfig: TTSModelConfig = {
-  modelName: 'text-to-speech',
-  version: '1.0.0',
+  modelName: "text-to-speech",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

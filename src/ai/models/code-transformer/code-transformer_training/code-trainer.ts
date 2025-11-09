@@ -4,7 +4,7 @@
 
 export class CODETrainer {
   train(data: any): void {
-    console.log('Training code-transformer...');
+    console.log("Training code-transformer...");
   }
 }
 

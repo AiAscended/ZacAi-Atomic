@@ -6,12 +6,12 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { detectTestPatterns } from "./testing_utils"
+import { detectTestPatterns } from "./testing_utils";
 
 export const testingParser = (code: string) => {
-  const patterns = detectTestPatterns(code)
-  const testCount = (code.match(/\b(test|it)\s*\(/g) || []).length
-  const assertionCount = (code.match(/\b(expect|assert)\s*\(/g) || []).length
+  const patterns = detectTestPatterns(code);
+  const testCount = (code.match(/\b(test|it)\s*\(/g) || []).length;
+  const assertionCount = (code.match(/\b(expect|assert)\s*\(/g) || []).length;
 
   return {
     patterns,
@@ -19,5 +19,5 @@ export const testingParser = (code: string) => {
     assertionCount,
     hasSetup: /beforeEach|beforeAll|setup/i.test(code),
     hasTeardown: /afterEach|afterAll|teardown/i.test(code),
-  }
-}
+  };
+};

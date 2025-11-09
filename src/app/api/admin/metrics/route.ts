@@ -1,51 +1,51 @@
 /**
  * Admin Metrics API
- * 
+ *
  * Real-time system performance metrics for admin dashboard
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { enhancedMetricsCollector } from '@/ai/monitoring/enhancedMetricsCollector';
+import { NextRequest, NextResponse } from "next/server";
+import { enhancedMetricsCollector } from "@/ai/monitoring/enhancedMetricsCollector";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type') || 'all';
+    const type = searchParams.get("type") || "all";
 
     switch (type) {
-      case 'system':
+      case "system":
         return NextResponse.json({
           success: true,
           data: enhancedMetricsCollector.getSystemMetrics(),
         });
 
-      case 'domains':
+      case "domains":
         return NextResponse.json({
           success: true,
           data: enhancedMetricsCollector.getDomainMetrics(),
         });
 
-      case 'models':
+      case "models":
         return NextResponse.json({
           success: true,
           data: enhancedMetricsCollector.getModelMetrics(),
         });
 
-      case 'health':
+      case "health":
         return NextResponse.json({
           success: true,
           data: enhancedMetricsCollector.getHealthStatus(),
         });
 
-      case 'export':
+      case "export":
         return NextResponse.json({
           success: true,
           data: enhancedMetricsCollector.exportMetrics(),
         });
 
-      case 'all':
+      case "all":
       default:
         return NextResponse.json({
           success: true,
@@ -58,14 +58,14 @@ export async function GET(request: NextRequest) {
         });
     }
   } catch (error) {
-    console.error('[Admin Metrics API] Error:', error);
+    console.error("[Admin Metrics API] Error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to retrieve metrics',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to retrieve metrics",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -73,20 +73,20 @@ export async function GET(request: NextRequest) {
 export async function DELETE() {
   try {
     enhancedMetricsCollector.clear();
-    
+
     return NextResponse.json({
       success: true,
-      message: 'Metrics cleared successfully',
+      message: "Metrics cleared successfully",
     });
   } catch (error) {
-    console.error('[Admin Metrics API] Error clearing metrics:', error);
+    console.error("[Admin Metrics API] Error clearing metrics:", error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to clear metrics',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to clear metrics",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

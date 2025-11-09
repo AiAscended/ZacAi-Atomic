@@ -12,7 +12,7 @@ export interface VADFrame {
 
 export const voiceActivityDetector = (
   audioBuffer: Float32Array,
-  sampleRate = 16000
+  sampleRate = 16000,
 ): VADFrame[] => {
   // Minimal energy-based VAD: this is only a placeholder for MVP
   const frameSize = Math.floor(sampleRate * 0.02); // 20ms

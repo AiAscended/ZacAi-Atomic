@@ -6,31 +6,37 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import path from 'path'
+import path from "path";
 
-import { domainRegistry } from '../domainRegistry'
-import { TESTING_DOMAIN } from "./testing_constants"
-import { loadTestingSeedVocabulary } from "./testing_vocabularyManager"
-import { testingRunInference } from "./testing_inferenceController"
-import { testingRunTrainingEpoch } from "./testing_trainingController"
+import { domainRegistry } from "../domainRegistry";
+import { TESTING_DOMAIN } from "./testing_constants";
+import { loadTestingSeedVocabulary } from "./testing_vocabularyManager";
+import { testingRunInference } from "./testing_inferenceController";
+import { testingRunTrainingEpoch } from "./testing_trainingController";
 
-const DOMAIN_NAME = 'testing';
-const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+const DOMAIN_NAME = "testing";
+const DOMAIN_DIR = path.join(
+  process.cwd(),
+  "src",
+  "ai",
+  "knowledge-domains",
+  DOMAIN_NAME,
+);
 
 export const testingInit = async () => {
-  await loadTestingSeedVocabulary()
+  await loadTestingSeedVocabulary();
 
   domainRegistry.registerDomain({
-  name: TESTING_DOMAIN,
-  displayName: 'Testing',
-  description: 'Test design, test-driven development, and quality assurance',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
-}
+    name: TESTING_DOMAIN,
+    displayName: "Testing",
+    description: "Test design, test-driven development, and quality assurance",
+    atomicLevel: "molecule",
+    modules: [],
+    seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+    learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+    weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+    enabled: true,
+  });
+};
 
-void testingInit()
+void testingInit();

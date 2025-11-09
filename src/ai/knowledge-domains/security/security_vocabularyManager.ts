@@ -6,14 +6,18 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { safeParseJSON } from "./security_utils"
-import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./security_utils";
+import { storageAdapter } from "../storageAdapter";
 
-export const loadSecuritySeedVocabulary = async (path = "/src/ai/knowledge-domains/security/security_seeds/security_seedVocabulary.json") => {
+export const loadSecuritySeedVocabulary = async (
+  path = "/src/ai/knowledge-domains/security/security_seeds/security_seedVocabulary.json",
+) => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { vulnerabilities: [] }) as { vulnerabilities: string[] }
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { vulnerabilities: [] }) as {
+      vulnerabilities: string[];
+    };
   } catch (e) {
-    return { vulnerabilities: [] }
+    return { vulnerabilities: [] };
   }
-}
+};

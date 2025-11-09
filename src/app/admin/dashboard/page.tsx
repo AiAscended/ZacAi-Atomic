@@ -4,25 +4,74 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Activity, Brain, Database, Zap, TrendingUp, Clock } from "lucide-react"
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Activity,
+  Brain,
+  Database,
+  Zap,
+  TrendingUp,
+  Clock,
+} from "lucide-react";
 
 export default function DashboardPage() {
-  const [timeRange, setTimeRange] = useState("24h")
-  const [metricType, setMetricType] = useState("all")
+  const [timeRange, setTimeRange] = useState("24h");
+  const [metricType, setMetricType] = useState("all");
 
   const metrics = [
-    { label: "Total Queries", value: "1,247", change: "+12%", icon: Activity, color: "text-blue-500" },
-    { label: "Active Domains", value: "19", change: "+3", icon: Database, color: "text-green-500" },
-    { label: "Avg Confidence", value: "87.3%", change: "+2.1%", icon: Brain, color: "text-purple-500" },
-    { label: "Training Epochs", value: "342", change: "+15", icon: Zap, color: "text-orange-500" },
-    { label: "Success Rate", value: "94.2%", change: "+1.8%", icon: TrendingUp, color: "text-emerald-500" },
-    { label: "Avg Response Time", value: "234ms", change: "-12ms", icon: Clock, color: "text-cyan-500" },
-  ]
+    {
+      label: "Total Queries",
+      value: "1,247",
+      change: "+12%",
+      icon: Activity,
+      color: "text-blue-500",
+    },
+    {
+      label: "Active Domains",
+      value: "19",
+      change: "+3",
+      icon: Database,
+      color: "text-green-500",
+    },
+    {
+      label: "Avg Confidence",
+      value: "87.3%",
+      change: "+2.1%",
+      icon: Brain,
+      color: "text-purple-500",
+    },
+    {
+      label: "Training Epochs",
+      value: "342",
+      change: "+15",
+      icon: Zap,
+      color: "text-orange-500",
+    },
+    {
+      label: "Success Rate",
+      value: "94.2%",
+      change: "+1.8%",
+      icon: TrendingUp,
+      color: "text-emerald-500",
+    },
+    {
+      label: "Avg Response Time",
+      value: "234ms",
+      change: "-12ms",
+      icon: Clock,
+      color: "text-cyan-500",
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -56,11 +105,13 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {metrics.map((metric) => {
-          const Icon = metric.icon
+          const Icon = metric.icon;
           return (
             <Card key={metric.label} className="p-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">{metric.label}</span>
+                <span className="text-sm text-muted-foreground">
+                  {metric.label}
+                </span>
                 <Icon className={`h-5 w-5 ${metric.color}`} />
               </div>
               <div className="flex items-baseline gap-2">
@@ -68,24 +119,31 @@ export default function DashboardPage() {
                 <span className="text-sm text-green-600">{metric.change}</span>
               </div>
             </Card>
-          )
+          );
         })}
       </div>
 
       <Card className="p-6">
         <h2 className="text-xl font-semibold mb-4">Domain Performance</h2>
         <div className="space-y-3">
-          {["React", "Next.js", "TypeScript", "Programming", "Mathematics"].map((domain) => (
-            <div key={domain} className="flex items-center gap-4">
-              <span className="w-32 text-sm font-medium">{domain}</span>
-              <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
-                <div className="h-full bg-primary rounded-full" style={{ width: `${Math.random() * 40 + 60}%` }} />
+          {["React", "Next.js", "TypeScript", "Programming", "Mathematics"].map(
+            (domain) => (
+              <div key={domain} className="flex items-center gap-4">
+                <span className="w-32 text-sm font-medium">{domain}</span>
+                <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full"
+                    style={{ width: `${Math.random() * 40 + 60}%` }}
+                  />
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {(Math.random() * 20 + 80).toFixed(1)}%
+                </span>
               </div>
-              <span className="text-sm text-muted-foreground">{(Math.random() * 20 + 80).toFixed(1)}%</span>
-            </div>
-          ))}
+            ),
+          )}
         </div>
       </Card>
     </div>
-  )
+  );
 }
