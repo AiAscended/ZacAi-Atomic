@@ -40,6 +40,10 @@ export class SlotFiller {
     );
   }
 
+  fill(text: string, slotNames?: string[]): Record<string, string | null> {
+    return this.extractSlots(text, slotNames);
+  }
+
   extractSlots(
     text: string,
     slotNames?: string[],

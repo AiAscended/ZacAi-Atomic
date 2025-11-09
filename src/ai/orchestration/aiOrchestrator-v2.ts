@@ -79,14 +79,26 @@ export class AIOrchestrator {
 
     // 4) Synthesize multi-domain results into response
     this.thinkingTracker.addStep("response_synth", "Synthesizing AI response");
-    const response = this.responseSynthesizer.synthesize(domainResults);
+    // Transform domainResults to match synthesize input format
+    const synthesizeInput = {
+      llmOutput: "", // No LLM output in this flow
+      domainOutputs: Object.entries(domainResults).map(([domain, result]) => ({
+        domain,
+        result: typeof result === 'string' ? result : JSON.stringify(result),
+      })),
+      originalPrompt: prompt,
+    };
+    const response = this.responseSynthesizer.synthesize(synthesizeInput);
 
     // 5) Log interaction for analytics and debugging
-    this.interactionLogger.log(sessionId, prompt, response);
+    this.interactionLogger.log(sessionId, prompt, response.text);
 
     // Attach thinking steps to response metadata for frontend UI
     return {
-      ...response,
+      text: response.text,
+      confidence: response.confidence,
+      sources: response.sources,
+      domains: response.metadata.combinedDomains || [],
       metadata: {
         ...response.metadata,
         thinkingSteps: this.thinkingTracker.getSteps(),
