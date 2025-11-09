@@ -7,7 +7,7 @@ type Relation = { from: string; to: string; type?: string };
 
 const relations: Relation[] = [];
 
-export const addRelation = (from: string, to: string, type = 'related') =>
+export const addRelation = (from: string, to: string, type = "related") =>
   relations.push({ from, to, type });
 
 export const queryRelated = (concept: string) =>

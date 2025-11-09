@@ -50,6 +50,6 @@ export const SECURITY_CORE_TOKENS = [
   "TOKEN_13",
   "TOKEN_14",
   "TOKEN_15",
-]
+];
 
-export default SECURITY_CORE_TOKENS
+export default SECURITY_CORE_TOKENS;

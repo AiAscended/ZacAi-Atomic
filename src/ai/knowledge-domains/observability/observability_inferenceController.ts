@@ -3,27 +3,30 @@
  * Handles logging, monitoring, metrics, and observability queries
  */
 
-import { DOMAIN_NAME } from './observability_constants';
+import { DOMAIN_NAME } from "./observability_constants";
 
-export const observabilityRunInference = async (input: string, _context?: any) => {
+export const observabilityRunInference = async (
+  input: string,
+  _context?: any,
+) => {
   const lowerInput = input.toLowerCase();
-  
-  let responseText = '';
+
+  let responseText = "";
   let confidence = 0.7;
   const sources: string[] = [];
 
   // Detect observability keywords
   if (
-    lowerInput.includes('log') ||
-    lowerInput.includes('monitor') ||
-    lowerInput.includes('metric') ||
-    lowerInput.includes('trace') ||
-    lowerInput.includes('observability') ||
-    lowerInput.includes('telemetry') ||
-    lowerInput.includes('alert')
+    lowerInput.includes("log") ||
+    lowerInput.includes("monitor") ||
+    lowerInput.includes("metric") ||
+    lowerInput.includes("trace") ||
+    lowerInput.includes("observability") ||
+    lowerInput.includes("telemetry") ||
+    lowerInput.includes("alert")
   ) {
     confidence = 0.85;
-    
+
     responseText = `I can help with observability and monitoring. Key pillars:
 
 **Logging:**

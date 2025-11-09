@@ -8,7 +8,7 @@ export const computeResizedDimensions = (
   width: number,
   height: number,
   maxWidth: number,
-  maxHeight: number
+  maxHeight: number,
 ): { width: number; height: number } => {
   const wRatio = maxWidth / width;
   const hRatio = maxHeight / height;

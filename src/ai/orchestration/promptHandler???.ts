@@ -7,9 +7,9 @@
  * - src/ai/orchestration/aiOrchestrator.ts
  */
 
-import { AIOrchestrator } from "./aiOrchestrator"
+import { AIOrchestrator } from "./aiOrchestrator";
 
-const orchestrator = new AIOrchestrator()
+const orchestrator = new AIOrchestrator();
 
 export const promptHandler = {
   /**
@@ -17,7 +17,7 @@ export const promptHandler = {
    * Typically called on session start.
    */
   async initialize() {
-    await orchestrator.initialize()
+    await orchestrator.initialize();
   },
 
   /**
@@ -28,13 +28,21 @@ export const promptHandler = {
    * @param context Additional context such as chat history
    * @returns Modular AI response with text, confidence, domains and thinking steps
    */
-  async handlePrompt(prompt: string, sessionId: string, context?: Record<string, unknown>) {
+  async handlePrompt(
+    prompt: string,
+    sessionId: string,
+    context?: Record<string, unknown>,
+  ) {
     try {
-      const response = await orchestrator.processPrompt(prompt, sessionId, context)
-      return response
+      const response = await orchestrator.processPrompt(
+        prompt,
+        sessionId,
+        context,
+      );
+      return response;
     } catch (error) {
-      console.error("Error in promptHandler.handlePrompt:", error)
-      throw error
+      console.error("Error in promptHandler.handlePrompt:", error);
+      throw error;
     }
   },
-}
+};

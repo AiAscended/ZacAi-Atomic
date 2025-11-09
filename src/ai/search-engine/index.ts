@@ -6,6 +6,6 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-export { crawlUrl, type CrawlResult } from "./webCrawler"
-export { extractMainContent, extractMetadata } from "./contentExtractor"
-export { summarizeResults, type SummaryResult } from "./resultSummarizer"
+export { crawlUrl, type CrawlResult } from "./webCrawler";
+export { extractMainContent, extractMetadata } from "./contentExtractor";
+export { summarizeResults, type SummaryResult } from "./resultSummarizer";

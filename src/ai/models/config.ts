@@ -9,11 +9,22 @@ import type { ScannerConfig } from "../shared/registry/moduleRegistry";
 export const modelScannerConfig: ScannerConfig = {
   scanDir: path.join(process.cwd(), "src", "ai", "models"),
   moduleType: "model",
-  registryFile: path.join(process.cwd(), "src", "ai", "models", "MODEL_REGISTRY.json"),
-  
+  registryFile: path.join(
+    process.cwd(),
+    "src",
+    "ai",
+    "models",
+    "MODEL_REGISTRY.json",
+  ),
+
   skipFolders: ["shared", "node_modules", ".git"],
-  skipFiles: ["config.ts", "modelRegistry.ts", "modelLoader.ts", "MODEL_REGISTRY.json"],
-  
+  skipFiles: [
+    "config.ts",
+    "modelRegistry.ts",
+    "modelLoader.ts",
+    "MODEL_REGISTRY.json",
+  ],
+
   requiredPatterns: {
     seeds: /seed|vocab/i,
     seedData: /seed.*data\.json/i,
@@ -27,7 +38,7 @@ export const modelScannerConfig: ScannerConfig = {
     inferenceEngine: /inference.*engine\.ts/i,
     trainingPipeline: /training.*pipeline\.ts/i,
   },
-  
+
   modelTypePatterns: {
     llm: /llm|language.*model|gpt|bert|t5/i,
     cnn: /cnn|convolution|conv.*net/i,

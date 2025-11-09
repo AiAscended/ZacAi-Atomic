@@ -19,7 +19,7 @@ export function stripHtmlTags(html: string): string {
     .replace(/&quot;/g, '"') // Replace &quot;
     .replace(/&#39;/g, "'") // Replace &#39;
     .replace(/\s+/g, " ") // Normalize whitespace
-    .trim()
+    .trim();
 }
 
 /**
@@ -32,17 +32,17 @@ export function extractMainContent(html: string): string {
     /<article[^>]*>([\s\S]*?)<\/article>/i,
     /<div[^>]*class="[^"]*content[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
     /<div[^>]*id="[^"]*content[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
-  ]
+  ];
 
   for (const pattern of mainPatterns) {
-    const match = html.match(pattern)
+    const match = html.match(pattern);
     if (match && match[1]) {
-      return stripHtmlTags(match[1])
+      return stripHtmlTags(match[1]);
     }
   }
 
   // Fallback: strip all HTML
-  return stripHtmlTags(html)
+  return stripHtmlTags(html);
 }
 
 /**
@@ -50,26 +50,26 @@ export function extractMainContent(html: string): string {
  */
 export function summarizeText(text: string, maxLength = 500): string {
   if (text.length <= maxLength) {
-    return text
+    return text;
   }
 
   // Try to cut at sentence boundary
-  const truncated = text.substring(0, maxLength)
-  const lastPeriod = truncated.lastIndexOf(".")
-  const lastQuestion = truncated.lastIndexOf("?")
-  const lastExclamation = truncated.lastIndexOf("!")
+  const truncated = text.substring(0, maxLength);
+  const lastPeriod = truncated.lastIndexOf(".");
+  const lastQuestion = truncated.lastIndexOf("?");
+  const lastExclamation = truncated.lastIndexOf("!");
 
-  const lastSentenceEnd = Math.max(lastPeriod, lastQuestion, lastExclamation)
+  const lastSentenceEnd = Math.max(lastPeriod, lastQuestion, lastExclamation);
 
   if (lastSentenceEnd > maxLength * 0.7) {
-    return truncated.substring(0, lastSentenceEnd + 1) + "..."
+    return truncated.substring(0, lastSentenceEnd + 1) + "...";
   }
 
   // Cut at word boundary
-  const lastSpace = truncated.lastIndexOf(" ")
+  const lastSpace = truncated.lastIndexOf(" ");
   if (lastSpace > 0) {
-    return truncated.substring(0, lastSpace) + "..."
+    return truncated.substring(0, lastSpace) + "...";
   }
 
-  return truncated + "..."
+  return truncated + "...";
 }

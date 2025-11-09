@@ -4,7 +4,7 @@
 
 export class GANTrainer {
   train(data: any): void {
-    console.log('Training generative-adversarial-network...');
+    console.log("Training generative-adversarial-network...");
   }
 }
 

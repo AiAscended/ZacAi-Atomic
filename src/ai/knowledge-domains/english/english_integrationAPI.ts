@@ -3,12 +3,12 @@
  * Purpose: Register the english domain into the new `src/ai/data/registry`.
  */
 
-import { domainRegistry } from '../domainRegistry';
-import { ENGLISH_DOMAIN } from './english_constants';
-import { loadEnglishSeedVocabulary } from './english_vocabularyManager';
-import { englishRunInference } from './english_inferenceController';
-import { englishRunTrainingEpoch } from './english_trainingController';
-import path from 'path';
+import { domainRegistry } from "../domainRegistry";
+import { ENGLISH_DOMAIN } from "./english_constants";
+import { loadEnglishSeedVocabulary } from "./english_vocabularyManager";
+import { englishRunInference } from "./english_inferenceController";
+import { englishRunTrainingEpoch } from "./english_trainingController";
+import path from "path";
 
 export const englishInit = async () => {
   await loadEnglishSeedVocabulary();
@@ -17,18 +17,24 @@ export const englishInit = async () => {
 };
 
 // Register the domain with unified registry
-const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', ENGLISH_DOMAIN);
+const DOMAIN_DIR = path.join(
+  process.cwd(),
+  "src",
+  "ai",
+  "knowledge-domains",
+  ENGLISH_DOMAIN,
+);
 
 domainRegistry.registerDomain({
   name: ENGLISH_DOMAIN,
-  displayName: 'English',
-  description: 'English language vocabulary, grammar, and semantic analysis',
-  atomicLevel: 'molecule',
+  displayName: "English",
+  description: "English language vocabulary, grammar, and semantic analysis",
+  atomicLevel: "molecule",
   modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, 'english_seeds'),
-  learnedDataPath: path.join(DOMAIN_DIR, 'english_learned'),
-  weightsPath: path.join(DOMAIN_DIR, 'english_weights'),
-  enabled: true
+  seedDataPath: path.join(DOMAIN_DIR, "english_seeds"),
+  learnedDataPath: path.join(DOMAIN_DIR, "english_learned"),
+  weightsPath: path.join(DOMAIN_DIR, "english_weights"),
+  enabled: true,
 });
 
 // Auto-register on import

@@ -13,7 +13,7 @@
  * @example cos(0) // returns 1
  */
 export function cos(angleRadians: number): number {
-  return Math.cos(angleRadians)
+  return Math.cos(angleRadians);
 }
 
 /**
@@ -23,5 +23,5 @@ export function cos(angleRadians: number): number {
  * @example cosDeg(0) // returns 1
  */
 export function cosDeg(angleDegrees: number): number {
-  return Math.cos((angleDegrees * Math.PI) / 180)
+  return Math.cos((angleDegrees * Math.PI) / 180);
 }

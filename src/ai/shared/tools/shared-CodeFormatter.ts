@@ -10,14 +10,14 @@
  * Formatting options
  */
 export interface FormatOptions {
-  indentSize?: number
-  useTabs?: boolean
-  maxLineLength?: number
-  semicolons?: boolean
-  singleQuote?: boolean
-  trailingComma?: "none" | "es5" | "all"
-  bracketSpacing?: boolean
-  arrowParens?: "avoid" | "always"
+  indentSize?: number;
+  useTabs?: boolean;
+  maxLineLength?: number;
+  semicolons?: boolean;
+  singleQuote?: boolean;
+  trailingComma?: "none" | "es5" | "all";
+  bracketSpacing?: boolean;
+  arrowParens?: "avoid" | "always";
 }
 
 /**
@@ -32,7 +32,7 @@ const DEFAULT_OPTIONS: Required<FormatOptions> = {
   trailingComma: "es5",
   bracketSpacing: true,
   arrowParens: "always",
-}
+};
 
 /**
  * Code Formatter - Formats code according to style guidelines
@@ -43,74 +43,81 @@ export class CodeFormatter {
    * Format TypeScript/JavaScript code
    */
   public static format(code: string, options: FormatOptions = {}): string {
-    const opts = { ...DEFAULT_OPTIONS, ...options }
-    let formatted = code
+    const opts = { ...DEFAULT_OPTIONS, ...options };
+    let formatted = code;
 
     // Normalize line endings
-    formatted = formatted.replace(/\r\n/g, "\n")
+    formatted = formatted.replace(/\r\n/g, "\n");
 
     // Remove trailing whitespace
     formatted = formatted
       .split("\n")
       .map((line) => line.trimEnd())
-      .join("\n")
+      .join("\n");
 
     // Fix indentation
-    formatted = this.fixIndentation(formatted, opts)
+    formatted = this.fixIndentation(formatted, opts);
 
     // Add/remove semicolons
     if (opts.semicolons) {
-      formatted = this.addSemicolons(formatted)
+      formatted = this.addSemicolons(formatted);
     } else {
-      formatted = this.removeSemicolons(formatted)
+      formatted = this.removeSemicolons(formatted);
     }
 
     // Fix spacing around operators
-    formatted = this.fixOperatorSpacing(formatted)
+    formatted = this.fixOperatorSpacing(formatted);
 
     // Fix spacing in object literals
-    formatted = this.fixObjectSpacing(formatted, opts.bracketSpacing)
+    formatted = this.fixObjectSpacing(formatted, opts.bracketSpacing);
 
     // Fix quote style
-    formatted = this.fixQuotes(formatted, opts.singleQuote)
+    formatted = this.fixQuotes(formatted, opts.singleQuote);
 
     // Ensure file ends with newline
     if (!formatted.endsWith("\n")) {
-      formatted += "\n"
+      formatted += "\n";
     }
 
-    return formatted
+    return formatted;
   }
 
   /**
    * Fix indentation throughout the code
    */
-  private static fixIndentation(code: string, options: Required<FormatOptions>): string {
-    const lines = code.split("\n")
-    const indent = options.useTabs ? "\t" : " ".repeat(options.indentSize)
-    let indentLevel = 0
-    const formatted: string[] = []
+  private static fixIndentation(
+    code: string,
+    options: Required<FormatOptions>,
+  ): string {
+    const lines = code.split("\n");
+    const indent = options.useTabs ? "\t" : " ".repeat(options.indentSize);
+    let indentLevel = 0;
+    const formatted: string[] = [];
 
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim()
+      const line = lines[i].trim();
 
       // Skip empty lines
       if (line === "") {
-        formatted.push("")
-        continue
+        formatted.push("");
+        continue;
       }
 
       // Decrease indent for closing braces
-      if (line.startsWith("}") || line.startsWith("]") || line.startsWith(")")) {
-        indentLevel = Math.max(0, indentLevel - 1)
+      if (
+        line.startsWith("}") ||
+        line.startsWith("]") ||
+        line.startsWith(")")
+      ) {
+        indentLevel = Math.max(0, indentLevel - 1);
       }
 
       // Apply indentation
-      formatted.push(indent.repeat(indentLevel) + line)
+      formatted.push(indent.repeat(indentLevel) + line);
 
       // Increase indent for opening braces
       if (line.endsWith("{") || line.endsWith("[") || line.endsWith("(")) {
-        indentLevel++
+        indentLevel++;
       }
 
       // Handle single-line blocks
@@ -123,20 +130,20 @@ export class CodeFormatter {
       }
     }
 
-    return formatted.join("\n")
+    return formatted.join("\n");
   }
 
   /**
    * Add semicolons to statements
    */
   private static addSemicolons(code: string): string {
-    const lines = code.split("\n")
+    const lines = code.split("\n");
     return lines
       .map((line) => {
-        const trimmed = line.trim()
+        const trimmed = line.trim();
 
         // Skip if already has semicolon
-        if (trimmed.endsWith(";")) return line
+        if (trimmed.endsWith(";")) return line;
 
         // Skip comments, empty lines, and control structures
         if (
@@ -158,64 +165,70 @@ export class CodeFormatter {
           trimmed.startsWith("export") ||
           trimmed.startsWith("import")
         ) {
-          return line
+          return line;
         }
 
         // Add semicolon
-        return line + ";"
+        return line + ";";
       })
-      .join("\n")
+      .join("\n");
   }
 
   /**
    * Remove unnecessary semicolons
    */
   private static removeSemicolons(code: string): string {
-    const lines = code.split("\n")
+    const lines = code.split("\n");
     return lines
       .map((line) => {
         // Only remove trailing semicolons, not those in for loops
         if (line.trim().endsWith(";") && !line.includes("for (")) {
-          return line.replace(/;(\s*)$/, "$1")
+          return line.replace(/;(\s*)$/, "$1");
         }
-        return line
+        return line;
       })
-      .join("\n")
+      .join("\n");
   }
 
   /**
    * Fix spacing around operators
    */
   private static fixOperatorSpacing(code: string): string {
-    let formatted = code
+    let formatted = code;
 
     // Add space around binary operators
-    formatted = formatted.replace(/([a-zA-Z0-9_)])([+\-*/%=<>])([a-zA-Z0-9_(])/g, "$1 $2 $3")
+    formatted = formatted.replace(
+      /([a-zA-Z0-9_)])([+\-*/%=<>])([a-zA-Z0-9_(])/g,
+      "$1 $2 $3",
+    );
 
     // Fix multiple spaces
-    formatted = formatted.replace(/ {2,}/g, " ")
+    formatted = formatted.replace(/ {2,}/g, " ");
 
     // Fix spacing around colons in object literals
-    formatted = formatted.replace(/(\w+)\s*:\s*/g, "$1: ")
+    formatted = formatted.replace(/(\w+)\s*:\s*/g, "$1: ");
 
-    return formatted
+    return formatted;
   }
 
   /**
    * Fix spacing in object literals
    */
-  private static fixObjectSpacing(code: string, bracketSpacing: boolean): string {
+  private static fixObjectSpacing(
+    code: string,
+    bracketSpacing: boolean,
+  ): string {
     if (bracketSpacing) {
       // Add space after { and before }
-      code = code.replace(/\{([^\s])/g, "{ $1")
-      code = code.replace(/([^\s])\}/g, "$1 }")
+      code = code.replace(/\{([^\s])/g, "{ $1");
+      code = code.replace(/([^\s])\}/g, "$1 }");
     } else {
       // Remove space after { and before }
-      code = code.replace(/\{\s+/g, "{")
-      code = code.replace(/\s+\}/g, "}")
+      code = code.replace(/\{\s+/g, "{");
+      code = code.replace(/\s+\}/g, "}");
     }
 
-    return code
+    return code;
   }
 
   /**
@@ -224,10 +237,10 @@ export class CodeFormatter {
   private static fixQuotes(code: string, useSingleQuote: boolean): string {
     if (useSingleQuote) {
       // Convert double quotes to single quotes (except in strings containing single quotes)
-      return code.replace(/"([^"']*?)"/g, "'$1'")
+      return code.replace(/"([^"']*?)"/g, "'$1'");
     } else {
       // Convert single quotes to double quotes (except in strings containing double quotes)
-      return code.replace(/'([^'"]*?)'/g, '"$1"')
+      return code.replace(/'([^'"]*?)'/g, '"$1"');
     }
   }
 
@@ -240,39 +253,39 @@ export class CodeFormatter {
     options?: FormatOptions,
   ): string {
     // Add appropriate wrapper and format
-    const wrapped = `${blockType === "interface" ? "interface" : blockType === "class" ? "class" : "function"} Temp ${code}`
-    const formatted = this.format(wrapped, options)
+    const wrapped = `${blockType === "interface" ? "interface" : blockType === "class" ? "class" : "function"} Temp ${code}`;
+    const formatted = this.format(wrapped, options);
 
     // Remove wrapper
-    const lines = formatted.split("\n")
-    return lines.slice(1).join("\n")
+    const lines = formatted.split("\n");
+    return lines.slice(1).join("\n");
   }
 
   /**
    * Format imports/exports
    */
   public static formatImports(code: string): string {
-    const lines = code.split("\n")
-    const imports: string[] = []
-    const exports: string[] = []
-    const other: string[] = []
+    const lines = code.split("\n");
+    const imports: string[] = [];
+    const exports: string[] = [];
+    const other: string[] = [];
 
     // Separate imports, exports, and other code
     lines.forEach((line) => {
       if (line.trim().startsWith("import ")) {
-        imports.push(line)
+        imports.push(line);
       } else if (line.trim().startsWith("export ")) {
-        exports.push(line)
+        exports.push(line);
       } else {
-        other.push(line)
+        other.push(line);
       }
-    })
+    });
 
     // Sort imports alphabetically
-    imports.sort()
+    imports.sort();
 
     // Reconstruct code with organized imports
-    return [...imports, "", ...other, "", ...exports].join("\n")
+    return [...imports, "", ...other, "", ...exports].join("\n");
   }
 }
 
@@ -280,10 +293,10 @@ export class CodeFormatter {
  * Convenience function for quick formatting
  */
 export function formatCode(code: string, options?: FormatOptions): string {
-  return CodeFormatter.format(code, options)
+  return CodeFormatter.format(code, options);
 }
 
 /**
  * Export formatter instance
  */
-export const formatter = CodeFormatter
+export const formatter = CodeFormatter;

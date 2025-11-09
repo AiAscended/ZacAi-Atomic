@@ -6,13 +6,13 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { detectSyntaxErrors } from "./error_detection_utils"
+import { detectSyntaxErrors } from "./error_detection_utils";
 
 export const errorDetectionParser = (code: string) => {
-  const syntaxErrors = detectSyntaxErrors(code)
-  const hasUndefined = /undefined/.test(code)
-  const hasNull = /null/.test(code)
-  const hasTryCatch = /try\s*{[\s\S]*}\s*catch/.test(code)
+  const syntaxErrors = detectSyntaxErrors(code);
+  const hasUndefined = /undefined/.test(code);
+  const hasNull = /null/.test(code);
+  const hasTryCatch = /try\s*{[\s\S]*}\s*catch/.test(code);
 
   return {
     syntaxErrors,
@@ -20,5 +20,5 @@ export const errorDetectionParser = (code: string) => {
     hasNull,
     hasTryCatch,
     errorCount: syntaxErrors.length,
-  }
-}
+  };
+};

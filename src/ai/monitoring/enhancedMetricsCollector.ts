@@ -1,13 +1,13 @@
 /**
  * Enhanced System Metrics Collector with AI Self-Awareness
- * 
+ *
  * This module extends metricsCollector to provide:
  * 1. Real-time system performance monitoring
  * 2. AI self-awareness metrics for the system domain
  * 3. Resource usage tracking (memory, CPU, latency)
  * 4. Model performance analytics
  * 5. Domain-specific inference metrics
- * 
+ *
  * Used by:
  * - System knowledge domain for self-awareness
  * - Admin dashboard for monitoring
@@ -15,8 +15,8 @@
  * - Training pipeline for quality assessment
  */
 
-import { metricsCollector } from './metricsCollector';
-import os from 'os';
+import { metricsCollector } from "./metricsCollector";
+import os from "os";
 
 export interface SystemMetrics {
   timestamp: string;
@@ -77,20 +77,26 @@ class EnhancedMetricsCollector {
     model?: string;
   }> = [];
 
-  private domainStats = new Map<string, {
-    count: number;
-    totalConfidence: number;
-    totalLatency: number;
-    successes: number;
-    lastUsed: Date;
-  }>();
+  private domainStats = new Map<
+    string,
+    {
+      count: number;
+      totalConfidence: number;
+      totalLatency: number;
+      successes: number;
+      lastUsed: Date;
+    }
+  >();
 
-  private modelStats = new Map<string, {
-    count: number;
-    totalLatency: number;
-    tokensGenerated: number;
-    successes: number;
-  }>();
+  private modelStats = new Map<
+    string,
+    {
+      count: number;
+      totalLatency: number;
+      tokensGenerated: number;
+      successes: number;
+    }
+  >();
 
   /**
    * Record an AI inference operation
@@ -123,13 +129,13 @@ class EnhancedMetricsCollector {
         successes: 0,
         lastUsed: new Date(),
       };
-      
+
       domainStat.count++;
       domainStat.totalConfidence += data.confidence;
       domainStat.totalLatency += data.latency;
       if (data.success) domainStat.successes++;
       domainStat.lastUsed = new Date();
-      
+
       this.domainStats.set(data.domain, domainStat);
     }
 
@@ -141,23 +147,23 @@ class EnhancedMetricsCollector {
         tokensGenerated: 0,
         successes: 0,
       };
-      
+
       modelStat.count++;
       modelStat.totalLatency += data.latency;
       modelStat.tokensGenerated += data.tokensGenerated || 0;
       if (data.success) modelStat.successes++;
-      
+
       this.modelStats.set(data.model, modelStat);
     }
 
     // Record in base metrics collector
-    metricsCollector.record('ai_inference', 1, {
-      domain: data.domain || 'unknown',
-      model: data.model || 'unknown',
+    metricsCollector.record("ai_inference", 1, {
+      domain: data.domain || "unknown",
+      model: data.model || "unknown",
       success: data.success.toString(),
     });
-    metricsCollector.record('ai_confidence', data.confidence);
-    metricsCollector.record('request_latency', data.latency);
+    metricsCollector.record("ai_confidence", data.confidence);
+    metricsCollector.record("request_latency", data.latency);
   }
 
   /**
@@ -167,16 +173,22 @@ class EnhancedMetricsCollector {
   getSystemMetrics(): SystemMetrics {
     const perfMetrics = metricsCollector.getPerformanceMetrics();
     const recentInferences = this.inferences.slice(-100);
-    
+
     const totalInferences = this.inferences.length;
-    const successfulInferences = this.inferences.filter(i => i.success).length;
-    const averageConfidence = recentInferences.length > 0
-      ? recentInferences.reduce((sum, i) => sum + i.confidence, 0) / recentInferences.length
-      : 0;
+    const successfulInferences = this.inferences.filter(
+      (i) => i.success,
+    ).length;
+    const averageConfidence =
+      recentInferences.length > 0
+        ? recentInferences.reduce((sum, i) => sum + i.confidence, 0) /
+          recentInferences.length
+        : 0;
 
     // Calculate requests per minute
     const oneMinuteAgo = new Date(Date.now() - 60000);
-    const recentRequests = this.inferences.filter(i => i.timestamp > oneMinuteAgo).length;
+    const recentRequests = this.inferences.filter(
+      (i) => i.timestamp > oneMinuteAgo,
+    ).length;
 
     return {
       timestamp: new Date().toISOString(),
@@ -204,9 +216,10 @@ class EnhancedMetricsCollector {
       },
       performance: {
         requestsPerMinute: recentRequests,
-        errorRate: totalInferences > 0 
-          ? ((totalInferences - successfulInferences) / totalInferences) * 100 
-          : 0,
+        errorRate:
+          totalInferences > 0
+            ? ((totalInferences - successfulInferences) / totalInferences) * 100
+            : 0,
         p95Latency: perfMetrics.p95Latency,
         p99Latency: perfMetrics.p99Latency,
       },
@@ -218,7 +231,7 @@ class EnhancedMetricsCollector {
    */
   getDomainMetrics(): DomainMetrics[] {
     const metrics: DomainMetrics[] = [];
-    
+
     this.domainStats.forEach((stats, domain) => {
       metrics.push({
         domain,
@@ -238,7 +251,7 @@ class EnhancedMetricsCollector {
    */
   getModelMetrics(): ModelMetrics[] {
     const metrics: ModelMetrics[] = [];
-    
+
     this.modelStats.forEach((stats, model) => {
       metrics.push({
         model,
@@ -256,7 +269,7 @@ class EnhancedMetricsCollector {
    * Get system health status
    */
   getHealthStatus(): {
-    status: 'healthy' | 'degraded' | 'critical';
+    status: "healthy" | "degraded" | "critical";
     issues: string[];
     recommendations: string[];
   } {
@@ -266,31 +279,44 @@ class EnhancedMetricsCollector {
 
     // Check memory usage
     if (metrics.system.memoryUsage.percentage > 90) {
-      issues.push('High memory usage (>90%)');
-      recommendations.push('Consider restarting the application or increasing memory allocation');
+      issues.push("High memory usage (>90%)");
+      recommendations.push(
+        "Consider restarting the application or increasing memory allocation",
+      );
     }
 
     // Check error rate
     if (metrics.performance.errorRate > 10) {
-      issues.push(`High error rate (${metrics.performance.errorRate.toFixed(1)}%)`);
-      recommendations.push('Review recent errors and check domain/model configurations');
+      issues.push(
+        `High error rate (${metrics.performance.errorRate.toFixed(1)}%)`,
+      );
+      recommendations.push(
+        "Review recent errors and check domain/model configurations",
+      );
     }
 
     // Check latency
     if (metrics.performance.p95Latency > 5000) {
-      issues.push('High latency detected (p95 > 5s)');
-      recommendations.push('Optimize inference engines or enable parallel processing');
+      issues.push("High latency detected (p95 > 5s)");
+      recommendations.push(
+        "Optimize inference engines or enable parallel processing",
+      );
     }
 
     // Check AI confidence
     if (metrics.ai.averageConfidence < 0.5) {
-      issues.push('Low average confidence (<0.5)');
-      recommendations.push('Train models with more data or adjust confidence thresholds');
+      issues.push("Low average confidence (<0.5)");
+      recommendations.push(
+        "Train models with more data or adjust confidence thresholds",
+      );
     }
 
-    const status = issues.length === 0 ? 'healthy' 
-      : issues.length <= 2 ? 'degraded' 
-      : 'critical';
+    const status =
+      issues.length === 0
+        ? "healthy"
+        : issues.length <= 2
+          ? "degraded"
+          : "critical";
 
     return { status, issues, recommendations };
   }
@@ -303,14 +329,14 @@ class EnhancedMetricsCollector {
     let totalIdle = 0;
     let totalTick = 0;
 
-    cpus.forEach(cpu => {
+    cpus.forEach((cpu) => {
       for (const type in cpu.times) {
         totalTick += cpu.times[type as keyof typeof cpu.times];
       }
       totalIdle += cpu.times.idle;
     });
 
-    return 100 - (100 * totalIdle / totalTick);
+    return 100 - (100 * totalIdle) / totalTick;
   }
 
   /**

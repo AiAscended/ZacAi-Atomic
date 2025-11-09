@@ -15,9 +15,9 @@
  */
 export function subtract(minuend: number, ...subtrahends: number[]): number {
   if (subtrahends.length === 0) {
-    throw new Error("Subtraction requires at least two numbers")
+    throw new Error("Subtraction requires at least two numbers");
   }
-  return subtrahends.reduce((result, num) => result - num, minuend)
+  return subtrahends.reduce((result, num) => result - num, minuend);
 }
 
 /**
@@ -28,6 +28,6 @@ export function subtract(minuend: number, ...subtrahends: number[]): number {
  * @returns Difference with specified precision
  */
 export function subtractPrecise(a: number, b: number, precision = 10): number {
-  const multiplier = Math.pow(10, precision)
-  return Math.round((a - b) * multiplier) / multiplier
+  const multiplier = Math.pow(10, precision);
+  return Math.round((a - b) * multiplier) / multiplier;
 }

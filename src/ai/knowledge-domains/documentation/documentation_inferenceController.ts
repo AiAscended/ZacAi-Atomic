@@ -6,16 +6,16 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { documentationTokenizer } from "./documentation_tokenizer"
-import { documentationSemanticAnalyzer } from "./documentation_semanticAnalyzer"
+import { documentationTokenizer } from "./documentation_tokenizer";
+import { documentationSemanticAnalyzer } from "./documentation_semanticAnalyzer";
 
 export const documentationRunInference = async (input: string) => {
-  const t = documentationTokenizer(input)
-  const sem = documentationSemanticAnalyzer(input)
+  const t = documentationTokenizer(input);
+  const sem = documentationSemanticAnalyzer(input);
   return {
     tokens: t.tokens,
     tokenCount: t.length,
     semantics: sem,
     response: `Documentation analysis: ${sem.commentCount} comments, quality: ${sem.quality}, coverage: ${sem.coverage}.`,
-  }
-}
+  };
+};

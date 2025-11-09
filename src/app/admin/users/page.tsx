@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 /**
  * User Management Page
@@ -6,12 +6,12 @@
  * Supports admin and system roles for self-awareness features
  */
 
-import { useState, useEffect } from "react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { UserPlus, Edit2, Trash2, Save, X } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { UserPlus, Edit2, Trash2, Save, X } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -19,7 +19,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -27,68 +27,72 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 interface User {
-  id: string
-  name: string
-  email: string
-  role: "admin" | "user" | "system"
-  createdAt: string
-  updatedAt: string
+  id: string;
+  name: string;
+  email: string;
+  role: "admin" | "user" | "system";
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [currentUser, setCurrentUser] = useState<User | null>(null)
-  const [formData, setFormData] = useState<{ name: string; email: string; role: "admin" | "user" | "system" }>({ 
-    name: "", 
-    email: "", 
-    role: "user" 
-  })
-  const { toast } = useToast()
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [formData, setFormData] = useState<{
+    name: string;
+    email: string;
+    role: "admin" | "user" | "system";
+  }>({
+    name: "",
+    email: "",
+    role: "user",
+  });
+  const { toast } = useToast();
 
   // Load users
   useEffect(() => {
-    loadUsers()
-  }, [])
+    loadUsers();
+  }, []);
 
   const loadUsers = async () => {
     try {
-      const response = await fetch("/api/admin/settings/users")
-      const result = await response.json()
+      const response = await fetch("/api/admin/settings/users");
+      const result = await response.json();
       if (result.success) {
-        setUsers(result.data || [])
+        setUsers(result.data || []);
       } else {
         toast({
           title: "Error",
           description: result.error || "Failed to load users",
           variant: "destructive",
-        })
+        });
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to connect to API",
         variant: "destructive",
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleAddUser = async () => {
     if (!formData.name || !formData.email) {
@@ -96,8 +100,8 @@ export default function UsersPage() {
         title: "Validation Error",
         description: "Name and email are required",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     try {
@@ -105,35 +109,35 @@ export default function UsersPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
-      })
-      const result = await response.json()
-      
+      });
+      const result = await response.json();
+
       if (result.success) {
         toast({
           title: "Success",
           description: "User created successfully",
-        })
-        setIsAddModalOpen(false)
-        setFormData({ name: "", email: "", role: "user" })
-        loadUsers()
+        });
+        setIsAddModalOpen(false);
+        setFormData({ name: "", email: "", role: "user" });
+        loadUsers();
       } else {
         toast({
           title: "Error",
           description: result.error || "Failed to create user",
           variant: "destructive",
-        })
+        });
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to create user",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleEditUser = async () => {
-    if (!currentUser) return
+    if (!currentUser) return;
 
     try {
       const response = await fetch("/api/admin/settings/users", {
@@ -144,99 +148,108 @@ export default function UsersPage() {
           ...formData,
           updatedAt: new Date().toISOString(),
         }),
-      })
-      const result = await response.json()
-      
+      });
+      const result = await response.json();
+
       if (result.success) {
         toast({
           title: "Success",
           description: "User updated successfully",
-        })
-        setIsEditModalOpen(false)
-        setCurrentUser(null)
-        loadUsers()
+        });
+        setIsEditModalOpen(false);
+        setCurrentUser(null);
+        loadUsers();
       } else {
         toast({
           title: "Error",
           description: result.error || "Failed to update user",
           variant: "destructive",
-        })
+        });
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to update user",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleDeleteUser = async () => {
-    if (!currentUser) return
+    if (!currentUser) return;
 
     try {
-      const response = await fetch(`/api/admin/settings/users?id=${currentUser.id}`, {
-        method: "DELETE",
-      })
-      const result = await response.json()
-      
+      const response = await fetch(
+        `/api/admin/settings/users?id=${currentUser.id}`,
+        {
+          method: "DELETE",
+        },
+      );
+      const result = await response.json();
+
       if (result.success) {
         toast({
           title: "Success",
           description: "User deleted successfully",
-        })
-        setIsDeleteModalOpen(false)
-        setCurrentUser(null)
-        loadUsers()
+        });
+        setIsDeleteModalOpen(false);
+        setCurrentUser(null);
+        loadUsers();
       } else {
         toast({
           title: "Error",
           description: result.error || "Failed to delete user",
           variant: "destructive",
-        })
+        });
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to delete user",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const openEditModal = (user: User) => {
-    setCurrentUser(user)
-    setFormData({ name: user.name, email: user.email, role: user.role })
-    setIsEditModalOpen(true)
-  }
+    setCurrentUser(user);
+    setFormData({ name: user.name, email: user.email, role: user.role });
+    setIsEditModalOpen(true);
+  };
 
   const openDeleteModal = (user: User) => {
-    setCurrentUser(user)
-    setIsDeleteModalOpen(true)
-  }
+    setCurrentUser(user);
+    setIsDeleteModalOpen(true);
+  };
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
-      case "admin": return "default"
-      case "system": return "secondary"
-      default: return "outline"
+      case "admin":
+        return "default";
+      case "system":
+        return "secondary";
+      default:
+        return "outline";
     }
-  }
+  };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case "admin": return "👤"
-      case "system": return "🤖"
-      default: return "👥"
+      case "admin":
+        return "👤";
+      case "system":
+        return "🤖";
+      default:
+        return "👥";
     }
-  }
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-muted-foreground">Loading users...</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -268,7 +281,10 @@ export default function UsersPage() {
           <TableBody>
             {users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={5}
+                  className="text-center text-muted-foreground"
+                >
                   No users found. Create your first user to get started.
                 </TableCell>
               </TableRow>
@@ -316,7 +332,8 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle>Add New User</DialogTitle>
             <DialogDescription>
-              Create a new user account. Use role &quot;system&quot; for AI self-awareness.
+              Create a new user account. Use role &quot;system&quot; for AI
+              self-awareness.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -325,7 +342,9 @@ export default function UsersPage() {
               <Input
                 id="add-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="Enter user name"
               />
             </div>
@@ -335,7 +354,9 @@ export default function UsersPage() {
                 id="add-email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 placeholder="user@example.com"
               />
             </div>
@@ -343,7 +364,9 @@ export default function UsersPage() {
               <Label htmlFor="add-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: any) => setFormData({ ...formData, role: value })}
+                onValueChange={(value: any) =>
+                  setFormData({ ...formData, role: value })
+                }
               >
                 <SelectTrigger id="add-role">
                   <SelectValue />
@@ -384,7 +407,9 @@ export default function UsersPage() {
               <Input
                 id="edit-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
@@ -393,14 +418,18 @@ export default function UsersPage() {
                 id="edit-email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: any) => setFormData({ ...formData, role: value })}
+                onValueChange={(value: any) =>
+                  setFormData({ ...formData, role: value })
+                }
               >
                 <SelectTrigger id="edit-role">
                   <SelectValue />
@@ -432,11 +461,15 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle>Delete User</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete user &quot;{currentUser?.name}&quot;? This action cannot be undone.
+              Are you sure you want to delete user &quot;{currentUser?.name}
+              &quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleDeleteUser}>
@@ -447,5 +480,5 @@ export default function UsersPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-import { vfs, IDEFile } from './virtualFileSystem';
+import { useState, useEffect, useCallback } from "react";
+import { vfs, IDEFile } from "./virtualFileSystem";
 
 interface FileNode {
   name: string;
   path: string;
-  type: 'file' | 'directory';
+  type: "file" | "directory";
   children?: FileNode[];
   expanded?: boolean;
 }
@@ -20,12 +20,12 @@ export function useFileSystem() {
 
     // First pass: create all nodes
     files.forEach((file) => {
-      const name = file.path.split('/').filter(Boolean).pop() || file.path;
+      const name = file.path.split("/").filter(Boolean).pop() || file.path;
       nodeMap.set(file.path, {
         name,
         path: file.path,
         type: file.type,
-        children: file.type === 'directory' ? [] : undefined,
+        children: file.type === "directory" ? [] : undefined,
         expanded: false,
       });
     });
@@ -40,7 +40,7 @@ export function useFileSystem() {
         if (parentNode && parentNode.children) {
           parentNode.children.push(node);
         }
-      } else if (file.path !== '/') {
+      } else if (file.path !== "/") {
         rootNodes.push(node);
       }
     });
@@ -49,7 +49,7 @@ export function useFileSystem() {
     const sortNodes = (nodes: FileNode[]) => {
       nodes.sort((a, b) => {
         if (a.type !== b.type) {
-          return a.type === 'directory' ? -1 : 1;
+          return a.type === "directory" ? -1 : 1;
         }
         return a.name.localeCompare(b.name);
       });
@@ -68,11 +68,11 @@ export function useFileSystem() {
     try {
       setLoading(true);
       setError(null);
-      const files = await vfs.getDirectoryTree('/');
-      const tree = buildFileTree(files.filter((f) => f.path !== '/'));
+      const files = await vfs.getDirectoryTree("/");
+      const tree = buildFileTree(files.filter((f) => f.path !== "/"));
       setFileTree(tree);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load files');
+      setError(err instanceof Error ? err.message : "Failed to load files");
     } finally {
       setLoading(false);
     }
@@ -83,17 +83,17 @@ export function useFileSystem() {
   }, [loadFileTree]);
 
   const createFile = useCallback(
-    async (path: string, content: string = '') => {
+    async (path: string, content: string = "") => {
       try {
         await vfs.createFile(path, content);
         await loadFileTree();
       } catch (err) {
         throw new Error(
-          err instanceof Error ? err.message : 'Failed to create file'
+          err instanceof Error ? err.message : "Failed to create file",
         );
       }
     },
-    [loadFileTree]
+    [loadFileTree],
   );
 
   const createDirectory = useCallback(
@@ -103,11 +103,11 @@ export function useFileSystem() {
         await loadFileTree();
       } catch (err) {
         throw new Error(
-          err instanceof Error ? err.message : 'Failed to create directory'
+          err instanceof Error ? err.message : "Failed to create directory",
         );
       }
     },
-    [loadFileTree]
+    [loadFileTree],
   );
 
   const deleteFile = useCallback(
@@ -117,11 +117,11 @@ export function useFileSystem() {
         await loadFileTree();
       } catch (err) {
         throw new Error(
-          err instanceof Error ? err.message : 'Failed to delete file'
+          err instanceof Error ? err.message : "Failed to delete file",
         );
       }
     },
-    [loadFileTree]
+    [loadFileTree],
   );
 
   const renameFile = useCallback(
@@ -131,11 +131,11 @@ export function useFileSystem() {
         await loadFileTree();
       } catch (err) {
         throw new Error(
-          err instanceof Error ? err.message : 'Failed to rename file'
+          err instanceof Error ? err.message : "Failed to rename file",
         );
       }
     },
-    [loadFileTree]
+    [loadFileTree],
   );
 
   const readFile = useCallback(async (path: string) => {
@@ -143,7 +143,7 @@ export function useFileSystem() {
       return await vfs.readFile(path);
     } catch (err) {
       throw new Error(
-        err instanceof Error ? err.message : 'Failed to read file'
+        err instanceof Error ? err.message : "Failed to read file",
       );
     }
   }, []);
@@ -155,11 +155,11 @@ export function useFileSystem() {
         await loadFileTree();
       } catch (err) {
         throw new Error(
-          err instanceof Error ? err.message : 'Failed to write file'
+          err instanceof Error ? err.message : "Failed to write file",
         );
       }
     },
-    [loadFileTree]
+    [loadFileTree],
   );
 
   const searchFiles = useCallback(async (query: string) => {
@@ -167,7 +167,7 @@ export function useFileSystem() {
       return await vfs.searchFiles(query);
     } catch (err) {
       throw new Error(
-        err instanceof Error ? err.message : 'Failed to search files'
+        err instanceof Error ? err.message : "Failed to search files",
       );
     }
   }, []);
@@ -178,7 +178,7 @@ export function useFileSystem() {
       await loadFileTree();
     } catch (err) {
       throw new Error(
-        err instanceof Error ? err.message : 'Failed to clear files'
+        err instanceof Error ? err.message : "Failed to clear files",
       );
     }
   }, [loadFileTree]);

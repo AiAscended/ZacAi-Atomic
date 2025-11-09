@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense } from 'react';
-import { IDELayout } from './components/IDELayout';
-import { IDELoadingState } from './components/IDELoadingState';
+import { Suspense } from "react";
+import { IDELayout } from "./components/IDELayout";
+import { IDELoadingState } from "./components/IDELoadingState";
 
 export default function IDEPage() {
   return (

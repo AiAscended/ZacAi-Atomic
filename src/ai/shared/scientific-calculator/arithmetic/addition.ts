@@ -14,9 +14,9 @@
  */
 export function add(...numbers: number[]): number {
   if (numbers.length === 0) {
-    throw new Error("Addition requires at least one number")
+    throw new Error("Addition requires at least one number");
   }
-  return numbers.reduce((sum, num) => sum + num, 0)
+  return numbers.reduce((sum, num) => sum + num, 0);
 }
 
 /**
@@ -27,6 +27,6 @@ export function add(...numbers: number[]): number {
  * @returns Sum with specified precision
  */
 export function addPrecise(a: number, b: number, precision = 10): number {
-  const multiplier = Math.pow(10, precision)
-  return Math.round((a + b) * multiplier) / multiplier
+  const multiplier = Math.pow(10, precision);
+  return Math.round((a + b) * multiplier) / multiplier;
 }

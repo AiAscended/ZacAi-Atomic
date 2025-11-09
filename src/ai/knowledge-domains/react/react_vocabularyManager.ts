@@ -1,8 +1,8 @@
-let vocabularyLoaded = false
-let vocabulary: string[] = []
+let vocabularyLoaded = false;
+let vocabulary: string[] = [];
 
 export async function loadReactSeedVocabulary(): Promise<void> {
-  if (vocabularyLoaded) return
+  if (vocabularyLoaded) return;
 
   try {
     // In a real implementation, this would load from the JSON file
@@ -18,20 +18,20 @@ export async function loadReactSeedVocabulary(): Promise<void> {
       "jsx",
       "render",
       "lifecycle",
-    ]
+    ];
 
-    vocabularyLoaded = true
-    console.log(`[React Domain] Loaded ${vocabulary.length} vocabulary terms`)
+    vocabularyLoaded = true;
+    console.log(`[React Domain] Loaded ${vocabulary.length} vocabulary terms`);
   } catch (error) {
-    console.error("[React Domain] Failed to load vocabulary:", error)
-    throw error
+    console.error("[React Domain] Failed to load vocabulary:", error);
+    throw error;
   }
 }
 
 export function getReactVocabulary(): string[] {
-  return [...vocabulary]
+  return [...vocabulary];
 }
 
 export function isVocabularyLoaded(): boolean {
-  return vocabularyLoaded
+  return vocabularyLoaded;
 }

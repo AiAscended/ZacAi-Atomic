@@ -6,7 +6,7 @@
  * Role: Tokenize text into words and return tokens and simple ids.
  */
 
-import { textNormalizer } from './textNormalizer';
+import { textNormalizer } from "./textNormalizer";
 
 export const wordTokenizer = (text: string): string[] => {
   const clean = textNormalizer(text);

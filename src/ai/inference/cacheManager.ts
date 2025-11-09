@@ -20,7 +20,8 @@ export class CacheManager<T> {
 
   clearOlderThan(ms: number) {
     const cutoff = Date.now() - ms;
-    for (const [k, v] of this.store.entries()) if (v.ts < cutoff) this.store.delete(k);
+    for (const [k, v] of this.store.entries())
+      if (v.ts < cutoff) this.store.delete(k);
   }
 
   clear() {

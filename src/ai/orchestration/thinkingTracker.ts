@@ -10,19 +10,19 @@
  */
 
 interface ThinkingStep {
-  step: string // short id or step name
-  description: string // human-readable description
-  timestamp: number // time ms elapsed since process start
-  data?: Record<string, unknown> // additional debugging/context data
+  step: string; // short id or step name
+  description: string; // human-readable description
+  timestamp: number; // time ms elapsed since process start
+  data?: Record<string, unknown>; // additional debugging/context data
 }
 
 export class ThinkingTracker {
-  private startTime: number
-  private steps: ThinkingStep[] = []
+  private startTime: number;
+  private steps: ThinkingStep[] = [];
 
   constructor() {
-    this.startTime = Date.now()
-    this.steps = []
+    this.startTime = Date.now();
+    this.steps = [];
   }
 
   /**
@@ -33,13 +33,13 @@ export class ThinkingTracker {
    * @param data any extra debugging info
    */
   addStep(step: string, description: string, data?: Record<string, unknown>) {
-    const now = Date.now()
+    const now = Date.now();
     this.steps.push({
       step,
       description,
       timestamp: now - this.startTime,
       data,
-    })
+    });
   }
 
   /**
@@ -47,14 +47,14 @@ export class ThinkingTracker {
    * @returns ThinkingStep[]
    */
   getSteps(): ThinkingStep[] {
-    return this.steps
+    return this.steps;
   }
 
   /**
    * Reset thinking tracker to new session.
    */
   reset() {
-    this.startTime = Date.now()
-    this.steps = []
+    this.startTime = Date.now();
+    this.steps = [];
   }
 }

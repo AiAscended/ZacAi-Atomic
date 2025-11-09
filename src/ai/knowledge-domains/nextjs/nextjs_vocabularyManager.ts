@@ -1,8 +1,8 @@
-let vocabularyLoaded = false
-let vocabulary: string[] = []
+let vocabularyLoaded = false;
+let vocabulary: string[] = [];
 
 export async function loadNextjsSeedVocabulary(): Promise<void> {
-  if (vocabularyLoaded) return
+  if (vocabularyLoaded) return;
 
   try {
     vocabulary = [
@@ -21,20 +21,22 @@ export async function loadNextjsSeedVocabulary(): Promise<void> {
       "dynamic-routes",
       "api-routes",
       "image-optimization",
-    ]
+    ];
 
-    vocabularyLoaded = true
-    console.log(`[Next.js Domain] Loaded ${vocabulary.length} vocabulary terms`)
+    vocabularyLoaded = true;
+    console.log(
+      `[Next.js Domain] Loaded ${vocabulary.length} vocabulary terms`,
+    );
   } catch (error) {
-    console.error("[Next.js Domain] Failed to load vocabulary:", error)
-    throw error
+    console.error("[Next.js Domain] Failed to load vocabulary:", error);
+    throw error;
   }
 }
 
 export function getNextjsVocabulary(): string[] {
-  return [...vocabulary]
+  return [...vocabulary];
 }
 
 export function isVocabularyLoaded(): boolean {
-  return vocabularyLoaded
+  return vocabularyLoaded;
 }

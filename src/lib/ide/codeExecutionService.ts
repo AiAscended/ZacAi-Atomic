@@ -1,4 +1,4 @@
-import { vfs } from './virtualFileSystem';
+import { vfs } from "./virtualFileSystem";
 
 export interface ExecutionResult {
   output: string;
@@ -15,14 +15,19 @@ class CodeExecutionService {
     this.iframe = iframe;
   }
 
-  async executeHTML(html: string, css?: string, js?: string): Promise<ExecutionResult> {
+  async executeHTML(
+    html: string,
+    css?: string,
+    js?: string,
+  ): Promise<ExecutionResult> {
     this.logs = [];
-    
+
     try {
       const fullHTML = this.buildFullHTML(html, css, js);
-      
+
       if (this.iframe) {
-        const doc = this.iframe.contentDocument || this.iframe.contentWindow?.document;
+        const doc =
+          this.iframe.contentDocument || this.iframe.contentWindow?.document;
         if (doc) {
           doc.open();
           doc.write(fullHTML);
@@ -31,14 +36,14 @@ class CodeExecutionService {
       }
 
       return {
-        output: 'Code executed successfully',
+        output: "Code executed successfully",
         html: fullHTML,
         logs: this.logs,
       };
     } catch (error) {
       return {
-        output: '',
-        error: error instanceof Error ? error.message : 'Execution failed',
+        output: "",
+        error: error instanceof Error ? error.message : "Execution failed",
         logs: this.logs,
       };
     }
@@ -46,28 +51,31 @@ class CodeExecutionService {
 
   async executeJavaScript(code: string): Promise<ExecutionResult> {
     this.logs = [];
-    
+
     try {
       // Create a sandboxed console
       const sandboxConsole = {
-        log: (...args: any[]) => this.logs.push(args.map(String).join(' ')),
-        error: (...args: any[]) => this.logs.push('ERROR: ' + args.map(String).join(' ')),
-        warn: (...args: any[]) => this.logs.push('WARN: ' + args.map(String).join(' ')),
-        info: (...args: any[]) => this.logs.push('INFO: ' + args.map(String).join(' ')),
+        log: (...args: any[]) => this.logs.push(args.map(String).join(" ")),
+        error: (...args: any[]) =>
+          this.logs.push("ERROR: " + args.map(String).join(" ")),
+        warn: (...args: any[]) =>
+          this.logs.push("WARN: " + args.map(String).join(" ")),
+        info: (...args: any[]) =>
+          this.logs.push("INFO: " + args.map(String).join(" ")),
       };
 
       // Execute in sandboxed environment
-      const func = new Function('console', code);
+      const func = new Function("console", code);
       func(sandboxConsole);
 
       return {
-        output: 'Execution completed',
+        output: "Execution completed",
         logs: this.logs,
       };
     } catch (error) {
       return {
-        output: '',
-        error: error instanceof Error ? error.message : 'Execution failed',
+        output: "",
+        error: error instanceof Error ? error.message : "Execution failed",
         logs: this.logs,
       };
     }
@@ -75,11 +83,11 @@ class CodeExecutionService {
 
   async executeReact(code: string): Promise<ExecutionResult> {
     this.logs = [];
-    
+
     try {
       // Transform JSX to createElement calls (simplified)
       const transformed = this.transformJSX(code);
-      
+
       const html = `
 <!DOCTYPE html>
 <html>
@@ -102,7 +110,8 @@ class CodeExecutionService {
 </html>`;
 
       if (this.iframe) {
-        const doc = this.iframe.contentDocument || this.iframe.contentWindow?.document;
+        const doc =
+          this.iframe.contentDocument || this.iframe.contentWindow?.document;
         if (doc) {
           doc.open();
           doc.write(html);
@@ -111,14 +120,14 @@ class CodeExecutionService {
       }
 
       return {
-        output: 'React component rendered',
+        output: "React component rendered",
         html,
         logs: this.logs,
       };
     } catch (error) {
       return {
-        output: '',
-        error: error instanceof Error ? error.message : 'Execution failed',
+        output: "",
+        error: error instanceof Error ? error.message : "Execution failed",
         logs: this.logs,
       };
     }
@@ -127,42 +136,45 @@ class CodeExecutionService {
   async executeFromVFS(filePath: string): Promise<ExecutionResult> {
     try {
       const file = await vfs.readFile(filePath);
-      
+
       if (!file) {
         return {
-          output: '',
-          error: 'File not found',
+          output: "",
+          error: "File not found",
           logs: [],
         };
       }
 
       // Determine execution method based on file type
-      if (file.language === 'html') {
+      if (file.language === "html") {
         // Look for associated CSS and JS files
-        const basePath = filePath.replace(/\.html$/, '');
-        const cssFile = await vfs.readFile(basePath + '.css');
-        const jsFile = await vfs.readFile(basePath + '.js');
-        
+        const basePath = filePath.replace(/\.html$/, "");
+        const cssFile = await vfs.readFile(basePath + ".css");
+        const jsFile = await vfs.readFile(basePath + ".js");
+
         return this.executeHTML(
           file.content,
           cssFile?.content,
-          jsFile?.content
+          jsFile?.content,
         );
-      } else if (file.language === 'javascript') {
+      } else if (file.language === "javascript") {
         return this.executeJavaScript(file.content);
-      } else if (file.language === 'typescript' && file.content.includes('React')) {
+      } else if (
+        file.language === "typescript" &&
+        file.content.includes("React")
+      ) {
         return this.executeReact(file.content);
       } else {
         return {
-          output: '',
-          error: 'Unsupported file type for execution',
+          output: "",
+          error: "Unsupported file type for execution",
           logs: [],
         };
       }
     } catch (error) {
       return {
-        output: '',
-        error: error instanceof Error ? error.message : 'Execution failed',
+        output: "",
+        error: error instanceof Error ? error.message : "Execution failed",
         logs: [],
       };
     }
@@ -187,12 +199,12 @@ class CodeExecutionService {
       line-height: 1.6;
       color: #333;
     }
-    ${css || ''}
+    ${css || ""}
   </style>
 </head>
 <body>
   ${html}
-  ${js ? `<script>${js}</script>` : ''}
+  ${js ? `<script>${js}</script>` : ""}
   <script>
     // Capture console output and send to parent
     const originalConsole = {
@@ -246,9 +258,9 @@ class CodeExecutionService {
     // Very basic JSX transformation - in production, use Babel
     // This is just a placeholder for the concept
     return code
-      .replace(/export\s+default\s+function\s+(\w+)/g, 'function $1')
-      .replace(/export\s+function\s+(\w+)/g, 'function $1')
-      .replace(/export\s+const\s+(\w+)/g, 'const $1');
+      .replace(/export\s+default\s+function\s+(\w+)/g, "function $1")
+      .replace(/export\s+function\s+(\w+)/g, "function $1")
+      .replace(/export\s+const\s+(\w+)/g, "const $1");
   }
 
   getLogs(): string[] {

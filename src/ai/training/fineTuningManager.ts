@@ -3,7 +3,7 @@
  * Purpose: Minimal fine-tuning manager that accepts data and runs a mocked training loop.
  */
 
-import { runTrainingLoop } from './trainingLoopController';
+import { runTrainingLoop } from "./trainingLoopController";
 
 export const fineTune = async (dataBatches: unknown[][], epochs = 1) => {
   await runTrainingLoop(epochs, dataBatches, async (_idx, _batch) => {

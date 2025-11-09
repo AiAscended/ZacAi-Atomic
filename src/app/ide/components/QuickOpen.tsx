@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Search, FileIcon, FileCode } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from "react";
+import { Search, FileIcon, FileCode } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useFileSystem } from '@/lib/ide/useFileSystem';
-import { useEditorStore } from '@/lib/ide/editorStore';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useFileSystem } from "@/lib/ide/useFileSystem";
+import { useEditorStore } from "@/lib/ide/editorStore";
 
 interface QuickOpenProps {
   open: boolean;
@@ -19,27 +19,30 @@ interface QuickOpenProps {
 }
 
 export function QuickOpen({ open, onOpenChange }: QuickOpenProps) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [results, setResults] = useState<any[]>([]);
   const { searchFiles } = useFileSystem();
   const { openFile } = useEditorStore();
 
-  const performSearch = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      setResults([]);
-      return;
-    }
+  const performSearch = useCallback(
+    async (searchQuery: string) => {
+      if (!searchQuery.trim()) {
+        setResults([]);
+        return;
+      }
 
-    try {
-      const files = await searchFiles(searchQuery);
-      setResults(files.slice(0, 20)); // Limit to 20 results
-      setSelectedIndex(0);
-    } catch (error) {
-      console.error('Search error:', error);
-      setResults([]);
-    }
-  }, [searchFiles]);
+      try {
+        const files = await searchFiles(searchQuery);
+        setResults(files.slice(0, 20)); // Limit to 20 results
+        setSelectedIndex(0);
+      } catch (error) {
+        console.error("Search error:", error);
+        setResults([]);
+      }
+    },
+    [searchFiles],
+  );
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -50,13 +53,13 @@ export function QuickOpen({ open, onOpenChange }: QuickOpenProps) {
   }, [query, performSearch]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowDown') {
+    if (e.key === "ArrowDown") {
       e.preventDefault();
       setSelectedIndex((prev) => Math.min(prev + 1, results.length - 1));
-    } else if (e.key === 'ArrowUp') {
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setSelectedIndex((prev) => Math.max(prev - 1, 0));
-    } else if (e.key === 'Enter') {
+    } else if (e.key === "Enter") {
       e.preventDefault();
       if (results[selectedIndex]) {
         handleSelectFile(results[selectedIndex]);
@@ -66,17 +69,17 @@ export function QuickOpen({ open, onOpenChange }: QuickOpenProps) {
 
   const handleSelectFile = async (file: any) => {
     try {
-      const fileName = file.path.split('/').pop() || file.path;
+      const fileName = file.path.split("/").pop() || file.path;
       openFile(file.path, fileName, file.content, file.language);
       onOpenChange(false);
-      setQuery('');
+      setQuery("");
     } catch (error) {
-      console.error('Failed to open file:', error);
+      console.error("Failed to open file:", error);
     }
   };
 
   const getFileIcon = (language: string) => {
-    if (['typescript', 'javascript'].includes(language)) {
+    if (["typescript", "javascript"].includes(language)) {
       return <FileCode className="w-4 h-4 text-blue-400" />;
     }
     return <FileIcon className="w-4 h-4 text-gray-400" />;
@@ -111,8 +114,8 @@ export function QuickOpen({ open, onOpenChange }: QuickOpenProps) {
                     key={file.path}
                     className={`flex items-center gap-3 p-3 rounded cursor-pointer ${
                       index === selectedIndex
-                        ? 'bg-[#37373d]'
-                        : 'hover:bg-[#2a2d2e]'
+                        ? "bg-[#37373d]"
+                        : "hover:bg-[#2a2d2e]"
                     }`}
                     onClick={() => handleSelectFile(file)}
                     onMouseEnter={() => setSelectedIndex(index)}
@@ -120,7 +123,7 @@ export function QuickOpen({ open, onOpenChange }: QuickOpenProps) {
                     {getFileIcon(file.language)}
                     <div className="flex-1 min-w-0">
                       <div className="text-sm text-gray-200 truncate">
-                        {file.path.split('/').pop()}
+                        {file.path.split("/").pop()}
                       </div>
                       <div className="text-xs text-gray-500 truncate">
                         {file.path}
@@ -143,7 +146,9 @@ export function QuickOpen({ open, onOpenChange }: QuickOpenProps) {
           <div className="flex items-center justify-between text-xs text-gray-500">
             <span>Use ↑↓ to navigate, Enter to open, Esc to close</span>
             {results.length > 0 && (
-              <span>{results.length} {results.length === 1 ? 'result' : 'results'}</span>
+              <span>
+                {results.length} {results.length === 1 ? "result" : "results"}
+              </span>
             )}
           </div>
         </div>

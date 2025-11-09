@@ -42,7 +42,7 @@ export const ALGORITHMS_CORE_TOKENS = [
   "<SYS_ALGORITHMS>",
   "ALGORITHMS_BASE",
   "ALGORITHMS_SYS_TOKEN",
-]
+];
 
 /**
  * Production-ready algorithm token analysis
@@ -51,12 +51,18 @@ export const ALGORITHMS_CORE_TOKENS = [
  */
 export const analyzeAlgorithmTokens = (tokens: string[]) => {
   const algorithms = {
-    sorting: tokens.filter((t) => /sort|quick|merge|heap|bubble/.test(t.toLowerCase())).length,
-    searching: tokens.filter((t) => /search|binary|linear|bfs|dfs/.test(t.toLowerCase())).length,
-    dynamicProgramming: tokens.filter((t) => /dynamic|memo|tabulation|dp/.test(t.toLowerCase())).length,
+    sorting: tokens.filter((t) =>
+      /sort|quick|merge|heap|bubble/.test(t.toLowerCase()),
+    ).length,
+    searching: tokens.filter((t) =>
+      /search|binary|linear|bfs|dfs/.test(t.toLowerCase()),
+    ).length,
+    dynamicProgramming: tokens.filter((t) =>
+      /dynamic|memo|tabulation|dp/.test(t.toLowerCase()),
+    ).length,
     greedy: tokens.filter((t) => /greedy|optimal/.test(t.toLowerCase())).length,
-  }
-  return algorithms
-}
+  };
+  return algorithms;
+};
 
-export default ALGORITHMS_CORE_TOKENS
+export default ALGORITHMS_CORE_TOKENS;

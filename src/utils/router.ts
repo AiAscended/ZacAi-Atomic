@@ -11,12 +11,12 @@ export interface Route {
 
 export class Router {
   private routes: Map<string, RouteHandler> = new Map();
-  private currentPath: string = '/';
+  private currentPath: string = "/";
   private onNavigateCallbacks: Array<(path: string) => void> = [];
 
   constructor() {
     // Listen to popstate for back/forward navigation
-    window.addEventListener('popstate', () => {
+    window.addEventListener("popstate", () => {
       this.handleRoute(window.location.pathname);
     });
   }
@@ -35,7 +35,7 @@ export class Router {
     if (path === this.currentPath) return;
 
     this.currentPath = path;
-    window.history.pushState({}, '', path);
+    window.history.pushState({}, "", path);
     this.handleRoute(path);
   }
 
@@ -50,11 +50,11 @@ export class Router {
       this.onNavigateCallbacks.forEach((callback) => callback(path));
     } else {
       // Default to home if route not found
-      const homeHandler = this.routes.get('/');
+      const homeHandler = this.routes.get("/");
       if (homeHandler) {
         homeHandler();
-        this.currentPath = '/';
-        this.onNavigateCallbacks.forEach((callback) => callback('/'));
+        this.currentPath = "/";
+        this.onNavigateCallbacks.forEach((callback) => callback("/"));
       }
     }
   }

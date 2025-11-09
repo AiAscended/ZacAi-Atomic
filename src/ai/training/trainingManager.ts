@@ -1,29 +1,29 @@
 /**
  * Training Manager & Scheduler
- * 
+ *
  * Manages automated training pipeline with:
  * - Manual training triggers
  * - Scheduled training execution
  * - Learning settings management
  * - Training history tracking
  * - Metrics-based training decisions
- * 
+ *
  * Integrates with:
  * - enhancedMetricsCollector for performance monitoring
  * - autoTrainingScheduler for training operations
  * - Admin API for user control
  */
 
-import { enhancedMetricsCollector } from '@/ai/monitoring/enhancedMetricsCollector';
-import * as logger from '../orchestration/logger';
-import cron from 'node-cron';
+import { enhancedMetricsCollector } from "@/ai/monitoring/enhancedMetricsCollector";
+import * as logger from "../orchestration/logger";
+import cron from "node-cron";
 
 export interface TrainingSettings {
   enabled: boolean;
   schedule: string; // Cron format
   confidenceThreshold: number;
   minSamplesForTraining: number;
-  trainingFrequency: 'hourly' | 'daily' | 'weekly' | 'manual';
+  trainingFrequency: "hourly" | "daily" | "weekly" | "manual";
   autoUpdate: {
     vocabulary: boolean;
     seeds: boolean;
@@ -39,8 +39,8 @@ export interface TrainingSettings {
 export interface TrainingHistory {
   id: string;
   timestamp: string;
-  mode: 'full' | 'vocabulary' | 'seeds' | 'weights';
-  status: 'running' | 'completed' | 'failed';
+  mode: "full" | "vocabulary" | "seeds" | "weights";
+  status: "running" | "completed" | "failed";
   duration: number; // milliseconds
   results?: {
     vocabularyUpdated?: boolean;
@@ -60,10 +60,10 @@ export interface TrainingHistory {
 class TrainingScheduler {
   private settings: TrainingSettings = {
     enabled: true,
-    schedule: '0 2 * * *', // Daily at 2 AM
+    schedule: "0 2 * * *", // Daily at 2 AM
     confidenceThreshold: 0.6,
     minSamplesForTraining: 100,
-    trainingFrequency: 'daily',
+    trainingFrequency: "daily",
     autoUpdate: {
       vocabulary: true,
       seeds: true,
@@ -90,7 +90,7 @@ class TrainingScheduler {
    */
   private loadSettings(): void {
     // TODO: Load from database or config file
-    logger.info('[TrainingScheduler] Settings loaded', {});
+    logger.info("[TrainingScheduler] Settings loaded", {});
   }
 
   /**
@@ -100,12 +100,15 @@ class TrainingScheduler {
     if (this.settings.enabled && this.settings.schedule) {
       try {
         this.cronJob = cron.schedule(this.settings.schedule, async () => {
-          logger.info('[TrainingScheduler] Scheduled training triggered', {});
-          await this.runTraining('full');
+          logger.info("[TrainingScheduler] Scheduled training triggered", {});
+          await this.runTraining("full");
         });
-        logger.info(`[TrainingScheduler] Scheduler activated: ${this.settings.schedule}`, {});
+        logger.info(
+          `[TrainingScheduler] Scheduler activated: ${this.settings.schedule}`,
+          {},
+        );
       } catch (error) {
-        logger.info('[TrainingScheduler] Failed to setup scheduler', { error });
+        logger.info("[TrainingScheduler] Failed to setup scheduler", { error });
       }
     }
   }
@@ -113,7 +116,9 @@ class TrainingScheduler {
   /**
    * Run training pipeline
    */
-  async runTraining(mode: 'full' | 'vocabulary' | 'seeds' | 'weights' = 'full'): Promise<TrainingHistory> {
+  async runTraining(
+    mode: "full" | "vocabulary" | "seeds" | "weights" = "full",
+  ): Promise<TrainingHistory> {
     const trainingId = `training_${Date.now()}`;
     const startTime = Date.now();
 
@@ -121,7 +126,7 @@ class TrainingScheduler {
       id: trainingId,
       timestamp: new Date().toISOString(),
       mode,
-      status: 'running',
+      status: "running",
       duration: 0,
     };
 
@@ -135,17 +140,17 @@ class TrainingScheduler {
       const metricsBefore = enhancedMetricsCollector.getSystemMetrics();
 
       // Execute training based on mode
-      const results: TrainingHistory['results'] = {};
+      const results: TrainingHistory["results"] = {};
 
-      if (mode === 'full' || mode === 'vocabulary') {
+      if (mode === "full" || mode === "vocabulary") {
         results.vocabularyUpdated = await this.updateVocabulary();
       }
 
-      if (mode === 'full' || mode === 'seeds') {
+      if (mode === "full" || mode === "seeds") {
         results.seedsRegenerated = await this.regenerateSeeds();
       }
 
-      if (mode === 'full' || mode === 'weights') {
+      if (mode === "full" || mode === "weights") {
         results.weightsUpdated = await this.updateWeights();
       }
 
@@ -160,16 +165,21 @@ class TrainingScheduler {
       };
 
       // Update training record
-      trainingRecord.status = 'completed';
+      trainingRecord.status = "completed";
       trainingRecord.duration = Date.now() - startTime;
       trainingRecord.results = results;
 
-      logger.info(`[TrainingScheduler] Training completed: ${trainingId} (${trainingRecord.duration}ms)`);
+      logger.info(
+        `[TrainingScheduler] Training completed: ${trainingId} (${trainingRecord.duration}ms)`,
+      );
     } catch (error) {
-      trainingRecord.status = 'failed';
+      trainingRecord.status = "failed";
       trainingRecord.duration = Date.now() - startTime;
-      trainingRecord.error = error instanceof Error ? error.message : 'Unknown error';
-      logger.info(`[TrainingScheduler] Training failed: ${trainingId}`, { error: String(error) });
+      trainingRecord.error =
+        error instanceof Error ? error.message : "Unknown error";
+      logger.info(`[TrainingScheduler] Training failed: ${trainingId}`, {
+        error: String(error),
+      });
     } finally {
       this.currentTraining = null;
     }
@@ -182,13 +192,15 @@ class TrainingScheduler {
    */
   private async updateVocabulary(): Promise<boolean> {
     try {
-      logger.info('[TrainingScheduler] Updating vocabulary...');
+      logger.info("[TrainingScheduler] Updating vocabulary...");
       // TODO: Implement vocabulary update logic
       // This would analyze recent prompts and add new tokens
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate work
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate work
       return true;
     } catch (error) {
-      logger.info('[TrainingScheduler] Vocabulary update failed', { error: String(error) });//, error);
+      logger.info("[TrainingScheduler] Vocabulary update failed", {
+        error: String(error),
+      }); //, error);
       return false;
     }
   }
@@ -198,13 +210,15 @@ class TrainingScheduler {
    */
   private async regenerateSeeds(): Promise<boolean> {
     try {
-      logger.info('[TrainingScheduler] Regenerating seeds...');
+      logger.info("[TrainingScheduler] Regenerating seeds...");
       // TODO: Implement seed regeneration logic
       // This would create new training samples from collected data
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate work
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate work
       return true;
     } catch (error) {
-      logger.info('[TrainingScheduler] Seed regeneration failed', { error: String(error) });//, error);
+      logger.info("[TrainingScheduler] Seed regeneration failed", {
+        error: String(error),
+      }); //, error);
       return false;
     }
   }
@@ -214,13 +228,15 @@ class TrainingScheduler {
    */
   private async updateWeights(): Promise<boolean> {
     try {
-      logger.info('[TrainingScheduler] Updating weights...');
+      logger.info("[TrainingScheduler] Updating weights...");
       // TODO: Implement weight update logic
       // This would fine-tune weights based on performance data
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate work
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate work
       return true;
     } catch (error) {
-      logger.info('[TrainingScheduler] Weight update failed', { error: String(error) });//, error);
+      logger.info("[TrainingScheduler] Weight update failed", {
+        error: String(error),
+      }); //, error);
       return false;
     }
   }
@@ -230,10 +246,10 @@ class TrainingScheduler {
    */
   async stopTraining(): Promise<void> {
     if (this.currentTraining) {
-      this.currentTraining.status = 'failed';
-      this.currentTraining.error = 'Stopped by user';
+      this.currentTraining.status = "failed";
+      this.currentTraining.error = "Stopped by user";
       this.currentTraining = null;
-      logger.info('[TrainingScheduler] Training stopped by user');
+      logger.info("[TrainingScheduler] Training stopped by user");
     }
   }
 
@@ -250,8 +266,10 @@ class TrainingScheduler {
       metrics.performance.p95Latency > triggers.latencyThreshold;
 
     if (shouldTrain) {
-      logger.info('[TrainingScheduler] Performance triggers activated, starting training');
-      await this.runTraining('full');
+      logger.info(
+        "[TrainingScheduler] Performance triggers activated, starting training",
+      );
+      await this.runTraining("full");
     }
 
     return shouldTrain;
@@ -269,7 +287,7 @@ class TrainingScheduler {
       this.setupScheduler();
     }
 
-    logger.info('[TrainingScheduler] Settings updated', newSettings);
+    logger.info("[TrainingScheduler] Settings updated", newSettings);
   }
 
   /**
@@ -282,7 +300,10 @@ class TrainingScheduler {
   /**
    * Get training status
    */
-  getStatus(): { isTraining: boolean; currentTraining: TrainingHistory | null } {
+  getStatus(): {
+    isTraining: boolean;
+    currentTraining: TrainingHistory | null;
+  } {
     return {
       isTraining: this.currentTraining !== null,
       currentTraining: this.currentTraining,

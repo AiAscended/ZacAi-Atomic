@@ -3,8 +3,8 @@
  * Purpose: Domain-prefixed tokenizer for English (MVP).
  */
 
-import { normalizeText } from './english_utils';
-import ENGLISH_CORE_TOKENS from './english_tokens';
+import { normalizeText } from "./english_utils";
+import ENGLISH_CORE_TOKENS from "./english_tokens";
 
 // Tokenizer updated to preserve system tokens like <SYS_ENGLISH> and numeric tokens
 /**
@@ -13,7 +13,10 @@ import ENGLISH_CORE_TOKENS from './english_tokens';
  * - maps digit sequences to NUM_X tokens
  * - prepends domain/system base tokens so downstream modules see a stable marker
  */
-export const englishTokenizer = (text: string, opts?: { includeSystemTokens?: boolean }) => {
+export const englishTokenizer = (
+  text: string,
+  opts?: { includeSystemTokens?: boolean },
+) => {
   const t = normalizeText(text).toLowerCase();
 
   // split on whitespace first, then on punctuation; keep alphanumerics and underscores
@@ -42,7 +45,9 @@ export const englishTokenizer = (text: string, opts?: { includeSystemTokens?: bo
 
   // optionally include system/domain tokens at the start; use canonical domain tokens
   if (opts?.includeSystemTokens ?? true) {
-    const sys = ['<SYS_ENGLISH>', 'ENGLISH_BASE'].filter((s) => ENGLISH_CORE_TOKENS.includes(s));
+    const sys = ["<SYS_ENGLISH>", "ENGLISH_BASE"].filter((s) =>
+      ENGLISH_CORE_TOKENS.includes(s),
+    );
     return { tokens: [...sys, ...tokens], length: tokens.length + sys.length };
   }
 

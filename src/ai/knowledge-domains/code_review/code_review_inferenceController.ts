@@ -6,18 +6,18 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { codeReviewTokenizer } from "./code_review_tokenizer"
-import { codeReviewSemanticAnalyzer } from "./code_review_semanticAnalyzer"
+import { codeReviewTokenizer } from "./code_review_tokenizer";
+import { codeReviewSemanticAnalyzer } from "./code_review_semanticAnalyzer";
 
 export const codeReviewRunInference = async (input: string) => {
-  const t = codeReviewTokenizer(input)
-  const sem = codeReviewSemanticAnalyzer(input)
+  const t = codeReviewTokenizer(input);
+  const sem = codeReviewSemanticAnalyzer(input);
   return {
     tokens: t.tokens,
     tokenCount: t.length,
     semantics: sem,
     response: `Code review: ${sem.quality} quality, complexity ${sem.complexity}, ${sem.recommendations.length} recommendations.`,
-  }
-}
+  };
+};
 
-export default codeReviewRunInference
+export default codeReviewRunInference;

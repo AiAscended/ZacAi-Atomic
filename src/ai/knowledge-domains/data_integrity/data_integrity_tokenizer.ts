@@ -3,7 +3,7 @@
  * Tokenizes text for data validation, consistency, and quality analysis
  */
 
-import { DOMAIN_NAME } from './data_integrity_constants';
+import { DOMAIN_NAME } from "./data_integrity_constants";
 
 export interface TokenizeOptions {
   includePunctuation?: boolean;
@@ -14,7 +14,10 @@ export interface TokenizeOptions {
 /**
  * Tokenize text for data integrity analysis
  */
-export const dataIntegrityTokenizer = (text: string, options?: TokenizeOptions): string[] => {
+export const dataIntegrityTokenizer = (
+  text: string,
+  options?: TokenizeOptions,
+): string[] => {
   const opts = {
     includePunctuation: false,
     lowercase: true,
@@ -32,15 +35,23 @@ export const dataIntegrityTokenizer = (text: string, options?: TokenizeOptions):
   // Split on whitespace and punctuation (except hyphens in words)
   const tokens = processedText
     .split(/[\s,;:.!?()[\]{}'"]+/)
-    .filter(token => token.length > 0);
+    .filter((token) => token.length > 0);
 
   // Add system tokens for data integrity concepts
   const systemTokens: string[] = [];
-  
+
   if (opts.includeSystemTokens) {
-    const dataKeywords = ['data', 'valid', 'integrity', 'consistency', 'quality'];
-    const hasDataKeywords = dataKeywords.some(kw => processedText.includes(kw));
-    
+    const dataKeywords = [
+      "data",
+      "valid",
+      "integrity",
+      "consistency",
+      "quality",
+    ];
+    const hasDataKeywords = dataKeywords.some((kw) =>
+      processedText.includes(kw),
+    );
+
     if (hasDataKeywords) {
       systemTokens.push(`<DOMAIN:${DOMAIN_NAME}>`);
     }
@@ -61,15 +72,31 @@ export const countTokens = (text: string): number => {
  */
 export const extractKeywords = (text: string): string[] => {
   const tokens = dataIntegrityTokenizer(text, { lowercase: true });
-  
+
   const keywords = [
-    'data', 'validation', 'integrity', 'consistency', 'quality',
-    'validate', 'check', 'verify', 'sanitize', 'clean',
-    'schema', 'constraint', 'format', 'type', 'error',
-    'corrupt', 'incomplete', 'accurate', 'unique', 'complete'
+    "data",
+    "validation",
+    "integrity",
+    "consistency",
+    "quality",
+    "validate",
+    "check",
+    "verify",
+    "sanitize",
+    "clean",
+    "schema",
+    "constraint",
+    "format",
+    "type",
+    "error",
+    "corrupt",
+    "incomplete",
+    "accurate",
+    "unique",
+    "complete",
   ];
-  
-  return tokens.filter(token => keywords.includes(token));
+
+  return tokens.filter((token) => keywords.includes(token));
 };
 
 export default dataIntegrityTokenizer;

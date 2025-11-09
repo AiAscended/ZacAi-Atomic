@@ -3,12 +3,12 @@
  * Handles system-level operations, configuration, time/date, location, and management queries
  */
 
-import { DOMAIN_NAME } from './system_constants';
+import { DOMAIN_NAME } from "./system_constants";
 
 export const systemRunInference = async (input: string, _context?: any) => {
   const lowerInput = input.toLowerCase();
-  
-  let responseText = '';
+
+  let responseText = "";
   let confidence = 0.7;
   const sources: string[] = [];
   const metadata: any = {};
@@ -25,25 +25,25 @@ export const systemRunInference = async (input: string, _context?: any) => {
     lowerInput.includes("what is the date")
   ) {
     const now = new Date();
-    const timeStr = now.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit',
+    const timeStr = now.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
       hour12: true,
-      timeZoneName: 'short'
+      timeZoneName: "short",
     });
-    const dateStr = now.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const dateStr = now.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
-    
+
     responseText = `**Current System Time & Date:**\n\n`;
     responseText += `🕐 **Time**: ${timeStr}\n`;
     responseText += `📅 **Date**: ${dateStr}\n\n`;
     responseText += `*Note: This is server time (UTC-based). For your local time, I'd need your timezone or location information.*`;
-    
+
     sources.push("System Clock (JavaScript Date API)");
     confidence = 0.98;
     metadata.timestamp = now.toISOString();
@@ -72,7 +72,7 @@ export const systemRunInference = async (input: string, _context?: any) => {
     responseText += `- Your geographic location (city/country)\n`;
     responseText += `- Or IP-based geolocation (with your permission)\n\n`;
     responseText += `*Note: Location services require additional APIs and user permissions for accuracy.*`;
-    
+
     confidence = 0.75;
     sources.push("System Information");
     metadata.systemFunction = true;
@@ -88,15 +88,15 @@ export const systemRunInference = async (input: string, _context?: any) => {
 
   // Handle system configuration/setup queries
   if (
-    lowerInput.includes('system') ||
-    lowerInput.includes('config') ||
-    lowerInput.includes('setup') ||
-    lowerInput.includes('install') ||
-    lowerInput.includes('environment') ||
-    lowerInput.includes('deployment')
+    lowerInput.includes("system") ||
+    lowerInput.includes("config") ||
+    lowerInput.includes("setup") ||
+    lowerInput.includes("install") ||
+    lowerInput.includes("environment") ||
+    lowerInput.includes("deployment")
   ) {
     confidence = 0.85;
-    
+
     responseText = `I can help with system-level operations and configuration:\n\n`;
     responseText += `**Common System Tasks:**\n`;
     responseText += `- ⚙️ Configuration management\n`;
@@ -106,7 +106,7 @@ export const systemRunInference = async (input: string, _context?: any) => {
     responseText += `- 🐛 System-level troubleshooting\n`;
     responseText += `- 🕐 Time/date/timezone handling\n\n`;
     responseText += `What specific system operation do you need help with?`;
-    
+
     sources.push("System Domain Knowledge");
     metadata.systemFunction = true;
   } else {
@@ -116,7 +116,7 @@ export const systemRunInference = async (input: string, _context?: any) => {
     responseText += `- Configuration management\n`;
     responseText += `- Environment setup\n\n`;
     responseText += `How can I assist you?`;
-    
+
     confidence = 0.6;
     sources.push("System Domain");
     metadata.systemFunction = true;

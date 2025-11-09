@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { X, Plus, Trash2 } from 'lucide-react';
-import { commandProcessor } from '@/lib/ide/commandProcessor';
+import React, { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { X, Plus, Trash2 } from "lucide-react";
+import { commandProcessor } from "@/lib/ide/commandProcessor";
 
 // Type imports (types are safe during SSR)
-import type { Terminal as XTermType } from 'xterm';
-import type { FitAddon as FitAddonType } from 'xterm-addon-fit';
+import type { Terminal as XTermType } from "xterm";
+import type { FitAddon as FitAddonType } from "xterm-addon-fit";
 
 interface TerminalSession {
   id: string;
@@ -23,7 +23,7 @@ export function TerminalPanel() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    if (!terminalRef.current || typeof window === 'undefined') return;
+    if (!terminalRef.current || typeof window === "undefined") return;
 
     let terminal: XTermType;
     let fitAddon: FitAddonType;
@@ -31,123 +31,139 @@ export function TerminalPanel() {
 
     // Dynamic import xterm modules
     Promise.all([
-      import('xterm'),
-      import('xterm-addon-fit'),
-      import('xterm-addon-web-links')
-    ]).then(([{ Terminal }, { FitAddon }, { WebLinksAddon }]) => {
-      if (!terminalRef.current) return;
-      
-      setIsLoaded(true);
+      import("xterm"),
+      import("xterm-addon-fit"),
+      import("xterm-addon-web-links"),
+    ])
+      .then(([{ Terminal }, { FitAddon }, { WebLinksAddon }]) => {
+        if (!terminalRef.current) return;
 
-      // Initialize first terminal session
-      terminal = new Terminal({
-        cursorBlink: true,
-        fontSize: 14,
-        fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-        theme: {
-          background: '#1e1e1e',
-          foreground: '#d4d4d4',
-          cursor: '#ffffff',
-          selectionBackground: '#264f78',
-        },
-        scrollback: 1000,
-      });
+        setIsLoaded(true);
 
-      fitAddon = new FitAddon();
-      const webLinksAddon = new WebLinksAddon();
-      
-      terminal.loadAddon(fitAddon);
-      terminal.loadAddon(webLinksAddon);
-      fitAddonRef.current = fitAddon;
+        // Initialize first terminal session
+        terminal = new Terminal({
+          cursorBlink: true,
+          fontSize: 14,
+          fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+          theme: {
+            background: "#1e1e1e",
+            foreground: "#d4d4d4",
+            cursor: "#ffffff",
+            selectionBackground: "#264f78",
+          },
+          scrollback: 1000,
+        });
 
-      terminal.open(terminalRef.current);
-      fitAddon.fit();
+        fitAddon = new FitAddon();
+        const webLinksAddon = new WebLinksAddon();
 
-    // Welcome message
-    terminal.writeln('\x1b[1;32m╔═══════════════════════════════════════════════╗\x1b[0m');
-    terminal.writeln('\x1b[1;32m║     Welcome to ZacAi IDE Terminal            ║\x1b[0m');
-    terminal.writeln('\x1b[1;32m╚═══════════════════════════════════════════════╝\x1b[0m');
-    terminal.writeln('');
-    terminal.writeln('Type \x1b[1;33mhelp\x1b[0m to see available commands');
-    terminal.writeln('');
-    
-    const prompt = () => {
-      const cwd = commandProcessor.getCurrentDirectory();
-      terminal.write(`\x1b[1;32m${cwd}\x1b[0m \x1b[1;36m$\x1b[0m `);
-    };
-    
-    prompt();
+        terminal.loadAddon(fitAddon);
+        terminal.loadAddon(webLinksAddon);
+        fitAddonRef.current = fitAddon;
 
-    // Command execution with full shell support
-    let currentLine = '';
-    let historyIndex = -1;
-    const history = commandProcessor.getHistory();
+        terminal.open(terminalRef.current);
+        fitAddon.fit();
 
-    terminal.onData(async (data: string) => {
-      const code = data.charCodeAt(0);
+        // Welcome message
+        terminal.writeln(
+          "\x1b[1;32m╔═══════════════════════════════════════════════╗\x1b[0m",
+        );
+        terminal.writeln(
+          "\x1b[1;32m║     Welcome to ZacAi IDE Terminal            ║\x1b[0m",
+        );
+        terminal.writeln(
+          "\x1b[1;32m╚═══════════════════════════════════════════════╝\x1b[0m",
+        );
+        terminal.writeln("");
+        terminal.writeln(
+          "Type \x1b[1;33mhelp\x1b[0m to see available commands",
+        );
+        terminal.writeln("");
 
-      // Handle special keys
-      if (code === 13) { // Enter
-        terminal.writeln('');
-        
-        if (currentLine.trim()) {
-          const result = await commandProcessor.executeCommand(currentLine);
-          
-          if (result.output) {
-            terminal.write(result.output);
+        const prompt = () => {
+          const cwd = commandProcessor.getCurrentDirectory();
+          terminal.write(`\x1b[1;32m${cwd}\x1b[0m \x1b[1;36m$\x1b[0m `);
+        };
+
+        prompt();
+
+        // Command execution with full shell support
+        let currentLine = "";
+        let historyIndex = -1;
+        const history = commandProcessor.getHistory();
+
+        terminal.onData(async (data: string) => {
+          const code = data.charCodeAt(0);
+
+          // Handle special keys
+          if (code === 13) {
+            // Enter
+            terminal.writeln("");
+
+            if (currentLine.trim()) {
+              const result = await commandProcessor.executeCommand(currentLine);
+
+              if (result.output) {
+                terminal.write(result.output);
+              }
+
+              if (result.error) {
+                terminal.writeln(`\x1b[1;31m${result.error}\x1b[0m`);
+              }
+            }
+
+            currentLine = "";
+            historyIndex = -1;
+            prompt();
+          } else if (code === 127) {
+            // Backspace
+            if (currentLine.length > 0) {
+              currentLine = currentLine.slice(0, -1);
+              terminal.write("\b \b");
+            }
+          } else if (code === 27) {
+            // Escape sequences (arrow keys)
+            // Handle arrow key navigation for history
+            return;
+          } else if (code === 3) {
+            // Ctrl+C
+            terminal.writeln("^C");
+            currentLine = "";
+            prompt();
+          } else if (code === 12) {
+            // Ctrl+L (clear)
+            terminal.clear();
+            prompt();
+          } else if (data >= String.fromCharCode(32)) {
+            // Printable characters
+            currentLine += data;
+            terminal.write(data);
           }
-          
-          if (result.error) {
-            terminal.writeln(`\x1b[1;31m${result.error}\x1b[0m`);
+        });
+
+        const sessionId = `session-${Date.now()}`;
+        setSessions([{ id: sessionId, title: "Terminal 1", terminal }]);
+        setActiveSessionId(sessionId);
+
+        // Handle resize
+        const resizeObserver = new ResizeObserver(() => {
+          if (fitAddon) {
+            fitAddon.fit();
           }
-        }
-        
-        currentLine = '';
-        historyIndex = -1;
-        prompt();
-      } else if (code === 127) { // Backspace
-        if (currentLine.length > 0) {
-          currentLine = currentLine.slice(0, -1);
-          terminal.write('\b \b');
-        }
-      } else if (code === 27) { // Escape sequences (arrow keys)
-        // Handle arrow key navigation for history
-        return;
-      } else if (code === 3) { // Ctrl+C
-        terminal.writeln('^C');
-        currentLine = '';
-        prompt();
-      } else if (code === 12) { // Ctrl+L (clear)
-        terminal.clear();
-        prompt();
-      } else if (data >= String.fromCharCode(32)) { // Printable characters
-        currentLine += data;
-        terminal.write(data);
-      }
-    });
+        });
 
-      const sessionId = `session-${Date.now()}`;
-      setSessions([{ id: sessionId, title: 'Terminal 1', terminal }]);
-      setActiveSessionId(sessionId);
-
-      // Handle resize
-      const resizeObserver = new ResizeObserver(() => {
-        if (fitAddon) {
-          fitAddon.fit();
+        if (terminalRef.current) {
+          resizeObserver.observe(terminalRef.current);
         }
+
+        cleanup = () => {
+          resizeObserver.disconnect();
+          terminal.dispose();
+        };
+      })
+      .catch((error) => {
+        console.error("Failed to load xterm:", error);
       });
-
-      if (terminalRef.current) {
-        resizeObserver.observe(terminalRef.current);
-      }
-
-      cleanup = () => {
-        resizeObserver.disconnect();
-        terminal.dispose();
-      };
-    }).catch((error) => {
-      console.error('Failed to load xterm:', error);
-    });
 
     return () => {
       if (cleanup) cleanup();
@@ -156,12 +172,12 @@ export function TerminalPanel() {
 
   const addSession = () => {
     // Phase 4: Create new terminal session
-    console.log('Add terminal session - Phase 4');
+    console.log("Add terminal session - Phase 4");
   };
 
   const closeSession = (sessionId: string) => {
     // Phase 4: Close terminal session
-    console.log('Close session:', sessionId);
+    console.log("Close session:", sessionId);
   };
 
   return (
@@ -173,8 +189,8 @@ export function TerminalPanel() {
             key={session.id}
             className={`flex items-center gap-2 px-3 py-1 text-sm rounded-sm cursor-pointer transition-colors ${
               session.id === activeSessionId
-                ? 'bg-[#1e1e1e] text-white'
-                : 'text-gray-400 hover:bg-[#2a2d2e]'
+                ? "bg-[#1e1e1e] text-white"
+                : "text-gray-400 hover:bg-[#2a2d2e]"
             }`}
             onClick={() => setActiveSessionId(session.id)}
           >

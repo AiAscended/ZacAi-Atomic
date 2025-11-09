@@ -1,7 +1,7 @@
 /**
  * File: src/ai/shared/types/adminSettings.ts
  * Purpose: Centralized TypeScript types for all admin settings
- * 
+ *
  * This schema defines the shape of configuration data for:
  * - System-wide settings
  * - Orchestrator configuration
@@ -21,7 +21,7 @@ export interface SystemSettings {
     logLevel: "debug" | "info" | "warn" | "error";
     enableTelemetry: boolean;
   };
-  
+
   rag: {
     embeddingModel: string;
     chunkSize: number;
@@ -29,7 +29,7 @@ export interface SystemSettings {
     maxRetrievalResults: number;
     similarityThreshold: number;
   };
-  
+
   security: {
     enableRateLimiting: boolean;
     maxRequestsPerMinute: number;
@@ -43,19 +43,19 @@ export interface SystemSettings {
 // ============================================================================
 
 export interface OrchestratorSettings {
-  domainSelectionThreshold: number;  // 0.0 - 1.0
+  domainSelectionThreshold: number; // 0.0 - 1.0
   maxDomainsPerQuery: number;
   enableParallelInference: boolean;
   enableContextEnhancement: boolean;
   enableKnowledgeRetrieval: boolean;
-  
+
   performance: {
     maxConcurrentRequests: number;
     requestTimeoutMs: number;
     enableCaching: boolean;
     cacheMaxSize: number;
   };
-  
+
   reasoning: {
     maxReasoningSteps: number;
     enableThinkingSteps: boolean;
@@ -70,24 +70,24 @@ export interface OrchestratorSettings {
 export interface DomainSettings {
   domainId: string;
   enabled: boolean;
-  
+
   inference: {
-    confidenceThreshold: number;  // 0.0 - 1.0
-    tokenMatchWeight: number;     // 0.0 - 1.0
-    semanticWeight: number;       // 0.0 - 1.0
-    temperature: number;          // 0.0 - 2.0
-    topP: number;                 // 0.0 - 1.0
+    confidenceThreshold: number; // 0.0 - 1.0
+    tokenMatchWeight: number; // 0.0 - 1.0
+    semanticWeight: number; // 0.0 - 1.0
+    temperature: number; // 0.0 - 2.0
+    topP: number; // 0.0 - 1.0
     maxTokens: number;
-    frequencyPenalty: number;     // -2.0 - 2.0
+    frequencyPenalty: number; // -2.0 - 2.0
   };
-  
+
   training: {
     enableAutoTraining: boolean;
-    trainingSchedule?: string;  // cron expression
+    trainingSchedule?: string; // cron expression
     minTrainingExamples: number;
     validationSplit: number;
   };
-  
+
   seeds: {
     lastUpdated?: string;
     version: string;
@@ -107,7 +107,7 @@ export interface TrainingSettings {
     maxSamplesPerRun: number;
     minSamplesRequired: number;
   };
-  
+
   pipeline: {
     enableVocabularyUpdate: boolean;
     enableWeightUpdate: boolean;
@@ -115,7 +115,7 @@ export interface TrainingSettings {
     validationSplit: number; // 0.0 - 1.0
     testSplit: number; // 0.0 - 1.0
   };
-  
+
   optimization: {
     learningRate: number;
     batchSize: number;
@@ -123,7 +123,7 @@ export interface TrainingSettings {
     earlyStoppingPatience: number;
     gradientClipping: number;
   };
-  
+
   status: {
     lastTrainingRun?: string;
     nextScheduledRun?: string;
@@ -141,19 +141,19 @@ export interface GitHubAppSettings {
   // Public configuration
   appId: string;
   clientId: string;
-  
+
   // Installation data (managed by OAuth flow)
   installations: GitHubInstallation[];
-  
+
   // Webhook configuration
   webhookSecret: string;
   webhookUrl?: string;
-  
+
   // Feature flags
   enableAutoCommit: boolean;
   enablePRCreation: boolean;
   enableIssueSync: boolean;
-  
+
   // Default repository settings
   defaultBranch: string;
   commitMessagePrefix: string;
@@ -182,7 +182,7 @@ export interface GitHubRepository {
 
 export interface IDEModeSettings {
   enabled: boolean;
-  
+
   features: {
     enableCodeCompletion: boolean;
     enableInlineChat: boolean;
@@ -190,7 +190,7 @@ export interface IDEModeSettings {
     enableTerminal: boolean;
     enableGitIntegration: boolean;
   };
-  
+
   editor: {
     theme: "light" | "dark" | "auto";
     fontSize: number;
@@ -198,7 +198,7 @@ export interface IDEModeSettings {
     wordWrap: boolean;
     minimap: boolean;
   };
-  
+
   ai: {
     enableContextualSuggestions: boolean;
     suggestionDelay: number;
@@ -212,9 +212,16 @@ export interface IDEModeSettings {
 
 export interface ModelSettings {
   modelId: string;
-  modelType: "llm" | "cnn" | "rnn" | "transformer" | "gan" | "diffusion" | "other";
+  modelType:
+    | "llm"
+    | "cnn"
+    | "rnn"
+    | "transformer"
+    | "gan"
+    | "diffusion"
+    | "other";
   enabled: boolean;
-  
+
   config: {
     batchSize: number;
     maxSequenceLength: number;
@@ -224,13 +231,13 @@ export interface ModelSettings {
     numHeads?: number;
     dropout: number;
   };
-  
+
   weights: {
     pretrainedPath?: string;
     finetunedPath?: string;
     lastUpdated?: string;
   };
-  
+
   inference: {
     device: "cpu" | "gpu" | "auto";
     precision: "fp16" | "fp32" | "int8";
@@ -245,7 +252,7 @@ export interface ModelSettings {
 export interface AdminSettings {
   version: string;
   lastUpdated: string;
-  
+
   system: SystemSettings;
   orchestrator: OrchestratorSettings;
   domains: Record<string, DomainSettings>;

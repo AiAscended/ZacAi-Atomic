@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
 /**
  * Admin Metrics Dashboard
- * 
+ *
  * Real-time system performance monitoring
  * Displays system health, domain metrics, model metrics
  */
 
-import { useEffect, useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useEffect, useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface SystemMetrics {
   timestamp: string;
@@ -40,7 +40,7 @@ interface SystemMetrics {
 }
 
 interface HealthStatus {
-  status: 'healthy' | 'degraded' | 'critical';
+  status: "healthy" | "degraded" | "critical";
   issues: string[];
   recommendations: string[];
 }
@@ -54,8 +54,8 @@ export default function MetricsDashboard() {
   const fetchMetrics = async () => {
     try {
       const [metricsRes, healthRes] = await Promise.all([
-        fetch('/api/admin/metrics?type=system'),
-        fetch('/api/admin/metrics?type=health'),
+        fetch("/api/admin/metrics?type=system"),
+        fetch("/api/admin/metrics?type=health"),
       ]);
 
       const metricsData = await metricsRes.json();
@@ -64,7 +64,7 @@ export default function MetricsDashboard() {
       if (metricsData.success) setMetrics(metricsData.data);
       if (healthData.success) setHealth(healthData.data);
     } catch (error) {
-      console.error('Failed to fetch metrics:', error);
+      console.error("Failed to fetch metrics:", error);
     } finally {
       setLoading(false);
     }
@@ -72,7 +72,7 @@ export default function MetricsDashboard() {
 
   useEffect(() => {
     fetchMetrics();
-    
+
     if (autoRefresh) {
       const interval = setInterval(fetchMetrics, 5000); // Refresh every 5s
       return () => clearInterval(interval);
@@ -92,15 +92,19 @@ export default function MetricsDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'bg-green-500';
-      case 'degraded': return 'bg-yellow-500';
-      case 'critical': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      case "healthy":
+        return "bg-green-500";
+      case "degraded":
+        return "bg-yellow-500";
+      case "critical":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
   const formatBytes = (bytes: number) => {
-    return (bytes / (1024 ** 3)).toFixed(2) + ' GB';
+    return (bytes / 1024 ** 3).toFixed(2) + " GB";
   };
 
   return (
@@ -109,11 +113,11 @@ export default function MetricsDashboard() {
         <h1 className="text-3xl font-bold">System Metrics</h1>
         <div className="flex gap-2">
           <Button
-            variant={autoRefresh ? 'default' : 'outline'}
+            variant={autoRefresh ? "default" : "outline"}
             onClick={() => setAutoRefresh(!autoRefresh)}
             size="sm"
           >
-            {autoRefresh ? 'Auto-Refresh: ON' : 'Auto-Refresh: OFF'}
+            {autoRefresh ? "Auto-Refresh: ON" : "Auto-Refresh: OFF"}
           </Button>
           <Button onClick={fetchMetrics} variant="outline" size="sm">
             Refresh Now
@@ -138,7 +142,9 @@ export default function MetricsDashboard() {
                 <h3 className="font-semibold text-sm">Issues:</h3>
                 <ul className="list-disc list-inside space-y-1">
                   {health.issues.map((issue, i) => (
-                    <li key={i} className="text-sm text-red-600">{issue}</li>
+                    <li key={i} className="text-sm text-red-600">
+                      {issue}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -148,13 +154,17 @@ export default function MetricsDashboard() {
                 <h3 className="font-semibold text-sm">Recommendations:</h3>
                 <ul className="list-disc list-inside space-y-1">
                   {health.recommendations.map((rec, i) => (
-                    <li key={i} className="text-sm text-blue-600">{rec}</li>
+                    <li key={i} className="text-sm text-blue-600">
+                      {rec}
+                    </li>
                   ))}
                 </ul>
               </div>
             )}
             {health.issues.length === 0 && (
-              <p className="text-sm text-green-600">System is operating normally</p>
+              <p className="text-sm text-green-600">
+                System is operating normally
+              </p>
             )}
           </CardContent>
         </Card>
@@ -169,9 +179,12 @@ export default function MetricsDashboard() {
                 <CardTitle className="text-sm">Total Inferences</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{metrics.ai.totalInferences}</div>
+                <div className="text-3xl font-bold">
+                  {metrics.ai.totalInferences}
+                </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Success: {metrics.ai.successfulInferences} | Failed: {metrics.ai.failedInferences}
+                  Success: {metrics.ai.successfulInferences} | Failed:{" "}
+                  {metrics.ai.failedInferences}
                 </p>
               </CardContent>
             </Card>
@@ -193,7 +206,9 @@ export default function MetricsDashboard() {
                 <CardTitle className="text-sm">Average Latency</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{metrics.ai.averageLatency.toFixed(0)}ms</div>
+                <div className="text-3xl font-bold">
+                  {metrics.ai.averageLatency.toFixed(0)}ms
+                </div>
                 <p className="text-xs text-gray-500 mt-1">Response Time</p>
               </CardContent>
             </Card>
@@ -203,7 +218,9 @@ export default function MetricsDashboard() {
                 <CardTitle className="text-sm">Active Domains</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{metrics.ai.domainsActive}</div>
+                <div className="text-3xl font-bold">
+                  {metrics.ai.domainsActive}
+                </div>
                 <p className="text-xs text-gray-500 mt-1">Knowledge Domains</p>
               </CardContent>
             </Card>
@@ -219,32 +236,43 @@ export default function MetricsDashboard() {
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span>Memory Usage</span>
-                    <span className="font-mono">{metrics.system.memoryUsage.percentage.toFixed(1)}%</span>
+                    <span className="font-mono">
+                      {metrics.system.memoryUsage.percentage.toFixed(1)}%
+                    </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-blue-600 h-2 rounded-full"
-                      style={{ width: `${metrics.system.memoryUsage.percentage}%` }}
+                      style={{
+                        width: `${metrics.system.memoryUsage.percentage}%`,
+                      }}
                     ></div>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    {formatBytes(metrics.system.memoryUsage.used)} / {formatBytes(metrics.system.memoryUsage.total)}
+                    {formatBytes(metrics.system.memoryUsage.used)} /{" "}
+                    {formatBytes(metrics.system.memoryUsage.total)}
                   </p>
                 </div>
 
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span>Error Rate</span>
-                    <span className="font-mono">{metrics.performance.errorRate.toFixed(2)}%</span>
+                    <span className="font-mono">
+                      {metrics.performance.errorRate.toFixed(2)}%
+                    </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full ${
-                        metrics.performance.errorRate > 10 ? 'bg-red-600' :
-                        metrics.performance.errorRate > 5 ? 'bg-yellow-600' :
-                        'bg-green-600'
+                        metrics.performance.errorRate > 10
+                          ? "bg-red-600"
+                          : metrics.performance.errorRate > 5
+                            ? "bg-yellow-600"
+                            : "bg-green-600"
                       }`}
-                      style={{ width: `${Math.min(metrics.performance.errorRate, 100)}%` }}
+                      style={{
+                        width: `${Math.min(metrics.performance.errorRate, 100)}%`,
+                      }}
                     ></div>
                   </div>
                 </div>
@@ -261,19 +289,27 @@ export default function MetricsDashboard() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Requests/Min</p>
-                  <p className="text-2xl font-bold">{metrics.performance.requestsPerMinute}</p>
+                  <p className="text-2xl font-bold">
+                    {metrics.performance.requestsPerMinute}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">P95 Latency</p>
-                  <p className="text-2xl font-bold">{metrics.performance.p95Latency.toFixed(0)}ms</p>
+                  <p className="text-2xl font-bold">
+                    {metrics.performance.p95Latency.toFixed(0)}ms
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">P99 Latency</p>
-                  <p className="text-2xl font-bold">{metrics.performance.p99Latency.toFixed(0)}ms</p>
+                  <p className="text-2xl font-bold">
+                    {metrics.performance.p99Latency.toFixed(0)}ms
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Platform</p>
-                  <p className="text-2xl font-bold">{metrics.system.platform}</p>
+                  <p className="text-2xl font-bold">
+                    {metrics.system.platform}
+                  </p>
                 </div>
               </div>
             </CardContent>

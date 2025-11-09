@@ -4,7 +4,7 @@
 
 export class STTTrainer {
   train(data: any): void {
-    console.log('Training speech-to-text...');
+    console.log("Training speech-to-text...");
   }
 }
 

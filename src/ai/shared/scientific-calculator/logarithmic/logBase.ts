@@ -16,10 +16,10 @@
  */
 export function logBase(x: number, base: number): number {
   if (x <= 0) {
-    throw new Error("Logarithm of non-positive number is undefined")
+    throw new Error("Logarithm of non-positive number is undefined");
   }
   if (base <= 0 || base === 1) {
-    throw new Error("Invalid logarithm base")
+    throw new Error("Invalid logarithm base");
   }
-  return Math.log(x) / Math.log(base)
+  return Math.log(x) / Math.log(base);
 }

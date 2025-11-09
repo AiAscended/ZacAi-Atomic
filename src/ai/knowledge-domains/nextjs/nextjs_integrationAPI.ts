@@ -6,33 +6,39 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import path from 'path'
+import path from "path";
 
-import { domainRegistry } from '../domainRegistry'
-import { NEXTJS_DOMAIN } from "./nextjs_constants"
-import { loadNextjsSeedVocabulary } from "./nextjs_vocabularyManager"
-import { nextjsRunInference } from "./nextjs_inferenceController"
-import { nextjsRunTrainingEpoch } from "./nextjs_trainingController"
+import { domainRegistry } from "../domainRegistry";
+import { NEXTJS_DOMAIN } from "./nextjs_constants";
+import { loadNextjsSeedVocabulary } from "./nextjs_vocabularyManager";
+import { nextjsRunInference } from "./nextjs_inferenceController";
+import { nextjsRunTrainingEpoch } from "./nextjs_trainingController";
 
-const DOMAIN_NAME = 'nextjs';
-const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+const DOMAIN_NAME = "nextjs";
+const DOMAIN_DIR = path.join(
+  process.cwd(),
+  "src",
+  "ai",
+  "knowledge-domains",
+  DOMAIN_NAME,
+);
 
 export const nextjsInit = async () => {
-  await loadNextjsSeedVocabulary()
+  await loadNextjsSeedVocabulary();
 
   domainRegistry.registerDomain({
-  name: NEXTJS_DOMAIN,
-  displayName: 'Next.js',
-  description: 'Next.js framework, server-side rendering, and app router',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
-}
+    name: NEXTJS_DOMAIN,
+    displayName: "Next.js",
+    description: "Next.js framework, server-side rendering, and app router",
+    atomicLevel: "molecule",
+    modules: [],
+    seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+    learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+    weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+    enabled: true,
+  });
+};
 
-void nextjsInit()
+void nextjsInit();
 
-export default nextjsInit
+export default nextjsInit;

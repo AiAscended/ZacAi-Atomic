@@ -5,5 +5,7 @@
 
 export const synthesizeTextToSpeech = async (text: string) => {
   // In production, integrate with a TTS provider. Here return a small object.
-  return { audioUrl: `data:audio/wav;base64,${Buffer.from(text).toString('base64')}` };
+  return {
+    audioUrl: `data:audio/wav;base64,${Buffer.from(text).toString("base64")}`,
+  };
 };

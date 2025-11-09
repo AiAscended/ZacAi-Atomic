@@ -3,7 +3,10 @@
  * Description: Compute simple sinusoidal positional encodings.
  */
 
-export const positionalEncoding = (length: number, depth: number): number[][] => {
+export const positionalEncoding = (
+  length: number,
+  depth: number,
+): number[][] => {
   const out: number[][] = [];
   for (let pos = 0; pos < length; pos++) {
     const row: number[] = [];

@@ -3,116 +3,118 @@
  * Reusable component for all model configuration pages
  */
 
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Save, RotateCcw, Check, AlertCircle, Activity } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Save, RotateCcw, Check, AlertCircle, Activity } from "lucide-react";
 
 interface ModelSettings {
-  enabled: boolean
-  type: string
-  parameters: Record<string, any>
+  enabled: boolean;
+  type: string;
+  parameters: Record<string, any>;
   performance: {
-    maxLatency: number
-    cacheEnabled: boolean
-  }
-  updatedAt: string
+    maxLatency: number;
+    cacheEnabled: boolean;
+  };
+  updatedAt: string;
 }
 
 interface ModelSettingsPageProps {
-  modelName: string
-  modelTitle: string
-  modelDescription: string
-  defaultParameters: Record<string, any>
+  modelName: string;
+  modelTitle: string;
+  modelDescription: string;
+  defaultParameters: Record<string, any>;
 }
 
 export function ModelSettingsPage({
   modelName,
   modelTitle,
   modelDescription,
-  defaultParameters
+  defaultParameters,
 }: ModelSettingsPageProps) {
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const [settings, setSettings] = useState<ModelSettings>({
     enabled: true,
     type: modelName,
     parameters: defaultParameters,
     performance: {
       maxLatency: 5000,
-      cacheEnabled: true
+      cacheEnabled: true,
     },
-    updatedAt: new Date().toISOString()
-  })
+    updatedAt: new Date().toISOString(),
+  });
 
   useEffect(() => {
-    loadSettings()
-  }, [modelName])
+    loadSettings();
+  }, [modelName]);
 
   const loadSettings = async () => {
     try {
-      setLoading(true)
-      setError(null)
-      const response = await fetch(`/api/admin/settings/models?name=${modelName}`)
-      const result = await response.json()
-      
+      setLoading(true);
+      setError(null);
+      const response = await fetch(
+        `/api/admin/settings/models?name=${modelName}`,
+      );
+      const result = await response.json();
+
       if (result.success) {
-        setSettings(result.data)
+        setSettings(result.data);
       } else {
-        setError(result.error || 'Failed to load settings')
+        setError(result.error || "Failed to load settings");
       }
     } catch (err) {
-      setError('Network error loading settings')
-      console.error('[Model Settings] Load error:', err)
+      setError("Network error loading settings");
+      console.error("[Model Settings] Load error:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const saveSettings = async () => {
     try {
-      setSaving(true)
-      setError(null)
-      setShowSuccess(false)
-      
-      const response = await fetch('/api/admin/settings/models', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      setSaving(true);
+      setError(null);
+      setShowSuccess(false);
+
+      const response = await fetch("/api/admin/settings/models", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           modelName,
           settings: {
             ...settings,
-            updatedAt: new Date().toISOString()
-          }
-        })
-      })
-      
-      const result = await response.json()
-      
+            updatedAt: new Date().toISOString(),
+          },
+        }),
+      });
+
+      const result = await response.json();
+
       if (result.success) {
-        setSettings(result.data)
-        setShowSuccess(true)
-        setTimeout(() => setShowSuccess(false), 3000)
+        setSettings(result.data);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
       } else {
-        setError(result.error || 'Failed to save settings')
+        setError(result.error || "Failed to save settings");
       }
     } catch (err) {
-      setError('Network error saving settings')
-      console.error('[Model Settings] Save error:', err)
+      setError("Network error saving settings");
+      console.error("[Model Settings] Save error:", err);
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const resetToDefaults = () => {
     setSettings({
@@ -121,21 +123,21 @@ export function ModelSettingsPage({
       parameters: defaultParameters,
       performance: {
         maxLatency: 5000,
-        cacheEnabled: true
+        cacheEnabled: true,
       },
-      updatedAt: new Date().toISOString()
-    })
-  }
+      updatedAt: new Date().toISOString(),
+    });
+  };
 
   const updateParameter = (key: string, value: any) => {
     setSettings({
       ...settings,
       parameters: {
         ...settings.parameters,
-        [key]: value
-      }
-    })
-  }
+        [key]: value,
+      },
+    });
+  };
 
   if (loading) {
     return (
@@ -145,7 +147,7 @@ export function ModelSettingsPage({
           <p className="text-muted-foreground">Loading model settings...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -194,19 +196,23 @@ export function ModelSettingsPage({
                   Enable or disable this model
                 </p>
               </div>
-              <Switch 
+              <Switch
                 id="enabled"
                 checked={settings.enabled}
-                onCheckedChange={(checked) => setSettings({ ...settings, enabled: checked })}
+                onCheckedChange={(checked) =>
+                  setSettings({ ...settings, enabled: checked })
+                }
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="type">Model Type</Label>
-              <Input 
-                id="type" 
+              <Input
+                id="type"
                 value={settings.type}
-                onChange={(e) => setSettings({ ...settings, type: e.target.value })}
+                onChange={(e) =>
+                  setSettings({ ...settings, type: e.target.value })
+                }
               />
             </div>
 
@@ -216,9 +222,17 @@ export function ModelSettingsPage({
                 <h3 className="font-semibold">Model Information</h3>
               </div>
               <div className="space-y-1 text-sm">
-                <p><span className="font-medium">Model ID:</span> {modelName}</p>
-                <p><span className="font-medium">Status:</span> {settings.enabled ? '✅ Active' : '❌ Disabled'}</p>
-                <p><span className="font-medium">Parameters:</span> {Object.keys(settings.parameters).length} configured</p>
+                <p>
+                  <span className="font-medium">Model ID:</span> {modelName}
+                </p>
+                <p>
+                  <span className="font-medium">Status:</span>{" "}
+                  {settings.enabled ? "✅ Active" : "❌ Disabled"}
+                </p>
+                <p>
+                  <span className="font-medium">Parameters:</span>{" "}
+                  {Object.keys(settings.parameters).length} configured
+                </p>
               </div>
             </div>
           </Card>
@@ -231,20 +245,24 @@ export function ModelSettingsPage({
               {Object.entries(settings.parameters).map(([key, value]) => (
                 <div key={key} className="space-y-2">
                   <Label htmlFor={key} className="capitalize">
-                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                    {key.replace(/([A-Z])/g, " $1").trim()}
                   </Label>
-                  {typeof value === 'boolean' ? (
+                  {typeof value === "boolean" ? (
                     <Switch
                       id={key}
                       checked={value}
-                      onCheckedChange={(checked) => updateParameter(key, checked)}
+                      onCheckedChange={(checked) =>
+                        updateParameter(key, checked)
+                      }
                     />
-                  ) : typeof value === 'number' ? (
+                  ) : typeof value === "number" ? (
                     <Input
                       id={key}
                       type="number"
                       value={value}
-                      onChange={(e) => updateParameter(key, parseFloat(e.target.value) || 0)}
+                      onChange={(e) =>
+                        updateParameter(key, parseFloat(e.target.value) || 0)
+                      }
                     />
                   ) : Array.isArray(value) ? (
                     <Textarea
@@ -252,7 +270,7 @@ export function ModelSettingsPage({
                       value={JSON.stringify(value, null, 2)}
                       onChange={(e) => {
                         try {
-                          updateParameter(key, JSON.parse(e.target.value))
+                          updateParameter(key, JSON.parse(e.target.value));
                         } catch {}
                       }}
                       className="font-mono text-sm"
@@ -274,20 +292,22 @@ export function ModelSettingsPage({
         <TabsContent value="performance" className="space-y-4">
           <Card className="p-6 space-y-6">
             <h2 className="text-xl font-semibold">Performance Settings</h2>
-            
+
             <div className="space-y-2">
               <Label htmlFor="maxLatency">Max Latency (ms)</Label>
-              <Input 
-                id="maxLatency" 
-                type="number" 
+              <Input
+                id="maxLatency"
+                type="number"
                 value={settings.performance.maxLatency}
-                onChange={(e) => setSettings({
-                  ...settings,
-                  performance: {
-                    ...settings.performance,
-                    maxLatency: parseInt(e.target.value) || 5000
-                  }
-                })}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    performance: {
+                      ...settings.performance,
+                      maxLatency: parseInt(e.target.value) || 5000,
+                    },
+                  })
+                }
               />
               <p className="text-sm text-muted-foreground">
                 Maximum allowed response time in milliseconds
@@ -301,16 +321,18 @@ export function ModelSettingsPage({
                   Cache responses for improved performance
                 </p>
               </div>
-              <Switch 
+              <Switch
                 id="cacheEnabled"
                 checked={settings.performance.cacheEnabled}
-                onCheckedChange={(checked) => setSettings({
-                  ...settings,
-                  performance: {
-                    ...settings.performance,
-                    cacheEnabled: checked
-                  }
-                })}
+                onCheckedChange={(checked) =>
+                  setSettings({
+                    ...settings,
+                    performance: {
+                      ...settings.performance,
+                      cacheEnabled: checked,
+                    },
+                  })
+                }
               />
             </div>
           </Card>
@@ -318,8 +340,8 @@ export function ModelSettingsPage({
       </Tabs>
 
       <div className="flex gap-3">
-        <Button 
-          onClick={saveSettings} 
+        <Button
+          onClick={saveSettings}
           disabled={saving}
           className="flex items-center gap-2"
         >
@@ -335,9 +357,9 @@ export function ModelSettingsPage({
             </>
           )}
         </Button>
-        
-        <Button 
-          variant="outline" 
+
+        <Button
+          variant="outline"
           onClick={resetToDefaults}
           className="flex items-center gap-2"
         >
@@ -346,5 +368,5 @@ export function ModelSettingsPage({
         </Button>
       </div>
     </div>
-  )
+  );
 }

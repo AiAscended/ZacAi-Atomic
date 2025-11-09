@@ -11,7 +11,7 @@ export class InternetSearchWebScraper {
   }> {
     // Placeholder implementation
     return {
-      content: '',
+      content: "",
       metadata: {},
       links: [],
     };

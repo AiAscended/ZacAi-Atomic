@@ -4,195 +4,356 @@
  * Location: /app/admin/domains/[domain]/page.tsx
  */
 
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
-import { Badge } from "@/components/ui/badge"
-import { useState, useEffect } from "react"
-import { Save, RotateCcw, Check, AlertCircle, X } from "lucide-react"
-import { useParams } from "next/navigation"
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { Save, RotateCcw, Check, AlertCircle, X } from "lucide-react";
+import { useParams } from "next/navigation";
 
 interface DomainSettings {
-  enabled: boolean
-  confidenceThreshold: number
-  maxTokens: number
-  temperature: number
-  description: string
-  keywords: string[]
-  priority: number
-  updatedAt: string
+  enabled: boolean;
+  confidenceThreshold: number;
+  maxTokens: number;
+  temperature: number;
+  description: string;
+  keywords: string[];
+  priority: number;
+  updatedAt: string;
 }
 
-const DOMAIN_INFO: Record<string, { title: string; description: string; defaultKeywords: string[] }> = {
-  'react': {
-    title: 'React',
-    description: 'React library, hooks, components, JSX, state management',
-    defaultKeywords: ['react', 'jsx', 'hooks', 'components', 'useState', 'useEffect', 'props']
+const DOMAIN_INFO: Record<
+  string,
+  { title: string; description: string; defaultKeywords: string[] }
+> = {
+  react: {
+    title: "React",
+    description: "React library, hooks, components, JSX, state management",
+    defaultKeywords: [
+      "react",
+      "jsx",
+      "hooks",
+      "components",
+      "useState",
+      "useEffect",
+      "props",
+    ],
   },
-  'nextjs': {
-    title: 'Next.js',
-    description: 'Next.js framework, app router, server components, API routes',
-    defaultKeywords: ['nextjs', 'app router', 'server components', 'metadata', 'routing']
+  nextjs: {
+    title: "Next.js",
+    description: "Next.js framework, app router, server components, API routes",
+    defaultKeywords: [
+      "nextjs",
+      "app router",
+      "server components",
+      "metadata",
+      "routing",
+    ],
   },
-  'typescript': {
-    title: 'TypeScript',
-    description: 'TypeScript types, interfaces, generics, type safety',
-    defaultKeywords: ['typescript', 'types', 'interfaces', 'generics', 'tsconfig']
+  typescript: {
+    title: "TypeScript",
+    description: "TypeScript types, interfaces, generics, type safety",
+    defaultKeywords: [
+      "typescript",
+      "types",
+      "interfaces",
+      "generics",
+      "tsconfig",
+    ],
   },
-  'javascript': {
-    title: 'JavaScript',
-    description: 'JavaScript language, ES6+, async/await, promises',
-    defaultKeywords: ['javascript', 'es6', 'async', 'promises', 'closures']
+  javascript: {
+    title: "JavaScript",
+    description: "JavaScript language, ES6+, async/await, promises",
+    defaultKeywords: ["javascript", "es6", "async", "promises", "closures"],
   },
-  'python': {
-    title: 'Python',
-    description: 'Python programming, data structures, libraries',
-    defaultKeywords: ['python', 'pip', 'virtual environment', 'pandas', 'numpy']
+  python: {
+    title: "Python",
+    description: "Python programming, data structures, libraries",
+    defaultKeywords: [
+      "python",
+      "pip",
+      "virtual environment",
+      "pandas",
+      "numpy",
+    ],
   },
-  'atomic': {
-    title: 'Atomic AI',
-    description: 'Atomic modular AI architecture, domain orchestration',
-    defaultKeywords: ['atomic', 'modular', 'orchestration', 'domains', 'routing']
+  atomic: {
+    title: "Atomic AI",
+    description: "Atomic modular AI architecture, domain orchestration",
+    defaultKeywords: [
+      "atomic",
+      "modular",
+      "orchestration",
+      "domains",
+      "routing",
+    ],
   },
-  'inference': {
-    title: 'Inference',
-    description: 'Model inference, prediction, response generation',
-    defaultKeywords: ['inference', 'prediction', 'generation', 'latency', 'optimization']
+  inference: {
+    title: "Inference",
+    description: "Model inference, prediction, response generation",
+    defaultKeywords: [
+      "inference",
+      "prediction",
+      "generation",
+      "latency",
+      "optimization",
+    ],
   },
-  'embeddings': {
-    title: 'Embeddings',
-    description: 'Vector embeddings, semantic search, similarity',
-    defaultKeywords: ['embeddings', 'vectors', 'semantic', 'similarity', 'cosine']
+  embeddings: {
+    title: "Embeddings",
+    description: "Vector embeddings, semantic search, similarity",
+    defaultKeywords: [
+      "embeddings",
+      "vectors",
+      "semantic",
+      "similarity",
+      "cosine",
+    ],
   },
-  'monitoring': {
-    title: 'Monitoring',
-    description: 'System monitoring, metrics, observability',
-    defaultKeywords: ['monitoring', 'metrics', 'observability', 'logs', 'alerts']
+  monitoring: {
+    title: "Monitoring",
+    description: "System monitoring, metrics, observability",
+    defaultKeywords: [
+      "monitoring",
+      "metrics",
+      "observability",
+      "logs",
+      "alerts",
+    ],
   },
-  'configuration': {
-    title: 'Configuration',
-    description: 'System configuration, settings, environment',
-    defaultKeywords: ['config', 'settings', 'environment', 'parameters', 'options']
+  configuration: {
+    title: "Configuration",
+    description: "System configuration, settings, environment",
+    defaultKeywords: [
+      "config",
+      "settings",
+      "environment",
+      "parameters",
+      "options",
+    ],
   },
-  'system': {
-    title: 'System',
-    description: 'System operations, architecture, infrastructure',
-    defaultKeywords: ['system', 'architecture', 'infrastructure', 'deployment', 'scaling']
+  system: {
+    title: "System",
+    description: "System operations, architecture, infrastructure",
+    defaultKeywords: [
+      "system",
+      "architecture",
+      "infrastructure",
+      "deployment",
+      "scaling",
+    ],
   },
-  'observability': {
-    title: 'Observability',
-    description: 'Logging, tracing, debugging, performance',
-    defaultKeywords: ['observability', 'logging', 'tracing', 'debugging', 'performance']
+  observability: {
+    title: "Observability",
+    description: "Logging, tracing, debugging, performance",
+    defaultKeywords: [
+      "observability",
+      "logging",
+      "tracing",
+      "debugging",
+      "performance",
+    ],
   },
-  'data-integrity': {
-    title: 'Data Integrity',
-    description: 'Data validation, consistency, quality checks',
-    defaultKeywords: ['validation', 'consistency', 'integrity', 'quality', 'verification']
+  "data-integrity": {
+    title: "Data Integrity",
+    description: "Data validation, consistency, quality checks",
+    defaultKeywords: [
+      "validation",
+      "consistency",
+      "integrity",
+      "quality",
+      "verification",
+    ],
   },
-  'repair': {
-    title: 'Repair',
-    description: 'Error correction, recovery, self-healing',
-    defaultKeywords: ['repair', 'recovery', 'healing', 'correction', 'fix']
+  repair: {
+    title: "Repair",
+    description: "Error correction, recovery, self-healing",
+    defaultKeywords: ["repair", "recovery", "healing", "correction", "fix"],
   },
-  'mathematics': {
-    title: 'Mathematics',
-    description: 'Mathematical operations, calculations, algorithms',
-    defaultKeywords: ['mathematics', 'calculus', 'algebra', 'statistics', 'equations']
+  mathematics: {
+    title: "Mathematics",
+    description: "Mathematical operations, calculations, algorithms",
+    defaultKeywords: [
+      "mathematics",
+      "calculus",
+      "algebra",
+      "statistics",
+      "equations",
+    ],
   },
-  'internet-search': {
-    title: 'Internet Search',
-    description: 'Web search, information retrieval, APIs',
-    defaultKeywords: ['search', 'web', 'api', 'scraping', 'retrieval']
+  "internet-search": {
+    title: "Internet Search",
+    description: "Web search, information retrieval, APIs",
+    defaultKeywords: ["search", "web", "api", "scraping", "retrieval"],
   },
-  'grammar': {
-    title: 'Grammar',
-    description: 'Grammar checking, language rules, correction',
-    defaultKeywords: ['grammar', 'syntax', 'punctuation', 'spelling', 'correction']
+  grammar: {
+    title: "Grammar",
+    description: "Grammar checking, language rules, correction",
+    defaultKeywords: [
+      "grammar",
+      "syntax",
+      "punctuation",
+      "spelling",
+      "correction",
+    ],
   },
-  'english': {
-    title: 'English',
-    description: 'English language, writing, communication',
-    defaultKeywords: ['english', 'writing', 'communication', 'vocabulary', 'composition']
+  english: {
+    title: "English",
+    description: "English language, writing, communication",
+    defaultKeywords: [
+      "english",
+      "writing",
+      "communication",
+      "vocabulary",
+      "composition",
+    ],
   },
-  'science': {
-    title: 'Science',
-    description: 'Scientific knowledge, research, methodology',
-    defaultKeywords: ['science', 'research', 'methodology', 'experiments', 'theory']
+  science: {
+    title: "Science",
+    description: "Scientific knowledge, research, methodology",
+    defaultKeywords: [
+      "science",
+      "research",
+      "methodology",
+      "experiments",
+      "theory",
+    ],
   },
-  'code-review': {
-    title: 'Code Review',
-    description: 'Code analysis, best practices, quality',
-    defaultKeywords: ['code review', 'analysis', 'quality', 'best practices', 'refactoring']
+  "code-review": {
+    title: "Code Review",
+    description: "Code analysis, best practices, quality",
+    defaultKeywords: [
+      "code review",
+      "analysis",
+      "quality",
+      "best practices",
+      "refactoring",
+    ],
   },
-  'error-detection': {
-    title: 'Error Detection',
-    description: 'Bug detection, error analysis, debugging',
-    defaultKeywords: ['error', 'bug', 'debugging', 'detection', 'analysis']
+  "error-detection": {
+    title: "Error Detection",
+    description: "Bug detection, error analysis, debugging",
+    defaultKeywords: ["error", "bug", "debugging", "detection", "analysis"],
   },
-  'testing': {
-    title: 'Testing',
-    description: 'Unit tests, integration tests, test coverage',
-    defaultKeywords: ['testing', 'unit tests', 'integration', 'coverage', 'jest']
+  testing: {
+    title: "Testing",
+    description: "Unit tests, integration tests, test coverage",
+    defaultKeywords: [
+      "testing",
+      "unit tests",
+      "integration",
+      "coverage",
+      "jest",
+    ],
   },
-  'documentation': {
-    title: 'Documentation',
-    description: 'Code documentation, API docs, comments',
-    defaultKeywords: ['documentation', 'comments', 'api docs', 'readme', 'guides']
+  documentation: {
+    title: "Documentation",
+    description: "Code documentation, API docs, comments",
+    defaultKeywords: [
+      "documentation",
+      "comments",
+      "api docs",
+      "readme",
+      "guides",
+    ],
   },
-  'security': {
-    title: 'Security',
-    description: 'Security best practices, vulnerabilities, authentication',
-    defaultKeywords: ['security', 'authentication', 'authorization', 'vulnerabilities', 'encryption']
+  security: {
+    title: "Security",
+    description: "Security best practices, vulnerabilities, authentication",
+    defaultKeywords: [
+      "security",
+      "authentication",
+      "authorization",
+      "vulnerabilities",
+      "encryption",
+    ],
   },
-  'algorithms': {
-    title: 'Algorithms',
-    description: 'Algorithm design, complexity, optimization',
-    defaultKeywords: ['algorithms', 'complexity', 'optimization', 'sorting', 'searching']
+  algorithms: {
+    title: "Algorithms",
+    description: "Algorithm design, complexity, optimization",
+    defaultKeywords: [
+      "algorithms",
+      "complexity",
+      "optimization",
+      "sorting",
+      "searching",
+    ],
   },
-  'data-structures': {
-    title: 'Data Structures',
-    description: 'Arrays, trees, graphs, hash tables',
-    defaultKeywords: ['data structures', 'arrays', 'trees', 'graphs', 'hash tables']
+  "data-structures": {
+    title: "Data Structures",
+    description: "Arrays, trees, graphs, hash tables",
+    defaultKeywords: [
+      "data structures",
+      "arrays",
+      "trees",
+      "graphs",
+      "hash tables",
+    ],
   },
-  'version-control': {
-    title: 'Version Control',
-    description: 'Git, GitHub, branching, merging',
-    defaultKeywords: ['git', 'github', 'version control', 'branching', 'commits']
+  "version-control": {
+    title: "Version Control",
+    description: "Git, GitHub, branching, merging",
+    defaultKeywords: [
+      "git",
+      "github",
+      "version control",
+      "branching",
+      "commits",
+    ],
   },
-  'environment': {
-    title: 'Environment',
-    description: 'Development environment, setup, configuration',
-    defaultKeywords: ['environment', 'setup', 'configuration', 'dependencies', 'tools']
+  environment: {
+    title: "Environment",
+    description: "Development environment, setup, configuration",
+    defaultKeywords: [
+      "environment",
+      "setup",
+      "configuration",
+      "dependencies",
+      "tools",
+    ],
   },
-  'general': {
-    title: 'General',
-    description: 'General programming knowledge and concepts',
-    defaultKeywords: ['programming', 'development', 'software', 'coding', 'general']
-  }
-}
+  general: {
+    title: "General",
+    description: "General programming knowledge and concepts",
+    defaultKeywords: [
+      "programming",
+      "development",
+      "software",
+      "coding",
+      "general",
+    ],
+  },
+};
 
 export default function DomainSettingsPage() {
-  const params = useParams()
-  const domainName = params.domain as string
-  const domainInfo = DOMAIN_INFO[domainName] || { 
-    title: domainName, 
+  const params = useParams();
+  const domainName = params.domain as string;
+  const domainInfo = DOMAIN_INFO[domainName] || {
+    title: domainName,
     description: `Configuration for ${domainName} domain`,
-    defaultKeywords: [domainName]
-  }
+    defaultKeywords: [domainName],
+  };
 
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [newKeyword, setNewKeyword] = useState('')
-  
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [newKeyword, setNewKeyword] = useState("");
+
   const [settings, setSettings] = useState<DomainSettings>({
     enabled: true,
     confidenceThreshold: 0.7,
@@ -201,67 +362,69 @@ export default function DomainSettingsPage() {
     description: domainInfo.description,
     keywords: domainInfo.defaultKeywords,
     priority: 5,
-    updatedAt: new Date().toISOString()
-  })
+    updatedAt: new Date().toISOString(),
+  });
 
   useEffect(() => {
-    loadSettings()
-  }, [domainName])
+    loadSettings();
+  }, [domainName]);
 
   const loadSettings = async () => {
     try {
-      setLoading(true)
-      setError(null)
-      const response = await fetch(`/api/admin/settings/domains?name=${domainName}`)
-      const result = await response.json()
-      
+      setLoading(true);
+      setError(null);
+      const response = await fetch(
+        `/api/admin/settings/domains?name=${domainName}`,
+      );
+      const result = await response.json();
+
       if (result.success) {
-        setSettings(result.data)
+        setSettings(result.data);
       } else {
-        setError(result.error || 'Failed to load settings')
+        setError(result.error || "Failed to load settings");
       }
     } catch (err) {
-      setError('Network error loading settings')
-      console.error('[Domain Settings] Load error:', err)
+      setError("Network error loading settings");
+      console.error("[Domain Settings] Load error:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const saveSettings = async () => {
     try {
-      setSaving(true)
-      setError(null)
-      setShowSuccess(false)
-      
-      const response = await fetch('/api/admin/settings/domains', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      setSaving(true);
+      setError(null);
+      setShowSuccess(false);
+
+      const response = await fetch("/api/admin/settings/domains", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           domainName,
           settings: {
             ...settings,
-            updatedAt: new Date().toISOString()
-          }
-        })
-      })
-      
-      const result = await response.json()
-      
+            updatedAt: new Date().toISOString(),
+          },
+        }),
+      });
+
+      const result = await response.json();
+
       if (result.success) {
-        setSettings(result.data)
-        setShowSuccess(true)
-        setTimeout(() => setShowSuccess(false), 3000)
+        setSettings(result.data);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
       } else {
-        setError(result.error || 'Failed to save settings')
+        setError(result.error || "Failed to save settings");
       }
     } catch (err) {
-      setError('Network error saving settings')
-      console.error('[Domain Settings] Save error:', err)
+      setError("Network error saving settings");
+      console.error("[Domain Settings] Save error:", err);
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const resetToDefaults = () => {
     setSettings({
@@ -272,26 +435,26 @@ export default function DomainSettingsPage() {
       description: domainInfo.description,
       keywords: domainInfo.defaultKeywords,
       priority: 5,
-      updatedAt: new Date().toISOString()
-    })
-  }
+      updatedAt: new Date().toISOString(),
+    });
+  };
 
   const addKeyword = () => {
     if (newKeyword.trim() && !settings.keywords.includes(newKeyword.trim())) {
       setSettings({
         ...settings,
-        keywords: [...settings.keywords, newKeyword.trim()]
-      })
-      setNewKeyword('')
+        keywords: [...settings.keywords, newKeyword.trim()],
+      });
+      setNewKeyword("");
     }
-  }
+  };
 
   const removeKeyword = (keyword: string) => {
     setSettings({
       ...settings,
-      keywords: settings.keywords.filter(k => k !== keyword)
-    })
-  }
+      keywords: settings.keywords.filter((k) => k !== keyword),
+    });
+  };
 
   if (loading) {
     return (
@@ -301,7 +464,7 @@ export default function DomainSettingsPage() {
           <p className="text-muted-foreground">Loading domain settings...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -342,28 +505,36 @@ export default function DomainSettingsPage() {
               Enable or disable this domain
             </p>
           </div>
-          <Switch 
+          <Switch
             id="enabled"
             checked={settings.enabled}
-            onCheckedChange={(checked) => setSettings({ ...settings, enabled: checked })}
+            onCheckedChange={(checked) =>
+              setSettings({ ...settings, enabled: checked })
+            }
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="description">Description</Label>
-          <Textarea 
-            id="description" 
+          <Textarea
+            id="description"
             rows={3}
             value={settings.description}
-            onChange={(e) => setSettings({ ...settings, description: e.target.value })}
+            onChange={(e) =>
+              setSettings({ ...settings, description: e.target.value })
+            }
           />
         </div>
 
         <div className="space-y-2">
-          <Label>Confidence Threshold: {settings.confidenceThreshold.toFixed(2)}</Label>
+          <Label>
+            Confidence Threshold: {settings.confidenceThreshold.toFixed(2)}
+          </Label>
           <Slider
             value={[settings.confidenceThreshold]}
-            onValueChange={([value]) => setSettings({ ...settings, confidenceThreshold: value })}
+            onValueChange={([value]) =>
+              setSettings({ ...settings, confidenceThreshold: value })
+            }
             min={0}
             max={1}
             step={0.01}
@@ -378,7 +549,9 @@ export default function DomainSettingsPage() {
           <Label>Temperature: {settings.temperature.toFixed(2)}</Label>
           <Slider
             value={[settings.temperature]}
-            onValueChange={([value]) => setSettings({ ...settings, temperature: value })}
+            onValueChange={([value]) =>
+              setSettings({ ...settings, temperature: value })
+            }
             min={0}
             max={2}
             step={0.1}
@@ -391,11 +564,16 @@ export default function DomainSettingsPage() {
 
         <div className="space-y-2">
           <Label htmlFor="maxTokens">Max Tokens</Label>
-          <Input 
-            id="maxTokens" 
-            type="number" 
+          <Input
+            id="maxTokens"
+            type="number"
             value={settings.maxTokens}
-            onChange={(e) => setSettings({ ...settings, maxTokens: parseInt(e.target.value) || 2000 })}
+            onChange={(e) =>
+              setSettings({
+                ...settings,
+                maxTokens: parseInt(e.target.value) || 2000,
+              })
+            }
           />
           <p className="text-sm text-muted-foreground">
             Maximum response length (100 - 8000 tokens)
@@ -404,9 +582,11 @@ export default function DomainSettingsPage() {
 
         <div className="space-y-2">
           <Label htmlFor="priority">Priority</Label>
-          <Select 
+          <Select
             value={settings.priority.toString()}
-            onValueChange={(value) => setSettings({ ...settings, priority: parseInt(value) })}
+            onValueChange={(value) =>
+              setSettings({ ...settings, priority: parseInt(value) })
+            }
           >
             <SelectTrigger>
               <SelectValue />
@@ -414,7 +594,12 @@ export default function DomainSettingsPage() {
             <SelectContent>
               {Array.from({ length: 10 }, (_, i) => i + 1).map((priority) => (
                 <SelectItem key={priority} value={priority.toString()}>
-                  Priority {priority} {priority === 10 ? '(Highest)' : priority === 1 ? '(Lowest)' : ''}
+                  Priority {priority}{" "}
+                  {priority === 10
+                    ? "(Highest)"
+                    : priority === 1
+                      ? "(Lowest)"
+                      : ""}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -427,20 +612,22 @@ export default function DomainSettingsPage() {
         <div className="space-y-2">
           <Label>Keywords</Label>
           <div className="flex gap-2 mb-2">
-            <Input 
-              placeholder="Add keyword..." 
+            <Input
+              placeholder="Add keyword..."
               value={newKeyword}
               onChange={(e) => setNewKeyword(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
+              onKeyDown={(e) => e.key === "Enter" && addKeyword()}
             />
-            <Button onClick={addKeyword} variant="outline">Add</Button>
+            <Button onClick={addKeyword} variant="outline">
+              Add
+            </Button>
           </div>
           <div className="flex flex-wrap gap-2">
             {settings.keywords.map((keyword) => (
               <Badge key={keyword} variant="secondary" className="px-3 py-1">
                 {keyword}
-                <X 
-                  className="h-3 w-3 ml-2 cursor-pointer" 
+                <X
+                  className="h-3 w-3 ml-2 cursor-pointer"
                   onClick={() => removeKeyword(keyword)}
                 />
               </Badge>
@@ -453,8 +640,8 @@ export default function DomainSettingsPage() {
       </Card>
 
       <div className="flex gap-3">
-        <Button 
-          onClick={saveSettings} 
+        <Button
+          onClick={saveSettings}
           disabled={saving}
           className="flex items-center gap-2"
         >
@@ -470,9 +657,9 @@ export default function DomainSettingsPage() {
             </>
           )}
         </Button>
-        
-        <Button 
-          variant="outline" 
+
+        <Button
+          variant="outline"
           onClick={resetToDefaults}
           className="flex items-center gap-2"
         >
@@ -481,5 +668,5 @@ export default function DomainSettingsPage() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

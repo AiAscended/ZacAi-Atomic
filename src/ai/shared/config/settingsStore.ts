@@ -1,7 +1,7 @@
 /**
  * File: src/ai/shared/config/settingsStore.ts
  * Purpose: Persistent storage for admin settings with encryption support
- * 
+ *
  * Features:
  * - Read/write settings to filesystem (JSON)
  * - Encrypt sensitive fields (privateKey, webhookSecret)
@@ -34,7 +34,8 @@ import {
 
 const SETTINGS_DIR = path.join(process.cwd(), ".config");
 const SETTINGS_FILE = path.join(SETTINGS_DIR, "admin-settings.json");
-const ENCRYPTION_KEY = process.env.SETTINGS_ENCRYPTION_KEY || "default-dev-key-change-in-production";
+const ENCRYPTION_KEY =
+  process.env.SETTINGS_ENCRYPTION_KEY || "default-dev-key-change-in-production";
 const ALGORITHM = "aes-256-cbc";
 
 // ============================================================================
@@ -45,10 +46,10 @@ function encrypt(text: string): string {
   const key = crypto.scryptSync(ENCRYPTION_KEY, "salt", 32);
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
-  
+
   let encrypted = cipher.update(text, "utf8", "hex");
   encrypted += cipher.final("hex");
-  
+
   return `${iv.toString("hex")}:${encrypted}`;
 }
 
@@ -58,10 +59,10 @@ function decrypt(encryptedText: string): string {
     const key = crypto.scryptSync(ENCRYPTION_KEY, "salt", 32);
     const iv = Buffer.from(ivHex, "hex");
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
-    
+
     let decrypted = decipher.update(encrypted, "hex", "utf8");
     decrypted += decipher.final("utf8");
-    
+
     return decrypted;
   } catch (error) {
     console.error("Decryption failed:", error);
@@ -117,15 +118,17 @@ export class SettingsStore {
     try {
       const fileContent = await fs.readFile(SETTINGS_FILE, "utf8");
       const parsed = JSON.parse(fileContent);
-      
+
       // Decrypt sensitive fields
       if (parsed.githubApp?.privateKey) {
         parsed.githubApp.privateKey = decrypt(parsed.githubApp.privateKey);
       }
       if (parsed.githubApp?.webhookSecret) {
-        parsed.githubApp.webhookSecret = decrypt(parsed.githubApp.webhookSecret);
+        parsed.githubApp.webhookSecret = decrypt(
+          parsed.githubApp.webhookSecret,
+        );
       }
-      
+
       this.settings = parsed;
     } catch (error) {
       // File doesn't exist or is invalid, create default
@@ -178,7 +181,9 @@ export class SettingsStore {
   /**
    * Update system settings
    */
-  async updateSystem(updates: Partial<SystemSettings>): Promise<SystemSettings> {
+  async updateSystem(
+    updates: Partial<SystemSettings>,
+  ): Promise<SystemSettings> {
     await this.initialize();
     if (!this.settings) throw new Error("Settings not initialized");
 
@@ -186,7 +191,7 @@ export class SettingsStore {
       ...this.settings.system,
       ...updates,
     };
-    
+
     await this.save();
     return this.settings.system;
   }
@@ -202,7 +207,9 @@ export class SettingsStore {
   /**
    * Update orchestrator settings
    */
-  async updateOrchestrator(updates: Partial<OrchestratorSettings>): Promise<OrchestratorSettings> {
+  async updateOrchestrator(
+    updates: Partial<OrchestratorSettings>,
+  ): Promise<OrchestratorSettings> {
     await this.initialize();
     if (!this.settings) throw new Error("Settings not initialized");
 
@@ -210,7 +217,7 @@ export class SettingsStore {
       ...this.settings.orchestrator,
       ...updates,
     };
-    
+
     await this.save();
     return this.settings.orchestrator;
   }
@@ -234,7 +241,10 @@ export class SettingsStore {
   /**
    * Update domain settings
    */
-  async updateDomain(domainId: string, updates: Partial<DomainSettings>): Promise<DomainSettings> {
+  async updateDomain(
+    domainId: string,
+    updates: Partial<DomainSettings>,
+  ): Promise<DomainSettings> {
     await this.initialize();
     if (!this.settings) throw new Error("Settings not initialized");
 
@@ -265,7 +275,7 @@ export class SettingsStore {
       ...existing,
       ...updates,
     };
-    
+
     await this.save();
     return this.settings.domains[domainId];
   }
@@ -275,20 +285,23 @@ export class SettingsStore {
    */
   async getGitHubApp(): Promise<GitHubAppSettings> {
     const all = await this.getAll();
-    
+
     // Prefer environment variables for secrets
     return {
       ...all.githubApp,
       appId: process.env.GITHUB_APP_ID || all.githubApp.appId,
       clientId: process.env.GITHUB_APP_CLIENT_ID || all.githubApp.clientId,
-      webhookSecret: process.env.GITHUB_APP_WEBHOOK_SECRET || all.githubApp.webhookSecret,
+      webhookSecret:
+        process.env.GITHUB_APP_WEBHOOK_SECRET || all.githubApp.webhookSecret,
     };
   }
 
   /**
    * Update GitHub App settings (metadata only, not secrets)
    */
-  async updateGitHubApp(updates: Partial<GitHubAppSettings>): Promise<GitHubAppSettings> {
+  async updateGitHubApp(
+    updates: Partial<GitHubAppSettings>,
+  ): Promise<GitHubAppSettings> {
     await this.initialize();
     if (!this.settings) throw new Error("Settings not initialized");
 
@@ -302,7 +315,7 @@ export class SettingsStore {
       ...this.settings.githubApp,
       ...updatesCopy,
     };
-    
+
     await this.save();
     return this.getGitHubApp(); // Return with env vars applied
   }
@@ -318,7 +331,9 @@ export class SettingsStore {
   /**
    * Update IDE mode settings
    */
-  async updateIDEMode(updates: Partial<IDEModeSettings>): Promise<IDEModeSettings> {
+  async updateIDEMode(
+    updates: Partial<IDEModeSettings>,
+  ): Promise<IDEModeSettings> {
     await this.initialize();
     if (!this.settings) throw new Error("Settings not initialized");
 
@@ -326,7 +341,7 @@ export class SettingsStore {
       ...this.settings.ideMode,
       ...updates,
     };
-    
+
     await this.save();
     return this.settings.ideMode;
   }
@@ -350,7 +365,10 @@ export class SettingsStore {
   /**
    * Update model settings
    */
-  async updateModel(modelId: string, updates: Partial<ModelSettings>): Promise<ModelSettings> {
+  async updateModel(
+    modelId: string,
+    updates: Partial<ModelSettings>,
+  ): Promise<ModelSettings> {
     await this.initialize();
     if (!this.settings) throw new Error("Settings not initialized");
 
@@ -363,7 +381,7 @@ export class SettingsStore {
       ...existing,
       ...updates,
     };
-    
+
     await this.save();
     return this.settings.models[modelId];
   }
@@ -381,10 +399,10 @@ export class SettingsStore {
    */
   async importSettings(settingsJson: string): Promise<void> {
     await this.initialize();
-    
+
     const imported = JSON.parse(settingsJson);
     this.settings = imported;
-    
+
     await this.save();
   }
 

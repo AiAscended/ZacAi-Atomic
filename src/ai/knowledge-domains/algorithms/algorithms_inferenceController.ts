@@ -6,16 +6,16 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { algorithmsTokenizer } from "./algorithms_tokenizer"
-import { algorithmsSemanticAnalyzer } from "./algorithms_semanticAnalyzer"
+import { algorithmsTokenizer } from "./algorithms_tokenizer";
+import { algorithmsSemanticAnalyzer } from "./algorithms_semanticAnalyzer";
 
 export const algorithmsRunInference = async (input: string) => {
-  const t = algorithmsTokenizer(input)
-  const sem = algorithmsSemanticAnalyzer(input)
+  const t = algorithmsTokenizer(input);
+  const sem = algorithmsSemanticAnalyzer(input);
   return {
     domain: "algorithms",
     tokens: t.tokens,
     semanticScore: sem.semanticScore,
     response: `Algorithms analysis: ${sem.parsed.algorithms.join(", ")} detected with ${sem.parsed.complexity} complexity.`,
-  }
-}
+  };
+};

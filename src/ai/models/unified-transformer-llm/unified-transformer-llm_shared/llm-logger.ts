@@ -4,17 +4,17 @@
  */
 
 export enum LogLevel {
-  DEBUG = 'DEBUG',
-  INFO = 'INFO',
-  WARN = 'WARN',
-  ERROR = 'ERROR',
+  DEBUG = "DEBUG",
+  INFO = "INFO",
+  WARN = "WARN",
+  ERROR = "ERROR",
 }
 
 export class LLMLogger {
   private level: LogLevel;
   private prefix: string;
 
-  constructor(prefix: string = 'LLM', level: LogLevel = LogLevel.INFO) {
+  constructor(prefix: string = "LLM", level: LogLevel = LogLevel.INFO) {
     this.prefix = prefix;
     this.level = level;
   }
@@ -44,7 +44,12 @@ export class LLMLogger {
   }
 
   private shouldLog(level: LogLevel): boolean {
-    const levels = [LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR];
+    const levels = [
+      LogLevel.DEBUG,
+      LogLevel.INFO,
+      LogLevel.WARN,
+      LogLevel.ERROR,
+    ];
     return levels.indexOf(level) >= levels.indexOf(this.level);
   }
 

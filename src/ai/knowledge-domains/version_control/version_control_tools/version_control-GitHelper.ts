@@ -11,8 +11,8 @@ export class VersionControlGitHelper {
   } {
     // Placeholder implementation
     return {
-      command: '',
-      explanation: '',
+      command: "",
+      explanation: "",
       alternatives: [],
     };
   }

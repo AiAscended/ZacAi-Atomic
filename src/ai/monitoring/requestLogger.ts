@@ -5,32 +5,37 @@
  */
 
 interface RequestLog {
-  timestamp: number
-  method: string
-  path: string
-  durationMs: number
-  status: number
+  timestamp: number;
+  method: string;
+  path: string;
+  durationMs: number;
+  status: number;
 }
 
 export class RequestLogger {
-  private logs: RequestLog[] = []
+  private logs: RequestLog[] = [];
 
   logRequestStart(method: string, path: string): number {
-    return Date.now()
+    return Date.now();
   }
 
-  logRequestEnd(startTime: number, method: string, path: string, status: number) {
-    const duration = Date.now() - startTime
+  logRequestEnd(
+    startTime: number,
+    method: string,
+    path: string,
+    status: number,
+  ) {
+    const duration = Date.now() - startTime;
     this.logs.push({
       timestamp: Date.now(),
       method,
       path,
       durationMs: duration,
       status,
-    })
+    });
   }
 
   getRecentLogs(count: number = 100): RequestLog[] {
-    return this.logs.slice(-count)
+    return this.logs.slice(-count);
   }
 }

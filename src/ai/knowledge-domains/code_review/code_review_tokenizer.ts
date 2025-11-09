@@ -6,8 +6,8 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { normalizeText } from "./code_review_utils"
-import CODE_REVIEW_CORE_TOKENS from "./code_review_tokens"
+import { normalizeText } from "./code_review_utils";
+import CODE_REVIEW_CORE_TOKENS from "./code_review_tokens";
 
 /**
  * codeReviewTokenizer
@@ -15,32 +15,37 @@ import CODE_REVIEW_CORE_TOKENS from "./code_review_tokens"
  * - Identifies code patterns and quality indicators
  * - Preserves code structure tokens
  */
-export const codeReviewTokenizer = (text: string, opts?: { includeSystemTokens?: boolean }) => {
-  const t = normalizeText(text)
-  const tokens: string[] = []
+export const codeReviewTokenizer = (
+  text: string,
+  opts?: { includeSystemTokens?: boolean },
+) => {
+  const t = normalizeText(text);
+  const tokens: string[] = [];
 
   // Split by whitespace and code delimiters
-  const raw = t.split(/(\s+|[{}();,.[\]])/).filter(Boolean)
+  const raw = t.split(/(\s+|[{}();,.[\]])/).filter(Boolean);
 
   for (const chunk of raw) {
-    if (/^\s+$/.test(chunk)) continue
+    if (/^\s+$/.test(chunk)) continue;
 
     // Check for code review domain tokens
-    const upper = chunk.toUpperCase()
+    const upper = chunk.toUpperCase();
     if (CODE_REVIEW_CORE_TOKENS.includes(upper)) {
-      tokens.push(upper)
+      tokens.push(upper);
     } else if (/^\d+$/.test(chunk)) {
-      for (const ch of chunk) tokens.push(ch)
+      for (const ch of chunk) tokens.push(ch);
     } else {
-      tokens.push(chunk.toLowerCase())
+      tokens.push(chunk.toLowerCase());
     }
   }
 
   // Include system tokens
   if (opts?.includeSystemTokens ?? true) {
-    const sys = ["<SYS_CODE_REVIEW>", "CODE_REVIEW_BASE"].filter((s) => CODE_REVIEW_CORE_TOKENS.includes(s))
-    return { tokens: [...sys, ...tokens], length: tokens.length + sys.length }
+    const sys = ["<SYS_CODE_REVIEW>", "CODE_REVIEW_BASE"].filter((s) =>
+      CODE_REVIEW_CORE_TOKENS.includes(s),
+    );
+    return { tokens: [...sys, ...tokens], length: tokens.length + sys.length };
   }
 
-  return { tokens, length: tokens.length }
-}
+  return { tokens, length: tokens.length };
+};

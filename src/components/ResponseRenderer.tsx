@@ -9,33 +9,36 @@
  * - src/app/page.tsx
  */
 
-"use client"
+"use client";
 
-import React from "react"
-import { CodeBlock } from "./code/CodeBlock"
+import React from "react";
+import { CodeBlock } from "./code/CodeBlock";
 
 interface TextBlock {
-  id: string
-  content: string
-  type: "paragraph" | "heading" | "list"
+  id: string;
+  content: string;
+  type: "paragraph" | "heading" | "list";
 }
 
 interface CodeBlockData {
-  id: string
-  language: string
-  code: string
-  filename?: string
+  id: string;
+  language: string;
+  code: string;
+  filename?: string;
 }
 
 export interface ResponseRendererProps {
-  textBlocks: TextBlock[]
-  codeBlocks: CodeBlockData[]
+  textBlocks: TextBlock[];
+  codeBlocks: CodeBlockData[];
 }
 
 /**
  * Renders text paragraphs and syntax-highlighted code blocks with proper formatting
  */
-export function ResponseRenderer({ textBlocks, codeBlocks }: ResponseRendererProps) {
+export function ResponseRenderer({
+  textBlocks,
+  codeBlocks,
+}: ResponseRendererProps) {
   return (
     <article className="prose max-w-none">
       {textBlocks.map((block) => (
@@ -55,5 +58,5 @@ export function ResponseRenderer({ textBlocks, codeBlocks }: ResponseRendererPro
         />
       ))}
     </article>
-  )
+  );
 }

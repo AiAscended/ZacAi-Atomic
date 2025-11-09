@@ -6,16 +6,16 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { securityTokenizer } from "./security_tokenizer"
-import { securitySemanticAnalyzer } from "./security_semanticAnalyzer"
+import { securityTokenizer } from "./security_tokenizer";
+import { securitySemanticAnalyzer } from "./security_semanticAnalyzer";
 
 export const securityRunInference = async (input: string) => {
-  const t = securityTokenizer(input)
-  const sem = securitySemanticAnalyzer(input)
+  const t = securityTokenizer(input);
+  const sem = securitySemanticAnalyzer(input);
   return {
     tokens: t.tokens,
     tokenCount: t.length,
     semantics: sem,
     response: `Security analysis: ${sem.issueCount} issues found, severity: ${sem.severity}.`,
-  }
-}
+  };
+};

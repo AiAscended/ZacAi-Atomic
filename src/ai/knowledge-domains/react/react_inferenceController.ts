@@ -6,22 +6,24 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { parseReactInput } from "./react_parser"
-import { analyzeReactSemantics } from "./react_semanticAnalyzer"
+import { parseReactInput } from "./react_parser";
+import { analyzeReactSemantics } from "./react_semanticAnalyzer";
 
 export interface ReactInferenceResult {
-  response: string
-  confidence: number
-  topics: string[]
+  response: string;
+  confidence: number;
+  topics: string[];
   metadata: {
-    intent: string
-    complexity: string
-    parseType: string
-  }
+    intent: string;
+    complexity: string;
+    parseType: string;
+  };
 }
 
-export async function reactRunInference(input: string): Promise<ReactInferenceResult | null> {
-  const lowerInput = input.toLowerCase()
+export async function reactRunInference(
+  input: string,
+): Promise<ReactInferenceResult | null> {
+  const lowerInput = input.toLowerCase();
 
   // Check if this query is relevant to React
   const reactKeywords = [
@@ -35,39 +37,41 @@ export async function reactRunInference(input: string): Promise<ReactInferenceRe
     "props",
     "state",
     "render",
-  ]
+  ];
 
-  const isReactQuery = reactKeywords.some((keyword) => lowerInput.includes(keyword))
+  const isReactQuery = reactKeywords.some((keyword) =>
+    lowerInput.includes(keyword),
+  );
 
   if (!isReactQuery) {
-    return null // Not a React query
+    return null; // Not a React query
   }
 
   try {
-    const parseResult = parseReactInput(input)
-    const semanticAnalysis = analyzeReactSemantics(input)
+    const parseResult = parseReactInput(input);
+    const semanticAnalysis = analyzeReactSemantics(input);
 
-    let response = ""
+    let response = "";
 
     // Generate response based on parse type and semantic analysis
     switch (parseResult.type) {
       case "component":
-        response = generateComponentResponse(input, semanticAnalysis)
-        break
+        response = generateComponentResponse(input, semanticAnalysis);
+        break;
       case "hook":
-        response = generateHookResponse(input, semanticAnalysis)
-        break
+        response = generateHookResponse(input, semanticAnalysis);
+        break;
       case "pattern":
-        response = generatePatternResponse(input, semanticAnalysis)
-        break
+        response = generatePatternResponse(input, semanticAnalysis);
+        break;
       case "question":
-        response = generateQuestionResponse(input, semanticAnalysis)
-        break
+        response = generateQuestionResponse(input, semanticAnalysis);
+        break;
       case "code":
-        response = generateCodeResponse(input, semanticAnalysis)
-        break
+        response = generateCodeResponse(input, semanticAnalysis);
+        break;
       default:
-        response = generateGeneralResponse(input, semanticAnalysis)
+        response = generateGeneralResponse(input, semanticAnalysis);
     }
 
     return {
@@ -79,40 +83,43 @@ export async function reactRunInference(input: string): Promise<ReactInferenceRe
         complexity: semanticAnalysis.complexity,
         parseType: parseResult.type,
       },
-    }
+    };
   } catch (error) {
-    console.error("[React Domain] Inference error:", error)
-    return null
+    console.error("[React Domain] Inference error:", error);
+    return null;
   }
 }
 
 function generateComponentResponse(_input: string, analysis: any): string {
-  return `React components are the building blocks of React applications. ${analysis.suggestedResponse} Components can be functional or class-based, with functional components being the modern standard.`
+  return `React components are the building blocks of React applications. ${analysis.suggestedResponse} Components can be functional or class-based, with functional components being the modern standard.`;
 }
 
 function generateHookResponse(_input: string, analysis: any): string {
-  const hookTypes = analysis.topics.filter((t: string) => t.startsWith("use"))
+  const hookTypes = analysis.topics.filter((t: string) => t.startsWith("use"));
   if (hookTypes.length > 0) {
-    return `React Hooks like ${hookTypes.join(", ")} allow you to use state and other React features in functional components. ${analysis.suggestedResponse}`
+    return `React Hooks like ${hookTypes.join(", ")} allow you to use state and other React features in functional components. ${analysis.suggestedResponse}`;
   }
-  return `React Hooks are functions that let you use state and lifecycle features in functional components. ${analysis.suggestedResponse}`
+  return `React Hooks are functions that let you use state and lifecycle features in functional components. ${analysis.suggestedResponse}`;
 }
 
 function generatePatternResponse(_input: string, analysis: any): string {
-  return `React patterns help organize code and solve common problems. ${analysis.suggestedResponse} Common patterns include composition, render props, higher-order components, and custom hooks.`
+  return `React patterns help organize code and solve common problems. ${analysis.suggestedResponse} Common patterns include composition, render props, higher-order components, and custom hooks.`;
 }
 
 function generateQuestionResponse(_input: string, analysis: any): string {
-  return `${analysis.suggestedResponse} React is a JavaScript library for building user interfaces, focusing on component-based architecture and declarative programming.`
+  return `${analysis.suggestedResponse} React is a JavaScript library for building user interfaces, focusing on component-based architecture and declarative programming.`;
 }
 
 function generateCodeResponse(input: string, analysis: any): string {
   const lowerInput = input.toLowerCase();
-  
+
   // Generate actual code examples based on the request
-  let codeExample = '';
-  
-  if (lowerInput.includes('hello world') || lowerInput.includes('simple component')) {
+  let codeExample = "";
+
+  if (
+    lowerInput.includes("hello world") ||
+    lowerInput.includes("simple component")
+  ) {
     codeExample = `
 
 Here's a simple React component example:
@@ -129,7 +136,7 @@ export default function HelloWorld() {
   );
 }
 \`\`\``;
-  } else if (lowerInput.includes('state') || lowerInput.includes('usestate')) {
+  } else if (lowerInput.includes("state") || lowerInput.includes("usestate")) {
     codeExample = `
 
 Here's a React component with state:
@@ -150,7 +157,7 @@ export default function Counter() {
   );
 }
 \`\`\``;
-  } else if (lowerInput.includes('props')) {
+  } else if (lowerInput.includes("props")) {
     codeExample = `
 
 Here's a React component with props:
@@ -170,7 +177,10 @@ export default function Greeting({ name, message }) {
 // Usage:
 // <Greeting name="Alice" message="Welcome to React!" />
 \`\`\``;
-  } else if (lowerInput.includes('component') || lowerInput.includes('create')) {
+  } else if (
+    lowerInput.includes("component") ||
+    lowerInput.includes("create")
+  ) {
     codeExample = `
 
 Here's a basic React functional component:
@@ -188,14 +198,14 @@ export default function MyComponent() {
 }
 \`\`\``;
   }
-  
+
   return `${analysis.suggestedResponse}${codeExample}
 
 React uses JSX syntax to describe UI, and components manage their own state and props.`;
 }
 
 function generateGeneralResponse(_input: string, analysis: any): string {
-  return `${analysis.suggestedResponse} React provides a powerful and flexible way to build modern web applications with reusable components.`
+  return `${analysis.suggestedResponse} React provides a powerful and flexible way to build modern web applications with reusable components.`;
 }
 
 export default reactRunInference;

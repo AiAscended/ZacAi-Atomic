@@ -1,7 +1,7 @@
 /**
  * File: src/app/api/admin/github-app/installation-token/route.ts
  * Purpose: Exchange installation ID for an access token
- * 
+ *
  * POST - Get installation access token for making API calls on behalf of installation
  */
 
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 /**
  * POST /api/admin/github-app/installation-token
  * Exchange installation ID for an access token
- * 
+ *
  * Body: { installationId: string }
  */
 export async function POST(request: NextRequest) {
@@ -23,20 +23,23 @@ export async function POST(request: NextRequest) {
     if (!installationId) {
       return NextResponse.json(
         { error: "installationId is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Get JWT token from internal endpoint
-    const jwtResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/admin/github-app/jwt`, {
-      method: "POST",
-    });
+    const jwtResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/admin/github-app/jwt`,
+      {
+        method: "POST",
+      },
+    );
 
     if (!jwtResponse.ok) {
       const error = await jwtResponse.json();
       return NextResponse.json(
         { error: error.error || "Failed to generate JWT" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -52,7 +55,7 @@ export async function POST(request: NextRequest) {
           Accept: "application/vnd.github.v3+json",
           "User-Agent": "ZacAI-Atomic",
         },
-      }
+      },
     );
 
     if (!response.ok) {
@@ -60,7 +63,7 @@ export async function POST(request: NextRequest) {
       console.error("GitHub API error:", errorText);
       return NextResponse.json(
         { error: "Failed to create installation token" },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -76,7 +79,7 @@ export async function POST(request: NextRequest) {
     console.error("Failed to create installation token:", error);
     return NextResponse.json(
       { error: "Failed to create installation token" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

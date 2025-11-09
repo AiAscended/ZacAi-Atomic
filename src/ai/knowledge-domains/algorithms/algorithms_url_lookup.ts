@@ -6,10 +6,20 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-const { registerSource } = require("../url_lookup")
+import { registerSource } from "../url_lookup";
 
-registerSource("algorithms", "Algorithm Visualizer", "https://algorithm-visualizer.org/", "Algorithm visualizations")
-registerSource("algorithms", "LeetCode", "https://leetcode.com/", "Algorithm practice problems")
+registerSource(
+  "algorithms",
+  "Algorithm Visualizer",
+  "https://algorithm-visualizer.org/",
+  "Algorithm visualizations",
+);
+registerSource(
+  "algorithms",
+  "LeetCode",
+  "https://leetcode.com/",
+  "Algorithm practice problems",
+);
 
-export const algorithmsSources = () => registerSource
-export default algorithmsSources
+export const algorithmsSources = () => registerSource;
+export default algorithmsSources;

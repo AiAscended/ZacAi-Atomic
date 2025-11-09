@@ -1,15 +1,15 @@
 interface ModelWeights {
-  embedding_layer: number[][]
-  attention_weights: Record<string, Record<string, number[][]>>
-  feedforward_weights: Record<string, Record<string, number[][]>>
-  output_layer: Record<string, number[][]>
+  embedding_layer: number[][];
+  attention_weights: Record<string, Record<string, number[][]>>;
+  feedforward_weights: Record<string, Record<string, number[][]>>;
+  output_layer: Record<string, number[][]>;
 }
 
-let weightsLoaded = false
-let modelWeights: ModelWeights | null = null
+let weightsLoaded = false;
+let modelWeights: ModelWeights | null = null;
 
 export async function loadProgrammingModelWeights(): Promise<ModelWeights> {
-  if (weightsLoaded && modelWeights) return modelWeights
+  if (weightsLoaded && modelWeights) return modelWeights;
 
   modelWeights = {
     embedding_layer: initializeMatrix(72, 128),
@@ -27,12 +27,14 @@ export async function loadProgrammingModelWeights(): Promise<ModelWeights> {
       },
     },
     output_layer: { w: initializeMatrix(128, 72) },
-  }
+  };
 
-  weightsLoaded = true
-  return modelWeights
+  weightsLoaded = true;
+  return modelWeights;
 }
 
 function initializeMatrix(rows: number, cols: number): number[][] {
-  return Array.from({ length: rows }, () => Array.from({ length: cols }, () => (Math.random() - 0.5) * 0.1))
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => (Math.random() - 0.5) * 0.1),
+  );
 }

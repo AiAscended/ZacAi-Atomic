@@ -3,13 +3,13 @@
  * Processes and learns from user feedback
  */
 
-"use client"
+"use client";
 
-import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage"
+import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage";
 
 export default function FeedbackAnalyzerPage() {
   return (
-    <ModelSettingsPage 
+    <ModelSettingsPage
       modelName="feedback-analyzer"
       modelTitle="Feedback Analyzer"
       modelDescription="Analyzes user feedback to improve system performance"
@@ -18,8 +18,8 @@ export default function FeedbackAnalyzerPage() {
         aggregationPeriod: "daily",
         minFeedbackCount: 10,
         autoApplyImprovements: false,
-        feedbackCategories: ["helpful", "unhelpful", "incorrect", "incomplete"]
+        feedbackCategories: ["helpful", "unhelpful", "incorrect", "incomplete"],
       }}
     />
-  )
+  );
 }

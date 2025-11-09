@@ -3,7 +3,7 @@
  * Tokenizes text for debugging, error detection, and code repair analysis
  */
 
-import { DOMAIN_NAME } from './repair_constants';
+import { DOMAIN_NAME } from "./repair_constants";
 
 export interface TokenizeOptions {
   includePunctuation?: boolean;
@@ -14,7 +14,10 @@ export interface TokenizeOptions {
 /**
  * Tokenize text for repair and debugging analysis
  */
-export const repairTokenizer = (text: string, options?: TokenizeOptions): string[] => {
+export const repairTokenizer = (
+  text: string,
+  options?: TokenizeOptions,
+): string[] => {
   const opts = {
     includePunctuation: false,
     lowercase: true,
@@ -32,15 +35,17 @@ export const repairTokenizer = (text: string, options?: TokenizeOptions): string
   // Split on whitespace and punctuation (except hyphens in words)
   const tokens = processedText
     .split(/[\s,;:.!?()[\]{}'"]+/)
-    .filter(token => token.length > 0);
+    .filter((token) => token.length > 0);
 
   // Add system tokens for repair concepts
   const systemTokens: string[] = [];
-  
+
   if (opts.includeSystemTokens) {
-    const repairKeywords = ['error', 'bug', 'fix', 'debug', 'repair', 'broken'];
-    const hasRepairKeywords = repairKeywords.some(kw => processedText.includes(kw));
-    
+    const repairKeywords = ["error", "bug", "fix", "debug", "repair", "broken"];
+    const hasRepairKeywords = repairKeywords.some((kw) =>
+      processedText.includes(kw),
+    );
+
     if (hasRepairKeywords) {
       systemTokens.push(`<DOMAIN:${DOMAIN_NAME}>`);
     }
@@ -61,15 +66,33 @@ export const countTokens = (text: string): number => {
  */
 export const extractKeywords = (text: string): string[] => {
   const tokens = repairTokenizer(text, { lowercase: true });
-  
+
   const keywords = [
-    'error', 'bug', 'fix', 'debug', 'debugging', 'repair',
-    'broken', 'crash', 'exception', 'failure', 'issue',
-    'troubleshoot', 'diagnose', 'resolve', 'patch', 'workaround',
-    'stack', 'trace', 'backtrace', 'undefined', 'null', 'reference'
+    "error",
+    "bug",
+    "fix",
+    "debug",
+    "debugging",
+    "repair",
+    "broken",
+    "crash",
+    "exception",
+    "failure",
+    "issue",
+    "troubleshoot",
+    "diagnose",
+    "resolve",
+    "patch",
+    "workaround",
+    "stack",
+    "trace",
+    "backtrace",
+    "undefined",
+    "null",
+    "reference",
   ];
-  
-  return tokens.filter(token => keywords.includes(token));
+
+  return tokens.filter((token) => keywords.includes(token));
 };
 
 export default repairTokenizer;

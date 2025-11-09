@@ -1,14 +1,20 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { RefreshCw, ExternalLink, Smartphone, Tablet, Monitor } from 'lucide-react';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  RefreshCw,
+  ExternalLink,
+  Smartphone,
+  Tablet,
+  Monitor,
+} from "lucide-react";
 
-type DeviceSize = 'mobile' | 'tablet' | 'desktop';
+type DeviceSize = "mobile" | "tablet" | "desktop";
 
 export function PreviewPanel() {
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [deviceSize, setDeviceSize] = useState<DeviceSize>('desktop');
+  const [deviceSize, setDeviceSize] = useState<DeviceSize>("desktop");
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -17,12 +23,12 @@ export function PreviewPanel() {
 
   const getDeviceDimensions = () => {
     switch (deviceSize) {
-      case 'mobile':
-        return { width: '375px', height: '667px' };
-      case 'tablet':
-        return { width: '768px', height: '1024px' };
+      case "mobile":
+        return { width: "375px", height: "667px" };
+      case "tablet":
+        return { width: "768px", height: "1024px" };
       default:
-        return { width: '100%', height: '100%' };
+        return { width: "100%", height: "100%" };
     }
   };
 
@@ -36,35 +42,35 @@ export function PreviewPanel() {
           <span className="text-sm font-semibold">Preview</span>
           <div className="flex items-center gap-1">
             <Button
-              variant={deviceSize === 'mobile' ? 'default' : 'ghost'}
+              variant={deviceSize === "mobile" ? "default" : "ghost"}
               size="sm"
               className="h-7 w-7 p-0"
-              onClick={() => setDeviceSize('mobile')}
+              onClick={() => setDeviceSize("mobile")}
               title="Mobile (375x667)"
             >
               <Smartphone className="h-4 w-4" />
             </Button>
             <Button
-              variant={deviceSize === 'tablet' ? 'default' : 'ghost'}
+              variant={deviceSize === "tablet" ? "default" : "ghost"}
               size="sm"
               className="h-7 w-7 p-0"
-              onClick={() => setDeviceSize('tablet')}
+              onClick={() => setDeviceSize("tablet")}
               title="Tablet (768x1024)"
             >
               <Tablet className="h-4 w-4" />
             </Button>
             <Button
-              variant={deviceSize === 'desktop' ? 'default' : 'ghost'}
+              variant={deviceSize === "desktop" ? "default" : "ghost"}
               size="sm"
               className="h-7 w-7 p-0"
-              onClick={() => setDeviceSize('desktop')}
+              onClick={() => setDeviceSize("desktop")}
               title="Desktop (Full)"
             >
               <Monitor className="h-4 w-4" />
             </Button>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -73,9 +79,16 @@ export function PreviewPanel() {
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+            />
           </Button>
-          <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Open in new tab">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0"
+            title="Open in new tab"
+          >
             <ExternalLink className="h-4 w-4" />
           </Button>
         </div>
@@ -88,8 +101,8 @@ export function PreviewPanel() {
           style={{
             width: dimensions.width,
             height: dimensions.height,
-            maxWidth: '100%',
-            maxHeight: '100%',
+            maxWidth: "100%",
+            maxHeight: "100%",
           }}
         >
           <iframe

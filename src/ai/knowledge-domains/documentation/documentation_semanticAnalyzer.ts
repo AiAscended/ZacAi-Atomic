@@ -6,16 +6,20 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { documentationParser } from "./documentation_parser"
+import { documentationParser } from "./documentation_parser";
 
 export const documentationSemanticAnalyzer = (code: string) => {
-  const parsed = documentationParser(code)
+  const parsed = documentationParser(code);
 
   return {
     commentCount: parsed.commentCount,
     hasJSDoc: parsed.hasJSDoc,
     hasTODO: parsed.hasTODO,
     coverage: parsed.coverage,
-    quality: parsed.hasJSDoc ? "good" : parsed.commentCount > 0 ? "fair" : "poor",
-  }
-}
+    quality: parsed.hasJSDoc
+      ? "good"
+      : parsed.commentCount > 0
+        ? "fair"
+        : "poor",
+  };
+};

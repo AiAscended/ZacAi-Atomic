@@ -3,7 +3,7 @@
  * Tokenizes text for system-level operations, configuration, and management
  */
 
-import { DOMAIN_NAME } from './system_constants';
+import { DOMAIN_NAME } from "./system_constants";
 
 export interface TokenizeOptions {
   includePunctuation?: boolean;
@@ -14,7 +14,10 @@ export interface TokenizeOptions {
 /**
  * Tokenize text for system operations analysis
  */
-export const systemTokenizer = (text: string, options?: TokenizeOptions): string[] => {
+export const systemTokenizer = (
+  text: string,
+  options?: TokenizeOptions,
+): string[] => {
   const opts = {
     includePunctuation: false,
     lowercase: true,
@@ -32,15 +35,24 @@ export const systemTokenizer = (text: string, options?: TokenizeOptions): string
   // Split on whitespace and punctuation (except hyphens in words)
   const tokens = processedText
     .split(/[\s,;:.!?()[\]{}'"]+/)
-    .filter(token => token.length > 0);
+    .filter((token) => token.length > 0);
 
   // Add system tokens for system operations concepts
   const systemTokens: string[] = [];
-  
+
   if (opts.includeSystemTokens) {
-    const systemKeywords = ['system', 'config', 'time', 'date', 'location', 'settings'];
-    const hasSystemKeywords = systemKeywords.some(kw => processedText.includes(kw));
-    
+    const systemKeywords = [
+      "system",
+      "config",
+      "time",
+      "date",
+      "location",
+      "settings",
+    ];
+    const hasSystemKeywords = systemKeywords.some((kw) =>
+      processedText.includes(kw),
+    );
+
     if (hasSystemKeywords) {
       systemTokens.push(`<DOMAIN:${DOMAIN_NAME}>`);
     }
@@ -61,15 +73,33 @@ export const countTokens = (text: string): number => {
  */
 export const extractKeywords = (text: string): string[] => {
   const tokens = systemTokenizer(text, { lowercase: true });
-  
+
   const keywords = [
-    'system', 'config', 'configuration', 'settings', 'time', 'date',
-    'timezone', 'location', 'environment', 'variable', 'path',
-    'version', 'platform', 'architecture', 'os', 'operating',
-    'process', 'thread', 'memory', 'cpu', 'disk', 'network'
+    "system",
+    "config",
+    "configuration",
+    "settings",
+    "time",
+    "date",
+    "timezone",
+    "location",
+    "environment",
+    "variable",
+    "path",
+    "version",
+    "platform",
+    "architecture",
+    "os",
+    "operating",
+    "process",
+    "thread",
+    "memory",
+    "cpu",
+    "disk",
+    "network",
   ];
-  
-  return tokens.filter(token => keywords.includes(token));
+
+  return tokens.filter((token) => keywords.includes(token));
 };
 
 export default systemTokenizer;

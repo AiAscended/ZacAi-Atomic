@@ -3,13 +3,13 @@
  * Enriches prompts with history and context
  */
 
-"use client"
+"use client";
 
-import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage"
+import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage";
 
 export default function ContextEnhancerPage() {
   return (
-    <ModelSettingsPage 
+    <ModelSettingsPage
       modelName="context-enhancer"
       modelTitle="Context Enhancer"
       modelDescription="Enriches user prompts with conversation history and relevant context"
@@ -18,8 +18,8 @@ export default function ContextEnhancerPage() {
         maxContextTokens: 1000,
         relevanceThreshold: 0.7,
         includeSystemPrompts: true,
-        contextDecayFactor: 0.9
+        contextDecayFactor: 0.9,
       }}
     />
-  )
+  );
 }

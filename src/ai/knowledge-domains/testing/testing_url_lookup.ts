@@ -6,10 +6,20 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerSource } from "../url_lookup"
+import { registerSource } from "../url_lookup";
 
-registerSource("testing", "Jest", "https://jestjs.io", "JavaScript testing framework")
-registerSource("testing", "Testing Library", "https://testing-library.com", "Testing utilities")
+registerSource(
+  "testing",
+  "Jest",
+  "https://jestjs.io",
+  "JavaScript testing framework",
+);
+registerSource(
+  "testing",
+  "Testing Library",
+  "https://testing-library.com",
+  "Testing utilities",
+);
 
-export const testingSources = () => registerSource
-export default testingSources
+export const testingSources = () => registerSource;
+export default testingSources;

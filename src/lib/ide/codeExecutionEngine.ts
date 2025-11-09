@@ -1,4 +1,4 @@
-import { vfs } from './virtualFileSystem';
+import { vfs } from "./virtualFileSystem";
 
 export interface ExecutionResult {
   output: string;
@@ -24,44 +24,49 @@ export class CodeExecutionEngine {
 
     try {
       switch (context.language) {
-        case 'javascript':
-        case 'typescript':
+        case "javascript":
+        case "typescript":
           return await this.executeJavaScript(context.code);
-        case 'html':
+        case "html":
           return await this.executeHTML(context.code);
-        case 'css':
-          return this.executionSuccess('CSS parsed successfully', startTime);
+        case "css":
+          return this.executionSuccess("CSS parsed successfully", startTime);
         default:
           return this.executionError(
             `Execution not supported for ${context.language}`,
-            startTime
+            startTime,
           );
       }
     } catch (error) {
       return this.executionError(
         error instanceof Error ? error.message : String(error),
-        startTime
+        startTime,
       );
     }
   }
 
   private async executeJavaScript(code: string): Promise<ExecutionResult> {
     const startTime = performance.now();
-    
+
     // Create sandboxed execution environment
     const sandbox: any = {
       console: {
-        log: (...args: any[]) => this.consoleOutput.push(args.map(String).join(' ')),
+        log: (...args: any[]) =>
+          this.consoleOutput.push(args.map(String).join(" ")),
         error: (...args: any[]) => {
-          const msg = args.map(String).join(' ');
+          const msg = args.map(String).join(" ");
           this.consoleOutput.push(`❌ ${msg}`);
           this.errorOutput = msg;
         },
-        warn: (...args: any[]) => this.consoleOutput.push(`⚠️ ${args.map(String).join(' ')}`),
-        info: (...args: any[]) => this.consoleOutput.push(`ℹ️ ${args.map(String).join(' ')}`),
+        warn: (...args: any[]) =>
+          this.consoleOutput.push(`⚠️ ${args.map(String).join(" ")}`),
+        info: (...args: any[]) =>
+          this.consoleOutput.push(`ℹ️ ${args.map(String).join(" ")}`),
       },
-      setTimeout: (fn: (...args: any[]) => void, ms: number) => setTimeout(fn, Math.min(ms, 5000)),
-      setInterval: (fn: (...args: any[]) => void, ms: number) => setInterval(fn, Math.max(ms, 100)),
+      setTimeout: (fn: (...args: any[]) => void, ms: number) =>
+        setTimeout(fn, Math.min(ms, 5000)),
+      setInterval: (fn: (...args: any[]) => void, ms: number) =>
+        setInterval(fn, Math.max(ms, 100)),
       clearTimeout: (id: number) => clearTimeout(id),
       clearInterval: (id: number) => clearInterval(id),
       Math,
@@ -108,7 +113,7 @@ export class CodeExecutionEngine {
         sandbox.String,
         sandbox.Number,
         sandbox.Boolean,
-        sandbox.Promise
+        sandbox.Promise,
       );
 
       // Add result to output if it exists
@@ -117,7 +122,7 @@ export class CodeExecutionEngine {
       }
 
       return {
-        output: this.consoleOutput.join('\n'),
+        output: this.consoleOutput.join("\n"),
         error: this.errorOutput,
         logs: this.consoleOutput,
         executionTime: performance.now() - startTime,
@@ -125,30 +130,35 @@ export class CodeExecutionEngine {
     } catch (error) {
       return this.executionError(
         error instanceof Error ? error.message : String(error),
-        startTime
+        startTime,
       );
     }
   }
 
   private async executeHTML(code: string): Promise<ExecutionResult> {
     const startTime = performance.now();
-    
+
     // Validate HTML structure
     const hasHtml = /<html[^>]*>/i.test(code);
     const hasBody = /<body[^>]*>/i.test(code);
-    
+
     if (!hasHtml || !hasBody) {
-      this.consoleOutput.push('⚠️ HTML document missing <html> or <body> tags');
+      this.consoleOutput.push("⚠️ HTML document missing <html> or <body> tags");
     }
 
     // Check for inline scripts
     const scriptMatches = code.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
     if (scriptMatches) {
-      this.consoleOutput.push(`ℹ️ Found ${scriptMatches.length} inline script(s)`);
-      
+      this.consoleOutput.push(
+        `ℹ️ Found ${scriptMatches.length} inline script(s)`,
+      );
+
       // Extract and execute scripts
       for (const scriptTag of scriptMatches) {
-        const scriptContent = scriptTag.replace(/<script[^>]*>|<\/script>/gi, '');
+        const scriptContent = scriptTag.replace(
+          /<script[^>]*>|<\/script>/gi,
+          "",
+        );
         if (scriptContent.trim()) {
           const jsResult = await this.executeJavaScript(scriptContent);
           if (jsResult.error) {
@@ -159,14 +169,17 @@ export class CodeExecutionEngine {
     }
 
     return {
-      output: this.consoleOutput.join('\n') || 'HTML ready for preview',
+      output: this.consoleOutput.join("\n") || "HTML ready for preview",
       error: this.errorOutput,
       logs: this.consoleOutput,
       executionTime: performance.now() - startTime,
     };
   }
 
-  private executionSuccess(message: string, startTime: number): ExecutionResult {
+  private executionSuccess(
+    message: string,
+    startTime: number,
+  ): ExecutionResult {
     return {
       output: message,
       error: null,
@@ -177,7 +190,7 @@ export class CodeExecutionEngine {
 
   private executionError(message: string, startTime: number): ExecutionResult {
     return {
-      output: '',
+      output: "",
       error: message,
       logs: [],
       executionTime: performance.now() - startTime,
@@ -192,7 +205,7 @@ export class CodeExecutionEngine {
       return this.executionError(`File not found: ${filePath}`, 0);
     }
 
-    if (file.type === 'directory') {
+    if (file.type === "directory") {
       return this.executionError(`Cannot execute directory: ${filePath}`, 0);
     }
 
@@ -206,7 +219,7 @@ export class CodeExecutionEngine {
   // Advanced: Execute with dependencies
   async executeWithDependencies(
     entryPoint: string,
-    files: Map<string, string>
+    files: Map<string, string>,
   ): Promise<ExecutionResult> {
     const startTime = performance.now();
 
@@ -243,7 +256,10 @@ export class CodeExecutionEngine {
       // Execute entry point
       const entryCode = files.get(entryPoint);
       if (!entryCode) {
-        return this.executionError(`Entry point not found: ${entryPoint}`, startTime);
+        return this.executionError(
+          `Entry point not found: ${entryPoint}`,
+          startTime,
+        );
       }
 
       await this.executeJavaScript(`
@@ -252,7 +268,7 @@ export class CodeExecutionEngine {
       `);
 
       return {
-        output: this.consoleOutput.join('\n'),
+        output: this.consoleOutput.join("\n"),
         error: this.errorOutput,
         logs: this.consoleOutput,
         executionTime: performance.now() - startTime,
@@ -260,19 +276,22 @@ export class CodeExecutionEngine {
     } catch (error) {
       return this.executionError(
         error instanceof Error ? error.message : String(error),
-        startTime
+        startTime,
       );
     }
   }
 
   // Test runner for code validation
-  async runTests(testCode: string, codeToTest: string): Promise<ExecutionResult> {
+  async runTests(
+    testCode: string,
+    codeToTest: string,
+  ): Promise<ExecutionResult> {
     const startTime = performance.now();
 
     try {
       // Simple test framework
       const tests: { name: string; passed: boolean; error?: string }[] = [];
-      
+
       const testFramework = {
         test: (name: string, fn: () => void) => {
           try {
@@ -285,7 +304,9 @@ export class CodeExecutionEngine {
               passed: false,
               error: error instanceof Error ? error.message : String(error),
             });
-            this.consoleOutput.push(`✗ ${name}: ${error instanceof Error ? error.message : String(error)}`);
+            this.consoleOutput.push(
+              `✗ ${name}: ${error instanceof Error ? error.message : String(error)}`,
+            );
           }
         },
         expect: (actual: any) => ({
@@ -296,7 +317,9 @@ export class CodeExecutionEngine {
           },
           toEqual: (expected: any) => {
             if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-              throw new Error(`Expected ${JSON.stringify(expected)} but got ${JSON.stringify(actual)}`);
+              throw new Error(
+                `Expected ${JSON.stringify(expected)} but got ${JSON.stringify(actual)}`,
+              );
             }
           },
           toBeTruthy: () => {
@@ -322,14 +345,16 @@ export class CodeExecutionEngine {
         ${testCode}
       `);
 
-      const passedCount = tests.filter(t => t.passed).length;
+      const passedCount = tests.filter((t) => t.passed).length;
       const failedCount = tests.length - passedCount;
 
-      this.consoleOutput.push('');
-      this.consoleOutput.push(`Tests: ${passedCount} passed, ${failedCount} failed, ${tests.length} total`);
+      this.consoleOutput.push("");
+      this.consoleOutput.push(
+        `Tests: ${passedCount} passed, ${failedCount} failed, ${tests.length} total`,
+      );
 
       return {
-        output: this.consoleOutput.join('\n'),
+        output: this.consoleOutput.join("\n"),
         error: failedCount > 0 ? `${failedCount} test(s) failed` : null,
         logs: this.consoleOutput,
         executionTime: performance.now() - startTime,
@@ -337,7 +362,7 @@ export class CodeExecutionEngine {
     } catch (error) {
       return this.executionError(
         error instanceof Error ? error.message : String(error),
-        startTime
+        startTime,
       );
     }
   }

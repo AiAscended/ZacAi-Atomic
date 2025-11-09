@@ -6,16 +6,16 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { environmentTokenizer } from "./environment_tokenizer"
-import { environmentSemanticAnalyzer } from "./environment_semanticAnalyzer"
+import { environmentTokenizer } from "./environment_tokenizer";
+import { environmentSemanticAnalyzer } from "./environment_semanticAnalyzer";
 
 export const environmentRunInference = async (input: string) => {
-  const t = environmentTokenizer(input)
-  const sem = environmentSemanticAnalyzer(input)
+  const t = environmentTokenizer(input);
+  const sem = environmentSemanticAnalyzer(input);
   return {
     domain: "environment",
     tokens: t.tokens,
     semanticScore: sem.semanticScore,
     response: `Environment analysis: ${sem.parsed.tools.join(", ")} tools detected with ${sem.parsed.complexity} complexity.`,
-  }
-}
+  };
+};

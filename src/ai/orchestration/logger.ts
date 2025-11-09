@@ -4,15 +4,15 @@
  */
 
 export const info = (msg: string, meta?: Record<string, unknown>) => {
-  console.log(`[info] ${msg}`, meta ?? '');
+  console.log(`[info] ${msg}`, meta ?? "");
 };
 
 export const warn = (msg: string, meta?: Record<string, unknown>) => {
-  console.warn(`[warn] ${msg}`, meta ?? '');
+  console.warn(`[warn] ${msg}`, meta ?? "");
 };
 
 export const error = (msg: string, meta?: Record<string, unknown>) => {
-  console.error(`[error] ${msg}`, meta ?? '');
+  console.error(`[error] ${msg}`, meta ?? "");
 };
 
 // Export logger object for files that import { logger }
@@ -21,6 +21,6 @@ export const logger = {
   warn,
   error,
   debug: (msg: string, meta?: Record<string, unknown>) => {
-    console.debug(`[debug] ${msg}`, meta ?? '');
+    console.debug(`[debug] ${msg}`, meta ?? "");
   },
 };

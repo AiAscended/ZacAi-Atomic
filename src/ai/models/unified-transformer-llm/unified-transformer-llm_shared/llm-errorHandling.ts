@@ -6,35 +6,35 @@
 export class LLMError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'LLMError';
+    this.name = "LLMError";
   }
 }
 
 export class LLMTokenizationError extends LLMError {
   constructor(message: string) {
     super(message);
-    this.name = 'LLMTokenizationError';
+    this.name = "LLMTokenizationError";
   }
 }
 
 export class LLMInferenceError extends LLMError {
   constructor(message: string) {
     super(message);
-    this.name = 'LLMInferenceError';
+    this.name = "LLMInferenceError";
   }
 }
 
 export class LLMTrainingError extends LLMError {
   constructor(message: string) {
     super(message);
-    this.name = 'LLMTrainingError';
+    this.name = "LLMTrainingError";
   }
 }
 
 export class LLMConfigError extends LLMError {
   constructor(message: string) {
     super(message);
-    this.name = 'LLMConfigError';
+    this.name = "LLMConfigError";
   }
 }
 
@@ -44,7 +44,7 @@ export function handleLLMError(error: unknown): void {
   } else if (error instanceof Error) {
     console.error(`[Error] ${error.message}`);
   } else {
-    console.error('Unknown error occurred');
+    console.error("Unknown error occurred");
   }
 }
 

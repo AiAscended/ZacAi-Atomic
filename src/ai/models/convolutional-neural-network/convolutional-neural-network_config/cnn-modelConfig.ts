@@ -14,8 +14,8 @@ export interface CNNModelConfig {
 }
 
 export const defaultCNNConfig: CNNModelConfig = {
-  modelName: 'convolutional-neural-network',
-  version: '1.0.0',
+  modelName: "convolutional-neural-network",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

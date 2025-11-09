@@ -1,7 +1,7 @@
 /**
  * File: src/ai/shared/loader/unifiedLoader.ts
  * Purpose: Unified dynamic loader for models and domains
- * 
+ *
  * Features:
  * - Single loader for both models and domains
  * - Shared validation and error handling
@@ -9,7 +9,11 @@
  * - Orchestrator-ready module access
  */
 
-import { getUnifiedRegistry, type ModuleManifest, type ModuleType } from "../registry/unifiedRegistry";
+import {
+  getUnifiedRegistry,
+  type ModuleManifest,
+  type ModuleType,
+} from "../registry/unifiedRegistry";
 
 // ============================================================================
 // Types
@@ -29,13 +33,13 @@ export interface LoadedModule {
 
 export class UnifiedLoader {
   private loadedModules: Map<string, LoadedModule> = new Map();
-  
+
   /**
    * Load all enabled modules (models + domains)
    */
   async loadAllModules(): Promise<void> {
     const registry = await getUnifiedRegistry();
-    
+
     // Load models
     for (const modelId of registry.enabledModels) {
       try {
@@ -44,7 +48,7 @@ export class UnifiedLoader {
         console.warn(`⚠️  Failed to load model: ${modelId}`, error);
       }
     }
-    
+
     // Load domains
     for (const domainId of registry.enabledDomains) {
       try {
@@ -54,7 +58,7 @@ export class UnifiedLoader {
       }
     }
   }
-  
+
   /**
    * Load single module (model or domain)
    */
@@ -63,14 +67,14 @@ export class UnifiedLoader {
     if (this.loadedModules.has(moduleId)) {
       return this.loadedModules.get(moduleId)!;
     }
-    
+
     const registry = await getUnifiedRegistry();
     const manifest = registry.modules[moduleId];
-    
+
     if (!manifest) {
       throw new Error(`Module not found: ${moduleId}`);
     }
-    
+
     if (!manifest.enabled) {
       const loaded: LoadedModule = {
         manifest,
@@ -81,7 +85,7 @@ export class UnifiedLoader {
       this.loadedModules.set(moduleId, loaded);
       return loaded;
     }
-    
+
     // Validate structure
     if (!this.validateModuleStructure(manifest)) {
       const loaded: LoadedModule = {
@@ -94,7 +98,7 @@ export class UnifiedLoader {
       this.loadedModules.set(moduleId, loaded);
       return loaded;
     }
-    
+
     // Start loading
     const loaded: LoadedModule = {
       manifest,
@@ -103,52 +107,67 @@ export class UnifiedLoader {
       status: "loading",
     };
     this.loadedModules.set(moduleId, loaded);
-    
+
     try {
       // Determine module path
-      const baseDir = manifest.moduleType === "model" ? "models" : "knowledge-domains";
-      
+      const baseDir =
+        manifest.moduleType === "model" ? "models" : "knowledge-domains";
+
       // Try to dynamically import the module
       let modulePath: string | undefined;
-      
-      if (manifest.moduleType === "model" && manifest.paths.inferenceEnginePath) {
+
+      if (
+        manifest.moduleType === "model" &&
+        manifest.paths.inferenceEnginePath
+      ) {
         modulePath = `../../${baseDir}/${moduleId}/${manifest.paths.inferenceEnginePath}`;
-      } else if (manifest.moduleType === "domain" && manifest.paths.integrationAPIPath) {
+      } else if (
+        manifest.moduleType === "domain" &&
+        manifest.paths.integrationAPIPath
+      ) {
         modulePath = `../../${baseDir}/${moduleId}/${manifest.paths.integrationAPIPath}`;
       }
-      
+
       if (modulePath) {
         const loadedModule = await import(modulePath);
         loaded.instance = loadedModule.default || loadedModule;
       }
-      
+
       loaded.status = "ready";
       console.log(`✅ Loaded ${manifest.moduleType}: ${manifest.displayName}`);
     } catch (error) {
       loaded.status = "error";
-      loaded.errorMessage = error instanceof Error ? error.message : "Unknown error";
-      console.error(`❌ Failed to load ${manifest.moduleType}: ${manifest.displayName}`, error);
+      loaded.errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error(
+        `❌ Failed to load ${manifest.moduleType}: ${manifest.displayName}`,
+        error,
+      );
     }
-    
+
     return loaded;
   }
-  
+
   /**
    * Validate module structure
    */
   private validateModuleStructure(manifest: ModuleManifest): boolean {
     if (manifest.moduleType === "model") {
       // Models need: seeds, weights, tokenizer
-      return manifest.structure.hasSeedsFolder 
-        && manifest.structure.hasWeightsFolder 
-        && manifest.structure.hasTokenizer;
+      return (
+        manifest.structure.hasSeedsFolder &&
+        manifest.structure.hasWeightsFolder &&
+        manifest.structure.hasTokenizer
+      );
     } else {
       // Domains need: inference controller, integration API
-      return manifest.structure.hasInferenceEngine 
-        && manifest.structure.hasIntegrationAPI;
+      return (
+        manifest.structure.hasInferenceEngine &&
+        manifest.structure.hasIntegrationAPI
+      );
     }
   }
-  
+
   /**
    * Unload module
    */
@@ -158,29 +177,30 @@ export class UnifiedLoader {
       console.log(`🗑️  Unloaded module: ${moduleId}`);
     }
   }
-  
+
   /**
    * Get loaded module
    */
   getLoadedModule(moduleId: string): LoadedModule | null {
     return this.loadedModules.get(moduleId) || null;
   }
-  
+
   /**
    * Get all loaded modules
    */
   getAllLoadedModules(): LoadedModule[] {
     return Array.from(this.loadedModules.values());
   }
-  
+
   /**
    * Get loaded modules by type
    */
   getLoadedModulesByType(type: ModuleType): LoadedModule[] {
-    return Array.from(this.loadedModules.values())
-      .filter(m => m.manifest.moduleType === type);
+    return Array.from(this.loadedModules.values()).filter(
+      (m) => m.manifest.moduleType === type,
+    );
   }
-  
+
   /**
    * Get modules for orchestrator (organized by type, ready status only)
    */
@@ -193,9 +213,13 @@ export class UnifiedLoader {
       readyDomains: number;
     };
   } {
-    const models = this.getLoadedModulesByType("model").filter(m => m.status === "ready");
-    const domains = this.getLoadedModulesByType("domain").filter(m => m.status === "ready");
-    
+    const models = this.getLoadedModulesByType("model").filter(
+      (m) => m.status === "ready",
+    );
+    const domains = this.getLoadedModulesByType("domain").filter(
+      (m) => m.status === "ready",
+    );
+
     return {
       models,
       domains,
@@ -206,33 +230,33 @@ export class UnifiedLoader {
       },
     };
   }
-  
+
   /**
    * Reload module (hot-reload)
    */
   async reloadModule(moduleId: string): Promise<LoadedModule> {
     this.unloadModule(moduleId);
-    
+
     // Bust require cache
     const registry = await getUnifiedRegistry(true); // Force refresh
-    
+
     return await this.loadModule(moduleId);
   }
-  
+
   /**
    * Reload all modules
    */
   async reloadAllModules(): Promise<void> {
     const moduleIds = Array.from(this.loadedModules.keys());
-    
+
     // Unload all
     for (const moduleId of moduleIds) {
       this.unloadModule(moduleId);
     }
-    
+
     // Force registry refresh
     await getUnifiedRegistry(true);
-    
+
     // Reload all
     await this.loadAllModules();
   }
@@ -268,10 +292,12 @@ export async function getReadyModulesForOrchestrator() {
  */
 export async function initializeAISystem(): Promise<void> {
   console.log("🚀 Initializing AI system...");
-  
+
   const loader = getUnifiedLoader();
   await loader.loadAllModules();
-  
+
   const { stats } = loader.getModulesForOrchestrator();
-  console.log(`✅ AI system initialized: ${stats.readyModels} models, ${stats.readyDomains} domains ready`);
+  console.log(
+    `✅ AI system initialized: ${stats.readyModels} models, ${stats.readyDomains} domains ready`,
+  );
 }

@@ -6,16 +6,16 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { safeParseJSON } from "./code_review_utils"
-import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./code_review_utils";
+import { storageAdapter } from "../storageAdapter";
 
 export const loadCodeReviewSeedVocabulary = async (
   path = "/src/ai/knowledge-domains/code_review/code_review_seeds/code_review_seedVocabulary.json",
 ) => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { patterns: [] }) as { patterns: string[] }
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { patterns: [] }) as { patterns: string[] };
   } catch (e) {
-    return { patterns: [] }
+    return { patterns: [] };
   }
-}
+};

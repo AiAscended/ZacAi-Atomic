@@ -1,28 +1,28 @@
 "use client";
 
-import React from 'react';
-import { 
-  Code2, 
-  FileCode, 
-  Eye, 
-  Terminal, 
-  MessageSquare, 
-  Layout, 
+import React from "react";
+import {
+  Code2,
+  FileCode,
+  Eye,
+  Terminal,
+  MessageSquare,
+  Layout,
   Settings,
   FolderOpen,
   Save,
-  Play
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
+  Play,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import { useLayoutStore } from '@/lib/ide/layoutStore';
-import Link from 'next/link';
+} from "@/components/ui/dropdown-menu";
+import { useLayoutStore } from "@/lib/ide/layoutStore";
+import Link from "next/link";
 
 export function IDEToolbar() {
   const togglePanel = useLayoutStore((state) => state.togglePanel);
@@ -38,14 +38,14 @@ export function IDEToolbar() {
             <Code2 className="h-5 w-5 text-primary" />
             <span className="font-semibold">ZacAi IDE</span>
           </Link>
-          
+
           <div className="h-6 w-px bg-border mx-2" />
-          
+
           <Button variant="ghost" size="sm" title="Save All (Ctrl+S)">
             <Save className="h-4 w-4 mr-1" />
             Save
           </Button>
-          
+
           <Button variant="ghost" size="sm" title="Run Code (Ctrl+Enter)">
             <Play className="h-4 w-4 mr-1" />
             Run
@@ -57,7 +57,7 @@ export function IDEToolbar() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => togglePanel('files')}
+            onClick={() => togglePanel("files")}
             title="Toggle Files (Ctrl+B)"
           >
             <FolderOpen className="h-4 w-4 mr-1" />
@@ -67,7 +67,7 @@ export function IDEToolbar() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => togglePanel('editor')}
+            onClick={() => togglePanel("editor")}
             title="Toggle Editor"
           >
             <FileCode className="h-4 w-4 mr-1" />
@@ -77,7 +77,7 @@ export function IDEToolbar() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => togglePanel('preview')}
+            onClick={() => togglePanel("preview")}
             title="Toggle Preview"
           >
             <Eye className="h-4 w-4 mr-1" />
@@ -87,7 +87,7 @@ export function IDEToolbar() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => togglePanel('terminal')}
+            onClick={() => togglePanel("terminal")}
             title="Toggle Terminal (Ctrl+`)"
           >
             <Terminal className="h-4 w-4 mr-1" />
@@ -97,7 +97,7 @@ export function IDEToolbar() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => togglePanel('aiChat')}
+            onClick={() => togglePanel("aiChat")}
             title="Toggle AI Chat (Ctrl+I)"
           >
             <MessageSquare className="h-4 w-4 mr-1" />
@@ -115,32 +115,34 @@ export function IDEToolbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem 
-                onClick={() => setLayout('default')}
-                className={currentLayout === 'default' ? 'bg-accent' : ''}
+              <DropdownMenuItem
+                onClick={() => setLayout("default")}
+                className={currentLayout === "default" ? "bg-accent" : ""}
               >
                 Default Layout
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setLayout('focus')}
-                className={currentLayout === 'focus' ? 'bg-accent' : ''}
+              <DropdownMenuItem
+                onClick={() => setLayout("focus")}
+                className={currentLayout === "focus" ? "bg-accent" : ""}
               >
                 Focus Mode
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setLayout('development')}
-                className={currentLayout === 'development' ? 'bg-accent' : ''}
+              <DropdownMenuItem
+                onClick={() => setLayout("development")}
+                className={currentLayout === "development" ? "bg-accent" : ""}
               >
                 Development
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setLayout('review')}
-                className={currentLayout === 'review' ? 'bg-accent' : ''}
+              <DropdownMenuItem
+                onClick={() => setLayout("review")}
+                className={currentLayout === "review" ? "bg-accent" : ""}
               >
                 Review Mode
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => useLayoutStore.getState().resetLayout()}>
+              <DropdownMenuItem
+                onClick={() => useLayoutStore.getState().resetLayout()}
+              >
                 Reset Layout
               </DropdownMenuItem>
             </DropdownMenuContent>

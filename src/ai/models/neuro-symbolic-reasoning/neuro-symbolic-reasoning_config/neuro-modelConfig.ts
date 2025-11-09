@@ -14,8 +14,8 @@ export interface NEUROModelConfig {
 }
 
 export const defaultNEUROConfig: NEUROModelConfig = {
-  modelName: 'neuro-symbolic-reasoning',
-  version: '1.0.0',
+  modelName: "neuro-symbolic-reasoning",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

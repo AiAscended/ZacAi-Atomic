@@ -1,7 +1,7 @@
 /**
  * File: src/app/api/admin/github-app/settings/route.ts
  * Purpose: API endpoint for GitHub App settings management
- * 
+ *
  * GET  - Retrieve current GitHub App settings (non-sensitive data)
  * POST - Update GitHub App settings
  */
@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const settings = await settingsStore.getGitHubApp();
-    
+
     // Redact sensitive information
     const safeSettings = {
       appId: settings.appId,
@@ -38,7 +38,7 @@ export async function GET() {
     console.error("Failed to get GitHub App settings:", error);
     return NextResponse.json(
       { error: "Failed to retrieve settings" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -50,12 +50,12 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Validate required fields
     if (!body.appId || !body.clientId) {
       return NextResponse.json(
         { error: "appId and clientId are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     console.error("Failed to update GitHub App settings:", error);
     return NextResponse.json(
       { error: "Failed to update settings" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

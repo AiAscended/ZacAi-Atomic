@@ -6,19 +6,22 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-export function internetSearchTokenizer(input: string): { tokens: string[]; length: number } {
+export function internetSearchTokenizer(input: string): {
+  tokens: string[];
+  length: number;
+} {
   // Remove punctuation except hyphens and apostrophes
   const cleaned = input
     .toLowerCase()
     .replace(/[^\w\s'-]/g, " ")
     .replace(/\s+/g, " ")
-    .trim()
+    .trim();
 
   // Split into tokens
-  const tokens = cleaned.split(" ").filter((token) => token.length > 0)
+  const tokens = cleaned.split(" ").filter((token) => token.length > 0);
 
   return {
     tokens,
     length: tokens.length,
-  }
+  };
 }

@@ -7,13 +7,13 @@
  */
 
 export interface FormatOptions {
-  language: string
-  tabSize?: number
-  useTabs?: boolean
-  semicolons?: boolean
-  singleQuote?: boolean
-  trailingComma?: "none" | "es5" | "all"
-  printWidth?: number
+  language: string;
+  tabSize?: number;
+  useTabs?: boolean;
+  semicolons?: boolean;
+  singleQuote?: boolean;
+  trailingComma?: "none" | "es5" | "all";
+  printWidth?: number;
 }
 
 /**
@@ -23,42 +23,42 @@ export interface FormatOptions {
  * @returns Formatted code string
  */
 export function formatCode(code: string, options: FormatOptions): string {
-  const { language, tabSize = 2, useTabs = false, printWidth = 80 } = options
+  const { language, tabSize = 2, useTabs = false, printWidth = 80 } = options;
 
   // Basic formatting logic - in production, integrate with Prettier or similar
-  let formatted = code.trim()
+  let formatted = code.trim();
 
   // Normalize line endings
-  formatted = formatted.replace(/\r\n/g, "\n")
+  formatted = formatted.replace(/\r\n/g, "\n");
 
   // Handle indentation
-  const indent = useTabs ? "\t" : " ".repeat(tabSize)
-  const lines = formatted.split("\n")
-  let indentLevel = 0
-  const formattedLines: string[] = []
+  const indent = useTabs ? "\t" : " ".repeat(tabSize);
+  const lines = formatted.split("\n");
+  let indentLevel = 0;
+  const formattedLines: string[] = [];
 
   for (let line of lines) {
-    line = line.trim()
+    line = line.trim();
 
     // Decrease indent for closing brackets
     if (line.startsWith("}") || line.startsWith("]") || line.startsWith(")")) {
-      indentLevel = Math.max(0, indentLevel - 1)
+      indentLevel = Math.max(0, indentLevel - 1);
     }
 
     // Add indentation
     if (line.length > 0) {
-      formattedLines.push(indent.repeat(indentLevel) + line)
+      formattedLines.push(indent.repeat(indentLevel) + line);
     } else {
-      formattedLines.push("")
+      formattedLines.push("");
     }
 
     // Increase indent for opening brackets
     if (line.endsWith("{") || line.endsWith("[") || line.endsWith("(")) {
-      indentLevel++
+      indentLevel++;
     }
   }
 
-  formatted = formattedLines.join("\n")
+  formatted = formattedLines.join("\n");
 
   // Language-specific formatting
   switch (language.toLowerCase()) {
@@ -66,48 +66,48 @@ export function formatCode(code: string, options: FormatOptions): string {
     case "javascript":
     case "tsx":
     case "jsx":
-      formatted = formatJavaScript(formatted, options)
-      break
+      formatted = formatJavaScript(formatted, options);
+      break;
     case "python":
-      formatted = formatPython(formatted, options)
-      break
+      formatted = formatPython(formatted, options);
+      break;
     case "json":
       try {
-        formatted = JSON.stringify(JSON.parse(formatted), null, tabSize)
+        formatted = JSON.stringify(JSON.parse(formatted), null, tabSize);
       } catch {
         // Keep original if invalid JSON
       }
-      break
+      break;
   }
 
-  return formatted
+  return formatted;
 }
 
 function formatJavaScript(code: string, options: FormatOptions): string {
-  let formatted = code
+  let formatted = code;
 
   // Add semicolons if required
   if (options.semicolons !== false) {
-    formatted = formatted.replace(/([^;{}\s])\s*\n/g, "$1;\n")
+    formatted = formatted.replace(/([^;{}\s])\s*\n/g, "$1;\n");
   }
 
   // Handle quotes
   if (options.singleQuote) {
-    formatted = formatted.replace(/"([^"]*)"/g, "'$1'")
+    formatted = formatted.replace(/"([^"]*)"/g, "'$1'");
   }
 
-  return formatted
+  return formatted;
 }
 
 function formatPython(code: string, options: FormatOptions): string {
   // Python-specific formatting (PEP 8 style)
-  let formatted = code
+  let formatted = code;
 
   // Ensure proper spacing around operators
-  formatted = formatted.replace(/([^=!<>])=([^=])/g, "$1 = $2")
-  formatted = formatted.replace(/([^=!<>])==([^=])/g, "$1 == $2")
+  formatted = formatted.replace(/([^=!<>])=([^=])/g, "$1 = $2");
+  formatted = formatted.replace(/([^=!<>])==([^=])/g, "$1 == $2");
 
-  return formatted
+  return formatted;
 }
 
 /**
@@ -116,21 +116,28 @@ function formatPython(code: string, options: FormatOptions): string {
  * @returns Detected language identifier
  */
 export function detectLanguage(code: string): string {
-  const trimmed = code.trim()
+  const trimmed = code.trim();
 
   // Check for common patterns
-  if (trimmed.includes("import React") || trimmed.includes("export default function")) {
-    return trimmed.includes("<") ? "tsx" : "typescript"
+  if (
+    trimmed.includes("import React") ||
+    trimmed.includes("export default function")
+  ) {
+    return trimmed.includes("<") ? "tsx" : "typescript";
   }
   if (trimmed.includes("def ") || trimmed.includes("import ")) {
-    return "python"
+    return "python";
   }
   if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
-    return "json"
+    return "json";
   }
-  if (trimmed.includes("function") || trimmed.includes("const ") || trimmed.includes("let ")) {
-    return "javascript"
+  if (
+    trimmed.includes("function") ||
+    trimmed.includes("const ") ||
+    trimmed.includes("let ")
+  ) {
+    return "javascript";
   }
 
-  return "text"
+  return "text";
 }

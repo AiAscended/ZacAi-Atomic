@@ -6,14 +6,16 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { safeParseJSON } from "./grammar_utils"
-import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./grammar_utils";
+import { storageAdapter } from "../storageAdapter";
 
-export const loadGrammarSeedVocabulary = async (path = "/src/ai/knowledge-domains/grammar/grammar_seeds/grammar_seedVocabulary.json") => {
+export const loadGrammarSeedVocabulary = async (
+  path = "/src/ai/knowledge-domains/grammar/grammar_seeds/grammar_seedVocabulary.json",
+) => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { rules: [] }) as { rules: string[] }
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { rules: [] }) as { rules: string[] };
   } catch (e) {
-    return { rules: [] }
+    return { rules: [] };
   }
-}
+};

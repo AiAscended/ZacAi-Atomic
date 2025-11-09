@@ -15,7 +15,7 @@
  */
 export function ln(x: number): number {
   if (x <= 0) {
-    throw new Error("Logarithm of non-positive number is undefined")
+    throw new Error("Logarithm of non-positive number is undefined");
   }
-  return Math.log(x)
+  return Math.log(x);
 }

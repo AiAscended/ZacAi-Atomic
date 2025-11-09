@@ -4,7 +4,10 @@
  */
 
 export class ScienceCalculator {
-  calculate(_expression: string, unit?: string): {
+  calculate(
+    _expression: string,
+    unit?: string,
+  ): {
     result: number;
     unit?: string;
     explanation: string;
@@ -13,7 +16,7 @@ export class ScienceCalculator {
     return {
       result: 0,
       unit,
-      explanation: '',
+      explanation: "",
     };
   }
 }

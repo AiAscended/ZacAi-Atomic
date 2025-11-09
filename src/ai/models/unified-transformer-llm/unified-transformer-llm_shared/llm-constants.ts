@@ -4,13 +4,13 @@
  */
 
 export const LLM_SPECIAL_TOKENS = {
-  PAD: '<PAD>',
-  BOS: '<BOS>',
-  EOS: '<EOS>',
-  UNK: '<UNK>',
-  MASK: '<MASK>',
-  SEP: '<SEP>',
-  CLS: '<CLS>',
+  PAD: "<PAD>",
+  BOS: "<BOS>",
+  EOS: "<EOS>",
+  UNK: "<UNK>",
+  MASK: "<MASK>",
+  SEP: "<SEP>",
+  CLS: "<CLS>",
 } as const;
 
 export const LLM_TOKEN_IDS = {
@@ -24,10 +24,10 @@ export const LLM_TOKEN_IDS = {
 } as const;
 
 export const LLM_MODEL_VERSIONS = {
-  SMALL: 'small',
-  MEDIUM: 'medium',
-  LARGE: 'large',
-  XL: 'xl',
+  SMALL: "small",
+  MEDIUM: "medium",
+  LARGE: "large",
+  XL: "xl",
 } as const;
 
 export const LLM_MAX_SEQUENCE_LENGTHS = {

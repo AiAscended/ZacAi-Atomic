@@ -15,23 +15,23 @@ export function typescriptParser(tokens: string[]): Record<string, any> {
     functions: [],
     classes: [],
     interfaces: [],
-  }
+  };
 
   for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i]
+    const token = tokens[i];
 
     if (token === "import") {
-      ast.imports.push({ type: "ImportDeclaration", index: i })
+      ast.imports.push({ type: "ImportDeclaration", index: i });
     } else if (token === "export") {
-      ast.exports.push({ type: "ExportDeclaration", index: i })
+      ast.exports.push({ type: "ExportDeclaration", index: i });
     } else if (token === "function") {
-      ast.functions.push({ type: "FunctionDeclaration", index: i })
+      ast.functions.push({ type: "FunctionDeclaration", index: i });
     } else if (token === "class") {
-      ast.classes.push({ type: "ClassDeclaration", index: i })
+      ast.classes.push({ type: "ClassDeclaration", index: i });
     } else if (token === "interface") {
-      ast.interfaces.push({ type: "InterfaceDeclaration", index: i })
+      ast.interfaces.push({ type: "InterfaceDeclaration", index: i });
     }
   }
 
-  return ast
+  return ast;
 }

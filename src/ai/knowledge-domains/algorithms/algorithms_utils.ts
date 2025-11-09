@@ -10,8 +10,8 @@
  * Normalize text for algorithm analysis
  */
 export const normalizeText = (text: string): string => {
-  return text.trim().replace(/\s+/g, " ").toLowerCase()
-}
+  return text.trim().replace(/\s+/g, " ").toLowerCase();
+};
 
 /**
  * Detect algorithm patterns in code
@@ -24,24 +24,24 @@ export const detectAlgorithmPatterns = (code: string) => {
     greedy: /greedy|optimal|maxProfit|minCost/gi,
     divideConquer: /divide|conquer|merge|partition/gi,
     backtracking: /backtrack|permutation|combination|nQueens/gi,
-  }
+  };
 
-  const detected: string[] = []
+  const detected: string[] = [];
   for (const [algorithm, pattern] of Object.entries(patterns)) {
     if (pattern.test(code)) {
-      detected.push(algorithm)
+      detected.push(algorithm);
     }
   }
-  return detected
-}
+  return detected;
+};
 
 /**
  * Safe JSON parsing with fallback
  */
 export const safeParseJSON = (text: string, fallback: unknown = {}) => {
   try {
-    return JSON.parse(text)
+    return JSON.parse(text);
   } catch {
-    return fallback
+    return fallback;
   }
-}
+};

@@ -40,12 +40,12 @@ export class LLMDatasetLoader {
   createBatches(dataset: Dataset): number[][][] {
     const batches: number[][][] = [];
     const { batchSize } = this.config;
-    
+
     for (let i = 0; i < dataset.tokenIds.length; i += batchSize) {
       const batch = dataset.tokenIds.slice(i, i + batchSize);
       batches.push(batch);
     }
-    
+
     return batches;
   }
 
@@ -54,16 +54,16 @@ export class LLMDatasetLoader {
    */
   shuffle(dataset: Dataset): Dataset {
     const indices = Array.from({ length: dataset.texts.length }, (_, i) => i);
-    
+
     // Fisher-Yates shuffle
     for (let i = indices.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [indices[i], indices[j]] = [indices[j], indices[i]];
     }
-    
+
     return {
-      texts: indices.map(i => dataset.texts[i]),
-      tokenIds: indices.map(i => dataset.tokenIds[i]),
+      texts: indices.map((i) => dataset.texts[i]),
+      tokenIds: indices.map((i) => dataset.tokenIds[i]),
     };
   }
 
@@ -71,9 +71,9 @@ export class LLMDatasetLoader {
    * Pad sequences to same length
    */
   padSequences(sequences: number[][], padTokenId: number = 0): number[][] {
-    const maxLen = Math.max(...sequences.map(seq => seq.length));
-    
-    return sequences.map(seq => {
+    const maxLen = Math.max(...sequences.map((seq) => seq.length));
+
+    return sequences.map((seq) => {
       const padded = [...seq];
       while (padded.length < maxLen) {
         padded.push(padTokenId);
@@ -89,12 +89,12 @@ export class LLMDatasetLoader {
     if (this.currentIndex >= dataset.tokenIds.length) {
       return null;
     }
-    
+
     const batch = dataset.tokenIds.slice(
       this.currentIndex,
-      this.currentIndex + this.config.batchSize
+      this.currentIndex + this.config.batchSize,
     );
-    
+
     this.currentIndex += this.config.batchSize;
     return this.padSequences(batch);
   }

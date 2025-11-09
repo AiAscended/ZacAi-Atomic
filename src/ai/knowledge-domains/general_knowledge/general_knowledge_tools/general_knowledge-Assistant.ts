@@ -11,7 +11,7 @@ export class GeneralAssistant {
     // Placeholder implementation
     // TODO: Use _query to provide context-specific responses
     return {
-      response: 'I can help with general queries.',
+      response: "I can help with general queries.",
       confidence: 0.7,
     };
   }

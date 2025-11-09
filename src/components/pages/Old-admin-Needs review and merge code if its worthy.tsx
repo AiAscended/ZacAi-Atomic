@@ -1,12 +1,12 @@
-import { createElement, appendChildren } from '@utils/dom';
-import { getFromStorage } from '@utils/storage';
+import { createElement, appendChildren } from "@utils/dom";
+import { getFromStorage } from "@utils/storage";
 
 export const renderAdminPage = (container: HTMLElement): void => {
-  container.innerHTML = '';
+  container.innerHTML = "";
 
-  const pageContainer = createElement('div', 'page-container');
+  const pageContainer = createElement("div", "page-container");
 
-  const header = createElement('div', 'card');
+  const header = createElement("div", "card");
   header.innerHTML = `
     <div class="card-header">
       <h1 class="card-title">Admin Dashboard</h1>
@@ -14,18 +14,18 @@ export const renderAdminPage = (container: HTMLElement): void => {
     </div>
   `;
 
-  const statsSection = createElement('div', 'admin-grid');
-  const messages = getFromStorage<unknown[]>('zacai-chat-messages', []);
+  const statsSection = createElement("div", "admin-grid");
+  const messages = getFromStorage<unknown[]>("zacai-chat-messages", []);
 
   const stats = [
-    { label: 'Total Messages', value: messages.length.toString() },
-    { label: 'Active Sessions', value: '1' },
-    { label: 'AI Model Version', value: '1.0.0' },
-    { label: 'System Status', value: 'Online' },
+    { label: "Total Messages", value: messages.length.toString() },
+    { label: "Active Sessions", value: "1" },
+    { label: "AI Model Version", value: "1.0.0" },
+    { label: "System Status", value: "Online" },
   ];
 
   stats.forEach((stat) => {
-    const statCard = createElement('div', 'stat-card');
+    const statCard = createElement("div", "stat-card");
     statCard.innerHTML = `
       <div class="stat-value">${stat.value}</div>
       <div class="stat-label">${stat.label}</div>
@@ -33,7 +33,7 @@ export const renderAdminPage = (container: HTMLElement): void => {
     statsSection.appendChild(statCard);
   });
 
-  const settingsSection = createElement('div', 'card');
+  const settingsSection = createElement("div", "card");
   settingsSection.innerHTML = `
     <div class="card-header">
       <h2 class="card-title">AI Model Settings</h2>
@@ -75,23 +75,23 @@ export const renderAdminPage = (container: HTMLElement): void => {
   `;
 
   setTimeout(() => {
-    const saveButton = document.getElementById('save-settings');
-    const resetButton = document.getElementById('reset-settings');
+    const saveButton = document.getElementById("save-settings");
+    const resetButton = document.getElementById("reset-settings");
 
     if (saveButton) {
-      saveButton.addEventListener('click', () => {
-        alert('Settings saved successfully! (This is a demo)');
+      saveButton.addEventListener("click", () => {
+        alert("Settings saved successfully! (This is a demo)");
       });
     }
 
     if (resetButton) {
-      resetButton.addEventListener('click', () => {
-        alert('Settings reset to default values! (This is a demo)');
+      resetButton.addEventListener("click", () => {
+        alert("Settings reset to default values! (This is a demo)");
       });
     }
   }, 0);
 
-  const infoSection = createElement('div', 'card');
+  const infoSection = createElement("div", "card");
   infoSection.innerHTML = `
     <div class="card-header">
       <h2 class="card-title">About ZacAi-Atomic</h2>
@@ -109,6 +109,12 @@ export const renderAdminPage = (container: HTMLElement): void => {
     </ul>
   `;
 
-  appendChildren(pageContainer, header, statsSection, settingsSection, infoSection);
+  appendChildren(
+    pageContainer,
+    header,
+    statsSection,
+    settingsSection,
+    infoSection,
+  );
   container.appendChild(pageContainer);
 };

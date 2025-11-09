@@ -13,7 +13,7 @@
  * @example sin(Math.PI / 2) // returns 1
  */
 export function sin(angleRadians: number): number {
-  return Math.sin(angleRadians)
+  return Math.sin(angleRadians);
 }
 
 /**
@@ -23,5 +23,5 @@ export function sin(angleRadians: number): number {
  * @example sinDeg(90) // returns 1
  */
 export function sinDeg(angleDegrees: number): number {
-  return Math.sin((angleDegrees * Math.PI) / 180)
+  return Math.sin((angleDegrees * Math.PI) / 180);
 }

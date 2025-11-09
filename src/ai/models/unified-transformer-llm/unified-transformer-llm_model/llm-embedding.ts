@@ -34,7 +34,9 @@ export class LLMEmbedding {
    */
   forward(tokenId: number): number[] {
     if (tokenId < 0 || tokenId >= this.vocabSize) {
-      throw new Error(`Token ID ${tokenId} out of range [0, ${this.vocabSize})`);
+      throw new Error(
+        `Token ID ${tokenId} out of range [0, ${this.vocabSize})`,
+      );
     }
     return [...this.embeddings[tokenId]];
   }
@@ -43,7 +45,7 @@ export class LLMEmbedding {
    * Get embeddings for a sequence of token IDs
    */
   forwardSequence(tokenIds: number[]): number[][] {
-    return tokenIds.map(id => this.forward(id));
+    return tokenIds.map((id) => this.forward(id));
   }
 
   /**
@@ -51,29 +53,35 @@ export class LLMEmbedding {
    */
   updateEmbedding(tokenId: number, newEmbedding: number[]): void {
     if (newEmbedding.length !== this.embeddingDim) {
-      throw new Error(`Embedding dimension mismatch: expected ${this.embeddingDim}, got ${newEmbedding.length}`);
+      throw new Error(
+        `Embedding dimension mismatch: expected ${this.embeddingDim}, got ${newEmbedding.length}`,
+      );
     }
     this.embeddings[tokenId] = [...newEmbedding];
   }
-  
+
   /**
    * Get all embeddings (for saving)
    */
   getEmbeddings(): number[][] {
-    return this.embeddings.map(emb => [...emb]);
+    return this.embeddings.map((emb) => [...emb]);
   }
-  
+
   /**
    * Set all embeddings (for loading)
    */
   setEmbeddings(embeddings: number[][]): void {
     if (embeddings.length !== this.vocabSize) {
-      throw new Error(`Vocab size mismatch: expected ${this.vocabSize}, got ${embeddings.length}`);
+      throw new Error(
+        `Vocab size mismatch: expected ${this.vocabSize}, got ${embeddings.length}`,
+      );
     }
     if (embeddings[0].length !== this.embeddingDim) {
-      throw new Error(`Embedding dim mismatch: expected ${this.embeddingDim}, got ${embeddings[0].length}`);
+      throw new Error(
+        `Embedding dim mismatch: expected ${this.embeddingDim}, got ${embeddings[0].length}`,
+      );
     }
-    this.embeddings = embeddings.map(emb => [...emb]);
+    this.embeddings = embeddings.map((emb) => [...emb]);
   }
 }
 
