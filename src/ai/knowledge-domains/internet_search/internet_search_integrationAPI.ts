@@ -9,7 +9,7 @@ import { loadInternetSearchSeedVocabulary } from "./internet_search_vocabularyMa
 import { internetSearchRunInference } from "./internet_search_inferenceController"
 
 // TODO: Use internetSearchQuery for additional context-aware search
-/* const internetSearchQuery = async (input: string, context?: any) => {
+/* const internetSearchQuery = async (input: string, context?: unknown) => {
   const searchResults = context?.searchResults || []
 
   if (searchResults.length > 0) {

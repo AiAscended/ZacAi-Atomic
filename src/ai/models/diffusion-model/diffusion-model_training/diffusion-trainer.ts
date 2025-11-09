@@ -3,7 +3,7 @@
  */
 
 export class DIFFUSIONTrainer {
-  train(data: any): void {
+  train(data: unknown): void {
     console.log('Training diffusion-model...');
   }
 }

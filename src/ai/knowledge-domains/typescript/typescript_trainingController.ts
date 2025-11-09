@@ -8,7 +8,7 @@
 
 import { loadTypescriptLearnedData, saveTypescriptLearnedData } from "./typescript_learnedDataManager"
 
-export async function typescriptRunTrainingEpoch(samples: any[]): Promise<{ loss: number; accuracy: number }> {
+export async function typescriptRunTrainingEpoch(samples: unknown[]): Promise<{ loss: number; accuracy: number }> {
   const learned = await loadTypescriptLearnedData()
 
   // Update learned data with new samples

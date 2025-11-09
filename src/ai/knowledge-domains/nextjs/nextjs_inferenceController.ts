@@ -26,7 +26,7 @@ export interface NextjsInferenceResult {
   }
 }
 
-export async function nextjsRunInference(input: string, context?: any): Promise<NextjsInferenceResult | null> {
+export async function nextjsRunInference(input: string, context?: unknown): Promise<NextjsInferenceResult | null> {
   console.log(`[NextJS] Running REAL AI inference with seed data for: "${input.substring(0, 50)}..."`);
   
   try {

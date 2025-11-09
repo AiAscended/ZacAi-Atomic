@@ -14,9 +14,11 @@ export const internetSearchTokenCount = () => tokenToId.size;
 
 export const internetSearchTokenMap = tokenToId;
 
-export default {
+const internet_search_tokenMap_bundle = {
   getInternetSearchTokenId,
   getInternetSearchTokenById,
   internetSearchTokenCount,
   internetSearchTokenMap,
 };
+
+export default internet_search_tokenMap_bundle;

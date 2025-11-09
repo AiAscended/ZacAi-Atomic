@@ -97,8 +97,8 @@ export class TrainingCoordinator {
       
       // Step 3: Load current weights (or initialize if none exist)
       try {
-        await this.weightsManager.loadLatestCheckpoint() || 
-        await this.weightsManager.loadWeights();
+        (await this.weightsManager.loadLatestCheckpoint()) || 
+        (await this.weightsManager.loadWeights());
         // In real implementation, would use loaded weights for training
         console.log('   ✅ Loaded existing weights');
       } catch (error) {

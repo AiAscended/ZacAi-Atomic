@@ -47,8 +47,10 @@ export const persistTypeScriptWeights = (weights: Record<string, number[]>) => {
   }
 };
 
-export default {
+const typescript_embeddings_bundle = {
   getTypescriptEmbedding,
   getTypescriptEmbeddingsForTokens,
   persistTypeScriptWeights,
 };
+
+export default typescript_embeddings_bundle;

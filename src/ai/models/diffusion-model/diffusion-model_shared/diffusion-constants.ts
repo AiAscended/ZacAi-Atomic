@@ -4,4 +4,6 @@
 
 export const DIFFUSION_VERSION = '1.0.0';
 
-export default { DIFFUSION_VERSION };
+const diffusionBundle = { DIFFUSION_VERSION }; export default exportBundle;
+
+export default diffusionBundle;

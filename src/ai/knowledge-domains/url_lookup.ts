@@ -18,4 +18,6 @@ export const findSources = (domain?: string) => {
   return sources.filter((s) => s.domain === domain);
 };
 
-export default { registerSource, findSources };
+const url_lookup_bundle = { registerSource, findSources };
+
+export default url_lookup_bundle;

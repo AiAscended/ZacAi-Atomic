@@ -5,13 +5,13 @@
 
 import { DOMAIN_NAME } from './system_constants';
 
-export const systemRunInference = async (input: string, _context?: any) => {
+export const systemRunInference = async (input: string, _context?: unknown) => {
   const lowerInput = input.toLowerCase();
   
   let responseText = '';
   let confidence = 0.7;
   const sources: string[] = [];
-  const metadata: any = {};
+  const metadata: unknown = {};
 
   // Handle time/date queries - return actual system time/date
   if (

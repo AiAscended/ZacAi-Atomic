@@ -150,7 +150,7 @@ function convertWordsToNumbers(input: string): string {
   return converted.trim()
 }
 
-export const mathematicsRunInference = async (input: string, _context?: any) => {
+export const mathematicsRunInference = async (input: string, _context?: unknown) => {
   const tk = mathematicsTokenizer(input)
   const sem = mathematicsSemanticAnalyzer(input)
 

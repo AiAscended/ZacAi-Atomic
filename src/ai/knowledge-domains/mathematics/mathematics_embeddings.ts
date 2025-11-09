@@ -47,8 +47,10 @@ export const persistMathematicsWeights = (weights: Record<string, number[]>) => 
   }
 };
 
-export default {
+const mathematics_embeddings_bundle = {
   getMathematicsEmbedding,
   getMathematicsEmbeddingForTokens,
   persistMathematicsWeights,
 };
+
+export default mathematics_embeddings_bundle;

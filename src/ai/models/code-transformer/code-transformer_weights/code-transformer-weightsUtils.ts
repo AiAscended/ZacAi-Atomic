@@ -2,8 +2,10 @@
  * Code-transformer - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
+export function loadWeights(path: string): unknown {
   return {};
 }
 
-export default { loadWeights };
+const code_transformer_weightsUtils_bundle = { loadWeights };
+
+export default code_transformer_weightsUtils_bundle;

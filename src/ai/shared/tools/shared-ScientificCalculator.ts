@@ -177,7 +177,7 @@ export class ScientificCalculator {
    * Normalize mathematical expression for evaluation
    */
   private static normalizeExpression(expr: string): string {
-    return expr.trim().replace(/\s+/g, "").replace(/×/g, "*").replace(/÷/g, "/").replace(/\^/g, "**")
+    return expr.trim().replace(/\s+/g, "").replace(/×/g, "*").replace(/÷/g, "/").replace(/\^/g, "**");
   }
 
   /**

@@ -19,7 +19,7 @@ import { getModelRegistry, type ModelManifest } from "./modelRegistry";
 
 export interface LoadedModel {
   manifest: ModelManifest;
-  instance: any;
+  instance: unknown;
   loadedAt: string;
   status: "ready" | "loading" | "error" | "disabled";
   errorMessage?: string;
@@ -27,7 +27,7 @@ export interface LoadedModel {
 
 export interface LoadedDomain {
   manifest: DomainManifest;
-  instance: any;
+  instance: unknown;
   loadedAt: string;
   status: "ready" | "loading" | "error" | "disabled";
   errorMessage?: string;

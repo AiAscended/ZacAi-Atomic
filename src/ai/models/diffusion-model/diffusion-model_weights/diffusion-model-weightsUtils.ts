@@ -2,8 +2,10 @@
  * Diffusion-model - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
+export function loadWeights(path: string): unknown {
   return {};
 }
 
-export default { loadWeights };
+const diffusion_model_weightsUtils_bundle = { loadWeights };
+
+export default diffusion_model_weightsUtils_bundle;
