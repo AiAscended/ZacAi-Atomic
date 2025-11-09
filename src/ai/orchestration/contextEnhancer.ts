@@ -68,23 +68,34 @@ export class ContextEnhancer {
     const sentiment = detectSentiment(text);
 
     // Extract slots (entities like names, dates, locations)
-    const slots = this.slotFiller.fill(text);
+    const rawSlots = this.slotFiller.fill(text);
+    // Filter out null values to match expected type
+    const slots: Record<string, string> = {};
+    for (const [key, value] of Object.entries(rawSlots)) {
+      if (value !== null) {
+        slots[key] = value;
+      }
+    }
 
     // Get user profile
     const userProfile = this.profileHandler.getProfile(sessionId);
 
     // Update dialogue flow
-    this.dialogueController.updateFlow(sessionId, text, sentiment.emotion);
+    this.dialogueController.updateFlow(sessionId, { text, sentiment: sentiment.sentiment });
 
     // Update user profile with new information
-    if (slots.name) {
-      this.profileHandler.updateProfile(sessionId, { name: slots.name });
+    if (rawSlots.name) {
+      this.profileHandler.updateProfile(sessionId, { name: rawSlots.name });
     }
 
     return {
       originalText: text,
       dialogueState,
-      sentiment,
+      sentiment: {
+        polarity: sentiment.sentiment,
+        emotion: sentiment.sentiment, // Map sentiment to emotion as fallback
+        confidence: sentiment.score,
+      },
       slots,
       userProfile,
       conversationTurn: history.length + 1,
@@ -97,8 +108,9 @@ export class ContextEnhancer {
   public getConversationSummary(sessionId: string): string {
     const profile = this.profileHandler.getProfile(sessionId);
     const state = this.dialogueController.getState(sessionId);
+    const historyLength = Array.isArray(profile.history) ? profile.history.length : 0;
 
-    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${profile.history?.length || 0} turns`;
+    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${historyLength} turns`;
   }
 }
 

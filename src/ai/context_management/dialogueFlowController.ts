@@ -28,9 +28,23 @@ export const handleTurn = async (
 
 export class DialogueFlowController {
   private handlers: Map<string, Handler> = new Map();
+  private states: Map<string, any> = new Map();
 
   registerHandler(intent: string, handler: Handler): void {
     this.handlers.set(intent, handler);
+  }
+
+  getState(sessionId: string): any {
+    return this.states.get(sessionId) || {};
+  }
+
+  setState(sessionId: string, state: any): void {
+    this.states.set(sessionId, state);
+  }
+
+  updateFlow(sessionId: string, updates: any): void {
+    const currentState = this.getState(sessionId);
+    this.setState(sessionId, { ...currentState, ...updates });
   }
 
   async handleTurn(
