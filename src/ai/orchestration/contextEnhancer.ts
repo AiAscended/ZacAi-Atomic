@@ -30,7 +30,7 @@ export interface EnhancedContext {
     emotion: string
     confidence: number
   }
-  slots: Record<string, string>
+  slots: Record<string, string | null>
   userProfile: {
     name?: string
     preferences?: Record<string, unknown>
@@ -96,7 +96,7 @@ export class ContextEnhancer {
     const profile = this.profileHandler.getProfile(sessionId)
     const state = `session-${sessionId}`
 
-    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${(profile.history ?? []).length || 0} turns`
+    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${Array.isArray(profile.history) ? profile.history.length : 0} turns`
   }
 }
 

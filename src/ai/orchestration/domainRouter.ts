@@ -283,7 +283,8 @@ export class DomainRouter {
     const availableDomains = listDomains()
 
     // Score each domain based on keyword matches
-    for (const domainName of availableDomains) {
+    for (const domain of availableDomains) {
+      const domainName = domain.name
       const score = this.calculateDomainScore(domainName, criteria.keywords)
 
       if (score > 0) {

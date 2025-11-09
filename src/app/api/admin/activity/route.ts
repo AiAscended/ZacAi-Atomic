@@ -4,7 +4,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import * as activityLogger from '@/lib/systemActivityLogger.cjs';
+// @ts-ignore - CommonJS module
+const activityLogger = require('@/lib/systemActivityLogger.cjs');
 import { addSecurityHeaders, generateRequestId } from '@/lib/productionHardening';
 
 export async function GET(request: NextRequest) {
