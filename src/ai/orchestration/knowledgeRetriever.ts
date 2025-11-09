@@ -26,12 +26,12 @@ export interface RetrievedKnowledge {
 }
 
 export class KnowledgeRetriever {
-  private cache: DocumentCache
+  private cache: typeof DocumentCache
   private retriever: DocumentRetrieverRanker
   private kbLoader: LocalKBLoader
 
   constructor() {
-    this.cache = new DocumentCache(1000)
+    this.cache = DocumentCache
     this.retriever = new DocumentRetrieverRanker()
     this.kbLoader = new LocalKBLoader()
   }
@@ -45,11 +45,11 @@ export class KnowledgeRetriever {
     }
 
     // Step 1: Check cache
-    const cached = this.cache.get(query)
+    const cached = this.cache.get<{ content: string }>(query)
     if (cached) {
       results.cacheHits++
       results.documents.push({
-        content: cached.content,
+        content: cached?.content ?? '',
         source: "cache",
         relevance: 1.0,
       })
@@ -57,14 +57,28 @@ export class KnowledgeRetriever {
 
     // Step 2: Load from local knowledge base
     for (const domain of domains) {
-      const kbDocs = await this.kbLoader.load(domain, query)
-      results.documents.push(...kbDocs.map((doc) => ({ ...doc, source: `kb:${domain}` })))
+      const kbDocs = await this.kbLoader.load(domain)
+      results.documents.push(...kbDocs.map((doc) => ({ 
+        content: doc.text,
+        source: `kb:${domain}`,
+        relevance: 0.5
+      })))
     }
 
     // Step 3: Retrieve and rank documents
     if (results.documents.length > 0) {
-      const ranked = this.retriever.rank(query, results.documents)
-      results.documents = ranked.slice(0, 5)
+      // Convert to KBDocument format for ranking
+      const kbDocs = results.documents.map((doc, idx) => ({
+        id: `doc-${idx}`,
+        text: doc.content,
+        title: doc.source
+      }))
+      const ranked = this.retriever.retrieve(query, kbDocs)
+      results.documents = ranked.map((doc, idx) => ({
+        content: doc.text,
+        source: doc.title || 'unknown',
+        relevance: 1.0 - (idx * 0.1) // Decreasing relevance
+      })).slice(0, 5)
     }
 
     if (useWeb) {

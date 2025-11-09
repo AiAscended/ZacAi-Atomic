@@ -71,7 +71,7 @@ export class CrossModalFusion {
     modalityData: ModalityData[],
     strategy: "early" | "late" | "hybrid" | "attention" = "hybrid"
   ): FusedOutput {
-    logger.info("CrossModalFusion", "Fusing modalities", {
+    logger.info("[CrossModalFusion] Fusing modalities", {
       modalityCount: modalityData.length,
       modalities: modalityData.map((d) => d.modality),
       strategy,
@@ -91,7 +91,7 @@ export class CrossModalFusion {
     // Apply fusion
     const fused = strategyFn(modalityData)
 
-    logger.info("CrossModalFusion", "Fusion complete", {
+    logger.info("[CrossModalFusion] Fusion complete", {
       modalitiesUsed: fused.metadata.modalitiesUsed.length,
       confidence: fused.metadata.confidence,
     })
