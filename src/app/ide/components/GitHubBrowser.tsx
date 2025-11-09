@@ -15,6 +15,17 @@ import {
 import { github } from '@/lib/ide/githubIntegration';
 import { useToast } from '@/hooks/use-toast';
 
+interface GitHubRepo {
+  id: React.Key;
+  fullName: string;
+  description: string | null;
+  language: string;
+  stars: number;
+  forks: number;
+  owner: string;
+  name: string;
+}
+
 interface GitHubBrowserProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -22,7 +33,7 @@ interface GitHubBrowserProps {
 }
 
 export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowserProps) {
-  const [repos, setRepos] = useState<any[]>([]);
+  const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [token, setToken] = useState('');
@@ -65,7 +76,7 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
     setLoading(true);
     try {
       const data = await github.listRepositories();
-      setRepos(data);
+      setRepos(data as GitHubRepo[]);
     } catch (error) {
       toast({
         title: 'Error',
@@ -86,7 +97,7 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
     setLoading(true);
     try {
       const data = await github.searchRepositories(searchQuery);
-      setRepos(data);
+      setRepos(data as GitHubRepo[]);
     } catch (error) {
       toast({
         title: 'Error',

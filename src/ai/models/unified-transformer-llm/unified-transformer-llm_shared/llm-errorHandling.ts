@@ -48,7 +48,7 @@ export function handleLLMError(error: unknown): void {
   }
 }
 
-export default {
+const llmErrorHandling = {
   LLMError,
   LLMTokenizationError,
   LLMInferenceError,
@@ -56,3 +56,5 @@ export default {
   LLMConfigError,
   handleLLMError,
 };
+
+export default llmErrorHandling;

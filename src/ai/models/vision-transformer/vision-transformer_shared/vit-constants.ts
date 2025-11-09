@@ -4,4 +4,6 @@
 
 export const VIT_VERSION = '1.0.0';
 
-export default { VIT_VERSION };
+const vitConstants = { VIT_VERSION };
+
+export default vitConstants;

@@ -49,19 +49,19 @@ export class CodeExecutionEngine {
     const startTime = performance.now();
     
     // Create sandboxed execution environment
-    const sandbox: any = {
+    const sandbox: Record<string, unknown> = {
       console: {
-        log: (...args: any[]) => this.consoleOutput.push(args.map(String).join(' ')),
-        error: (...args: any[]) => {
+        log: (...args: unknown[]) => this.consoleOutput.push(args.map(String).join(' ')),
+        error: (...args: unknown[]) => {
           const msg = args.map(String).join(' ');
           this.consoleOutput.push(`❌ ${msg}`);
           this.errorOutput = msg;
         },
-        warn: (...args: any[]) => this.consoleOutput.push(`⚠️ ${args.map(String).join(' ')}`),
-        info: (...args: any[]) => this.consoleOutput.push(`ℹ️ ${args.map(String).join(' ')}`),
+        warn: (...args: unknown[]) => this.consoleOutput.push(`⚠️ ${args.map(String).join(' ')}`),
+        info: (...args: unknown[]) => this.consoleOutput.push(`ℹ️ ${args.map(String).join(' ')}`),
       },
-      setTimeout: (fn: (...args: any[]) => void, ms: number) => setTimeout(fn, Math.min(ms, 5000)),
-      setInterval: (fn: (...args: any[]) => void, ms: number) => setInterval(fn, Math.max(ms, 100)),
+      setTimeout: (fn: (...args: unknown[]) => void, ms: number) => setTimeout(fn, Math.min(ms, 5000)),
+      setInterval: (fn: (...args: unknown[]) => void, ms: number) => setInterval(fn, Math.max(ms, 100)),
       clearTimeout: (id: number) => clearTimeout(id),
       clearInterval: (id: number) => clearInterval(id),
       Math,
@@ -212,7 +212,7 @@ export class CodeExecutionEngine {
 
     try {
       // Build module system
-      const modules: Record<string, any> = {};
+      const modules: Record<string, { exports: Record<string, unknown> }> = {};
 
       // Simple require implementation
       const requireFn = (modulePath: string) => {
@@ -288,13 +288,13 @@ export class CodeExecutionEngine {
             this.consoleOutput.push(`✗ ${name}: ${error instanceof Error ? error.message : String(error)}`);
           }
         },
-        expect: (actual: any) => ({
-          toBe: (expected: any) => {
+        expect: (actual: unknown) => ({
+          toBe: (expected: unknown) => {
             if (actual !== expected) {
               throw new Error(`Expected ${expected} but got ${actual}`);
             }
           },
-          toEqual: (expected: any) => {
+          toEqual: (expected: unknown) => {
             if (JSON.stringify(actual) !== JSON.stringify(expected)) {
               throw new Error(`Expected ${JSON.stringify(expected)} but got ${JSON.stringify(actual)}`);
             }

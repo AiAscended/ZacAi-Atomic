@@ -4,4 +4,6 @@
 
 export function sttUtility(): void {}
 
-export default { sttUtility };
+const sttUtils = { sttUtility };
+
+export default sttUtils;

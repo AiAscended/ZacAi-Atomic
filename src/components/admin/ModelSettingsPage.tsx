@@ -18,7 +18,7 @@ import { Save, RotateCcw, Check, AlertCircle, Activity } from "lucide-react"
 interface ModelSettings {
   enabled: boolean
   type: string
-  parameters: Record<string, any>
+  parameters: Record<string, unknown>
   performance: {
     maxLatency: number
     cacheEnabled: boolean
@@ -30,7 +30,7 @@ interface ModelSettingsPageProps {
   modelName: string
   modelTitle: string
   modelDescription: string
-  defaultParameters: Record<string, any>
+  defaultParameters: Record<string, unknown>
 }
 
 export function ModelSettingsPage({
@@ -127,7 +127,7 @@ export function ModelSettingsPage({
     })
   }
 
-  const updateParameter = (key: string, value: any) => {
+  const updateParameter = (key: string, value: unknown) => {
     setSettings({
       ...settings,
       parameters: {

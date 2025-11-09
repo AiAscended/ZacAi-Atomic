@@ -343,7 +343,7 @@ export default function UsersPage() {
               <Label htmlFor="add-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: any) => setFormData({ ...formData, role: value })}
+                onValueChange={(value: "admin" | "user" | "system") => setFormData({ ...formData, role: value })}
               >
                 <SelectTrigger id="add-role">
                   <SelectValue />
@@ -400,7 +400,7 @@ export default function UsersPage() {
               <Label htmlFor="edit-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: any) => setFormData({ ...formData, role: value })}
+                onValueChange={(value: "admin" | "user" | "system") => setFormData({ ...formData, role: value })}
               >
                 <SelectTrigger id="edit-role">
                   <SelectValue />

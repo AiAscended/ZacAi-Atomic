@@ -113,10 +113,10 @@ export function addSecurityHeaders(response: NextResponse): NextResponse {
 export interface ValidationError {
   field: string;
   message: string;
-  value?: any;
+  value?: unknown;
 }
 
-export function validateChatInput(input: any): { valid: boolean; errors: ValidationError[] } {
+export function validateChatInput(input: Record<string, unknown>): { valid: boolean; errors: ValidationError[] } {
   const errors: ValidationError[] = [];
   
   // Check message exists
@@ -163,7 +163,7 @@ export function sanitizeHtml(input: string): string {
     .replace(/\//g, '&#x2F;');
 }
 
-export function sanitizeInput(input: any): any {
+export function sanitizeInput(input: unknown): unknown {
   if (typeof input === 'string') {
     return sanitizeHtml(input);
   }
@@ -173,7 +173,7 @@ export function sanitizeInput(input: any): any {
   }
   
   if (typeof input === 'object' && input !== null) {
-    const sanitized: any = {};
+    const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(input)) {
       sanitized[key] = sanitizeInput(value);
     }
@@ -273,10 +273,10 @@ export interface MiddlewareConfig {
 }
 
 export function withHardening(
-  handler: (req: NextRequest, context: any) => Promise<NextResponse>,
+  handler: (req: NextRequest, context: unknown) => Promise<NextResponse>,
   config: MiddlewareConfig = {}
 ) {
-  return async (req: NextRequest, context: any) => {
+  return async (req: NextRequest, context: unknown) => {
     const requestId = generateRequestId();
     const clientIp = getClientIp(req);
     const startTime = Date.now();

@@ -438,7 +438,7 @@ Available commands:
       // Simple eval execution (unsafe, for demo only)
       // In production, use WebAssembly or WebContainers
       let output = '';
-      const consoleLog = (...args: any[]) => {
+      const consoleLog = (...args: unknown[]) => {
         output += args.map(String).join(' ') + '\n';
       };
 

@@ -2,8 +2,10 @@
  * Neuro-symbolic-reasoning - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
+export function loadWeights(path: string): unknown {
   return {};
 }
 
-export default { loadWeights };
+const neuroSymbolicReasoningWeightsUtils = { loadWeights };
+
+export default neuroSymbolicReasoningWeightsUtils;

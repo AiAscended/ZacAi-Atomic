@@ -144,7 +144,7 @@ export const monacoConfig = {
 };
 
 // Custom snippets for common patterns
-export const customSnippets = (monaco: any) => ({
+export const customSnippets = (monaco: typeof import('monaco-editor')) => ({
   typescript: [
     {
       label: 'rfc',
@@ -277,7 +277,7 @@ export function registerCustomCommands(editor: monaco.editor.IStandaloneCodeEdit
 }
 
 // Configure language features
-export function configureLanguageFeatures(monaco: any) {
+export function configureLanguageFeatures(monaco: typeof import('monaco-editor')) {
   // Register TypeScript/JavaScript snippets
   monaco.languages.registerCompletionItemProvider('typescript', {
     provideCompletionItems: (model: monaco.editor.IReadOnlyModel, position: monaco.Position) => {

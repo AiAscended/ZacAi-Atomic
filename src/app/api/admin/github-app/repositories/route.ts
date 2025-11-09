@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
 
     // Transform to our format
-    const formatted = data.repositories.map((repo: any) => ({
+    const formatted = data.repositories.map((repo: Record<string, unknown>) => ({
       id: repo.id,
       name: repo.name,
       fullName: repo.full_name,

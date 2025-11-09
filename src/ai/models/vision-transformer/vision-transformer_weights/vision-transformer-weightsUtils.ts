@@ -2,8 +2,10 @@
  * Vision-transformer - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
+export function loadWeights(_path: string): unknown {
   return {};
 }
 
-export default { loadWeights };
+const visionTransformerWeightsUtils = { loadWeights };
+
+export default visionTransformerWeightsUtils;

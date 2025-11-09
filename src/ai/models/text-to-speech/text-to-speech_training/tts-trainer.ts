@@ -3,7 +3,7 @@
  */
 
 export class TTSTrainer {
-  train(data: any): void {
+  train(_data: unknown): void {
     console.log('Training text-to-speech...');
   }
 }

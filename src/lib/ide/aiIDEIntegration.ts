@@ -213,14 +213,14 @@ class AIIDEIntegration {
     return prompt;
   }
 
-  private parseAIResponse(rawResponse: string | any): AIResponse {
+  private parseAIResponse(rawResponse: string | Record<string, unknown>): AIResponse {
     if (typeof rawResponse !== 'string') {
       // If the response is already an object, assume it's structured and return it.
       // This handles cases where the API directly returns JSON.
       return {
-        content: rawResponse.content || JSON.stringify(rawResponse),
-        code: rawResponse.code || [],
-        actions: rawResponse.actions || [],
+        content: (rawResponse.content as string) || JSON.stringify(rawResponse),
+        code: (rawResponse.code as []) || [],
+        actions: (rawResponse.actions as []) || [],
       };
     }
 

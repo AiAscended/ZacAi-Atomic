@@ -4,4 +4,6 @@
 
 export const RNN_VERSION = '1.0.0';
 
-export default { RNN_VERSION };
+const rnnConstants = { RNN_VERSION };
+
+export default rnnConstants;

@@ -2,8 +2,10 @@
  * Generative-adversarial-network - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
+export function loadWeights(path: string): unknown {
   return {};
 }
 
-export default { loadWeights };
+const generativeAdversarialNetworkWeightsUtils = { loadWeights };
+
+export default generativeAdversarialNetworkWeightsUtils;

@@ -47,8 +47,10 @@ export function perplexity(loss: number): number {
   return Math.exp(loss);
 }
 
-export default {
+const llmLossFunction = {
   crossEntropyLoss,
   batchCrossEntropyLoss,
   perplexity,
 };
+
+export default llmLossFunction;
