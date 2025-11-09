@@ -151,3 +151,17 @@ export class DomainRegistry extends EventEmitter {
 
 // Singleton instance - the ONLY registry in the system
 export const domainRegistry = new DomainRegistry()
+
+/**
+ * Helper function to list all domains
+ */
+export const listDomains = (): DomainMetadata[] => {
+  return domainRegistry.getAllDomains()
+}
+
+/**
+ * Helper function to get a domain by name
+ */
+export const getDomain = (name: string): DomainMetadata | undefined => {
+  return domainRegistry.getDomain(name)
+}
