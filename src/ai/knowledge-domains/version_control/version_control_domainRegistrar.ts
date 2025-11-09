@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import meta from "./version_control_meta.json";
+import meta from "./version_control_seeds/version_control_meta.json";
 import { VERSION_CONTROL_DOMAIN } from "./version_control_constants";
 
 export const getDomainMeta = () => ({ ...meta, name: VERSION_CONTROL_DOMAIN });

@@ -33,7 +33,7 @@ interface InferenceContext {
  */
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase();
-  const vocabulary = pretrainedWeights.vocabulary as Record<string, number>;
+  const vocabulary = (pretrainedWeights as any).vocabulary || {};
 
   let tokenScore = 0;
   let matchCount = 0;
@@ -62,7 +62,7 @@ function calculateConfidence(tokens: string[], input: string): number {
   semanticScore = Math.min(semanticScore / 2, 1.0);
 
   // Combine scores
-  const thresholds = pretrainedWeights.thresholds;
+  const thresholds = (pretrainedWeights as any).thresholds || { highConfidence: 0.8, mediumConfidence: 0.5 };
   const finalConfidence =
     avgTokenScore * thresholds.token_match_weight +
     semanticScore * thresholds.semantic_weight;

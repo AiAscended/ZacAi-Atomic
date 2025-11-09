@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import meta from "./error_detection_meta.json";
+import meta from "./error_detection_seeds/error_detection_meta.json";
 import { ERROR_DETECTION_DOMAIN } from "./error_detection_constants";
 
 export const getDomainMeta = () => ({ ...meta, name: ERROR_DETECTION_DOMAIN });
