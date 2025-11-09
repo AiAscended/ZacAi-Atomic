@@ -52,7 +52,16 @@ export async function writeFile(
   const token = await getInstallationAccessToken(installationId);
   const encoded = Buffer.from(content).toString("base64");
 
-  const params: unknown = {
+  const params: {
+    owner: string;
+    repo: string;
+    path: string;
+    message: string;
+    content: string;
+    branch: string;
+    headers: { authorization: string };
+    sha?: string;
+  } = {
     owner,
     repo,
     path,
@@ -94,7 +103,9 @@ export async function getFileSha(
     
     return response.data.sha;
   } catch (error: unknown) {
-    if (error.status === 404) return null;
+    if (typeof error === 'object' && error !== null && 'status' in error && (error as { status: number }).status === 404) {
+      return null;
+    }
     throw error;
   }
 }

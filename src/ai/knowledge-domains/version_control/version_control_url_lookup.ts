@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-const { registerSource } = require("../url_lookup")
+import { registerSource } from "../url_lookup"
 
 registerSource("version_control", "Git Documentation", "https://git-scm.com/doc", "Official Git documentation")
 registerSource("version_control", "GitHub Guides", "https://guides.github.com/", "GitHub workflow guides")
