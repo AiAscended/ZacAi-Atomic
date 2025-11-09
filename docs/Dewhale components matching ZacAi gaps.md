@@ -848,3 +848,440 @@ Citations:
 [8] ai-for-developers/awesome-ai-coding-tools https://github.com/ai-for-developers/awesome-ai-coding-tools
 [9] Integrated coastal management and sustainable tourism https://www.sciencedirect.com/science/article/abs/pii/S0964569114000982
 [10] Self-hosted AI coding that just works : r/24gb https://www.reddit.com/r/24gb/comments/1ltposh/selfhosted_ai_coding_that_just_works/
+
+---
+
+Show error responses and HTTP status codes for each endpoint
+
+Here are example error responses and associated HTTP status codes for each listed endpoint relevant to ZacAi’s Dewhale-inspired components:
+
+***
+
+### Multi-Agent Orchestration Layer
+
+- **POST /api/orchestrator/agents/register**
+  - 400 Bad Request: Missing or invalid agentId or capabilities
+  - 401 Unauthorized: Invalid or missing auth token
+  - 409 Conflict: Agent with agentId already registered
+
+Example error response:
+```json
+{
+  "errorCode": "AgentAlreadyRegistered",
+  "message": "Agent with id 'code-gen-1' is already registered"
+}
+```
+
+***
+
+- **POST /api/orchestrator/tasks**
+  - 400 Bad Request: Invalid task payload or unknown agentId
+  - 401 Unauthorized: Authentication failure
+  - 404 Not Found: AgentId not found
+  - 429 Too Many Requests: Rate limit exceeded
+
+Example:
+```json
+{
+  "errorCode": "AgentNotFound",
+  "message": "No agent registered with id 'code-gen-9'"
+}
+```
+
+***
+
+- **GET /api/orchestrator/tasks/{taskId}/status**
+  - 400 Bad Request: Invalid taskId format
+  - 401 Unauthorized
+  - 404 Not Found: TaskId does not exist
+  - 500 Internal Server Error: Orchestrator failure
+
+Example:
+```json
+{
+  "errorCode": "TaskNotFound",
+  "message": "Task with id 'task123' not found"
+}
+```
+
+***
+
+### Secure Runtime Execution Environment
+
+- **POST /api/sandbox/execute**
+  - 400 Bad Request: Malformed code or invalid language parameter
+  - 401 Unauthorized
+  - 429 Too Many Requests: Execution rate limit exceeded
+  - 503 Service Unavailable: Sandbox environment overloaded
+
+Example:
+```json
+{
+  "errorCode": "SandboxOverloaded",
+  "message": "Sandbox environment is busy, try again later"
+}
+```
+
+***
+
+- **GET /api/sandbox/{executionId}/output**
+  - 400 Bad Request: Invalid executionId format
+  - 401 Unauthorized
+  - 404 Not Found: Execution record missing
+  - 500 Internal Server Error: Execution failure
+
+Example:
+```json
+{
+  "errorCode": "ExecutionNotFound",
+  "message": "Execution with id 'exec-789' not found"
+}
+```
+
+***
+
+### Client-Server Architecture with Clear Separation
+
+- **POST /api/frontend/interaction**
+  - 400 Bad Request: Missing input fields
+  - 401 Unauthorized
+  - 429 Too Many Requests
+  - 500 Internal Server Error
+
+Example:
+```json
+{
+  "errorCode": "InvalidInput",
+  "message": "Missing required field 'userInput'"
+}
+```
+
+***
+
+- **POST /api/backend/model/inference**
+  - 400 Bad Request: Invalid model name or input text
+  - 401 Unauthorized
+  - 503 Service Unavailable: Model server down
+
+Example:
+```json
+{
+  "errorCode": "ModelUnavailable",
+  "message": "Requested model 'codegen-v2' is currently unavailable"
+}
+```
+
+***
+
+### Extensible Modular Pipelines
+
+- **POST /api/pipelines**
+  - 400 Bad Request: Malformed pipeline definition
+  - 401 Unauthorized
+  - 409 Conflict: PipelineId already exists
+
+Example:
+```json
+{
+  "errorCode": "PipelineExists",
+  "message": "Pipeline with id 'pipeline42' already exists"
+}
+```
+
+***
+
+- **POST /api/pipelines/{pipelineId}/run**
+  - 400 Bad Request: Invalid pipelineId or run input
+  - 401 Unauthorized
+  - 404 Not Found: PipelineId absent
+  - 429 Too Many Requests
+
+Example:
+```json
+{
+  "errorCode": "PipelineNotFound",
+  "message": "Pipeline 'pipeline42' does not exist"
+}
+```
+
+***
+
+- **GET /api/pipelines/{pipelineId}/status**
+  - 400 Bad Request
+  - 401 Unauthorized
+  - 404 Not Found
+
+Example:
+```json
+{
+  "errorCode": "PipelineRunNotFound",
+  "message": "No running instance found for pipeline 'pipeline42'"
+}
+```
+
+***
+
+### Stateful Context and Interaction Tracking
+
+- **POST /api/context/session**
+  - 400 Bad Request: Missing sessionId or contextData
+  - 401 Unauthorized
+
+Example:
+```json
+{
+  "errorCode": "InvalidSessionData",
+  "message": "Session context data is missing or malformed"
+}
+```
+
+***
+
+- **GET /api/context/session/{sessionId}**
+  - 400 Bad Request
+  - 401 Unauthorized
+  - 404 Not Found
+
+Example:
+```json
+{
+  "errorCode": "SessionNotFound",
+  "message": "Session 'sess123' does not exist"
+}
+```
+
+***
+
+These error responses conform to widely accepted HTTP status codes combined with detailed JSON body error codes/messages for clarity, facilitating robust client-side error handling in ZacAi’s modular AI coding assistant architecture.
+
+Citations:
+[1] Rest API with same HTTP status code, different error ... https://stackoverflow.com/questions/73270869/rest-api-with-same-http-status-code-different-error-responses-for-one-endpoint
+[2] Which HTTP Status Code to Use for Every CRUD App https://www.moesif.com/blog/technical/api-design/Which-HTTP-Status-Code-To-Use-For-Every-CRUD-App/
+[3] HTTP Status Codes: All 63 explained https://umbraco.com/knowledge-base/http-status-codes/
+[4] HTTP response status codes - MDN Web Docs - Mozilla https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
+[5] HTTP Status Codes - REST API Tutorial https://restfulapi.net/http-status-codes/
+[6] API response codes: examples and error-handling strategies https://www.merge.dev/blog/api-response-codes
+[7] List of HTTP status codes https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+[8] Bulk URL HTTP Status Code, Header & Redirect Checker ... https://httpstatus.io
+
+
+---
+
+Provide sample JSON schemas for request and response bodies
+
+Here are sample JSON schemas for request and response bodies for key ZacAi endpoints inspired by Dewhale components:
+
+***
+
+### 1. Register Agent Request Schema
+
+```json
+{
+  "type": "object",
+  "required": ["agentId", "capabilities"],
+  "properties": {
+    "agentId": { "type": "string", "minLength": 1 },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    }
+  }
+}
+```
+
+### Register Agent Response Schema
+
+```json
+{
+  "type": "object",
+  "required": ["message", "agentId"],
+  "properties": {
+    "message": { "type": "string" },
+    "agentId": { "type": "string" }
+  }
+}
+```
+
+***
+
+### 2. Submit Task Request Schema
+
+```json
+{
+  "type": "object",
+  "required": ["taskId", "agentId", "taskType", "payload"],
+  "properties": {
+    "taskId": { "type": "string" },
+    "agentId": { "type": "string" },
+    "taskType": { "type": "string" },
+    "payload": { "type": "object" }
+  }
+}
+```
+
+### Submit Task Response Schema
+
+```json
+{
+  "type": "object",
+  "required": ["message", "taskId"],
+  "properties": {
+    "message": { "type": "string" },
+    "taskId": { "type": "string" }
+  }
+}
+```
+
+***
+
+### 3. Execute Sandbox Code Request Schema
+
+```json
+{
+  "type": "object",
+  "required": ["code", "language", "resourceLimits"],
+  "properties": {
+    "code": { "type": "string" },
+    "language": { "type": "string" },
+    "resourceLimits": {
+      "type": "object",
+      "properties": {
+        "cpu": { "type": "string" },
+        "memory": { "type": "string" }
+      },
+      "required": ["cpu", "memory"]
+    }
+  }
+}
+```
+
+### Execute Sandbox Response Schema
+
+```json
+{
+  "type": "object",
+  "required": ["message", "executionId"],
+  "properties": {
+    "message": { "type": "string" },
+    "executionId": { "type": "string" }
+  }
+}
+```
+
+***
+
+### 4. Frontend Interaction Request Schema
+
+```json
+{
+  "type": "object",
+  "required": ["sessionId", "userInput", "context"],
+  "properties": {
+    "sessionId": { "type": "string" },
+    "userInput": { "type": "string" },
+    "context": {
+      "type": "object",
+      "properties": {
+        "file": { "type": "string" },
+        "cursorPosition": { "type": "integer" }
+      },
+      "required": ["file", "cursorPosition"]
+    }
+  }
+}
+```
+
+### Frontend Interaction Response Schema
+
+```json
+{
+  "type": "object",
+  "required": ["response", "sessionId"],
+  "properties": {
+    "response": { "type": "string" },
+    "sessionId": { "type": "string" }
+  }
+}
+```
+
+***
+
+### 5. Pipeline Definition Request Schema
+
+```json
+{
+  "type": "object",
+  "required": ["pipelineId", "steps"],
+  "properties": {
+    "pipelineId": { "type": "string" },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "config"],
+        "properties": {
+          "type": { "type": "string" },
+          "config": { "type": "object" }
+        }
+      }
+    }
+  }
+}
+```
+
+### Pipeline Creation Response Schema
+
+```json
+{
+  "type": "object",
+  "required": ["message", "pipelineId"],
+  "properties": {
+    "message": { "type": "string" },
+    "pipelineId": { "type": "string" }
+  }
+}
+```
+
+***
+
+### 6. Context Session Update Request Schema
+
+```json
+{
+  "type": "object",
+  "required": ["sessionId", "contextData"],
+  "properties": {
+    "sessionId": { "type": "string" },
+    "contextData": { "type": "object" }
+  }
+}
+```
+
+### Context Session Update Response Schema
+
+```json
+{
+  "type": "object",
+  "required": ["message", "sessionId"],
+  "properties": {
+    "message": { "type": "string" },
+    "sessionId": { "type": "string" }
+  }
+}
+```
+
+***
+
+These JSON schemas provide clear structure and validation rules for ZacAi API requests and responses, ensuring robust communication between hybrid AI components and client frontends.
+
+Citations:
+[1] Using a JSON schema to validate a response body https://learnetto.com/tutorials/using-a-json-schema-to-validate-a-response-body
+[2] Describing Request Body https://swagger.io/docs/specification/v3_0/describing-request-body/describing-request-body/
+[3] JSON Schema - Pydantic Validation https://docs.pydantic.dev/latest/concepts/json_schema/
+[4] JSON Schema examples https://json-schema.org/learn/json-schema-examples
+[5] JSON Schema Examples Tutorial https://www.mongodb.com/resources/languages/json-schema-examples
+[6] Miscellaneous Examples https://json-schema.org/learn/miscellaneous-examples
+[7] Generate sample Json output from Json Schema https://stackoverflow.com/questions/21894873/generate-sample-json-output-from-json-schema
+[8] JSON Schema Validator, Generator, and Editor Guide https://stoplight.io/json-guide
+
