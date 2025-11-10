@@ -64,7 +64,7 @@ export class ContextEnhancer {
     const sentiment = detectSentiment(text)
 
     // Extract slots (entities like names, dates, locations)
-    const slots = this.slotFiller.fill(text)
+    const slots = this.slotFiller.extractSlots(text)
 
     // Get user profile
     const userProfile = this.profileHandler.getProfile(sessionId)
@@ -80,8 +80,12 @@ export class ContextEnhancer {
     return {
       originalText: text,
       dialogueState,
-      sentiment,
-      slots,
+      sentiment: {
+        polarity: sentiment.sentiment,
+        emotion: sentiment.emotion,
+        confidence: sentiment.score,
+      },
+      slots: slots as Record<string, string>,
       userProfile,
       conversationTurn: history.length + 1,
     }
@@ -93,8 +97,11 @@ export class ContextEnhancer {
   public getConversationSummary(sessionId: string): string {
     const profile = this.profileHandler.getProfile(sessionId)
     const state = this.dialogueController.getState(sessionId)
+    
+    const name = profile.name as string | undefined
+    const history = profile.history as string[] | undefined
 
-    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${profile.history?.length || 0} turns`
+    return `User: ${name || "Unknown"}, State: ${state}, History: ${history?.length || 0} turns`
   }
 }
 

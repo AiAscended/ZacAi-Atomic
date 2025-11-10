@@ -22,6 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <AdminSidebar
         isOpen={isSidebarOpen}
         isExpanded={isSidebarExpanded}
+        onClose={() => setIsSidebarOpen(false)}
         onExpandToggle={() => setIsSidebarExpanded(!isSidebarExpanded)}
       />
       <main className="transition-all duration-300 p-6">{children}</main>
