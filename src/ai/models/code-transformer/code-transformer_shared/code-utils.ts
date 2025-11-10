@@ -4,6 +4,6 @@
 
 export function codeUtility(): void {}
 
-const codeBundle = { codeUtility }; export default exportBundle;
+export const codeBundle = { codeUtility }
 
-export default codeBundle;
+export default codeBundle

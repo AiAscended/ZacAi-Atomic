@@ -4,6 +4,7 @@
 
 export function ganUtility(): void {}
 
-const ganBundle = { ganUtility }; export default exportBundle;
+export const ganBundle = { ganUtility }
+
 
 export default ganBundle;

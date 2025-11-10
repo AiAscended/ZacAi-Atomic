@@ -4,5 +4,6 @@
 
 export function neuroUtility(): void {}
 
-const utils = { neuroUtility }; export default exportBundle;
+export const utils = { neuroUtility }
+
 export default utils;

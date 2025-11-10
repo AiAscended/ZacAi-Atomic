@@ -43,7 +43,7 @@ export interface FormattedResponse {
  * Returns structured, ready-for-UI rendering response object.
  * @param rawResponse - raw AI-generated text including code blocks
  */
-export function formatResponse(rawResponse: string): FormattedResponse {
+export async function formatResponse(rawResponse: string): Promise<FormattedResponse> {
   const codeBlocks: CodeBlock[] = []
   const textBlocks: TextBlock[] = []
   const languages = new Set<string>()
@@ -76,7 +76,7 @@ export function formatResponse(rawResponse: string): FormattedResponse {
     // Format code, fallback to original if formatting fails
     let formattedCode = code
     try {
-      const formatted = formatCode(code, { language })
+  const formatted = await formatCode(code, { language })
       if (formatted && typeof formatted === 'string') {
         formattedCode = formatted
       }

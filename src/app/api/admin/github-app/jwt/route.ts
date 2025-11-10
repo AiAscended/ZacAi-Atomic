@@ -5,7 +5,7 @@
  * POST - Create a JWT token signed with the app's private key
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
  * POST /api/admin/github-app/jwt
  * Generate a GitHub App JWT token
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const appId = process.env.GITHUB_APP_ID;
     const privateKey = process.env.GITHUB_APP_PRIVATE_KEY;

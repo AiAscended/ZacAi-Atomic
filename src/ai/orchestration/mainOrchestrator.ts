@@ -244,7 +244,7 @@ export class MainOrchestrator {
               domains: ['mathematics'],
               confidence: 1.0,
               sources: ['Scientific Calculator'],
-              contentBlocks: formatResponse(`The result is: ${result.value}${result.steps ? '\n\nCalculation steps:\n' + result.steps.join('\n') : ''}`),
+              contentBlocks: await formatResponse(`The result is: ${result.value}${result.steps ? '\n\nCalculation steps:\n' + result.steps.join('\n') : ''}`),
             }
           }
         } catch (error) {
@@ -399,7 +399,7 @@ export class MainOrchestrator {
       
       let formattedResponse
       try {
-        formattedResponse = formatResponse(synthesizedResponse.text)
+  formattedResponse = await formatResponse(synthesizedResponse.text)
         console.log("[MainOrchestrator] Formatting completed, blocks:", 
           formattedResponse.textBlocks.length, "text,", 
           formattedResponse.codeBlocks.length, "code")

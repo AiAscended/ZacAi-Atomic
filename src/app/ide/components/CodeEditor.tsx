@@ -3,8 +3,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Editor, { OnMount } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
-import { useEditorStore } from '@/lib/ide/editorStore';
-import { useFileSystem } from '@/lib/ide/useFileSystem';
+import { useEditorStore } from '@/ide/editorStore';
+import { useFileSystem } from '@/ide/useFileSystem';
 import { Button } from '@/components/ui/button';
 import { X, Save, MoreVertical, Copy, FileCode } from 'lucide-react';
 import { cn } from '@/lib/utils';

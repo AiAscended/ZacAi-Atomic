@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, ExternalLink, Smartphone, Tablet, Monitor, AlertCircle } from 'lucide-react';
-import { codeExecutor } from '@/lib/ide/codeExecutor';
-import { useEditorStore } from '@/lib/ide/editorStore';
-import { useFileSystem } from '@/lib/ide/useFileSystem';
+import { codeExecutor } from '@/ide/codeExecutor';
+import { useEditorStore } from '@/ide/editorStore';
+import { useFileSystem } from '@/ide/useFileSystem';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 type DeviceSize = 'mobile' | 'tablet' | 'desktop';

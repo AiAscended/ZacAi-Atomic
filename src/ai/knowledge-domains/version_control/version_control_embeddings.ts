@@ -9,10 +9,14 @@
 import pretrained from "./version_control_weights/version_control_pretrained_weights.json"
 import { VERSION_CONTROL_DOMAIN } from "./version_control_constants"
 
-const EMBEDDING_DIM = 128
+const EMBEDDING_DIM = pretrained.architecture?.embeddingDim ?? 128
+
+type SeedWeightMap = {
+  seedWeights?: Record<string, number[]>
+}
 
 export const getVersionControlEmbedding = (token: string): number[] => {
-  const weights = pretrained.seedWeights as Record<string, number[]>
+  const weights = (pretrained as SeedWeightMap).seedWeights ?? {}
   if (weights[token]) return weights[token]
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
 }

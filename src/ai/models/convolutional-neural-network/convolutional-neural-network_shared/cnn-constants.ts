@@ -2,8 +2,8 @@
  * Convolutional-neural-network - Constants
  */
 
-export const CNN_VERSION = '1.0.0';
+export const CNN_VERSION = "1.0.0"
 
-const convolutionalBundle = { CNN_VERSION }; export default exportBundle;
+export const convolutionalBundle = { CNN_VERSION }
 
-export default convolutionalBundle;
+export default convolutionalBundle

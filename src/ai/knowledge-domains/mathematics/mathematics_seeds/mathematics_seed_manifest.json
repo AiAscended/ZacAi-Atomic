@@ -27,6 +27,5 @@
       "type": "relationships",
       "description": "Core relationships and dependencies"
     }
-    // ...add all other files in load order
   ]
 }

@@ -28,12 +28,30 @@ interface InferenceContext {
   userProfile?: unknown
 }
 
+type SearchResult = {
+  title: string
+  snippet: string
+  url: string
+  source: string
+}
+
+type ThresholdWeights = {
+  token_match_weight: number
+  semantic_weight: number
+}
+
+const DEFAULT_THRESHOLDS: ThresholdWeights = {
+  token_match_weight: 0.6,
+  semantic_weight: 0.4,
+}
+
 /**
  * Calculate confidence using pretrained weights and token analysis
  */
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
-  const vocabulary = pretrainedWeights.vocabulary as Record<string, number>
+  const vocabulary = (seeds as { vocabulary?: Record<string, number> }).vocabulary ?? {}
+  const thresholds = (pretrainedWeights as { thresholds?: ThresholdWeights }).thresholds ?? DEFAULT_THRESHOLDS
 
   let tokenScore = 0
   let matchCount = 0
@@ -51,7 +69,7 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   // Semantic pattern matching
   let semanticScore = 0
-  const patterns = seeds.patterns as Array<{ pattern: string; weight: number }>
+  const patterns = (seeds as { patterns?: Array<{ pattern: string; weight: number }> }).patterns ?? []
 
   for (const patternObj of patterns) {
     if (lowerInput.includes(patternObj.pattern)) {
@@ -61,8 +79,6 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   semanticScore = Math.min(semanticScore / 2, 1.0)
 
-  // Combine scores
-  const thresholds = pretrainedWeights.thresholds
   const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
 
   return Math.min(finalConfidence, 1.0)
@@ -112,7 +128,7 @@ export async function internetSearchRunInference(input: string, _context?: Infer
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} extracted query:`, searchQuery)
 
   const searchEngines = findSources(INTERNET_SEARCH_DOMAIN)
-  const results: unknown[] = []
+  const results: SearchResult[] = []
 
   for (const engine of searchEngines) {
     try {

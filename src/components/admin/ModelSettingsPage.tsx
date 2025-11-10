@@ -5,7 +5,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -55,11 +55,7 @@ export function ModelSettingsPage({
     updatedAt: new Date().toISOString()
   })
 
-  useEffect(() => {
-    loadSettings()
-  }, [modelName])
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -77,7 +73,11 @@ export function ModelSettingsPage({
     } finally {
       setLoading(false)
     }
-  }
+  }, [modelName])
+
+  useEffect(() => {
+    void loadSettings()
+  }, [loadSettings])
 
   const saveSettings = async () => {
     try {

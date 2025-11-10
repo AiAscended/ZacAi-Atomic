@@ -14,7 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import { promises as fs } from 'fs';
 
-const CHAT_HISTORY_DIR = path.join(process.cwd(), 'data', 'chat-history');
+const CHAT_HISTORY_DIR = path.join(process.cwd(), 'src', 'ai', 'data', 'chat-history');
 
 // ============================================================================
 // Helper Functions
@@ -24,7 +24,7 @@ async function ensureUserDirectory(userId: string) {
   const userDir = path.join(CHAT_HISTORY_DIR, `user-${userId}`);
   try {
     await fs.mkdir(userDir, { recursive: true });
-  } catch (error) {
+  } catch {
     // Directory might already exist
   }
   return userDir;
@@ -92,7 +92,7 @@ async function listChats(userId: string, options: Record<string, unknown> = {}) 
         console.error('Error loading chat:', filePath, error);
       }
     }
-  } catch (error) {
+  } catch {
     // Directory doesn't exist yet
     return [];
   }
@@ -122,7 +122,7 @@ async function getAllChatFiles(dir: string): Promise<string[]> {
         files.push(fullPath);
       }
     }
-  } catch (error) {
+  } catch {
     // Directory doesn't exist
   }
   
@@ -234,7 +234,7 @@ export async function PUT(request: NextRequest) {
         const oldPath = await getChatFilePath(userId, chatId, chat.folder as string | null);
         try {
           await fs.unlink(oldPath);
-        } catch (error) {
+        } catch {
           // File might not exist
         }
         chat.folder = data.folder;

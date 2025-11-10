@@ -18,6 +18,13 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+function stripJsonComments(content: string): string {
+  return content
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('//'))
+    .join('\n');
+}
+
 /**
  * Seed entry in the registry
  */
@@ -176,15 +183,27 @@ class SeedRegistryManager {
         fileIdMap.set(jsonFile, fileId);
         
         const filePath = path.join(seedPath, jsonFile);
-        const content = await fs.readFile(filePath, 'utf-8');
-        const data = JSON.parse(content);
+        const rawContent = await fs.readFile(filePath, 'utf-8');
+        const content = stripJsonComments(rawContent);
+
+        let data: unknown;
+        try {
+          data = JSON.parse(content);
+        } catch (parseError) {
+          console.warn(`[SeedRegistry] Skipping invalid JSON file ${filePath}:`, parseError);
+          continue;
+        }
         
         // Handle different seed formats
         let entries: unknown[] = [];
-        if (data.concepts && Array.isArray(data.concepts)) {
+        if (isRecordWithArray(data, 'concepts')) {
           entries = data.concepts;
-        } else if (data.words && Array.isArray(data.words)) {
+        } else if (isRecordWithArray(data, 'words')) {
           entries = data.words;
+        } else if (isRecordWithArray(data, 'terms')) {
+          entries = data.terms.map((term) => (typeof term === 'string' ? { term } : term));
+        } else if (isRecordWithArray(data, 'vocabulary')) {
+          entries = data.vocabulary.map((word) => (typeof word === 'string' ? { word } : word));
         } else if (Array.isArray(data)) {
           entries = data;
         }
@@ -430,6 +449,10 @@ class SeedRegistryManager {
   public getVocabularyList(): string[] {
     return Array.from(this.entries.keys()).map(key => key.split(':')[1]);
   }
+}
+
+function isRecordWithArray<T extends string>(value: unknown, key: T): value is Record<T, unknown[]> {
+  return typeof value === 'object' && value !== null && Array.isArray((value as Record<string, unknown[]>)[key]);
 }
 
 // Singleton instance

@@ -64,7 +64,7 @@ Execute a complete, systematic verification of the ZacAi-Atomic hybrid multi-mod
 - [ ] Create default user 1: AiAscended (role: admin, email: admin@aiascended.com)
 - [ ] Create default user 2: Zac (role: system, email: zac@system.ai)
 - [ ] Implement differentiated logging: 👤 AiAscended vs 🤖 Zac
-- [ ] Verify user data persists in `/data/settings/users.json`
+- [ ] Verify user data persists in `src/ai/data/settings/users.json`
 - [ ] Test CRUD operations (Create, Read, Update, Delete)
 
 **Expected Outcome:** Functional user management with 2 default users created
@@ -81,7 +81,7 @@ Execute a complete, systematic verification of the ZacAi-Atomic hybrid multi-mod
 - [ ] Verify all fields render: systemName, version, mode, location, timezone
 - [ ] Test save functionality
 - [ ] Check success toast appears
-- [ ] Verify settings persist in `/data/settings/system.json`
+- [ ] Verify settings persist in `src/ai/data/settings/system.json`
 - [ ] Test load on page refresh
 - [ ] Verify API endpoint: GET/PUT `/api/admin/settings/system`
 
@@ -108,7 +108,7 @@ Execute a complete, systematic verification of the ZacAi-Atomic hybrid multi-mod
   - [ ] Keywords can be added/removed
   - [ ] Save button triggers PUT request
   - [ ] Success toast appears
-  - [ ] Settings persist in `/data/settings/domains.json`
+  - [ ] Settings persist in `src/ai/data/settings/domains.json`
   - [ ] Settings load correctly on refresh
 - [ ] Verify API endpoint: GET/PUT `/api/admin/settings/domains`
 - [ ] Check all 29 domains are registered: react, typescript, javascript, python, java, csharp, cpp, rust, go, ruby, php, swift, kotlin, scala, mathematics, physics, chemistry, biology, english, spanish, french, german, chinese, japanese, atomic, inference, embeddings, monitoring, analytics
@@ -150,7 +150,7 @@ Execute a complete, systematic verification of the ZacAi-Atomic hybrid multi-mod
   - [ ] Cache toggle works
   - [ ] Save button triggers PUT request
   - [ ] Success toast appears
-  - [ ] Settings persist in `/data/settings/models.json`
+  - [ ] Settings persist in `src/ai/data/settings/models.json`
 - [ ] Verify API endpoint: GET/PUT `/api/admin/settings/models`
 
 **Expected Outcome:** All models have functional settings pages with persistence
@@ -312,7 +312,7 @@ Execute a complete, systematic verification of the ZacAi-Atomic hybrid multi-mod
 ## 📋 PHASE 5: Data Persistence & Storage
 
 ### 5.1 Settings Storage
-**Location:** `/data/settings/`
+**Location:** `src/ai/data/settings/`
 
 **Tasks:**
 - [ ] Verify directory exists

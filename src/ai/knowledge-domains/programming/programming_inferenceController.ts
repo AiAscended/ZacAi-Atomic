@@ -5,7 +5,7 @@ export interface ProgrammingInferenceResult {
   response: string
   confidence: number
   topics: string[]
-  metadata: { intent: string; complexity: string; parseType: string }
+  metadata: { intent: string; complexity: string; parseType: string; hasCodeExample?: boolean }
 }
 
 // Code examples library
@@ -164,13 +164,19 @@ export async function programmingRunInference(input: string): Promise<Programmin
     let codeExample = null
 
     // Check if user is asking for code examples
-    const requestsExample = lowerInput.includes("example") || 
-                           lowerInput.includes("show me") ||
-                           lowerInput.includes("code snippet") ||
-                           lowerInput.includes("how to")
+    const requestsExample =
+      lowerInput.includes("example") ||
+      lowerInput.includes("show me") ||
+      lowerInput.includes("code snippet") ||
+      lowerInput.includes("how to")
+
+    const wantsExample =
+      requestsExample ||
+      parseResult.metadata.hasCode ||
+      semanticAnalysis.intent === "implement"
 
     // Find relevant code example based on keywords
-    if (requestsExample || parseResult.type === "example") {
+    if (wantsExample) {
       for (const [key, example] of Object.entries(CODE_EXAMPLES)) {
         if (lowerInput.includes(key)) {
           codeExample = example

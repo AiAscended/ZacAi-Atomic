@@ -10,6 +10,14 @@ import { typescriptTokenizer } from "./typescript_tokenizer"
 import { typescriptSemanticAnalyzer } from "./typescript_semanticAnalyzer"
 import pretrainedWeights from "./typescript_weights/typescript_pretrained_weights.json"
 
+interface TypeScriptPretrainedWeights {
+  vocabulary?: Record<string, number>
+  thresholds?: {
+    token_match_weight: number
+    semantic_weight: number
+  }
+}
+
 interface InferenceContext {
   tokens: string[]
   inferenceResults?: unknown
@@ -21,7 +29,8 @@ interface InferenceContext {
 
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
-  const vocabulary = pretrainedWeights.vocabulary as Record<string, number>
+  const weightsConfig = pretrainedWeights as unknown as TypeScriptPretrainedWeights
+  const vocabulary = weightsConfig.vocabulary ?? {}
 
   let tokenScore = 0
   let matchCount = 0
@@ -58,7 +67,10 @@ function calculateConfidence(tokens: string[], input: string): number {
   semanticScore = Math.min(semanticScore / 2, 1.0)
 
   // Combine scores using weights from pretrained config
-  const thresholds = pretrainedWeights.thresholds
+  const thresholds = weightsConfig.thresholds ?? {
+    token_match_weight: 0.6,
+    semantic_weight: 0.4,
+  }
   const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
 
   if (lowerInput.match(/\b(code|example|file|entry|main|index)\b/)) {

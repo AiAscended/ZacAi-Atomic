@@ -42,7 +42,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Critical for microservices and distributed systems."[1][2][3][4][5][6]
+      "notes": "Critical for microservices and distributed systems."
     },
     {
       "priority": 3,
@@ -64,7 +64,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Used for standalone or small deployments."[2][3]
+      "notes": "Used for standalone or small deployments."
     },
     {
       "priority": 4,
@@ -86,7 +86,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Reduces network isolation for performance."[2][3]
+      "notes": "Reduces network isolation for performance."
     },
     {
       "priority": 5,
@@ -108,7 +108,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Enables multi-host, multi-cloud deployments."[2][3][5]
+      "notes": "Enables multi-host, multi-cloud deployments."
     },
     {
       "priority": 6,
@@ -130,7 +130,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "CNI manages pod and service networking."[1][4][6][7]
+      "notes": "CNI manages pod and service networking."
     },
     {
       "priority": 7,
@@ -152,7 +152,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Pod-to-pod communication is fundamental in Kubernetes."[1][4]
+      "notes": "Pod-to-pod communication is fundamental in Kubernetes."
     },
     {
       "priority": 8,
@@ -174,7 +174,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Handled by kube-proxy and service abstractions."[1][4]
+      "notes": "Handled by kube-proxy and service abstractions."
     },
     {
       "priority": 9,
@@ -196,7 +196,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Central to Kubernetes service networking."[1][4]
+      "notes": "Central to Kubernetes service networking."
     },
     {
       "priority": 10,
@@ -218,7 +218,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "CoreDNS is the default DNS in Kubernetes."[1][4]
+      "notes": "CoreDNS is the default DNS in Kubernetes."
     },
     {
       "priority": 11,
@@ -240,7 +240,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Kubernetes allocates IPs for pods, services, and nodes."[1][4]
+      "notes": "Kubernetes allocates IPs for pods, services, and nodes."
     },
     {
       "priority": 12,
@@ -262,7 +262,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Dynamic port allocation is handled by orchestrators."[4]
+      "notes": "Dynamic port allocation is handled by orchestrators."
     },
     {
       "priority": 13,
@@ -284,7 +284,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Each driver provides different isolation and connectivity."[2][3]
+      "notes": "Each driver provides different isolation and connectivity."
     },
     {
       "priority": 14,
@@ -306,7 +306,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Enables advanced routing, security, and telemetry."[1][4]
+      "notes": "Enables advanced routing, security, and telemetry."
     },
     {
       "priority": 15,
@@ -328,7 +328,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Nginx and Traefik are common ingress controllers."[1][4]
+      "notes": "Nginx and Traefik are common ingress controllers."
     },
     {
       "priority": 16,
@@ -350,7 +350,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Egress policies prevent data exfiltration."[1][4]
+      "notes": "Egress policies prevent data exfiltration."
     },
     {
       "priority": 17,
@@ -372,7 +372,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Critical for multi-tenant and secure clusters."[1][4]
+      "notes": "Critical for multi-tenant and secure clusters."
     },
     {
       "priority": 18,
@@ -394,7 +394,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Services abstract dynamic pod IPs for clients."[1][4]
+      "notes": "Services abstract dynamic pod IPs for clients."
     },
     {
       "priority": 19,

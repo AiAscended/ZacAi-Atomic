@@ -4,6 +4,7 @@
 
 export function rnnUtility(): void {}
 
-const rnnUtils = { rnnUtility }; export default exportBundle;
+export const rnnUtils = { rnnUtility }
+
 
 export default rnnUtils;

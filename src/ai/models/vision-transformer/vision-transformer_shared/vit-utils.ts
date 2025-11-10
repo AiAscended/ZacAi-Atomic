@@ -4,6 +4,7 @@
 
 export function vitUtility(): void {}
 
-const vitUtils = { vitUtility }; export default exportBundle;
+export const vitUtils = { vitUtility }
+
 
 export default vitUtils;

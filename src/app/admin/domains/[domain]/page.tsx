@@ -6,7 +6,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -55,11 +55,7 @@ export default function DomainSettingsPage() {
   const [seedData, setSeedData] = useState("")
   const [weightsData, setWeightsData] = useState("")
 
-  useEffect(() => {
-    loadSettings()
-  }, [domain])
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -77,7 +73,11 @@ export default function DomainSettingsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [domain])
+
+  useEffect(() => {
+    void loadSettings()
+  }, [loadSettings])
 
   const saveSettings = async () => {
     try {

@@ -9,7 +9,7 @@ import { PreviewPanel } from './PreviewPanel';
 import { TerminalPanel } from './TerminalPanel';
 import { AIChatPanel } from './AIChatPanel';
 import { IDEToolbar } from './IDEToolbar';
-import { useLayoutStore } from '@/lib/ide/layoutStore';
+import { useLayoutStore } from '@/ide/layoutStore';
 
 export function IDELayout() {
   const layout = useLayoutStore((state) => ({

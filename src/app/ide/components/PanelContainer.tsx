@@ -2,7 +2,7 @@
 
 import React, { ReactNode } from 'react';
 import { WindowControls } from './WindowControls';
-import { useLayoutStore } from '@/lib/ide/layoutStore';
+import { useLayoutStore } from '@/ide/layoutStore';
 import { cn } from '@/lib/utils';
 
 interface PanelContainerProps {

@@ -416,7 +416,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Ensures data integrity and supports transactions."[1][2]
+      "notes": "Ensures data integrity and supports transactions."
     },
     {
       "priority": 20,
@@ -438,7 +438,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Supports object persistence and relationships."[2]
+      "notes": "Supports object persistence and relationships."
     },
     {
       "priority": 21,
@@ -460,7 +460,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Bridges object and relational paradigms."[2]
+      "notes": "Bridges object and relational paradigms."
     },
     {
       "priority": 22,
@@ -482,7 +482,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Enables scaling and resilience."[1]
+      "notes": "Enables scaling and resilience."
     },
     {
       "priority": 23,
@@ -504,7 +504,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Used for backups and distributed data."[1]
+      "notes": "Used for backups and distributed data."
     },
     {
       "priority": 24,
@@ -526,7 +526,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Includes NTFS, ext4, HDFS, and more."[1]
+      "notes": "Includes NTFS, ext4, HDFS, and more."
     },
     {
       "priority": 25,
@@ -548,7 +548,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Includes transactional and non-transactional methods."[5]
+      "notes": "Includes transactional and non-transactional methods."
     },
     {
       "priority": 26,
@@ -570,7 +570,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Supports encapsulation and inheritance in storage."[2]
+      "notes": "Supports encapsulation and inheritance in storage."
     },
     {
       "priority": 27,
@@ -592,7 +592,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Ensures system reliability and uptime."[2]
+      "notes": "Ensures system reliability and uptime."
     },
     {
       "priority": 28,
@@ -614,7 +614,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Lost after program or session ends."[2][8]
+      "notes": "Lost after program or session ends."
     },
     {
       "priority": 29,
@@ -636,7 +636,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Stored in databases or files for durability."[2][8]
+      "notes": "Stored in databases or files for durability."
     },
     {
       "priority": 30,
@@ -658,7 +658,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Includes full, incremental, and differential backups."[1][3]
+      "notes": "Includes full, incremental, and differential backups."
     },
     {
       "priority": 31,
@@ -680,7 +680,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Includes regular drills and recovery time objectives."[1]
+      "notes": "Includes regular drills and recovery time objectives."
     },
     {
       "priority": 32,
@@ -702,7 +702,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Fast recovery reduces downtime and data loss."[1][3]
+      "notes": "Fast recovery reduces downtime and data loss."
     },
     {
       "priority": 33,
@@ -724,7 +724,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Used in high-availability systems."[1]
+      "notes": "Used in high-availability systems."
     },
     {
       "priority": 34,
@@ -746,7 +746,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Preferred for distributed, high-performance systems."[1]
+      "notes": "Preferred for distributed, high-performance systems."
     },
     {
       "priority": 35,
@@ -768,7 +768,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Essential for uptime and reliability."[1]
+      "notes": "Essential for uptime and reliability."
     },
     {
       "priority": 36,
@@ -790,7 +790,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Critical for data consistency and reliability."[1]
+      "notes": "Critical for data consistency and reliability."
     }
   ]
 }

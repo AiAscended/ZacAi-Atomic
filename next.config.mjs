@@ -36,7 +36,7 @@ const nextConfig = {
   },
   
   // Webpack configuration
-  webpack: (config, { isServer, dev }) => {
+  webpack: (config, { isServer }) => {
     // Resolve TypeScript path aliases in webpack
     config.resolve.alias = {
       ...config.resolve.alias,

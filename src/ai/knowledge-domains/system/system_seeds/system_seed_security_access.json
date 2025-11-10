@@ -12,7 +12,6 @@
       "permissions": ["read", "write"],
       "description": "Standard user with limited access."
     }
-    // Add more roles as needed
   ],
   "access_control": [
     {
@@ -25,6 +24,5 @@
       "role_id": "role-user",
       "access_level": "read-only"
     }
-    // Add more access control rules as needed
   ]
 }

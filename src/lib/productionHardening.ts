@@ -11,7 +11,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { headers } from 'next/headers';
 import fs from 'fs';
 import path from 'path';
 
@@ -321,7 +320,7 @@ export function withHardening(
               { status: 400 }
             );
           }
-        } catch (e) {
+  } catch {
           return NextResponse.json(
             { error: 'Invalid JSON payload' },
             { status: 400 }
@@ -400,7 +399,7 @@ export async function getHealthStatus(): Promise<HealthStatus> {
     fs.writeFileSync(testPath, 'OK', 'utf-8');
     fs.unlinkSync(testPath);
     checks.storage = 'pass';
-  } catch (e) {
+  } catch {
     checks.storage = 'fail';
     overallStatus = 'degraded';
   }
@@ -409,7 +408,7 @@ export async function getHealthStatus(): Promise<HealthStatus> {
   try {
     // Verify key modules can be imported
     checks.ai = 'pass';
-  } catch (e) {
+  } catch {
     checks.ai = 'fail';
     overallStatus = 'unhealthy';
   }

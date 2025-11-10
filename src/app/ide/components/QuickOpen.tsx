@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useFileSystem } from '@/lib/ide/useFileSystem';
-import { useEditorStore } from '@/lib/ide/editorStore';
+import { useFileSystem } from '@/ide/useFileSystem';
+import { useEditorStore } from '@/ide/editorStore';
 
 interface QuickOpenProps {
   open: boolean;
