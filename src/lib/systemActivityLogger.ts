@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * systemActivityLogger.cjs
+ * systemActivityLogger.ts
  * Minimal system activity logger for audit/self-awareness.
  * Writes JSON lines to src/ai/data/system-activity.log and provides a reader.
  */
@@ -17,7 +17,7 @@ function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-function logEvent(type, message, meta = {}) {
+export function logEvent(type: string, message: string | unknown, meta: Record<string, unknown> = {}) {
   ensureDataDir();
   const entry = {
     ts: new Date().toISOString(),
@@ -29,11 +29,12 @@ function logEvent(type, message, meta = {}) {
     fs.appendFileSync(LOG_PATH, JSON.stringify(entry) + '\n', 'utf-8');
   } catch (err) {
     // Best-effort logging; don't throw in production logger
-    console.error('systemActivityLogger: failed to write log', err.message);
+    const errorMessage = err instanceof Error ? err.message : 'unknown error';
+    console.error('systemActivityLogger: failed to write log', errorMessage);
   }
 }
 
-function readEvents(limit = 200) {
+export function readEvents(limit = 200): unknown[] {
   ensureDataDir();
   if (!fs.existsSync(LOG_PATH)) return [];
   const lines = fs.readFileSync(LOG_PATH, 'utf-8').trim().split('\n');
@@ -47,4 +48,7 @@ function readEvents(limit = 200) {
   }).reverse();
 }
 
-module.exports = { logEvent, readEvents };
+// Default export for CommonJS compatibility
+const logger = { logEvent, readEvents };
+export default logger;
+

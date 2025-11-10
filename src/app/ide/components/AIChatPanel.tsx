@@ -52,8 +52,8 @@ export function AIChatPanel() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { openFiles, activeFileId, getFileById, updateFileContent } = useEditorStore();
-  const { fs, fileTree } = useFileSystem();
+  const { tabs, activeTabId, getTab, updateTabContent } = useEditorStore();
+  const { fileTree, writeFile } = useFileSystem();
 
   // Initialize AI assistant
   useEffect(() => {
@@ -76,7 +76,7 @@ export function AIChatPanel() {
 
   // Build IDE context
   const getIDEContext = (): IDEContext => {
-    const activeFile = getFileById(activeFileId);
+    const activeFile = activeTabId ? getTab(activeTabId) : undefined;
     const projectFiles = fileTree.map((node) => node.path);
 
     return {
@@ -87,10 +87,10 @@ export function AIChatPanel() {
             language: activeFile.language,
           }
         : undefined,
-      openFiles: openFiles.map((file) => ({
-        path: file.path,
-        content: file.content,
-        language: file.language,
+      openFiles: tabs.map((tab) => ({
+        path: tab.path,
+        content: tab.content,
+        language: tab.language,
       })),
       projectFiles,
     };
@@ -138,7 +138,7 @@ export function AIChatPanel() {
   };
 
   const handleQuickAction = async (action: string) => {
-    const activeFile = getFileById(activeFileId);
+    const activeFile = activeTabId ? getTab(activeTabId) : undefined;
     
     if (!activeFile) {
       setInput(`${action} code for: `);
@@ -195,22 +195,20 @@ export function AIChatPanel() {
   };
 
   const handleInsertCode = async (code: string, filename?: string) => {
-    if (!fs) return;
-
     if (filename) {
       // Create new file
       try {
         const path = `/${filename}`;
-        await fs.write(path, code);
+        await writeFile(path, code);
         // The file system hook will refresh the tree
       } catch (error) {
         console.error('Failed to create file:', error);
       }
-    } else if (activeFileId) {
+    } else if (activeTabId) {
       // Insert into active file
-      const activeFile = getFileById(activeFileId);
+      const activeFile = getTab(activeTabId);
       if (activeFile) {
-        updateFileContent(activeFileId, code);
+        updateTabContent(activeTabId, code);
       }
     }
   };
@@ -234,7 +232,7 @@ export function AIChatPanel() {
               variant="ghost"
               size="sm"
               className="justify-start text-xs h-8"
-              onClick={() => handleQuickAction(action.prompt)}
+              onClick={() => handleQuickAction(action.action)}
             >
               <action.icon className="h-3 w-3 mr-1" />
               {action.label}
