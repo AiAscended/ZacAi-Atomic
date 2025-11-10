@@ -10,6 +10,14 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  {
+    ignores: [
+      "**/programming_seeds/scripts/**/*.js",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**",
+    ],
+  },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     rules: {

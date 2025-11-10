@@ -73,6 +73,7 @@
     "src/components/chat/ChatMessage.ts",
     "src/components/navigation/Navigation.ts",
     "src/components/pages/Needs*",
-    "src/components/pages/Old-*"
+    "src/components/pages/Old-*",
+    "src/ai/knowledge-domains/programming/programming_seeds/scripts/**/*.js"
   ]
 }

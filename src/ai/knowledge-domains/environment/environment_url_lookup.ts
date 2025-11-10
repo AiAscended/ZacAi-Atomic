@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-const { registerSource } = require("../url_lookup")
+import { registerSource } from "../url_lookup"
 
 registerSource("environment", "Docker Docs", "https://docs.docker.com/", "Docker documentation")
 registerSource("environment", "Kubernetes Docs", "https://kubernetes.io/docs/", "Kubernetes documentation")
