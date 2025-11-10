@@ -76,7 +76,7 @@ export class InterfaceGenerator {
 
     lines.push("}")
 
-    const code = formatCode(lines.join("\n"))
+  const code = formatCode(lines.join("\n"))
 
     return {
       code,

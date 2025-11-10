@@ -3,10 +3,10 @@
  * Enterprise-grade health monitoring for production readiness
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getHealthStatus, addSecurityHeaders, generateRequestId } from '@/lib/productionHardening';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const requestId = generateRequestId();
   
   try {
@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
     return addSecurityHeaders(response);
     
   } catch (error) {
+    console.error('Health check failed', error)
     const response = NextResponse.json(
       {
         status: 'unhealthy',
@@ -37,6 +38,6 @@ export async function GET(request: NextRequest) {
 }
 
 // Also support HEAD requests for basic uptime monitoring
-export async function HEAD(request: NextRequest) {
+export async function HEAD() {
   return new NextResponse(null, { status: 200 });
 }

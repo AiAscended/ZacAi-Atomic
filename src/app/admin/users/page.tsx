@@ -6,7 +6,7 @@
  * Supports admin and system roles for self-awareness features
  */
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -62,12 +62,9 @@ export default function UsersPage() {
   const { toast } = useToast()
 
   // Load users
-  useEffect(() => {
-    loadUsers()
-  }, [])
-
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
+      setLoading(true)
       const response = await fetch("/api/admin/settings/users")
       const result = await response.json()
       if (result.success) {
@@ -79,7 +76,8 @@ export default function UsersPage() {
           variant: "destructive",
         })
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("[Users] Load error", err)
       toast({
         title: "Error",
         description: "Failed to connect to API",
@@ -88,7 +86,11 @@ export default function UsersPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    void loadUsers()
+  }, [loadUsers])
 
   const handleAddUser = async () => {
     if (!formData.name || !formData.email) {
@@ -123,7 +125,8 @@ export default function UsersPage() {
           variant: "destructive",
         })
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("[Users] Create error", err)
       toast({
         title: "Error",
         description: "Failed to create user",
@@ -162,7 +165,8 @@ export default function UsersPage() {
           variant: "destructive",
         })
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("[Users] Update error", err)
       toast({
         title: "Error",
         description: "Failed to update user",
@@ -195,7 +199,8 @@ export default function UsersPage() {
           variant: "destructive",
         })
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("[Users] Delete error", err)
       toast({
         title: "Error",
         description: "Failed to delete user",

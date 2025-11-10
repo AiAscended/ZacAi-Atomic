@@ -46,13 +46,22 @@ const stopWords = [
   "your",
 ]
 
-export const generalRunInference = async (input: string, _context?: unknown) => {
-  const tokens = _context?.tokens || []
-  const embeddings = _context?.embeddings || []
-  const inferenceResults = _context?.inferenceResults
-  const sentiment = _context?.sentiment
+type GeneralInferenceContext = {
+  tokens?: string[]
+  embeddings?: unknown
+  inferenceResults?: unknown
+  sentiment?: { sentiment?: string; confidence?: number }
+  userProfile?: Record<string, unknown>
+}
+
+export const generalRunInference = async (input: string, _context: GeneralInferenceContext = {}) => {
+  const tokens = Array.isArray(_context.tokens) ? _context.tokens : []
+  const embeddingsRaw = _context.embeddings
+  const embeddings = Array.isArray(embeddingsRaw) ? embeddingsRaw : []
+  const inferenceResults = _context.inferenceResults
+  const sentiment = _context.sentiment
   // TODO: Use userProfile for personalized responses
-  // const userProfile = _context?.userProfile || {}
+  // const userProfile = _context.userProfile || {}
 
   const domainInferenceResult = Array.isArray(inferenceResults)
     ? inferenceResults.find((r) => r.domain === GENERAL_DOMAIN)

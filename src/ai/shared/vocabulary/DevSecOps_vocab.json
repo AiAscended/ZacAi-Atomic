@@ -20,7 +20,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Promotes a culture where everyone is responsible for security."[2][3][7]
+      "notes": "Promotes a culture where everyone is responsible for security."
     },
     {
       "priority": 2,
@@ -42,7 +42,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Policies should be clear and enforced across teams."[2][3]
+      "notes": "Policies should be clear and enforced across teams."
     },
     {
       "priority": 3,
@@ -64,7 +64,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Key for reducing attack surface and risk."[3][4][5]
+      "notes": "Key for reducing attack surface and risk."
     },
     {
       "priority": 4,
@@ -86,7 +86,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Includes role-based and attribute-based models."[4][5]
+      "notes": "Includes role-based and attribute-based models."
     },
     {
       "priority": 5,
@@ -108,7 +108,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Reduces risk of supply chain and insider attacks."[2][3][4]
+      "notes": "Reduces risk of supply chain and insider attacks."
     },
     {
       "priority": 6,
@@ -130,7 +130,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Central to secure cloud and DevOps environments."[4][5]
+      "notes": "Central to secure cloud and DevOps environments."
     },
     {
       "priority": 7,
@@ -152,7 +152,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Use vaults or secret managers, not plain text."[3]
+      "notes": "Use vaults or secret managers, not plain text."
     },
     {
       "priority": 8,
@@ -174,7 +174,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Encrypt both data at rest and in transit."[5]
+      "notes": "Encrypt both data at rest and in transit."
     },
     {
       "priority": 9,
@@ -196,7 +196,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Automated checks help maintain compliance."[5][8]
+      "notes": "Automated checks help maintain compliance."
     },
     {
       "priority": 10,
@@ -218,7 +218,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Increasingly adopted for enterprise security."[5]
+      "notes": "Increasingly adopted for enterprise security."
     },
     {
       "priority": 11,
@@ -240,7 +240,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Limits lateral movement in case of compromise."[3][5]
+      "notes": "Limits lateral movement in case of compromise."
     },
     {
       "priority": 12,
@@ -262,7 +262,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Includes network and web application firewalls."[5]
+      "notes": "Includes network and web application firewalls."
     },
     {
       "priority": 13,
@@ -284,7 +284,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Automated tools help track and fix vulnerabilities."[2][6][7][8][9][10]
+      "notes": "Automated tools help track and fix vulnerabilities."
     },
     {
       "priority": 14,
@@ -306,7 +306,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Essential for rapid, scalable security checks."[1][2][6][7][9][10]
+      "notes": "Essential for rapid, scalable security checks."
     },
     {
       "priority": 15,
@@ -328,7 +328,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Manual and automated approaches are both used."[2][7]
+      "notes": "Manual and automated approaches are both used."
     },
     {
       "priority": 16,
@@ -350,7 +350,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Should be enforced in coding standards and reviews."[1][6][7]
+      "notes": "Should be enforced in coding standards and reviews."
     },
     {
       "priority": 17,
@@ -372,7 +372,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Continuous configuration reduces risk of errors."[1][3][6]
+      "notes": "Continuous configuration reduces risk of errors."
     },
     {
       "priority": 18,
@@ -394,7 +394,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Automated monitoring enables rapid detection and response."[3][5][6][10]
+      "notes": "Automated monitoring enables rapid detection and response."
     },
     {
       "priority": 19,
@@ -416,7 +416,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Tools: Veracode, Checkmarx, SonarQube."[1][2][3][4]
+      "notes": "Tools: Veracode, Checkmarx, SonarQube."
     },
     {
       "priority": 20,
@@ -438,7 +438,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Tools: ZAP, Burp Suite, Veracode."[1][2][3][10]
+      "notes": "Tools: ZAP, Burp Suite, Veracode."
     },
     {
       "priority": 21,
@@ -460,7 +460,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "IAST integrates into CI/CD for continuous feedback."[3][4]
+      "notes": "IAST integrates into CI/CD for continuous feedback."
     },
     {
       "priority": 22,
@@ -482,7 +482,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Tools: Snyk, WhiteSource, Veracode."[2][3][5]
+      "notes": "Tools: Snyk, WhiteSource, Veracode."
     },
     {
       "priority": 23,
@@ -504,7 +504,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Tools: Trivy, Aqua, Prisma Cloud."[3][5]
+      "notes": "Tools: Trivy, Aqua, Prisma Cloud."
     },
     {
       "priority": 24,
@@ -526,7 +526,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Tools: Trivy, Clair, Anchore."[3][5]
+      "notes": "Tools: Trivy, Clair, Anchore."
     },
     {
       "priority": 25,
@@ -548,7 +548,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Essential for zero-day threat defense."[3]
+      "notes": "Essential for zero-day threat defense."
     },
     {
       "priority": 26,
@@ -570,7 +570,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Feeds: AlienVault, Recorded Future, MISP."[3]
+      "notes": "Feeds: AlienVault, Recorded Future, MISP."
     },
     {
       "priority": 27,
@@ -592,7 +592,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Critical for cloud and container security."[3]
+      "notes": "Critical for cloud and container security."
     },
     {
       "priority": 28,
@@ -614,7 +614,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Runbooks and automation improve response speed."[1][3]
+      "notes": "Runbooks and automation improve response speed."
     },
     {
       "priority": 29,
@@ -636,7 +636,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Tools: Ansible, StackStorm, CodeAI."[1][3][4]
+      "notes": "Tools: Ansible, StackStorm, CodeAI."
     },
     {
       "priority": 30,
@@ -658,7 +658,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Improves reliability and response time."[1]
+      "notes": "Improves reliability and response time."
     },
     {
       "priority": 31,
@@ -680,7 +680,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Improves visibility into potential vulnerabilities."[4]
+      "notes": "Improves visibility into potential vulnerabilities."
     },
     {
       "priority": 32,
@@ -702,7 +702,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Reduces risk of regulatory violations."[1][2][3]
+      "notes": "Reduces risk of regulatory violations."
     },
     {
       "priority": 33,
@@ -724,7 +724,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Critical for modern software development."[2][3][5]
+      "notes": "Critical for modern software development."
     },
     {
       "priority": 34,
@@ -746,7 +746,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "OWASP tools are widely adopted in DevSecOps."[3][10]
+      "notes": "OWASP tools are widely adopted in DevSecOps."
     },
     {
       "priority": 35,
@@ -768,7 +768,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Free, open source, and highly extensible."[3][10]
+      "notes": "Free, open source, and highly extensible."
     },
     {
       "priority": 36,
@@ -790,7 +790,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Popular for cloud-based, integrated security testing."[1][2][3]
+      "notes": "Popular for cloud-based, integrated security testing."
     }
   ]
 }

@@ -9,14 +9,18 @@
 import pretrained from "./data_structures_weights/data_structures_pretrained_weights.json"
 import { DATA_STRUCTURES_DOMAIN } from "./data_structures_constants"
 
-const EMBEDDING_DIM = 128
+const EMBEDDING_DIM = pretrained.architecture?.embeddingDim ?? 128
+
+type SeedWeightMap = {
+  seedWeights?: Record<string, number[]>
+}
 
 /**
  * Get embedding vector for a token
  * Returns: 128-dimensional vector or random fallback
  */
 export const getDataStructuresEmbedding = (token: string): number[] => {
-  const weights = pretrained.seedWeights as Record<string, number[]>
+  const weights = (pretrained as SeedWeightMap).seedWeights ?? {}
   if (weights[token]) return weights[token]
   // Fallback: random embedding
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)

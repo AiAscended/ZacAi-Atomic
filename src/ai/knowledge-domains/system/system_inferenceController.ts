@@ -3,7 +3,13 @@
  * Handles system-level operations, configuration, time/date, location, and management queries
  */
 
-import { DOMAIN_NAME } from './system_constants';
+import { DOMAIN_NAME } from "./system_constants"
+
+type SystemMetadata = {
+  timestamp?: string
+  inferenceMethod?: string
+  systemFunction?: boolean
+}
 
 export const systemRunInference = async (input: string, _context?: unknown) => {
   const lowerInput = input.toLowerCase();
@@ -11,7 +17,7 @@ export const systemRunInference = async (input: string, _context?: unknown) => {
   let responseText = '';
   let confidence = 0.7;
   const sources: string[] = [];
-  const metadata: unknown = {};
+  const metadata: SystemMetadata = {};
 
   // Handle time/date queries - return actual system time/date
   if (

@@ -259,14 +259,14 @@ User → Admin UI → POST /api/admin/training
 - ❌ Model Settings: Only 4/13 have pages
 - ⚠️ User Management: Page exists but needs CRUD implementation
 
-**Storage Location**: `/data/settings/` (JSON files)
+**Storage Location**: `src/ai/data/settings/` (JSON files)
 
 **Data Persistence Flow**:
 ```
 User Edit → Frontend State → API Call (PUT)
   → settingsStore.saveXSettings()
   → writeJSON(filename, data)
-  → /data/settings/[file].json
+  → src/ai/data/settings/[file].json
   → Success Toast ✅
   → Page Refresh → API Call (GET)
   → Settings Persist ✅

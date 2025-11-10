@@ -2,8 +2,8 @@
  * Code-transformer - Constants
  */
 
-export const CODE_VERSION = '1.0.0';
+export const CODE_VERSION = "1.0.0"
 
-const codeBundle = { CODE_VERSION }; export default exportBundle;
+export const codeBundle = { CODE_VERSION }
 
-export default codeBundle;
+export default codeBundle

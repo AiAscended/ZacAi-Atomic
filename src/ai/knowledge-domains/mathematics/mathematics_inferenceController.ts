@@ -2,6 +2,11 @@ import { mathematicsTokenizer } from "./mathematics_tokenizer"
 import { mathematicsSemanticAnalyzer } from "./mathematics_semanticAnalyzer"
 import { calculator } from "../../shared/tools/shared-ScientificCalculator"
 
+type MathematicsInferenceContext = {
+  inferenceResults?: unknown
+  tokens?: string[]
+}
+
 const wordToNumber: Record<string, number> = {
   zero: 0,
   one: 1,
@@ -150,12 +155,12 @@ function convertWordsToNumbers(input: string): string {
   return converted.trim()
 }
 
-export const mathematicsRunInference = async (input: string, _context?: unknown) => {
+export const mathematicsRunInference = async (input: string, _context: MathematicsInferenceContext = {}) => {
   const tk = mathematicsTokenizer(input)
   const sem = mathematicsSemanticAnalyzer(input)
 
-  const inferenceResults = _context?.inferenceResults
-  const tokens = _context?.tokens || []
+  const inferenceResults = _context.inferenceResults
+  const tokens = Array.isArray(_context.tokens) ? _context.tokens : []
 
   const domainInferenceResult = Array.isArray(inferenceResults)
     ? inferenceResults.find((r) => r.domain === "mathematics")

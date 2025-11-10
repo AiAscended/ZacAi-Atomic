@@ -1,6 +1,10 @@
 /**
  * File: src/ai/orchestration/aiOrchestrator.ts
- * Re-export from aiOrchestrator-v2.ts for compatibility
+ * Legacy compatibility wrapper that now re-exports the MainOrchestrator API.
+ * Prefer importing from ./mainOrchestrator directly in new code.
  */
 
-export { AIOrchestrator } from "./aiOrchestrator-v2"
+export {
+	MainOrchestrator,
+	type OrchestratorResponse,
+} from "./mainOrchestrator"

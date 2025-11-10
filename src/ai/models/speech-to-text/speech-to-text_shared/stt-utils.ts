@@ -4,6 +4,7 @@
 
 export function sttUtility(): void {}
 
-const sttUtils = { sttUtility }; export default exportBundle;
+export const sttUtils = { sttUtility }
+
 
 export default sttUtils;

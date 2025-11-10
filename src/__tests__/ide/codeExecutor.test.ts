@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { CodeExecutor } from '@/lib/ide/codeExecutor';
+import { CodeExecutor } from '@/ide/codeExecutor';
 
 describe('CodeExecutor', () => {
   const executor = new CodeExecutor();

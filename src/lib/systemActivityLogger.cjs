@@ -3,14 +3,14 @@
 /**
  * systemActivityLogger.cjs
  * Minimal system activity logger for audit/self-awareness.
- * Writes JSON lines to data/system-activity.log and provides a reader.
+ * Writes JSON lines to src/ai/data/system-activity.log and provides a reader.
  */
 
 import fs from 'fs';
 import path from 'path';
 
 const ROOT_DIR = path.resolve(__dirname, '..');
-const DATA_DIR = path.join(ROOT_DIR, 'data');
+const DATA_DIR = path.join(ROOT_DIR, 'ai', 'data');
 const LOG_PATH = path.join(DATA_DIR, 'system-activity.log');
 
 function ensureDataDir() {
@@ -39,7 +39,11 @@ function readEvents(limit = 200) {
   const lines = fs.readFileSync(LOG_PATH, 'utf-8').trim().split('\n');
   const last = lines.slice(-limit);
   return last.map(l => {
-    try { return JSON.parse(l); } catch (e) { return { raw: l }; }
+    try {
+      return JSON.parse(l);
+    } catch (error) {
+      return { raw: l, error: error instanceof Error ? error.message : 'parse error' };
+    }
   }).reverse();
 }
 

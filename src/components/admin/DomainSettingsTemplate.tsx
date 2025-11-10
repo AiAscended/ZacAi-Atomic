@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
 import { Badge } from "@/components/ui/badge"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Save, RotateCcw, Check, AlertCircle, X } from "lucide-react"
 import { useParams } from "next/navigation"
 
@@ -204,11 +204,7 @@ export default function DomainSettingsPage() {
     updatedAt: new Date().toISOString()
   })
 
-  useEffect(() => {
-    loadSettings()
-  }, [domainName])
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -226,7 +222,11 @@ export default function DomainSettingsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [domainName])
+
+  useEffect(() => {
+    void loadSettings()
+  }, [loadSettings])
 
   const saveSettings = async () => {
     try {

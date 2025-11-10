@@ -30,6 +30,5 @@
       "example": "Core configuration has the highest priority.",
       "related": ["order", "importance"]
     }
-    // Add up to 36 system-specific terms; if more, create system_vocabulary2.json, etc.
   ]
 }

@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useTheme } from "next-themes"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Moon, Sun, Monitor, Save, RotateCcw, Check, AlertCircle } from "lucide-react"
 
 interface SystemSettings {
@@ -51,10 +51,9 @@ export default function SystemPage() {
 
   useEffect(() => {
     setMounted(true)
-    loadSettings()
   }, [])
 
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -76,7 +75,11 @@ export default function SystemPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [setTheme, theme])
+
+  useEffect(() => {
+    void loadSettings()
+  }, [loadSettings])
 
   const saveSettings = async () => {
     try {

@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,11 +52,39 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
+  const getDefaultSettings = function (): SystemSettings {
+    return {
+      general: {
+        systemName: 'ZacAi-Atomic',
+        version: '0.0.2',
+        environment: 'production',
+        maintenanceMode: false,
+      },
+      ai: {
+        maxTokens: 2048,
+        temperature: 0.7,
+        topP: 0.9,
+        frequencyPenalty: 0.0,
+        presencePenalty: 0.0,
+        streamingEnabled: true,
+      },
+      security: {
+        rateLimitEnabled: true,
+        rateLimitPerMinute: 60,
+        corsEnabled: true,
+        csrfProtection: true,
+        healthCheckEnabled: true,
+      },
+      storage: {
+        chatHistoryEnabled: true,
+        chatHistoryRetentionDays: 90,
+        activityLogEnabled: true,
+        activityLogRetentionDays: 30,
+      },
+    };
+  };
 
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/admin/settings/system');
@@ -73,37 +101,11 @@ export default function SettingsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const getDefaultSettings = (): SystemSettings => ({
-    general: {
-      systemName: 'ZacAi-Atomic',
-      version: '0.0.2',
-      environment: 'production',
-      maintenanceMode: false,
-    },
-    ai: {
-      maxTokens: 2048,
-      temperature: 0.7,
-      topP: 0.9,
-      frequencyPenalty: 0.0,
-      presencePenalty: 0.0,
-      streamingEnabled: true,
-    },
-    security: {
-      rateLimitEnabled: true,
-      rateLimitPerMinute: 60,
-      corsEnabled: true,
-      csrfProtection: true,
-      healthCheckEnabled: true,
-    },
-    storage: {
-      chatHistoryEnabled: true,
-      chatHistoryRetentionDays: 90,
-      activityLogEnabled: true,
-      activityLogRetentionDays: 30,
-    },
-  });
+  useEffect(() => {
+    void loadSettings();
+  }, [loadSettings]);
 
   const saveSettings = async () => {
     if (!settings) return;
@@ -125,6 +127,7 @@ export default function SettingsPage() {
         throw new Error('Failed to save settings');
       }
     } catch (error) {
+      console.error('[System Settings] Save error', error)
       toast({
         title: 'Error',
         description: 'Failed to save settings. Please try again.',

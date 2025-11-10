@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { github } from '@/lib/ide/githubIntegration';
+import { github } from '@/ide/githubIntegration';
 import { useToast } from '@/hooks/use-toast';
 
 interface GitHubRepo {

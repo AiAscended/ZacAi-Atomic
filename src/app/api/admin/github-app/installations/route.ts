@@ -5,7 +5,7 @@
  * GET - Retrieve all installations for the GitHub App
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
  * GET /api/admin/github-app/installations
  * List all installations of the GitHub App
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Get JWT token from internal endpoint
     const jwtResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/admin/github-app/jwt`, {

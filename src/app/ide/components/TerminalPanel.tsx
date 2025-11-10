@@ -7,8 +7,8 @@ import { WebLinksAddon } from 'xterm-addon-web-links';
 import 'xterm/css/xterm.css';
 import { Button } from '@/components/ui/button';
 import { X, Plus, Trash2 } from 'lucide-react';
-import { CommandProcessor } from '@/lib/ide/commandProcessor';
-import { useFileSystem } from '@/lib/ide/useFileSystem';
+import { CommandProcessor } from '@/ide/commandProcessor';
+import { useFileSystem } from '@/ide/useFileSystem';
 
 interface TerminalSession {
   id: string;

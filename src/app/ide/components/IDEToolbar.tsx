@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { useLayoutStore } from '@/lib/ide/layoutStore';
+import { useLayoutStore } from '@/ide/layoutStore';
 import Link from 'next/link';
 
 export function IDEToolbar() {

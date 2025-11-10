@@ -8,14 +8,14 @@
  * - User preferences
  * - Training configurations
  * 
- * Storage: JSON files in /data/settings/ directory
+ * Storage: JSON files in src/ai/data/settings/ directory
  * Future: Migrate to PostgreSQL/MongoDB for production
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 
-const SETTINGS_DIR = path.join(process.cwd(), 'data', 'settings');
+const SETTINGS_DIR = path.join(process.cwd(), 'src', 'ai', 'data', 'settings');
 
 // Ensure settings directory exists
 if (!fs.existsSync(SETTINGS_DIR)) {

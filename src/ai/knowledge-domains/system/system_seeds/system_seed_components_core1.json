@@ -37,6 +37,5 @@
       },
       "tags": ["ai", "language", "core"]
     }
-    // Add up to 36 core components here; if more, create components_core2.json, etc.
   ]
 }
