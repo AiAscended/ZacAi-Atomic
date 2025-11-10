@@ -154,8 +154,8 @@ export const mathematicsRunInference = async (input: string, _context?: unknown)
   const tk = mathematicsTokenizer(input)
   const sem = mathematicsSemanticAnalyzer(input)
 
-  const inferenceResults = _context?.inferenceResults
-  const tokens = _context?.tokens || []
+  const inferenceResults = (_context as any)?.inferenceResults
+  const tokens = (_context as any)?.tokens || []
 
   const domainInferenceResult = Array.isArray(inferenceResults)
     ? inferenceResults.find((r) => r.domain === "mathematics")

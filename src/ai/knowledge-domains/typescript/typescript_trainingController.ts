@@ -12,7 +12,7 @@ export async function typescriptRunTrainingEpoch(samples: unknown[]): Promise<{ 
   const learned = await loadTypescriptLearnedData()
 
   // Update learned data with new samples
-  for (const sample of samples) {
+  for (const sample of samples as any[]) {
     if (sample.input && sample.output) {
       // Add interactions array if it doesn't exist
       const interactions = (learned as any).interactions || []
