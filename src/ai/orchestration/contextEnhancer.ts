@@ -30,7 +30,7 @@ export interface EnhancedContext {
     emotion: string
     confidence: number
   }
-  slots: Record<string, string>
+  slots: Record<string, string | null>
   userProfile: {
     name?: string
     preferences?: Record<string, unknown>
@@ -93,8 +93,11 @@ export class ContextEnhancer {
   public getConversationSummary(sessionId: string): string {
     const profile = this.profileHandler.getProfile(sessionId)
     const state = this.dialogueController.getState(sessionId)
+    
+    const name = (profile.name as string) || "Unknown"
+    const history = Array.isArray(profile.history) ? profile.history.length : 0
 
-    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${profile.history?.length || 0} turns`
+    return `User: ${name}, State: ${state}, History: ${history} turns`
   }
 }
 

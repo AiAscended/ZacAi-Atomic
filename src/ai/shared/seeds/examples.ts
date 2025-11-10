@@ -25,7 +25,7 @@ async function example1_simpleLookup() {
   // Look up a mathematical concept
   const addition = await lookupSeed('addition', 'mathematics');
   
-  if (addition) {
+  if (addition && addition.fullData) {
     console.log(`Found: ${addition.concept}`);
     console.log(`Definition: ${addition.fullData.definition}`);
     console.log(`Examples:`, addition.fullData.examples);
@@ -65,7 +65,8 @@ function example3_search() {
   
   console.log(`Found ${results.length} results:`);
   results.forEach(result => {
-    console.log(`  - ${result.concept}: ${result.fullData.definition?.substring(0, 60)}...`);
+    const def = result.fullData?.definition as string | undefined;
+    console.log(`  - ${result.concept}: ${def?.substring(0, 60) || 'No definition'}...`);
   });
 }
 
@@ -77,7 +78,7 @@ async function example4_contextualLookup() {
   
   const context = lookupWithContext('addition', 'mathematics');
   
-  if (context.main) {
+  if (context.main && context.main.fullData) {
     console.log(`Main concept: ${context.main.concept}`);
     console.log(`Definition: ${context.main.fullData.definition}`);
     
@@ -168,7 +169,8 @@ async function example8_orchestratorUsage(userPrompt: string) {
   knownSeeds
     .filter(s => s.domain === mostRelevantDomain)
     .forEach(seed => {
-      console.log(`  - ${seed.concept}: ${seed.fullData.definition?.substring(0, 80)}...`);
+      const def = seed.fullData?.definition as string | undefined;
+      console.log(`  - ${seed.concept}: ${def?.substring(0, 80) || 'No definition'}...`);
     });
 }
 
@@ -183,7 +185,7 @@ async function example9_llmTokenizerUsage(unknownToken: string) {
   // Try to find in seeds
   const seed = await lookupSeed(unknownToken);
   
-  if (seed) {
+  if (seed && seed.fullData) {
     console.log(`✅ Found in seeds!`);
     console.log(`Domain: ${seed.domain}`);
     console.log(`Definition: ${seed.fullData.definition}`);
@@ -216,21 +218,22 @@ async function example10_domainInference(concept: string, domain: string) {
   
   const context = lookupWithContext(concept, domain);
   
-  if (context.main) {
+  if (context.main && context.main.fullData) {
     const seed = context.main;
+    const fullData = seed.fullData!; // Non-null assertion - we just checked it above
     
     console.log(`Generating response for: ${concept}`);
     console.log(`\nSeed context available:`);
-    console.log(`  - Definition: ${seed.fullData.definition}`);
-    console.log(`  - ${seed.fullData.examples?.length || 0} examples`);
+    console.log(`  - Definition: ${fullData.definition}`);
+    console.log(`  - ${Array.isArray(fullData.examples) ? fullData.examples.length : 0} examples`);
     console.log(`  - ${context.related.length} related concepts`);
     
     // Construct enhanced response
     const response = {
-      answer: seed.fullData.definition,
-      examples: seed.fullData.examples || [],
+      answer: fullData.definition,
+      examples: Array.isArray(fullData.examples) ? fullData.examples : [],
       relatedConcepts: context.related.map(r => r.concept),
-      usage: seed.fullData.usage,
+      usage: fullData.usage,
       category: seed.category,
       confidence: seed.priority ? (1 - seed.priority / 100) : 0.5
     };
