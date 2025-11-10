@@ -11,7 +11,7 @@ export const systemRunInference = async (input: string, _context?: unknown) => {
   let responseText = '';
   let confidence = 0.7;
   const sources: string[] = [];
-  const metadata: unknown = {};
+  const metadata: Record<string, any> = {};
 
   // Handle time/date queries - return actual system time/date
   if (
