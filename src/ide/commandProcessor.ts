@@ -3,7 +3,7 @@
  * Handles shell-like commands in the browser
  */
 
-import { VirtualFileSystem } from './virtualFileSystem';
+import { VirtualFileSystem, type IDEFile } from './virtualFileSystem';
 
 export interface CommandResult {
   output: string;
@@ -129,13 +129,12 @@ export class CommandProcessor {
   }
 
   private async handleLs(args: string[]): Promise<CommandResult> {
-    const showAll = args.includes('-a') || args.includes('-la') || args.includes('-al');
     const longFormat = args.includes('-l') || args.includes('-la') || args.includes('-al');
     const path = args.find((arg) => !arg.startsWith('-')) || this.context.currentPath;
     const resolvedPath = this.resolvePath(path);
 
     try {
-      const items = await this.context.fs.list(resolvedPath);
+      const items = await this.context.fs.listDirectory(resolvedPath);
       
       if (items.length === 0) {
         return { output: '', exitCode: 0 };
@@ -171,8 +170,8 @@ export class CommandProcessor {
     const resolvedPath = this.resolvePath(path);
 
     try {
-      const exists = await this.context.fs.exists(resolvedPath);
-      if (!exists) {
+      const entry = await this.context.fs.readFile(resolvedPath);
+      if (!entry) {
         return {
           output: `cd: ${path}: No such file or directory\n`,
           exitCode: 1,
@@ -180,11 +179,7 @@ export class CommandProcessor {
         };
       }
 
-      // Check if it's a directory
-      const items = await this.context.fs.list(resolvedPath.split('/').slice(0, -1).join('/') || '/');
-      const item = items.find((i) => i.path === resolvedPath);
-      
-      if (item && item.type !== 'directory') {
+      if (entry.type !== 'directory') {
         return {
           output: `cd: ${path}: Not a directory\n`,
           exitCode: 1,
@@ -223,9 +218,14 @@ export class CommandProcessor {
     for (const arg of args) {
       const path = this.resolvePath(arg);
       try {
-        const content = await this.context.fs.read(path);
-        output += content + '\n';
-      } catch (error) {
+        const fileEntry = await this.context.fs.readFile(path);
+        if (!fileEntry || fileEntry.type !== 'file') {
+          output += `cat: ${arg}: No such file or directory\n`;
+          continue;
+        }
+
+        output += `${fileEntry.content}\n`;
+      } catch {
         output += `cat: ${arg}: No such file or directory\n`;
       }
     }
@@ -246,7 +246,7 @@ export class CommandProcessor {
       if (arg.startsWith('-')) continue; // Skip flags
       const path = this.resolvePath(arg);
       try {
-        await this.context.fs.mkdir(path);
+        await this.context.fs.createDirectory(path);
       } catch (error) {
         return {
           output: `mkdir: cannot create directory '${arg}': ${error}\n`,
@@ -271,9 +271,11 @@ export class CommandProcessor {
     for (const arg of args) {
       const path = this.resolvePath(arg);
       try {
-        const exists = await this.context.fs.exists(path);
-        if (!exists) {
-          await this.context.fs.write(path, '');
+        const existing = await this.context.fs.readFile(path);
+        if (existing) {
+          await this.context.fs.writeFile(path, existing.content);
+        } else {
+          await this.context.fs.createFile(path, '');
         }
       } catch (error) {
         return {
@@ -302,7 +304,24 @@ export class CommandProcessor {
     for (const file of files) {
       const path = this.resolvePath(file);
       try {
-        await this.context.fs.delete(path);
+        const entry = await this.context.fs.readFile(path);
+        if (!entry) {
+          return {
+            output: `rm: cannot remove '${file}': No such file or directory\n`,
+            exitCode: 1,
+            error: 'Not found',
+          };
+        }
+
+        if (entry.type === 'directory' && !recursive) {
+          return {
+            output: `rm: cannot remove '${file}': Is a directory (use -r)\n`,
+            exitCode: 1,
+            error: 'Is a directory',
+          };
+        }
+
+        await this.context.fs.deleteFile(path);
       } catch (error) {
         return {
           output: `rm: cannot remove '${file}': ${error}\n`,
@@ -357,11 +376,11 @@ For more information, type: man <command>
     const path = args[0] || this.context.currentPath;
     const resolvedPath = this.resolvePath(path);
 
-    const buildTree = async (dirPath: string, prefix = '', isLast = true): Promise<string> => {
+  const buildTree = async (dirPath: string, prefix = ''): Promise<string> => {
       let output = '';
       try {
-        const items = await this.context.fs.list(dirPath);
-        items.sort((a, b) => {
+        const items = await this.context.fs.listDirectory(dirPath);
+        items.sort((a: IDEFile, b: IDEFile) => {
           if (a.type === 'directory' && b.type !== 'directory') return -1;
           if (a.type !== 'directory' && b.type === 'directory') return 1;
           return a.name.localeCompare(b.name);
@@ -377,10 +396,10 @@ For more information, type: man <command>
 
           if (item.type === 'directory') {
             const newPrefix = prefix + (isLastItem ? '    ' : '│   ');
-            output += await buildTree(item.path, newPrefix, isLastItem);
+            output += await buildTree(item.path, newPrefix);
           }
         }
-      } catch (error) {
+      } catch {
         // Silently ignore errors in subdirectories
       }
       return output;
@@ -410,8 +429,8 @@ For more information, type: man <command>
 
     const searchTerm = args[0];
     try {
-      const results = await this.context.fs.search(searchTerm);
-      const output = results.map((r) => r.path).join('\n') + (results.length > 0 ? '\n' : '');
+      const results = await this.context.fs.searchFiles(searchTerm);
+      const output = results.map((r: IDEFile) => r.path).join('\n') + (results.length > 0 ? '\n' : '');
       return { output, exitCode: 0 };
     } catch (error) {
       return {
@@ -435,9 +454,17 @@ For more information, type: man <command>
     const filePath = this.resolvePath(args[1]);
 
     try {
-      const content = await this.context.fs.read(filePath);
-      const lines = content.split('\n');
-      const matches = lines.filter((line) => line.includes(pattern));
+      const fileEntry = await this.context.fs.readFile(filePath);
+      if (!fileEntry || fileEntry.type !== 'file') {
+        return {
+          output: `grep: ${args[1]}: No such file\n`,
+          exitCode: 2,
+          error: 'File not found',
+        };
+      }
+
+      const lines = fileEntry.content.split('\n');
+      const matches = lines.filter((line: string) => line.includes(pattern));
       const output = matches.join('\n') + (matches.length > 0 ? '\n' : '');
       return { output, exitCode: matches.length > 0 ? 0 : 1 };
     } catch (error) {

@@ -194,7 +194,7 @@ export class MonacoAdvancedFeatures {
   }
 
   // Custom IntelliSense configuration
-  configureIntelliSense(language: string = 'typescript') {
+  configureIntelliSense(): void {
     if (!this.monaco) return;
 
     // Enhanced TypeScript/JavaScript IntelliSense
@@ -293,13 +293,17 @@ export class MonacoAdvancedFeatures {
   }
 
   // Git diff inline
-  showInlineDiff(originalCode: string, modifiedCode: string) {
+  showInlineDiff(originalCode: string, modifiedCode?: string): void {
     if (!this.monaco || !this.editor) return;
 
     const originalModel = this.monaco.editor.createModel(originalCode, 'typescript');
     const modifiedModel = this.editor.getModel();
 
     if (!modifiedModel) return;
+
+    if (typeof modifiedCode === 'string') {
+      modifiedModel.setValue(modifiedCode);
+    }
 
     // Create diff editor (simplified - real implementation needs proper diff editor)
     const diffNavigator = this.monaco.editor.createDiffEditor(

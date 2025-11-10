@@ -316,7 +316,7 @@ export class CodeExecutionEngine {
       await this.executeJavaScript(codeToTest);
 
       // Then execute tests
-      const testResult = await this.executeJavaScript(`
+      await this.executeJavaScript(`
         const test = ${JSON.stringify(testFramework.test)};
         const expect = ${JSON.stringify(testFramework.expect)};
         ${testCode}

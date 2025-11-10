@@ -1,7 +1,7 @@
 import React from 'react';
 import { create } from 'zustand';
 import { useEditorStore } from './editorStore';
-import { codeExecutor, ExecutionResult } from './codeExecutionEngine';
+import { codeExecutor } from './codeExecutionEngine';
 
 export interface PreviewState {
   htmlContent: string;
@@ -21,7 +21,7 @@ export interface PreviewState {
   addConsoleLog: (message: string, type?: 'log' | 'error' | 'warn' | 'info') => void;
 }
 
-export const usePreviewStore = create<PreviewState>((set, get) => ({
+export const usePreviewStore = create<PreviewState>((set) => ({
   htmlContent: '',
   consoleOutput: [],
   errors: [],
@@ -94,11 +94,6 @@ export const usePreviewStore = create<PreviewState>((set, get) => ({
 // Generate HTML preview with execution
 async function generateHTMLPreview(html: string): Promise<string> {
   // Execute any inline scripts
-  const result = await codeExecutor.execute({
-    language: 'html',
-    code: html,
-  });
-
   // Inject console capture
   const enhancedHTML = `
     <!DOCTYPE html>
