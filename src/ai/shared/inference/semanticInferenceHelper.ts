@@ -111,7 +111,7 @@ export async function performSemanticInference(
         });
         
         // Extract code examples if available
-        if (seed.fullData.examples) {
+        if (seed.fullData.examples && Array.isArray(seed.fullData.examples)) {
           seed.fullData.examples.forEach((ex: string) => {
             if (ex.includes('{') || ex.includes('function') || ex.includes('const') || ex.includes('import')) {
               codeExamples.push(ex);
@@ -204,13 +204,15 @@ export async function searchCodeExamples(
   for (const keyword of keywords) {
     try {
       const seed = await seedRegistry.lookup(keyword, domain);
-      if (seed && seed.fullData && seed.fullData.examples) {
-        seed.fullData.examples.forEach((ex: string) => {
+      if (seed && seed.fullData && seed.fullData.examples && Array.isArray(seed.fullData.examples)) {
+        const fullData = seed.fullData;
+        const examples_array = fullData.examples as string[]; // Type assertion
+        examples_array.forEach((ex: string) => {
           if (ex.includes('{') || ex.includes('function') || ex.includes('const')) {
             examples.push({
               code: ex,
-              concept: seed.fullData.word || seed.fullData.concept,
-              language: seed.fullData.language || 'typescript'
+              concept: String(fullData.word || fullData.concept || 'unknown'),
+              language: String(fullData.language || 'typescript')
             });
           }
         });
@@ -233,7 +235,8 @@ export async function getRelatedConcepts(
   try {
     const seed = await seedRegistry.lookup(term, domain);
     if (seed && seed.fullData) {
-      return seed.fullData.relatedConcepts || seed.fullData.related || [];
+      const relatedConcepts = seed.fullData.relatedConcepts || seed.fullData.related;
+      return Array.isArray(relatedConcepts) ? relatedConcepts as string[] : [];
     }
   } catch (error) {
     // Seed not found
