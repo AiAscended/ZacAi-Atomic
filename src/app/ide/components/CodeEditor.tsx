@@ -13,18 +13,17 @@ export function CodeEditor() {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof monaco | null>(null);
   const { 
-    openFiles, 
-    activeFileId, 
-    closeFile, 
-    setActiveFile, 
-    updateFileContent,
-    saveFile,
-    getFileById 
+    tabs: openFiles, 
+    activeTabId: activeFileId, 
+    closeTab: closeFile, 
+    setActiveTab: setActiveFile, 
+    updateTabContent: updateFileContent,
+    getTab: getFileById 
   } = useEditorStore();
-  const { fs } = useFileSystem();
+  const { } = useFileSystem();
   const [theme, setTheme] = useState<'vs-dark' | 'light'>('vs-dark');
 
-  const activeFile = getFileById(activeFileId);
+  const activeFile = activeFileId ? getFileById(activeFileId) : undefined;
 
   const handleEditorDidMount: OnMount = (editor, monacoInstance) => {
     editorRef.current = editor;
@@ -92,6 +91,14 @@ export function CodeEditor() {
     languages.forEach((lang) => {
       monacoInstance.languages.registerCompletionItemProvider(lang, {
         provideCompletionItems: (model, position) => {
+          const word = model.getWordUntilPosition(position);
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: word.startColumn,
+            endColumn: word.endColumn,
+          };
+          
           const suggestions = [
             {
               label: 'log',
@@ -99,6 +106,7 @@ export function CodeEditor() {
               insertText: "console.log('${1}');",
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Console log',
+              range,
             },
             {
               label: 'func',
@@ -106,6 +114,7 @@ export function CodeEditor() {
               insertText: 'function ${1:name}(${2:params}) {\n\t${3}\n}',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Function declaration',
+              range,
             },
             {
               label: 'arrow',
@@ -113,6 +122,7 @@ export function CodeEditor() {
               insertText: 'const ${1:name} = (${2:params}) => {\n\t${3}\n};',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Arrow function',
+              range,
             },
             {
               label: 'async',

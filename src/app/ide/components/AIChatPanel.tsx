@@ -52,8 +52,8 @@ export function AIChatPanel() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { openFiles, activeFileId, getFileById, updateFileContent } = useEditorStore();
-  const { fs, fileTree } = useFileSystem();
+  const { tabs: openFiles, activeTabId: activeFileId, getTab: getFileById, updateTabContent: updateFileContent } = useEditorStore();
+  const { fileTree, createFile } = useFileSystem();
 
   // Initialize AI assistant
   useEffect(() => {
@@ -76,7 +76,7 @@ export function AIChatPanel() {
 
   // Build IDE context
   const getIDEContext = (): IDEContext => {
-    const activeFile = getFileById(activeFileId);
+    const activeFile = activeFileId ? getFileById(activeFileId) : undefined;
     const projectFiles = fileTree.map((node) => node.path);
 
     return {
@@ -138,6 +138,11 @@ export function AIChatPanel() {
   };
 
   const handleQuickAction = async (action: string) => {
+    if (!activeFileId) {
+      setInput(`${action} code for: `);
+      return;
+    }
+    
     const activeFile = getFileById(activeFileId);
     
     if (!activeFile) {
@@ -195,13 +200,11 @@ export function AIChatPanel() {
   };
 
   const handleInsertCode = async (code: string, filename?: string) => {
-    if (!fs) return;
-
     if (filename) {
       // Create new file
       try {
         const path = `/${filename}`;
-        await fs.write(path, code);
+        await createFile(path, code);
         // The file system hook will refresh the tree
       } catch (error) {
         console.error('Failed to create file:', error);
@@ -234,7 +237,7 @@ export function AIChatPanel() {
               variant="ghost"
               size="sm"
               className="justify-start text-xs h-8"
-              onClick={() => handleQuickAction(action.prompt)}
+              onClick={() => handleQuickAction(action.action)}
             >
               <action.icon className="h-3 w-3 mr-1" />
               {action.label}

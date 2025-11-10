@@ -21,6 +21,7 @@ export const handleTurn = async (text: string, context: Record<string, unknown> 
 
 export class DialogueFlowController {
   private handlers: Map<string, Handler> = new Map()
+  private sessionStates: Map<string, string> = new Map()
 
   registerHandler(intent: string, handler: Handler): void {
     this.handlers.set(intent, handler)
@@ -47,5 +48,22 @@ export class DialogueFlowController {
 
   getRegisteredIntents(): string[] {
     return Array.from(this.handlers.keys())
+  }
+
+  /**
+   * Get the current dialogue state for a session
+   */
+  getState(sessionId: string): string {
+    return this.sessionStates.get(sessionId) || "initial"
+  }
+
+  /**
+   * Update the dialogue flow state based on user input and emotion
+   */
+  updateFlow(sessionId: string, text: string, emotion: string): void {
+    const { intent } = classifyIntent(text)
+    // Update state based on intent and emotion
+    const newState = `${intent}_${emotion}`
+    this.sessionStates.set(sessionId, newState)
   }
 }

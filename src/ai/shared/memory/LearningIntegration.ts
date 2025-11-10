@@ -149,8 +149,8 @@ export async function extractAndLearnFromInput(
           `Extracted from user input: "${userInput}"`
         );
 
-        if (result.found && !result.fromExisting) {
-          learned.push(result.data);
+        if (result.found && !result.fromExisting && typeof result.data === 'object' && result.data !== null) {
+          learned.push(result.data as LearnedItem);
         }
       }
     }

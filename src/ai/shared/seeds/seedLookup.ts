@@ -77,10 +77,11 @@ export function getDefinition(key: string, domain?: string): string | null {
   const entry = seedRegistry.lookup(key, domain);
   if (!entry?.fullData) return null;
   
-  return entry.fullData.definition || 
+  const def = entry.fullData.definition || 
          entry.fullData.description || 
-         entry.fullData.explanation || 
-         null;
+         entry.fullData.explanation;
+  
+  return typeof def === 'string' ? def : null;
 }
 
 /**
@@ -199,11 +200,13 @@ export function lookupWithContext(key: string, domain?: string): {
   }
   
   // Get related terms
-  const relatedKeys = main.fullData?.related || [];
-  for (const relKey of relatedKeys) {
-    const relSeed = seedRegistry.lookup(relKey, domain);
-    if (relSeed) {
-      result.related.push(relSeed);
+  const relatedKeys = main.fullData?.related;
+  if (Array.isArray(relatedKeys)) {
+    for (const relKey of relatedKeys as string[]) {
+      const relSeed = seedRegistry.lookup(relKey, domain);
+      if (relSeed) {
+        result.related.push(relSeed);
+      }
     }
   }
   
