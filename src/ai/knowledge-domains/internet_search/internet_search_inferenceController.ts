@@ -33,7 +33,7 @@ interface InferenceContext {
  */
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
-  const vocabulary = pretrainedWeights.vocabulary as Record<string, number>
+  const vocabulary = (pretrainedWeights as any).vocabulary as Record<string, number>
 
   let tokenScore = 0
   let matchCount = 0
@@ -62,7 +62,7 @@ function calculateConfidence(tokens: string[], input: string): number {
   semanticScore = Math.min(semanticScore / 2, 1.0)
 
   // Combine scores
-  const thresholds = pretrainedWeights.thresholds
+  const thresholds = (pretrainedWeights as any).thresholds
   const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
 
   return Math.min(finalConfidence, 1.0)
@@ -136,14 +136,14 @@ export async function internetSearchRunInference(input: string, _context?: Infer
 
   if (results.length > 0) {
     const resultText = results
-      .map((r, i) => `**${i + 1}. ${r.title}** (${r.source})\n${r.snippet}\n[Source](${r.url})`)
+      .map((r: any, i) => `**${i + 1}. ${r.title}** (${r.source})\n${r.snippet}\n[Source](${r.url})`)
       .join("\n\n")
 
     return {
       response: `**Search Results:**\n\n${resultText}`,
       confidence: Math.max(confidence, 0.7),
       domain: INTERNET_SEARCH_DOMAIN,
-      sources: results.map((r) => r.url),
+      sources: results.map((r: any) => r.url),
       metadata: {
         tokensUsed: tokens.length,
         semanticAnalysis: semantics,

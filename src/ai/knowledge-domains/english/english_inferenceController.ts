@@ -73,7 +73,7 @@ function calculateConfidence(tokens: string[], input: string): number {
 export const englishRunInference = async (input: string, _context?: unknown) => {
   const t = englishTokenizer(input)
   const sem = englishSemanticAnalyzer(input)
-  const tokens = _context?.tokens || t.tokens
+  const tokens = (_context as any)?.tokens || t.tokens
 
   const confidence = calculateConfidence(tokens, input)
 

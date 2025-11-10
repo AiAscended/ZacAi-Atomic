@@ -47,10 +47,10 @@ const stopWords = [
 ]
 
 export const generalRunInference = async (input: string, _context?: unknown) => {
-  const tokens = _context?.tokens || []
-  const embeddings = _context?.embeddings || []
-  const inferenceResults = _context?.inferenceResults
-  const sentiment = _context?.sentiment
+  const tokens = (_context as any)?.tokens || []
+  const embeddings = (_context as any)?.embeddings || []
+  const inferenceResults = (_context as any)?.inferenceResults
+  const sentiment = (_context as any)?.sentiment
   // TODO: Use userProfile for personalized responses
   // const userProfile = _context?.userProfile || {}
 

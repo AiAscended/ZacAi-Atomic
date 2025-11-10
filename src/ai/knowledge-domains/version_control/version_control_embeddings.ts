@@ -12,7 +12,8 @@ import { VERSION_CONTROL_DOMAIN } from "./version_control_constants"
 const EMBEDDING_DIM = 128
 
 export const getVersionControlEmbedding = (token: string): number[] => {
-  const weights = pretrained.seedWeights as Record<string, number[]>
+  // Handle both old and new pretrained weight formats
+  const weights = (pretrained as any).seedWeights || {};
   if (weights[token]) return weights[token]
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
 }

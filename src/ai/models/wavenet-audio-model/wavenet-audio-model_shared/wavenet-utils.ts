@@ -4,6 +4,6 @@
 
 export function wavenetUtility(): void {}
 
-const wavenetUtils = { wavenetUtility }; export default exportBundle;
+const wavenetUtils = { wavenetUtility }; // Removed duplicate export default
 
 export default wavenetUtils;

@@ -4,6 +4,6 @@
 
 export function gnnUtility(): void {}
 
-const gnnBundle = { gnnUtility }; export default exportBundle;
+const gnnBundle = { gnnUtility }; // Removed duplicate export default
 
 export default gnnBundle;
