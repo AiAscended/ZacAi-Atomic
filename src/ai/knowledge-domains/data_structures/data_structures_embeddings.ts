@@ -25,17 +25,13 @@ export const getDataStructuresEmbedding = (token: string): number[] => {
 export const getDataStructuresEmbeddingForTokens = (tokens: string[]) => tokens.map(getDataStructuresEmbedding)
 
 export const persistDataStructuresWeights = (weights: Record<string, number[]>) => {
-  const content = JSON.stringify(
-    { domain: DATA_STRUCTURES_DOMAIN, version: "0.2", embeddingDim: EMBEDDING_DIM, seedWeights: weights },
-    null,
-    2,
-  )
-  // In production, write to file system
-  const { updateFile } = require("../../orchestration/fileWatcher")
-  updateFile(DATA_STRUCTURES_DOMAIN, "src/ai/knowledge-domains/data_structures/data_structures_weights/data_structures_pretrained_weights.json", content)
+  // Note: File persistence functionality is not yet implemented
+  // TODO: Implement proper file writing mechanism without requiring fileWatcher
+  console.warn('persistDataStructuresWeights: File persistence not yet implemented');
   return {
-    success: true,
+    success: false,
     path: "src/ai/knowledge-domains/data_structures/data_structures_weights/data_structures_pretrained_weights.json",
+    error: "File persistence not implemented"
   }
 }
 

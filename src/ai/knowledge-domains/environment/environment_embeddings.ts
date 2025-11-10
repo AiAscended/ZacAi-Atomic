@@ -20,16 +20,13 @@ export const getEnvironmentEmbedding = (token: string): number[] => {
 export const getEnvironmentEmbeddingForTokens = (tokens: string[]) => tokens.map(getEnvironmentEmbedding)
 
 export const persistEnvironmentWeights = (weights: Record<string, number[]>) => {
-  const content = JSON.stringify(
-    { domain: ENVIRONMENT_DOMAIN, version: "0.2", embeddingDim: EMBEDDING_DIM, seedWeights: weights },
-    null,
-    2,
-  )
-  const { updateFile } = require("../../orchestration/fileWatcher")
-  updateFile(ENVIRONMENT_DOMAIN, "src/ai/knowledge-domains/environment/environment_weights/environment_pretrained_weights.json", content)
+  // Note: File persistence functionality is not yet implemented
+  // TODO: Implement proper file writing mechanism without requiring fileWatcher
+  console.warn('persistEnvironmentWeights: File persistence not yet implemented');
   return {
-    success: true,
+    success: false,
     path: "src/ai/knowledge-domains/environment/environment_weights/environment_pretrained_weights.json",
+    error: "File persistence not implemented"
   }
 }
 

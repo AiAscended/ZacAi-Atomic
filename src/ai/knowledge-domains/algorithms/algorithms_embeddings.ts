@@ -20,16 +20,13 @@ export const getAlgorithmsEmbedding = (token: string): number[] => {
 export const getAlgorithmsEmbeddingForTokens = (tokens: string[]) => tokens.map(getAlgorithmsEmbedding)
 
 export const persistAlgorithmsWeights = (weights: Record<string, number[]>) => {
-  const content = JSON.stringify(
-    { domain: ALGORITHMS_DOMAIN, version: "0.2", embeddingDim: EMBEDDING_DIM, seedWeights: weights },
-    null,
-    2,
-  )
-  const { updateFile } = require("../../orchestration/fileWatcher")
-  updateFile(ALGORITHMS_DOMAIN, "src/ai/knowledge-domains/algorithms/algorithms_weights/algorithms_pretrained_weights.json", content)
+  // Note: File persistence functionality is not yet implemented
+  // TODO: Implement proper file writing mechanism without requiring fileWatcher
+  console.warn('persistAlgorithmsWeights: File persistence not yet implemented');
   return {
-    success: true,
+    success: false,
     path: "src/ai/knowledge-domains/algorithms/algorithms_weights/algorithms_pretrained_weights.json",
+    error: "File persistence not implemented"
   }
 }
 
