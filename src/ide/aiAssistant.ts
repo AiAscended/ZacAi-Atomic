@@ -56,7 +56,7 @@ export interface AIResponse {
   }>;
   domains: string[];
   confidence: number;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export class AIAssistant {
@@ -78,9 +78,13 @@ export class AIAssistant {
         throw new Error('Failed to initialize AI session');
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as { sessionId?: unknown };
+      if (typeof data.sessionId !== 'string') {
+        throw new Error('Invalid session response from AI service');
+      }
+
       this.sessionId = data.sessionId;
-      return this.sessionId;
+      return data.sessionId;
     } catch (error) {
       console.error('AI initialization error:', error);
       throw error;
@@ -222,14 +226,6 @@ export class AIAssistant {
       file: string;
       content?: string;
     }> = [];
-
-    // Look for explicit action commands
-    const actionPatterns = [
-      /create file `([^`]+)`/gi,
-      /update file `([^`]+)`/gi,
-      /delete file `([^`]+)`/gi,
-      /open file `([^`]+)`/gi,
-    ];
 
     const codeBlocks = this.extractCodeBlocks(text);
 
