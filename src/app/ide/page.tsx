@@ -1,8 +1,14 @@
 "use client";
 
 import { Suspense } from 'react';
-import { IDELayout } from './components/IDELayout';
+import dynamic from 'next/dynamic';
 import { IDELoadingState } from './components/IDELoadingState';
+
+// Dynamically import IDELayout with no SSR to avoid xterm SSR issues
+const IDELayout = dynamic(() => import('./components/IDELayout').then(mod => ({ default: mod.IDELayout })), {
+  ssr: false,
+  loading: () => <IDELoadingState />
+});
 
 export default function IDEPage() {
   return (
