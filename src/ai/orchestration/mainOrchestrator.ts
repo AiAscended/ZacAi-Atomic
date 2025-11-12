@@ -133,21 +133,24 @@ export class MainOrchestrator {
       
       // Step 1: Initialize LLM
       this.thinkingTracker.addStep("init_llm", "Initializing Unified Transformer LLM")
-      // Use default LLM config
+      // Use default LLM config with actual vocabulary size from vocabularyManager
+      const { vocabularyManager } = await import('../shared/vocabulary/vocabularyManager')
+      const actualVocabSize = vocabularyManager.getVocabSize()
+      
       const llmConfig = {
         modelType: 'decoder-only' as const,
-        numLayers: 12,
-        numHeads: 12,
-        hiddenSize: 768,
-        embeddingDim: 768, // Same as hiddenSize
-        hiddenDim: 3072, // 4x hiddenSize (FFN hidden dimension)
-        ffnSize: 3072,
-        vocabSize: 50257,
-        maxSequenceLength: 2048,
-        batchSize: 32,
+        numLayers: 6, // Reduced for smaller vocab
+        numHeads: 8, // Reduced for efficiency
+        hiddenSize: 512, // Aligned with smaller vocab
+        embeddingDim: 512, // Same as hiddenSize
+        hiddenDim: 2048, // 4x hiddenSize (FFN hidden dimension)
+        ffnSize: 2048,
+        vocabSize: actualVocabSize, // Use actual vocabulary size (436 tokens)
+        maxSequenceLength: 512, // Reduced for efficiency
+        batchSize: 16, // Smaller batch for faster inference
         learningRate: 0.0001,
-        warmupSteps: 4000,
-        maxSteps: 100000,
+        warmupSteps: 1000,
+        maxSteps: 50000,
         dropoutRate: 0.1,
         attentionDropout: 0.1,
         padTokenId: 0,
@@ -155,6 +158,8 @@ export class MainOrchestrator {
         eosTokenId: 2,
         unkTokenId: 3,
       }
+      
+      console.log(`[MainOrchestrator] LLM config created with vocabulary size: ${actualVocabSize}`)
       this.llmInferenceEngine = new LLMInferenceEngine(llmConfig)
       this.availableModels.push("unified-transformer-llm")
       logger.info("LLM initialized", {})
@@ -264,10 +269,10 @@ export class MainOrchestrator {
       
       let relevantDomains = this.identifyRelevantDomains(cleanedPrompt, subtasks)
       
-      // Fallback to general domain if no matches (for testing)
+      // Fallback to general_knowledge domain if no matches (for testing)
       if (relevantDomains.length === 0) {
-        relevantDomains = ['general']
-        logger.info("No domains matched keywords, using general domain fallback")
+        relevantDomains = ['general_knowledge']
+        logger.info("No domains matched keywords, using general_knowledge domain fallback")
       }
       
       // Apply configuration constraints
@@ -305,8 +310,9 @@ export class MainOrchestrator {
       let llmSuccess = false
       let llmError: Error | null = null
       
-      // Attempt LLM generation (will fail gracefully if vocabulary not loaded)
+      // Attempt LLM generation with fixed configuration
       try {
+        // RE-ENABLED: LLM dimension mismatch fixed - now using actual vocab size
         if (this.llmInferenceEngine) {
           // Construct enriched prompt with domain knowledge
           const enrichedPrompt = this.buildEnrichedPrompt(cleanedPrompt, domainResults)
@@ -460,7 +466,7 @@ export class MainOrchestrator {
           thinkingSteps: this.thinkingTracker.getSteps(),
           processingTime: Date.now() - processingStartTime,
         },
-        domains: ["general"],
+        domains: ["general_knowledge"],
         confidence: 0.1,
         sources: [],
       }
@@ -477,15 +483,15 @@ export class MainOrchestrator {
     const lowerPrompt = prompt.toLowerCase()
     const relevantDomains: Set<string> = new Set()
 
-    // Domain keyword mapping
+    // Domain keyword mapping (only include domains that actually exist)
     const domainKeywords: Record<string, string[]> = {
+      system: ["time", "date", "today", "now", "timezone", "location", "where", "when", "system", "config", "setup", "environment"],
       english: ["grammar", "spelling", "sentence", "word", "language", "text"],
       mathematics: ["math", "calculate", "equation", "number", "solve", "formula"],
-      typescript: ["typescript", "ts", "type", "interface", "generic"],
-      javascript: ["javascript", "js", "function", "async", "promise"],
-      react: ["react", "component", "jsx", "hook", "state", "props"],
-      nextjs: ["next.js", "nextjs", "app router", "server component"],
-      programming: ["code", "function", "variable", "loop", "algorithm"],
+      typescript: ["typescript", "ts", "type", "interface", "generic", "code example", "example"],
+      react: ["react", "component", "jsx", "hook", "state", "props", "code example", "example"],
+      nextjs: ["next.js", "nextjs", "app router", "server component", "code example", "example"],
+      programming: ["code", "javascript", "js", "function", "variable", "loop", "algorithm", "async", "promise", "example", "snippet"],
       science: ["science", "physics", "chemistry", "biology", "experiment"],
       testing: ["test", "unit test", "integration", "jest", "vitest"],
       security: ["security", "vulnerability", "auth", "encrypt", "xss"],
@@ -494,6 +500,7 @@ export class MainOrchestrator {
       code_review: ["review", "refactor", "optimize", "improve"],
       algorithms: ["algorithm", "complexity", "big o", "data structure"],
       version_control: ["git", "commit", "branch", "merge", "github"],
+      general_knowledge: ["tell me", "who are you", "what are you", "your name", "about you", "introduce"],
     }
 
     // Check for domain matches
@@ -506,9 +513,9 @@ export class MainOrchestrator {
       }
     }
 
-    // Always include general domain as fallback
+    // Always include general_knowledge domain as fallback
     if (relevantDomains.size === 0) {
-      relevantDomains.add("general")
+      relevantDomains.add("general_knowledge")
     }
 
     return Array.from(relevantDomains)

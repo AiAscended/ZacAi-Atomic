@@ -172,3 +172,5 @@ export async function internetSearchRunInference(input: string, _context?: Infer
     },
   }
 }
+
+export default internetSearchRunInference;

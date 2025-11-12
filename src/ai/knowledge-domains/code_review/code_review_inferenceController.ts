@@ -19,3 +19,5 @@ export const codeReviewRunInference = async (input: string) => {
     response: `Code review: ${sem.quality} quality, complexity ${sem.complexity}, ${sem.recommendations.length} recommendations.`,
   }
 }
+
+export default codeReviewRunInference

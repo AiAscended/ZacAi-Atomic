@@ -19,3 +19,5 @@ export const dataStructuresRunInference = async (input: string) => {
     response: `Data structures analysis: ${sem.parsed.structures.join(", ")} detected with ${sem.parsed.complexity} complexity.`,
   }
 }
+
+export default dataStructuresRunInference
