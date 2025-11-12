@@ -31,13 +31,6 @@ export default function UsersPage() {
           </div>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Dark Mode</Label>
-              <p className="text-sm text-muted-foreground">Enable dark theme</p>
-            </div>
-            <Switch defaultChecked />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
               <Label>Show Thinking Process</Label>
               <p className="text-sm text-muted-foreground">Display AI reasoning steps</p>
             </div>

@@ -122,10 +122,11 @@ interface AdminSidebarProps {
   isOpen: boolean
   isExpanded: boolean
   onExpandToggle: () => void
+  onNavigate?: () => void
   onClose: () => void
 }
 
-export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onClose }: AdminSidebarProps) {
+export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate, onClose }: AdminSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
   const pathname = usePathname()
   const router = useRouter()
@@ -149,7 +150,7 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onClose }: Ad
       }
     } else if (item.path) {
       router.push(item.path)
-      // Don't auto-close - let users navigate quickly between pages
+      // Don't auto-close menu - let users navigate freely
     }
   }
 
@@ -199,16 +200,26 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onClose }: Ad
         isOpen ? (isExpanded ? "w-64" : "w-16") : "w-0 -translate-x-full",
       )}
     >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full pb-4">
         {/* Header with close button */}
-        <div className="h-14 border-b flex items-center justify-between px-3">
-          {isExpanded && <span className="font-semibold text-sm">Navigation</span>}
-          <Button
-            variant="ghost"
-            size="icon"
+        <div className="flex items-center justify-between px-3 py-4 border-b">
+          {isExpanded && <span className="font-semibold text-lg">Menu</span>}
+          <button
             onClick={onClose}
-            className="h-8 w-8"
+            className="p-2 rounded-lg hover:bg-accent transition-colors ml-auto"
             aria-label="Close menu"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        <nav className="flex-1 overflow-y-auto px-2 space-y-1 pt-2">{menuItems.map((item) => renderMenuItem(item))}</nav>
+        
+        {isOpen && !isExpanded && (
+          <button
+            onClick={onExpandToggle}
+            className="mx-2 p-2 rounded-lg hover:bg-accent transition-colors"
+            aria-label="Expand menu"
           >
             <X className="h-4 w-4" />
           </Button>

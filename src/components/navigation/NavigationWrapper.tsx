@@ -58,18 +58,17 @@ export function NavigationWrapper({ children }: NavigationWrapperProps) {
         isOpen={isOpen}
         isExpanded={isExpanded}
         onExpandToggle={toggleExpanded}
+        onNavigate={closeMenu}
         onClose={closeMenu}
       />
-
-      {/* Main content - pushed by sidebar, no overlap */}
-      <main
-        className={cn("transition-all duration-300 ease-in-out min-h-screen")}
+      <div
+        className="transition-all duration-300"
         style={{
-          marginLeft: `${sidebarWidth}px`,
+          marginLeft: isOpen ? (isExpanded ? "256px" : "64px") : "0",
         }}
       >
         {children}
-      </main>
-    </div>
+      </div>
+    </>
   )
 }
