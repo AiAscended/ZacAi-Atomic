@@ -1,13 +1,12 @@
 /**
  * File: components/navigation/AdminSidebar.tsx
  * Purpose: Sliding admin sidebar with icon-first expandable menu
- * Updated: Added auto-close on navigation, improved animations
+ * UX: X button inside menu, stays open for quick navigation, pushes content
  */
 
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import {
@@ -26,6 +25,7 @@ import {
   X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 interface MenuItem {
   id: string
@@ -144,6 +144,7 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate, o
   const handleItemClick = (item: MenuItem) => {
     if (item.children) {
       toggleExpanded(item.id)
+      // Expand menu if collapsed when clicking parent items
       if (!isExpanded) {
         onExpandToggle()
       }
@@ -169,6 +170,7 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate, o
             isActive && "bg-accent text-accent-foreground font-medium",
             depth > 0 && "pl-8",
           )}
+          title={!isExpanded ? item.label : undefined}
         >
           <Icon className="h-5 w-5 flex-shrink-0" />
           {isExpanded && (
@@ -219,8 +221,29 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate, o
             className="mx-2 p-2 rounded-lg hover:bg-accent transition-colors"
             aria-label="Expand menu"
           >
-            <ChevronRight className="h-5 w-5" />
-          </button>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Menu items */}
+        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
+          {menuItems.map((item) => renderMenuItem(item))}
+        </nav>
+
+        {/* Expand/collapse toggle at bottom */}
+        {isOpen && (
+          <div className="border-t p-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onExpandToggle}
+              className="w-full justify-start"
+              aria-label={isExpanded ? "Collapse menu" : "Expand menu"}
+            >
+              <ChevronRight className={cn("h-4 w-4 transition-transform", isExpanded && "rotate-180")} />
+              {isExpanded && <span className="ml-2 text-xs">Collapse</span>}
+            </Button>
+          </div>
         )}
       </div>
     </aside>

@@ -31,11 +31,21 @@ import { listDomains } from "./registry"
 
 /**
  * Verify all domains are registered
+ * Waits briefly for async init functions to complete
  */
-export function verifyDomains(): void {
+export async function verifyDomains(): Promise<void> {
+  // Wait for async domain init functions to complete
+  await new Promise(resolve => setTimeout(resolve, 100))
+  
   const domains = listDomains()
   console.log(`[v0] Registered ${domains.length} domains:`, domains.map((d) => d.name).join(", "))
+  
+  if (domains.length === 0) {
+    console.warn(`[v0] WARNING: No domains registered! Check that integration APIs are executing properly.`)
+  }
 }
 
-// Auto-verify on import
-verifyDomains()
+// Auto-verify on import (with delay for async init functions)
+setTimeout(() => {
+  verifyDomains().catch(err => console.error('[v0] Domain verification failed:', err))
+}, 200)

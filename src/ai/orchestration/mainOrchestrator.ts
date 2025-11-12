@@ -260,7 +260,13 @@ export class MainOrchestrator {
       // ============================================
       this.thinkingTracker.addStep("domain_routing", "Identifying relevant knowledge domains")
       
-      const relevantDomains = this.identifyRelevantDomains(cleanedPrompt, subtasks)
+      let relevantDomains = this.identifyRelevantDomains(cleanedPrompt, subtasks)
+      
+      // Fallback to general domain if no matches (for testing)
+      if (relevantDomains.length === 0) {
+        relevantDomains = ['general']
+        logger.info("No domains matched keywords, using general domain fallback")
+      }
       
       // Apply configuration constraints
       const maxDomains = this.config?.maxDomainsPerQuery || 3
@@ -294,33 +300,105 @@ export class MainOrchestrator {
       this.thinkingTracker.addStep("llm_inference", "Generating response with LLM")
       
       let llmResponse = ""
-      if (this.llmInferenceEngine) {
-        // Construct enriched prompt with domain knowledge
-        const enrichedPrompt = this.buildEnrichedPrompt(cleanedPrompt, domainResults)
-        llmResponse = await this.llmInferenceEngine.generate(enrichedPrompt, 100)
-      } else {
-        llmResponse = "LLM not initialized."
+      let llmSuccess = false
+      let llmError: Error | null = null
+      
+      // Attempt LLM generation (will fail gracefully if vocabulary not loaded)
+      try {
+        if (this.llmInferenceEngine) {
+          // Construct enriched prompt with domain knowledge
+          const enrichedPrompt = this.buildEnrichedPrompt(cleanedPrompt, domainResults)
+          console.log("[MainOrchestrator] Attempting LLM generation...")
+          llmResponse = await this.llmInferenceEngine.generate(enrichedPrompt, 100)
+          
+          // Validate response quality
+          if (llmResponse && llmResponse.trim().length > 20 && !llmResponse.includes('<UNK>')) {
+            llmSuccess = true
+            console.log("[MainOrchestrator] LLM generation succeeded:", llmResponse.substring(0, 100))
+          } else {
+            console.warn("[MainOrchestrator] LLM output quality too low (likely vocabulary not loaded)")
+          }
+        } else {
+          console.warn("[MainOrchestrator] LLM inference engine not initialized")
+        }
+      } catch (error) {
+        llmError = error as Error
+        console.error("[MainOrchestrator] LLM generation failed:", error)
       }
       
+      // ============================================
+      // INTELLIGENT FALLBACK HIERARCHY
+      // ============================================
+      // If LLM fails, orchestrator uses domain results and reasoning to construct response
+      if (!llmSuccess) {
+        console.log("[MainOrchestrator] LLM unavailable, using orchestrator reasoning...")
+        this.thinkingTracker.addStep("orchestrator_reasoning", "Orchestrator generating fallback response")
+        
+        // Check what resources are available
+        const hasDomainResults = domainResults && domainResults.length > 0
+        const hasValidDomains = limitedDomains && limitedDomains.length > 0
+        
+        if (hasDomainResults) {
+          // FALLBACK LEVEL 1: Use domain results to construct response
+          console.log("[MainOrchestrator] Constructing response from domain results...")
+          llmResponse = this.constructDomainBasedResponse(cleanedPrompt, limitedDomains, domainResults)
+        } else if (hasValidDomains) {
+          // FALLBACK LEVEL 2: Explain which domains would handle this, but no results yet
+          console.log("[MainOrchestrator] Domains identified but no results, explaining to user...")
+          llmResponse = this.explainDomainRouting(cleanedPrompt, limitedDomains, llmError)
+        } else {
+          // FALLBACK LEVEL 3: Orchestrator reasoning about system state
+          console.log("[MainOrchestrator] No domains or results, analyzing system state...")
+          llmResponse = this.analyzeSystemState(cleanedPrompt, llmError)
+        }
+      }
+      
+      console.log("[MainOrchestrator] Final LLM response length:", llmResponse.length)
       logger.info("LLM inference completed", { responseLength: llmResponse.length })
 
       // ============================================
       // STEP 5: RESPONSE SYNTHESIS
       // ============================================
+      console.log("[MainOrchestrator] Starting step 5: Response Synthesis")
       this.thinkingTracker.addStep("synthesis", "Synthesizing multi-source response")
       
-      const synthesizedResponse = this.responseSynthesizer.synthesize({
-        llmOutput: llmResponse,
-        domainOutputs: domainResults,
-        originalPrompt: prompt,
-      })
+      let synthesizedResponse
+      try {
+        synthesizedResponse = this.responseSynthesizer.synthesize({
+          llmOutput: llmResponse,
+          domainOutputs: domainResults,
+          originalPrompt: prompt,
+        })
+        console.log("[MainOrchestrator] Synthesis completed, text length:", synthesizedResponse.text.length)
+      } catch (synthError) {
+        console.error("[MainOrchestrator] Synthesis error:", synthError)
+        synthesizedResponse = {
+          text: llmResponse || "Error synthesizing response.",
+          confidence: 0.5,
+          sources: [],
+          metadata: { combinedDomains: [], responseLength: 0 }
+        }
+      }
       
       // ============================================
       // STEP 6: RESPONSE FORMATTING
       // ============================================
+      console.log("[MainOrchestrator] Starting step 6: Response Formatting")
       this.thinkingTracker.addStep("formatting", "Formatting response for display")
       
-      const formattedResponse = formatResponse(synthesizedResponse.text)
+      let formattedResponse
+      try {
+        formattedResponse = formatResponse(synthesizedResponse.text)
+        console.log("[MainOrchestrator] Formatting completed, blocks:", 
+          formattedResponse.textBlocks.length, "text,", 
+          formattedResponse.codeBlocks.length, "code")
+      } catch (formatError) {
+        console.error("[MainOrchestrator] Formatting error:", formatError)
+        formattedResponse = {
+          textBlocks: [{ id: "text-1", content: synthesizedResponse.text }],
+          codeBlocks: []
+        }
+      }
       
       const processingTime = Date.now() - processingStartTime
       
@@ -440,8 +518,8 @@ export class MainOrchestrator {
   private async queryKnowledgeDomains(
     domains: string[],
     subtasks: string[]
-  ): Promise<Array<{ domain: string; result: string }>> {
-    const results: Array<{ domain: string; result: string }> = []
+  ): Promise<Array<{ domain: string; result: string; confidence: number }>> {
+    const results: Array<{ domain: string; result: string; confidence: number }> = []
     
     // Combine subtasks into single query
     const query = subtasks.join(' ')
@@ -453,10 +531,12 @@ export class MainOrchestrator {
           // Use new domain-specific inference
           const domainResults = await this.domainQueryExecutor.queryDomainsByName([domainName], query)
           
-          if (domainResults.length > 0 && domainResults[0].confidence > 0.3) {
+          // Lowered threshold from 0.3 to 0.01 for testing - accept all responses
+          if (domainResults.length > 0 && domainResults[0].confidence > 0.01) {
             results.push({ 
               domain: domainName, 
               result: domainResults[0].response || 'No result',
+              confidence: domainResults[0].confidence,
             })
           }
         }
@@ -474,19 +554,20 @@ export class MainOrchestrator {
   private async queryKnowledgeDomainsParallel(
     domains: string[],
     subtasks: string[]
-  ): Promise<Array<{ domain: string; result: string }>> {
+  ): Promise<Array<{ domain: string; result: string; confidence: number }>> {
     // Combine subtasks into single query
     const query = subtasks.join(' ')
     
     // Query all domains in parallel
     const domainResults = await this.domainQueryExecutor.queryDomainsByName(domains, query)
     
-    // Filter and format results
+    // Filter and format results (lowered threshold from 0.3 to 0.01 for testing)
     return domainResults
-      .filter(result => result.confidence > 0.3 && !result.error)
+      .filter(result => result.confidence > 0.01 && !result.error)
       .map(result => ({
         domain: result.domain,
         result: result.response || 'No result',
+        confidence: result.confidence,
       }))
   }
 
@@ -551,6 +632,152 @@ export class MainOrchestrator {
    */
   public async flushLearningMetrics(): Promise<void> {
     await this.learningMetricsTracker.flushToDisk()
+  }
+  
+  /**
+   * INTELLIGENT FALLBACK METHODS
+   * These methods allow the orchestrator to reason about failures and construct
+   * helpful responses even when LLM or domains are unavailable
+   */
+  
+  /**
+   * FALLBACK LEVEL 1: Construct response from domain results
+   * Use domain inference results to build a coherent response
+   */
+  private constructDomainBasedResponse(
+    prompt: string,
+    domains: string[],
+    domainResults: Array<{ domain: string; result: string; confidence: number }>
+  ): string {
+    console.log("[Orchestrator Reasoning] Building response from domain results...")
+    
+    // Analyze domain results
+    const highConfidenceResults = domainResults.filter(d => d.confidence > 0.7)
+    const hasUsefulResults = highConfidenceResults.length > 0
+    
+    if (hasUsefulResults) {
+      // Build response from high-confidence domain outputs
+      let response = `Based on analysis from my ${domains.join(', ')} domains:\n\n`
+      
+      for (const result of highConfidenceResults) {
+        response += `**${result.domain}**: ${result.result}\n\n`
+      }
+      
+      response += `\n*Note: My language model is still training, so I'm providing direct domain analysis. Once fully trained, I'll synthesize these insights more naturally.*`
+      
+      return response
+    } else {
+      // Low confidence results
+      let response = `I've analyzed your question "${prompt}" using my ${domains.join(', ')} domains, but the results have low confidence.\n\n`
+      response += `Here's what I found:\n\n`
+      
+      for (const result of domainResults) {
+        response += `- **${result.domain}** (${Math.round(result.confidence * 100)}% confident): ${result.result}\n`
+      }
+      
+      response += `\nCould you rephrase or provide more details to help me give you a better answer?`
+      
+      return response
+    }
+  }
+  
+  /**
+   * FALLBACK LEVEL 2: Explain domain routing when domains identified but no results
+   */
+  private explainDomainRouting(
+    prompt: string,
+    domains: string[],
+    error: Error | null
+  ): string {
+    console.log("[Orchestrator Reasoning] Explaining domain routing to user...")
+    
+    let response = `I understand you're asking about: "${prompt}"\n\n`
+    response += `I've identified that this relates to my **${domains.join(', ')}** knowledge domains. `
+    
+    if (error) {
+      response += `However, I encountered an issue:\n\n`
+      response += `**System Status**: ${error.message}\n\n`
+      
+      if (error.message.includes('vocabulary') || error.message.includes('tokenizer')) {
+        response += `**Issue**: My language model's vocabulary is not yet loaded. I'm in training mode.\n\n`
+      } else if (error.message.includes('domain') || error.message.includes('offline')) {
+        response += `**Issue**: One or more required knowledge domains may be offline.\n\n`
+        response += `**Admin Action**: Please check domain status in Admin → Domains\n\n`
+      } else {
+        response += `**Issue**: ${error.message}\n\n`
+      }
+    } else {
+      response += `However, I'm currently unable to generate a complete response because my domain inference engines haven't returned results yet.\n\n`
+    }
+    
+    response += `**Available Domains**: I have ${this.availableDomains.length} domains registered\n`
+    response += `**Available Models**: ${this.availableModels.join(', ') || 'Training in progress'}\n\n`
+    response += `**Suggestion**: Try rephrasing your question or check the system status in the Admin panel.`
+    
+    return response
+  }
+  
+  /**
+   * FALLBACK LEVEL 3: Analyze system state and provide diagnostic information
+   * This is the orchestrator's last resort before the hard-coded system fallback
+   */
+  private analyzeSystemState(prompt: string, error: Error | null): string {
+    console.log("[Orchestrator Reasoning] Analyzing system state for diagnostic response...")
+    
+    let response = `**System Diagnostic**\n\n`
+    response += `I received your message: "${prompt}"\n\n`
+    
+    // Check system components
+    const systemChecks = {
+      'Orchestrator': true,
+      'Domain Registry': this.availableDomains.length > 0,
+      'LLM Engine': this.llmInferenceEngine !== null,
+      'Models Loaded': this.availableModels.length > 0,
+      'Initialization': this.initialized,
+    }
+    
+    response += `**Component Status**:\n`
+    for (const [component, status] of Object.entries(systemChecks)) {
+      response += `- ${component}: ${status ? '✓ Online' : '✗ Offline'}\n`
+    }
+    response += `\n`
+    
+    // Identify the problem
+    if (error) {
+      response += `**Error Detected**: ${error.message}\n\n`
+      
+      if (error.message.includes('vocabulary') || error.message.includes('tokenizer')) {
+        response += `**Root Cause**: LLM vocabulary not loaded. The language model requires a trained vocabulary file.\n\n`
+        response += `**Resolution**: The model is still in training. This is expected during initial system setup.\n\n`
+      } else if (error.message.includes('domain')) {
+        response += `**Root Cause**: Domain routing or inference failure.\n\n`
+        response += `**Resolution**: Check Admin → Domains to verify all domains are properly registered.\n\n`
+      } else {
+        response += `**Root Cause**: ${error.stack ? error.stack.split('\\n')[0] : 'Unknown error'}\n\n`
+      }
+    } else {
+      response += `**Status**: No specific error, but unable to generate response.\n\n`
+      response += `**Possible Causes**:\n`
+      response += `- LLM model vocabulary not yet loaded (training in progress)\n`
+      response += `- Domain inference engines not returning results\n`
+      response += `- Insufficient context or ambiguous query\n\n`
+    }
+    
+    // Provide actionable next steps
+    response += `**What You Can Do**:\n`
+    response += `1. Check the Admin panel → System Status for component health\n`
+    response += `2. Review Admin → Errors for detailed error logs\n`
+    response += `3. Verify domains are active in Admin → Domains\n`
+    response += `4. Try a simpler query or rephrase your question\n\n`
+    
+    response += `**System Info**:\n`
+    response += `- Registered Domains: ${this.availableDomains.length}\n`
+    response += `- Available Models: ${this.availableModels.length}\n`
+    response += `- Initialization Status: ${this.initialized ? 'Complete' : 'Incomplete'}\n\n`
+    
+    response += `*This diagnostic message was generated by the orchestrator's reasoning engine. The system is functioning, but some components need training or configuration.*`
+    
+    return response
   }
   
   /**

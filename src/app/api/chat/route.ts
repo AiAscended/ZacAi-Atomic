@@ -90,15 +90,25 @@ export async function POST(request: Request) {
           confidence: response.confidence,
           sources: response.sources || [],
           metadata: response.metadata,
+          contentBlocks: response.contentBlocks, // Include formatted content blocks
         })
       } catch (error) {
         console.error("[v0] Error in AI processing:", error)
+        const errorText = "Sorry, something went wrong while processing your request. Please try again or check the Admin → Errors panel for details."
         return NextResponse.json({
-          text: "I'm having trouble processing your request right now. The AI system encountered an error.",
+          text: errorText,
           domains: ["general"],
           confidence: 0.5,
           sources: [],
           error: String(error),
+          contentBlocks: {
+            textBlocks: [{ id: "error-1", content: errorText }],
+            codeBlocks: [],
+          },
+          metadata: {
+            thinkingSteps: [],
+            error: String(error),
+          },
         })
       }
     }

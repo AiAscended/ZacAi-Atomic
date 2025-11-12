@@ -84,14 +84,25 @@ export class ResponseSynthesizer {
       };
     }
     
-    // Strategy 3: Fallback to basic response
+    // Strategy 3: Fallback to basic response with helpful message
+    console.warn("[ResponseSynthesizer] No valid LLM or domain outputs, using fallback");
+    const fallbackText = `I understand you're asking about: "${originalPrompt}". 
+
+I'm processing your request, but the AI models are still being trained. Here's what I can tell you:
+
+- The system identified ${domainOutputs.length} relevant knowledge domain(s)
+- Your query has been processed and logged for training
+- More detailed responses will be available as the models improve
+
+Please try again with a different question, or check back later as the system continues learning.`;
+    
     return {
-      text: `I understand you're asking about: "${originalPrompt}". Let me help you with that.`,
+      text: fallbackText,
       confidence: 0.3,
-      sources: [],
+      sources: domainOutputs.map(d => d.domain),
       metadata: {
-        combinedDomains: [],
-        responseLength: 0,
+        combinedDomains: domainOutputs.map(d => d.domain),
+        responseLength: fallbackText.length,
       },
     };
   }
