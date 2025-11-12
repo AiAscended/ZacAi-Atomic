@@ -1,12 +1,12 @@
 /**
- * File: src/ai/data/english/english_inferenceController.ts
+ * File: src/ai/knowledge-domains/english/english_inferenceController.ts
  * Purpose: English domain inference pipeline wrapper (prefixed file names).
  */
 
 import { englishTokenizer } from "./english_tokenizer"
 import { englishSemanticAnalyzer } from "./english_semanticAnalyzer"
-import pretrainedWeights from "./weights/english_pretrained_weights.json"
-import seeds from "./seeds/english_seeds.json"
+import pretrainedWeights from "./english_weights/english_pretrained_weights.json"
+import seeds from "./english_seeds/english_seeds.json"
 
 const definitions: Record<string, { definition: string; synonyms: string[]; example: string }> = {
   molecular: {

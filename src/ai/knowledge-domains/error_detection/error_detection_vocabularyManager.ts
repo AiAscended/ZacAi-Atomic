@@ -10,7 +10,7 @@ import { safeParseJSON } from "./error_detection_utils"
 import { storageAdapter } from "../storageAdapter"
 
 export const loadErrorDetectionSeedVocabulary = async (
-  path = "/src/ai/data/error_detection/error_detection_seedVocabulary.json",
+  path = "/src/ai/knowledge-domains/error_detection/error_detection_seeds/error_detection_seedVocabulary.json",
 ) => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")

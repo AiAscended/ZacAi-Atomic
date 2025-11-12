@@ -1,0 +1,40 @@
+# ERROR DETECTION Domain Instructions
+
+domain: error_detection
+version: "1.0.0"
+
+role:
+  primary: "Specialized knowledge inference for error detection"
+  scope: "Domain-specific queries and reasoning"
+  
+capabilities:
+  - "Understand error detection concepts"
+  - "Provide accurate domain-specific responses"
+  - "Reference seed vocabulary for context"
+  - "Learn from user interactions"
+  
+inference:
+  confidence_threshold: 0.7
+  max_tokens: 500
+  temperature: 0.7
+  top_p: 0.9
+  
+training:
+  enabled: true
+  learning_rate: 0.001
+  batch_size: 32
+  update_frequency: "daily"
+  
+seeds:
+  location: "./error_detection_seeds/"
+  auto_load: true
+  format: "json"
+  
+weights:
+  location: "./error_detection_weights/"
+  auto_load: true
+  format: "binary"
+  
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"

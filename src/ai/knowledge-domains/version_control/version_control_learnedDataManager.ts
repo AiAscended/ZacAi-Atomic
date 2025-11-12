@@ -10,7 +10,7 @@ import { safeParseJSON } from "./version_control_utils"
 import { storageAdapter } from "../storageAdapter"
 
 export const loadVersionControlLearnedData = async (
-  path = "/src/ai/data/version_control/version_control_learnedData.json",
+  path = "/src/ai/knowledge-domains/version_control/version_control_learned/version_control_learnedData.json",
 ) => {
   try {
     const content = await storageAdapter.readFile(path, "utf-8")
@@ -22,7 +22,7 @@ export const loadVersionControlLearnedData = async (
 
 export const saveVersionControlLearnedData = async (
   data: unknown,
-  path = "/src/ai/data/version_control/version_control_learnedData.json",
+  path = "/src/ai/knowledge-domains/version_control/version_control_learned/version_control_learnedData.json",
 ) => {
   try {
     await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))

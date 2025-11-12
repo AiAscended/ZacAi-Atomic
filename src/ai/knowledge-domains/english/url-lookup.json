@@ -1,0 +1,15 @@
+{
+  "domain": "english",
+  "sources": [
+    {
+      "name": "english Documentation",
+      "url": "https://example.com/english",
+      "type": "documentation",
+      "description": "Official documentation for english",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

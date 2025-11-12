@@ -1,4 +1,4 @@
-import pretrained from './internet_search_pretrained_weights.json';
+import pretrained from './internet_search_weights/internet_search_pretrained_weights.json';
 import { INTERNET_SEARCH_DOMAIN } from './internet_search_constants';
 import { updateFile } from '../dataRegistry';
 
@@ -24,7 +24,7 @@ export const getInternetSearchEmbedding = (token: string): number[] => {
 export const persistInternetSearchWeights = (weights: Record<string, number[]>) => {
   try {
     const content = JSON.stringify({ domain: INTERNET_SEARCH_DOMAIN, version: '0.2', embeddingDim: EMBEDDING_DIM, seedWeights: weights }, null, 2);
-    updateFile(INTERNET_SEARCH_DOMAIN, 'src/ai/data/internet_search/internet_search_pretrained_weights.json', content);
+    updateFile(INTERNET_SEARCH_DOMAIN, 'src/ai/knowledge-domains/internet_search/internet_search_weights/internet_search_pretrained_weights.json', content);
     return true;
   } catch (e) {
     return false;

@@ -2,7 +2,7 @@ import { storageAdapter } from "../storageAdapter"
 import { safeParseJSON } from "./mathematics_utils"
 
 export const loadMathematicsSeedVocabulary = async (
-  path = "/src/ai/data/mathematics/mathematics_seedVocabulary.json",
+  path = "/src/ai/knowledge-domains/mathematics/mathematics_seeds/mathematics_seedVocabulary.json",
 ) => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")

@@ -1,0 +1,19 @@
+{
+  "model": "generative-adversarial-network",
+  "version": "1.0.0",
+  "architecture": "generative_adversarial_network",
+  "lastUpdated": "2025-11-02T11:55:05.050Z",
+  "weights": {
+    "current": "generative-adversarial-network_current_weights.bin",
+    "pretrained": "generative-adversarial-network_pretrained_weights.bin",
+    "checkpoint": "generative-adversarial-network_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}

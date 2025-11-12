@@ -1,44 +1,28 @@
-import { registerDomain } from "../registry"
+import path from 'path'
+
+import { domainRegistry } from '../domainRegistry'
 import { GENERAL_DOMAIN } from "./general_knowledge_constants"
 import { loadGeneralSeedVocabulary } from "./general_knowledge_vocabularyManager"
 import { generalRunInference } from "./general_knowledge_inferenceController"
 import { generalRunTrainingEpoch } from "./general_knowledge_trainingController"
-import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
+
+const DOMAIN_NAME = 'general_knowledge';
+const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
 
 export const generalInit = async () => {
   await loadGeneralSeedVocabulary()
-  registerDomainFiles(GENERAL_DOMAIN, [
-    "src/ai/data/general/general_seedVocabulary.json",
-    "src/ai/data/general/general_learnedData.json",
-    "src/ai/data/general/general_webDocReferences.json",
-    "src/ai/data/general/general_trainingWeights.bin",
-    "src/ai/data/general/general_pretrained_weights.json",
-    "src/ai/data/general/general_tokens.ts",
-    "src/ai/data/general/general_tokenizer.ts",
-  ])
-  try {
-    watchDomainFiles(GENERAL_DOMAIN)
-  } catch (e) {
-    // ignore
-  }
 
-  registerDomain({
-    name: GENERAL_DOMAIN,
-    version: "0.1",
-    initialize: async () => {
-      await loadGeneralSeedVocabulary()
-    },
-    query: async (input: string, context?: any) => {
-      const result = await generalRunInference(input, context)
-      return {
-        response: result.response,
-        confidence: result.confidence,
-        sources: result.sources,
-        metadata: result.metadata,
-      }
-    },
-    train: async (opts?: Record<string, unknown>) => generalRunTrainingEpoch(opts as { epochs?: number }),
-  })
+  domainRegistry.registerDomain({
+  name: GENERAL_DOMAIN,
+  displayName: 'General Knowledge',
+  description: 'Broad knowledge base and general information',
+  atomicLevel: 'organ',
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
+});
 }
 
 void generalInit()

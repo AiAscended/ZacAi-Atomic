@@ -1,14 +1,14 @@
 /**
- * File: src/ai/data/typescript/typescript_inferenceController.ts
+ * File: src/ai/knowledge-domains/typescript/typescript_inferenceController.ts
  * Purpose: Controls inference operations for TypeScript domain using pretrained weights and token analysis
- * Depends on: src/ai/data/typescript/typescript_tokenizer.ts, src/ai/data/typescript/typescript_semanticAnalyzer.ts
- * Depended on by: src/ai/data/typescript/typescript_integrationAPI.ts
+ * Depends on: src/ai/knowledge-domains/typescript/typescript_tokenizer.ts, src/ai/knowledge-domains/typescript/typescript_semanticAnalyzer.ts
+ * Depended on by: src/ai/knowledge-domains/typescript/typescript_integrationAPI.ts
  * Creator: Vercel v0 Coding Assistant
  */
 
 import { typescriptTokenizer } from "./typescript_tokenizer"
 import { typescriptSemanticAnalyzer } from "./typescript_semanticAnalyzer"
-import pretrainedWeights from "./weights/typescript_pretrained_weights.json"
+import pretrainedWeights from "./typescript_weights/typescript_pretrained_weights.json"
 
 interface InferenceContext {
   tokens: string[]

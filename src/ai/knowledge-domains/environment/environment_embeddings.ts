@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./environment_pretrained_weights.json"
+import pretrained from "./environment_seeds/environment_pretrained_weights.json"
 import { ENVIRONMENT_DOMAIN } from "./environment_constants"
 
 const EMBEDDING_DIM = 128
@@ -26,10 +26,10 @@ export const persistEnvironmentWeights = (weights: Record<string, number[]>) => 
     2,
   )
   const { updateFile } = require("../../orchestration/fileWatcher")
-  updateFile(ENVIRONMENT_DOMAIN, "src/ai/data/environment/environment_pretrained_weights.json", content)
+  updateFile(ENVIRONMENT_DOMAIN, "src/ai/knowledge-domains/environment/environment_weights/environment_pretrained_weights.json", content)
   return {
     success: true,
-    path: "src/ai/data/environment/environment_pretrained_weights.json",
+    path: "src/ai/knowledge-domains/environment/environment_weights/environment_pretrained_weights.json",
   }
 }
 

@@ -1,0 +1,19 @@
+{
+  "model": "vision-transformer",
+  "version": "1.0.0",
+  "architecture": "vision_transformer",
+  "lastUpdated": "2025-11-02T11:55:05.082Z",
+  "weights": {
+    "current": "vision-transformer_current_weights.bin",
+    "pretrained": "vision-transformer_pretrained_weights.bin",
+    "checkpoint": "vision-transformer_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}

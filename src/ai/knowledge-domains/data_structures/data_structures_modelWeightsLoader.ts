@@ -9,7 +9,7 @@
 import { storageAdapter } from "../storageAdapter"
 
 export const dataStructuresLoadWeights = async (
-  path = "/src/ai/data/data_structures/data_structures_trainingWeights.bin",
+  path = "/src/ai/knowledge-domains/data_structures/data_structures_weights/data_structures_trainingWeights.bin",
 ) => {
   try {
     const buffer = await storageAdapter.readFile(path)

@@ -1,0 +1,15 @@
+{
+  "domain": "typescript",
+  "sources": [
+    {
+      "name": "typescript Documentation",
+      "url": "https://example.com/typescript",
+      "type": "documentation",
+      "description": "Official documentation for typescript",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./version_control_pretrained_weights.json"
+import pretrained from "./version_control_seeds/version_control_pretrained_weights.json"
 import { VERSION_CONTROL_DOMAIN } from "./version_control_constants"
 
 const EMBEDDING_DIM = 128
@@ -26,10 +26,10 @@ export const persistVersionControlWeights = (weights: Record<string, number[]>) 
     2,
   )
   const { updateFile } = require("../../orchestration/fileWatcher")
-  updateFile(VERSION_CONTROL_DOMAIN, "src/ai/data/version_control/version_control_pretrained_weights.json", content)
+  updateFile(VERSION_CONTROL_DOMAIN, "src/ai/knowledge-domains/version_control/version_control_weights/version_control_pretrained_weights.json", content)
   return {
     success: true,
-    path: "src/ai/data/version_control/version_control_pretrained_weights.json",
+    path: "src/ai/knowledge-domains/version_control/version_control_weights/version_control_pretrained_weights.json",
   }
 }
 

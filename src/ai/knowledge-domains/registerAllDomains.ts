@@ -26,8 +26,12 @@ import "./algorithms/algorithms_integrationAPI"
 import "./data_structures/data_structures_integrationAPI"
 import "./version_control/version_control_integrationAPI"
 import "./environment/environment_integrationAPI"
+import "./data_integrity/data_integrity_integrationAPI"
+import "./observability/observability_integrationAPI"
+import "./repair/repair_integrationAPI"
+import "./system/system_integrationAPI"
 
-import { listDomains } from "./registry"
+import { domainRegistry } from "./domainRegistry"
 
 /**
  * Verify all domains are registered
@@ -37,7 +41,7 @@ export async function verifyDomains(): Promise<void> {
   // Wait for async domain init functions to complete
   await new Promise(resolve => setTimeout(resolve, 100))
   
-  const domains = listDomains()
+  const domains = domainRegistry.getAllDomains()
   console.log(`[v0] Registered ${domains.length} domains:`, domains.map((d) => d.name).join(", "))
   
   if (domains.length === 0) {

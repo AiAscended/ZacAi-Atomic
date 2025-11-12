@@ -9,7 +9,7 @@
 import { storageAdapter } from "../storageAdapter"
 
 export const documentationLoadWeights = async (
-  path = "/src/ai/data/documentation/documentation_trainingWeights.bin",
+  path = "/src/ai/knowledge-domains/documentation/documentation_weights/documentation_trainingWeights.bin",
 ) => {
   try {
     const raw = await storageAdapter.readFile(path)

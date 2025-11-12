@@ -1,0 +1,12 @@
+{
+  "model": "convolutional-neural-network",
+  "source": "initialization",
+  "method": "Xavier/He initialization",
+  "date": "2025-11-02T11:55:05.042Z",
+  "description": "Base pretrained weights for model initialization",
+  "files": [
+    "convolutional-neural-network_pretrained_embeddings.bin",
+    "convolutional-neural-network_pretrained_encoder.bin",
+    "convolutional-neural-network_pretrained_decoder.bin"
+  ]
+}

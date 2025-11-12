@@ -1,0 +1,15 @@
+{
+  "domain": "internet_search",
+  "sources": [
+    {
+      "name": "internet search Documentation",
+      "url": "https://example.com/internet_search",
+      "type": "documentation",
+      "description": "Official documentation for internet search",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

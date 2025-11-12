@@ -7,4 +7,4 @@
  */
 
 export const ERROR_DETECTION_DOMAIN = "error_detection"
-export const ERROR_DETECTION_VOCAB_PATH = "/src/ai/data/error_detection/error_detection_seedVocabulary.json"
+export const ERROR_DETECTION_VOCAB_PATH = "/src/ai/knowledge-domains/error_detection/error_detection_seeds/error_detection_seedVocabulary.json"

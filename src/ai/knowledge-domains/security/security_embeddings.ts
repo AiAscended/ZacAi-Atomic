@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./security_pretrained_weights.json"
+import pretrained from "./security_weights/security_pretrained_weights.json"
 import { SECURITY_DOMAIN } from "./security_constants"
 import { updateFile } from "../dataRegistry"
 
@@ -38,7 +38,7 @@ export const persistSecurityWeights = (weights: Record<string, number[]>) => {
       null,
       2,
     )
-    updateFile(SECURITY_DOMAIN, "src/ai/data/security/security_pretrained_weights.json", content)
+    updateFile(SECURITY_DOMAIN, "src/ai/knowledge-domains/security/security_weights/security_pretrained_weights.json", content)
     return true
   } catch (e) {
     return false

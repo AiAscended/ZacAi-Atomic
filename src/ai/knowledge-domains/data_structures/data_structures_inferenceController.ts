@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/data_structures/data_structures_inferenceController.ts
+ * File: src/ai/knowledge-domains/data_structures/data_structures_inferenceController.ts
  * Purpose: Data structures domain inference pipeline wrapper
  * Depends on: data_structures_tokenizer.ts, data_structures_semanticAnalyzer.ts
  * Depended on by: data_structures_integrationAPI.ts

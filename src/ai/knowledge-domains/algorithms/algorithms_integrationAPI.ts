@@ -6,49 +6,31 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerDomain } from "../registry"
-import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
+import path from 'path'
+
+import { domainRegistry } from '../domainRegistry'
 import { ALGORITHMS_DOMAIN } from "./algorithms_constants"
 import { loadAlgorithmsSeedVocabulary } from "./algorithms_vocabularyManager"
 import { algorithmsRunInference } from "./algorithms_inferenceController"
 import { algorithmsRunTrainingEpoch } from "./algorithms_trainingController"
 
+const DOMAIN_NAME = 'algorithms';
+const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+
 export const algorithmsInit = async () => {
   await loadAlgorithmsSeedVocabulary()
 
-  registerDomainFiles(ALGORITHMS_DOMAIN, [
-    "src/ai/data/algorithms/algorithms_seedVocabulary.json",
-    "src/ai/data/algorithms/algorithms_learnedData.json",
-    "src/ai/data/algorithms/algorithms_webDocReferences.json",
-    "src/ai/data/algorithms/algorithms_trainingWeights.bin",
-    "src/ai/data/algorithms/algorithms_pretrained_weights.json",
-    "src/ai/data/algorithms/algorithms_tokens.ts",
-    "src/ai/data/algorithms/algorithms_tokenMap.ts",
-    "src/ai/data/algorithms/algorithms_embeddings.ts",
-    "src/ai/data/algorithms/algorithms_tokenizer.ts",
-    "src/ai/data/algorithms/algorithms_parser.ts",
-    "src/ai/data/algorithms/algorithms_semanticAnalyzer.ts",
-    "src/ai/data/algorithms/algorithms_vocabularyManager.ts",
-    "src/ai/data/algorithms/algorithms_learnedDataManager.ts",
-    "src/ai/data/algorithms/algorithms_inferenceController.ts",
-    "src/ai/data/algorithms/algorithms_trainingController.ts",
-    "src/ai/data/algorithms/algorithms_modelWeightsLoader.ts",
-    "src/ai/data/algorithms/algorithms_meta.json",
-  ])
-
-  try {
-    watchDomainFiles(ALGORITHMS_DOMAIN)
-  } catch {}
-
-  registerDomain({
-    name: ALGORITHMS_DOMAIN,
-    version: "1.0.0",
-    initialize: async () => {
-      await loadAlgorithmsSeedVocabulary()
-    },
-    query: async (input: string) => algorithmsRunInference(input),
-    train: async (opts?: Record<string, unknown>) => algorithmsRunTrainingEpoch(opts as { epochs?: number }),
-  })
+  domainRegistry.registerDomain({
+  name: ALGORITHMS_DOMAIN,
+  displayName: 'Algorithms',
+  description: 'Algorithm design, complexity analysis, and optimization',
+  atomicLevel: 'molecule',
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
+});
 }
 
 void algorithmsInit()
