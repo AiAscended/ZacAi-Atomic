@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/code_review/code_review_inferenceController.ts
+ * File: src/ai/knowledge-domains/code_review/code_review_inferenceController.ts
  * Purpose: Code review domain inference pipeline wrapper
  * Depends on: code_review_tokenizer.ts, code_review_semanticAnalyzer.ts
  * Depended on by: code_review_integrationAPI.ts

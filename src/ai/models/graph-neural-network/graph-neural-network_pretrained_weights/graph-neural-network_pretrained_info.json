@@ -1,0 +1,12 @@
+{
+  "model": "graph-neural-network",
+  "source": "initialization",
+  "method": "Xavier/He initialization",
+  "date": "2025-11-02T11:55:05.054Z",
+  "description": "Base pretrained weights for model initialization",
+  "files": [
+    "graph-neural-network_pretrained_embeddings.bin",
+    "graph-neural-network_pretrained_encoder.bin",
+    "graph-neural-network_pretrained_decoder.bin"
+  ]
+}

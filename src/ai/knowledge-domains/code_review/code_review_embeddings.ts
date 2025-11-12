@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./code_review_pretrained_weights.json"
+import pretrained from "./code_review_weights/code_review_pretrained_weights.json"
 import { CODE_REVIEW_DOMAIN } from "./code_review_constants"
 import { updateFile } from "../dataRegistry"
 
@@ -38,7 +38,7 @@ export const persistCodeReviewWeights = (weights: Record<string, number[]>) => {
       null,
       2,
     )
-    updateFile(CODE_REVIEW_DOMAIN, "src/ai/data/code_review/code_review_pretrained_weights.json", content)
+    updateFile(CODE_REVIEW_DOMAIN, "src/ai/knowledge-domains/code_review/code_review_weights/code_review_pretrained_weights.json", content)
     return true
   } catch (e) {
     return false

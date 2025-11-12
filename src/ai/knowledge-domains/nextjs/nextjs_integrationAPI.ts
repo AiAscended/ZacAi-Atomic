@@ -6,58 +6,31 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerDomain } from "../registry"
+import path from 'path'
+
+import { domainRegistry } from '../domainRegistry'
 import { NEXTJS_DOMAIN } from "./nextjs_constants"
 import { loadNextjsSeedVocabulary } from "./nextjs_vocabularyManager"
 import { nextjsRunInference } from "./nextjs_inferenceController"
 import { nextjsRunTrainingEpoch } from "./nextjs_trainingController"
-import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
+
+const DOMAIN_NAME = 'nextjs';
+const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
 
 export const nextjsInit = async () => {
   await loadNextjsSeedVocabulary()
 
-  registerDomainFiles(NEXTJS_DOMAIN, [
-    "src/ai/data/nextjs/nextjs_seedVocabulary.json",
-    "src/ai/data/nextjs/nextjs_learnedData.json",
-    "src/ai/data/nextjs/nextjs_webDocReferences.json",
-    "src/ai/data/nextjs/nextjs_trainingWeights.bin",
-    "src/ai/data/nextjs/nextjs_pretrained_weights.json",
-    "src/ai/data/nextjs/nextjs_tokens.ts",
-    "src/ai/data/nextjs/nextjs_tokenMap.ts",
-    "src/ai/data/nextjs/nextjs_embeddings.ts",
-    "src/ai/data/nextjs/nextjs_tokenizer.ts",
-    "src/ai/data/nextjs/nextjs_parser.ts",
-    "src/ai/data/nextjs/nextjs_semanticAnalyzer.ts",
-    "src/ai/data/nextjs/nextjs_vocabularyManager.ts",
-    "src/ai/data/nextjs/nextjs_learnedDataManager.ts",
-    "src/ai/data/nextjs/nextjs_inferenceController.ts",
-    "src/ai/data/nextjs/nextjs_trainingController.ts",
-    "src/ai/data/nextjs/nextjs_modelWeightsLoader.ts",
-    "src/ai/data/nextjs/nextjs_domainRegistrar.ts",
-    "src/ai/data/nextjs/nextjs_meta.json",
-    "src/ai/data/nextjs/nextjs_constants.ts",
-    "src/ai/data/nextjs/nextjs_utils.ts",
-    "src/ai/data/nextjs/nextjs_url_lookup.ts",
-  ])
-
-  try {
-    watchDomainFiles(NEXTJS_DOMAIN)
-  } catch (e) {
-    // Ignore watch errors
-  }
-
-  registerDomain({
-    name: NEXTJS_DOMAIN,
-    version: "1.0.0",
-    initialize: async () => {
-      await loadNextjsSeedVocabulary()
-    },
-    query: async (input: string) => nextjsRunInference(input),
-    train: async (opts?: Record<string, unknown>) => {
-      const samples = (opts?.samples as any[]) || []
-      return nextjsRunTrainingEpoch(samples)
-    },
-  })
+  domainRegistry.registerDomain({
+  name: NEXTJS_DOMAIN,
+  displayName: 'Next.js',
+  description: 'Next.js framework, server-side rendering, and app router',
+  atomicLevel: 'molecule',
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
+});
 }
 
 void nextjsInit()

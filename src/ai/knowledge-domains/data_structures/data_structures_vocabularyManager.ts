@@ -10,7 +10,7 @@ import { safeParseJSON } from "./data_structures_utils"
 import { storageAdapter } from "../storageAdapter"
 
 export const loadDataStructuresSeedVocabulary = async (
-  path = "/src/ai/data/data_structures/data_structures_seedVocabulary.json",
+  path = "/src/ai/knowledge-domains/data_structures/data_structures_seeds/data_structures_seedVocabulary.json",
 ) => {
   try {
     const content = await storageAdapter.readFile(path, "utf-8")

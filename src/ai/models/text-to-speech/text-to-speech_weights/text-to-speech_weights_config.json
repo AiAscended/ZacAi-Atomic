@@ -1,0 +1,19 @@
+{
+  "model": "text-to-speech",
+  "version": "1.0.0",
+  "architecture": "text_to_speech",
+  "lastUpdated": "2025-11-02T11:55:05.073Z",
+  "weights": {
+    "current": "text-to-speech_current_weights.bin",
+    "pretrained": "text-to-speech_pretrained_weights.bin",
+    "checkpoint": "text-to-speech_checkpoint_weights.bin"
+  },
+  "trainingMetadata": {
+    "epochs": 0,
+    "steps": 0,
+    "accuracy": 0,
+    "loss": 0,
+    "validationAccuracy": 0,
+    "validationLoss": 0
+  }
+}

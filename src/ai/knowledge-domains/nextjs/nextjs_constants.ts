@@ -7,10 +7,10 @@
  */
 
 export const NEXTJS_DOMAIN = "nextjs"
-export const NEXTJS_VOCAB_PATH = "/src/ai/data/nextjs/nextjs_seedVocabulary.json"
-export const NEXTJS_LEARNED_DATA_PATH = "/src/ai/data/nextjs/nextjs_learnedData.json"
-export const NEXTJS_WEIGHTS_PATH = "/src/ai/data/nextjs/nextjs_pretrained_weights.json"
-export const NEXTJS_TRAINING_WEIGHTS_PATH = "/src/ai/data/nextjs/nextjs_trainingWeights.bin"
+export const NEXTJS_VOCAB_PATH = "/src/ai/knowledge-domains/nextjs/nextjs_seeds/nextjs_seedVocabulary.json"
+export const NEXTJS_LEARNED_DATA_PATH = "/src/ai/knowledge-domains/nextjs/nextjs_learned/nextjs_learnedData.json"
+export const NEXTJS_WEIGHTS_PATH = "/src/ai/knowledge-domains/nextjs/nextjs_weights/nextjs_pretrained_weights.json"
+export const NEXTJS_TRAINING_WEIGHTS_PATH = "/src/ai/knowledge-domains/nextjs/nextjs_weights/nextjs_trainingWeights.bin"
 
 // Next.js-specific constants
 export const NEXTJS_CONCEPTS = [

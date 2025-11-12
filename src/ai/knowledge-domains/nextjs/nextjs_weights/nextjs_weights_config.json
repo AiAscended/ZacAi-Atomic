@@ -1,0 +1,27 @@
+{
+  "domain": "nextjs",
+  "version": "1.0.0",
+  "lastUpdated": "2025-11-02T11:51:09.751Z",
+  "weightFiles": [
+    {
+      "name": "nextjs_base_weights.bin",
+      "type": "inference",
+      "description": "Base trained weights for domain inference",
+      "size": 0,
+      "checksum": null
+    },
+    {
+      "name": "nextjs_pretrained_weights.bin",
+      "type": "pretrained",
+      "description": "Pretrained weights from initialization",
+      "size": 0,
+      "checksum": null
+    }
+  ],
+  "trainingMetadata": {
+    "epochs": 0,
+    "lastTrainingDate": null,
+    "accuracy": 0,
+    "loss": 0
+  }
+}

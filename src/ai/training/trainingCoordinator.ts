@@ -5,7 +5,7 @@
  */
 
 import { LearningMetricsTracker } from '../monitoring/learningMetricsTracker';
-import { LLMWeightsManager } from '../models/unified-transformer-llm/llm-weights/llm-weightsManager';
+import { LLMWeightsManager } from '../models/unified-transformer-llm/unified-transformer-llm_weights/unified-transformer-llm-weightsManager';
 import type { InferenceMetrics } from '../monitoring/learningMetricsTracker';
 
 export interface TrainingConfig {

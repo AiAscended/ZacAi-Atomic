@@ -9,7 +9,7 @@
 import { safeParseJSON } from "./science_utils"
 import { storageAdapter } from "../storageAdapter"
 
-export const loadScienceSeedVocabulary = async (path = "/src/ai/data/science/science_seedVocabulary.json") => {
+export const loadScienceSeedVocabulary = async (path = "/src/ai/knowledge-domains/science/science_seeds/science_seedVocabulary.json") => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { concepts: [] }) as { concepts: string[] }

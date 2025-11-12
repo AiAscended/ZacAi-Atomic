@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./error_detection_pretrained_weights.json"
+import pretrained from "./error_detection_weights/error_detection_pretrained_weights.json"
 import { ERROR_DETECTION_DOMAIN } from "./error_detection_constants"
 import { updateFile } from "../dataRegistry"
 
@@ -38,7 +38,7 @@ export const persistErrorDetectionWeights = (weights: Record<string, number[]>) 
       null,
       2,
     )
-    updateFile(ERROR_DETECTION_DOMAIN, "src/ai/data/error_detection/error_detection_pretrained_weights.json", content)
+    updateFile(ERROR_DETECTION_DOMAIN, "src/ai/knowledge-domains/error_detection/error_detection_weights/error_detection_pretrained_weights.json", content)
     return true
   } catch (e) {
     return false

@@ -7,4 +7,4 @@
  */
 
 export const ENVIRONMENT_DOMAIN = "environment"
-export const ENVIRONMENT_VOCAB_PATH = "/src/ai/data/environment/environment_seedVocabulary.json"
+export const ENVIRONMENT_VOCAB_PATH = "/src/ai/knowledge-domains/environment/environment_seeds/environment_seedVocabulary.json"

@@ -6,49 +6,31 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerDomain } from "../registry"
+import path from 'path'
+
+import { domainRegistry } from '../domainRegistry'
 import { SECURITY_DOMAIN } from "./security_constants"
 import { loadSecuritySeedVocabulary } from "./security_vocabularyManager"
 import { securityRunInference } from "./security_inferenceController"
 import { securityRunTrainingEpoch } from "./security_trainingController"
-import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
+
+const DOMAIN_NAME = 'security';
+const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
 
 export const securityInit = async () => {
   await loadSecuritySeedVocabulary()
 
-  registerDomainFiles(SECURITY_DOMAIN, [
-    "src/ai/data/security/security_seedVocabulary.json",
-    "src/ai/data/security/security_learnedData.json",
-    "src/ai/data/security/security_webDocReferences.json",
-    "src/ai/data/security/security_trainingWeights.bin",
-    "src/ai/data/security/security_pretrained_weights.json",
-    "src/ai/data/security/security_tokens.ts",
-    "src/ai/data/security/security_tokenMap.ts",
-    "src/ai/data/security/security_embeddings.ts",
-    "src/ai/data/security/security_tokenizer.ts",
-    "src/ai/data/security/security_parser.ts",
-    "src/ai/data/security/security_semanticAnalyzer.ts",
-    "src/ai/data/security/security_vocabularyManager.ts",
-    "src/ai/data/security/security_learnedDataManager.ts",
-    "src/ai/data/security/security_inferenceController.ts",
-    "src/ai/data/security/security_trainingController.ts",
-    "src/ai/data/security/security_modelWeightsLoader.ts",
-    "src/ai/data/security/security_meta.json",
-  ])
-
-  try {
-    watchDomainFiles(SECURITY_DOMAIN)
-  } catch (e) {}
-
-  registerDomain({
-    name: SECURITY_DOMAIN,
-    version: "0.1",
-    initialize: async () => {
-      await loadSecuritySeedVocabulary()
-    },
-    query: async (input: string) => securityRunInference(input),
-    train: async (opts?: Record<string, unknown>) => securityRunTrainingEpoch(opts as { epochs?: number }),
-  })
+  domainRegistry.registerDomain({
+  name: SECURITY_DOMAIN,
+  displayName: 'Security',
+  description: 'Security analysis, vulnerability detection, and secure coding',
+  atomicLevel: 'molecule',
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
+});
 }
 
 void securityInit()

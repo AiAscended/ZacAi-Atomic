@@ -1,4 +1,4 @@
-import pretrained from './mathematics_pretrained_weights.json';
+import pretrained from './mathematics_weights/mathematics_pretrained_weights.json';
 import { MATHEMATICS_DOMAIN } from './mathematics_constants';
 import { updateFile } from '../dataRegistry';
 
@@ -38,7 +38,7 @@ export const persistMathematicsWeights = (weights: Record<string, number[]>) => 
     );
     updateFile(
       MATHEMATICS_DOMAIN,
-      'src/ai/data/mathematics/mathematics_pretrained_weights.json',
+      'src/ai/knowledge-domains/mathematics/mathematics_weights/mathematics_pretrained_weights.json',
       content
     );
     return true;

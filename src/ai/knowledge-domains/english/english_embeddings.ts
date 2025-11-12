@@ -1,4 +1,4 @@
-import pretrained from './english_pretrained_weights.json';
+import pretrained from './english_weights/english_pretrained_weights.json';
 import { ENGLISH_DOMAIN } from './english_constants';
 import { updateFile } from '../dataRegistry';
 
@@ -36,7 +36,7 @@ export const persistEnglishWeights = (weights: Record<string, number[]>) => {
       null,
       2
     );
-    updateFile(ENGLISH_DOMAIN, 'src/ai/data/english/english_pretrained_weights.json', content);
+    updateFile(ENGLISH_DOMAIN, 'src/ai/knowledge-domains/english/english_weights/english_pretrained_weights.json', content);
     return true;
   } catch (e) {
     return false;

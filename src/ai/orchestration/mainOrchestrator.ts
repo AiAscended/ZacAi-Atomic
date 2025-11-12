@@ -30,7 +30,7 @@ import * as logger from "./logger"
 import { domainRegistry } from "../knowledge-domains/domainRegistry"
 
 // Import LLM inference engine
-import { LLMInferenceEngine } from "../models/unified-transformer-llm/llm-inference/llm-inferenceEngine"
+import { LLMInferenceEngine } from "../models/unified-transformer-llm/unified-transformer-llm_inference/llm-inferenceEngine"
 
 // Import scientific calculator for quick mathematical inference
 import { ScientificCalculator } from "../shared/tools/shared-ScientificCalculator"
@@ -159,8 +159,10 @@ export class MainOrchestrator {
       this.availableModels.push("unified-transformer-llm")
       logger.info("LLM initialized", {})
 
-      // Step 2: Load knowledge domains
+      // Step 2: Load knowledge domains (real-time from unified registry)
       this.thinkingTracker.addStep("init_domains", "Loading knowledge domains")
+      // Wait briefly for async domain registrations to complete
+      await new Promise(resolve => setTimeout(resolve, 500))
       const allDomains = domainRegistry.getAllDomains()
       this.availableDomains = allDomains.map(d => d.name)
       logger.info(`Loaded ${this.availableDomains.length} knowledge domains`, {
@@ -319,7 +321,7 @@ export class MainOrchestrator {
             console.warn("[MainOrchestrator] LLM output quality too low (likely vocabulary not loaded)")
           }
         } else {
-          console.warn("[MainOrchestrator] LLM inference engine not initialized")
+          console.log("[MainOrchestrator] LLM inference disabled temporarily (dimension mismatch fix needed)")
         }
       } catch (error) {
         llmError = error as Error

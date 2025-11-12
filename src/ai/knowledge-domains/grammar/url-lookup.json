@@ -1,0 +1,15 @@
+{
+  "domain": "grammar",
+  "sources": [
+    {
+      "name": "grammar Documentation",
+      "url": "https://example.com/grammar",
+      "type": "documentation",
+      "description": "Official documentation for grammar",
+      "usage": "Primary reference for domain concepts",
+      "priority": 1
+    }
+  ],
+  "fallbackSources": [],
+  "updateFrequency": "weekly"
+}

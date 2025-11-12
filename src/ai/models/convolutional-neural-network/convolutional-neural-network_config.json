@@ -1,0 +1,25 @@
+{
+  "model": "convolutional-neural-network",
+  "version": "1.0.0",
+  "type": "neural_network",
+  "architecture": {
+    "input_dim": 512,
+    "hidden_dim": 1024,
+    "output_dim": 512,
+    "num_layers": 6,
+    "num_heads": 8,
+    "dropout": 0.1
+  },
+  "hyperparameters": {
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "max_epochs": 100,
+    "early_stopping_patience": 10
+  },
+  "paths": {
+    "seeds": "./convolutional-neural-network_seeds/",
+    "weights": "./convolutional-neural-network_weights/",
+    "pretrained": "./convolutional-neural-network_pretrained_weights/",
+    "checkpoints": "./convolutional-neural-network_checkpoints/"
+  }
+}

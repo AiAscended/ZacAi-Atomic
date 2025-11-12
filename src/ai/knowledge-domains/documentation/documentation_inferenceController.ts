@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/documentation/documentation_inferenceController.ts
+ * File: src/ai/knowledge-domains/documentation/documentation_inferenceController.ts
  * Purpose: Documentation domain inference pipeline wrapper
  * Depends on: documentation_tokenizer.ts, documentation_semanticAnalyzer.ts
  * Depended on by: documentation_integrationAPI.ts

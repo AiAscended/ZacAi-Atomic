@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/science/science_inferenceController.ts
+ * File: src/ai/knowledge-domains/science/science_inferenceController.ts
  * Purpose: Science domain inference pipeline wrapper
  * Depends on: science_tokenizer.ts, science_semanticAnalyzer.ts
  * Depended on by: science_integrationAPI.ts

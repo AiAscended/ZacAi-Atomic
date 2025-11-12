@@ -9,7 +9,7 @@
 import { safeParseJSON } from "./environment_utils"
 import { storageAdapter } from "../storageAdapter"
 
-export const loadEnvironmentLearnedData = async (path = "/src/ai/data/environment/environment_learnedData.json") => {
+export const loadEnvironmentLearnedData = async (path = "/src/ai/knowledge-domains/environment/environment_learned/environment_learnedData.json") => {
   try {
     const content = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(content, { notes: [], concepts: {} })
@@ -20,7 +20,7 @@ export const loadEnvironmentLearnedData = async (path = "/src/ai/data/environmen
 
 export const saveEnvironmentLearnedData = async (
   data: unknown,
-  path = "/src/ai/data/environment/environment_learnedData.json",
+  path = "/src/ai/knowledge-domains/environment/environment_learned/environment_learnedData.json",
 ) => {
   try {
     await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))

@@ -6,51 +6,31 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerDomain } from "../registry"
+import path from 'path'
+
+import { domainRegistry } from '../domainRegistry'
 import { GRAMMAR_DOMAIN } from "./grammar_constants"
 import { loadGrammarSeedVocabulary } from "./grammar_vocabularyManager"
 import { grammarRunInference } from "./grammar_inferenceController"
 import { grammarRunTrainingEpoch } from "./grammar_trainingController"
-import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
+
+const DOMAIN_NAME = 'grammar';
+const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
 
 export const grammarInit = async () => {
   await loadGrammarSeedVocabulary()
 
-  registerDomainFiles(GRAMMAR_DOMAIN, [
-    "src/ai/data/grammar/grammar_seedVocabulary.json",
-    "src/ai/data/grammar/grammar_learnedData.json",
-    "src/ai/data/grammar/grammar_webDocReferences.json",
-    "src/ai/data/grammar/grammar_trainingWeights.bin",
-    "src/ai/data/grammar/grammar_pretrained_weights.json",
-    "src/ai/data/grammar/grammar_tokens.ts",
-    "src/ai/data/grammar/grammar_tokenMap.ts",
-    "src/ai/data/grammar/grammar_embeddings.ts",
-    "src/ai/data/grammar/grammar_tokenizer.ts",
-    "src/ai/data/grammar/grammar_parser.ts",
-    "src/ai/data/grammar/grammar_semanticAnalyzer.ts",
-    "src/ai/data/grammar/grammar_vocabularyManager.ts",
-    "src/ai/data/grammar/grammar_learnedDataManager.ts",
-    "src/ai/data/grammar/grammar_inferenceController.ts",
-    "src/ai/data/grammar/grammar_trainingController.ts",
-    "src/ai/data/grammar/grammar_modelWeightsLoader.ts",
-    "src/ai/data/grammar/grammar_meta.json",
-  ])
-
-  try {
-    watchDomainFiles(GRAMMAR_DOMAIN)
-  } catch (e) {
-    // ignore watch failures
-  }
-
-  registerDomain({
-    name: GRAMMAR_DOMAIN,
-    version: "0.1",
-    initialize: async () => {
-      await loadGrammarSeedVocabulary()
-    },
-    query: async (input: string) => grammarRunInference(input),
-    train: async (opts?: Record<string, unknown>) => grammarRunTrainingEpoch(opts as { epochs?: number }),
-  })
+  domainRegistry.registerDomain({
+  name: GRAMMAR_DOMAIN,
+  displayName: 'Grammar',
+  description: 'Grammar rules, syntax analysis, and language structure',
+  atomicLevel: 'molecule',
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
+});
 }
 
 void grammarInit()

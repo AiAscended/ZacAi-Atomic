@@ -1,5 +1,5 @@
 /**
- * File: src/ai/data/grammar/grammar_inferenceController.ts
+ * File: src/ai/knowledge-domains/grammar/grammar_inferenceController.ts
  * Purpose: Grammar domain inference pipeline wrapper
  * Depends on: grammar_tokenizer.ts, grammar_semanticAnalyzer.ts
  * Depended on by: grammar_integrationAPI.ts

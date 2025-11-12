@@ -6,49 +6,31 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerDomain } from "../registry"
-import { registerDomainFiles, watchDomainFiles } from "../dataRegistry"
+import path from 'path'
+
+import { domainRegistry } from '../domainRegistry'
 import { VERSION_CONTROL_DOMAIN } from "./version_control_constants"
 import { loadVersionControlSeedVocabulary } from "./version_control_vocabularyManager"
 import { versionControlRunInference } from "./version_control_inferenceController"
 import { versionControlRunTrainingEpoch } from "./version_control_trainingController"
 
+const DOMAIN_NAME = 'version_control';
+const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+
 export const versionControlInit = async () => {
   await loadVersionControlSeedVocabulary()
 
-  registerDomainFiles(VERSION_CONTROL_DOMAIN, [
-    "src/ai/data/version_control/version_control_seedVocabulary.json",
-    "src/ai/data/version_control/version_control_learnedData.json",
-    "src/ai/data/version_control/version_control_webDocReferences.json",
-    "src/ai/data/version_control/version_control_trainingWeights.bin",
-    "src/ai/data/version_control/version_control_pretrained_weights.json",
-    "src/ai/data/version_control/version_control_tokens.ts",
-    "src/ai/data/version_control/version_control_tokenMap.ts",
-    "src/ai/data/version_control/version_control_embeddings.ts",
-    "src/ai/data/version_control/version_control_tokenizer.ts",
-    "src/ai/data/version_control/version_control_parser.ts",
-    "src/ai/data/version_control/version_control_semanticAnalyzer.ts",
-    "src/ai/data/version_control/version_control_vocabularyManager.ts",
-    "src/ai/data/version_control/version_control_learnedDataManager.ts",
-    "src/ai/data/version_control/version_control_inferenceController.ts",
-    "src/ai/data/version_control/version_control_trainingController.ts",
-    "src/ai/data/version_control/version_control_modelWeightsLoader.ts",
-    "src/ai/data/version_control/version_control_meta.json",
-  ])
-
-  try {
-    watchDomainFiles(VERSION_CONTROL_DOMAIN)
-  } catch {}
-
-  registerDomain({
-    name: VERSION_CONTROL_DOMAIN,
-    version: "1.0.0",
-    initialize: async () => {
-      await loadVersionControlSeedVocabulary()
-    },
-    query: async (input: string) => versionControlRunInference(input),
-    train: async (opts?: Record<string, unknown>) => versionControlRunTrainingEpoch(opts as { epochs?: number }),
-  })
+  domainRegistry.registerDomain({
+  name: VERSION_CONTROL_DOMAIN,
+  displayName: 'Version Control',
+  description: 'Git, version control workflows, and collaboration',
+  atomicLevel: 'molecule',
+  modules: [],
+  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+  enabled: true
+});
 }
 
 void versionControlInit()

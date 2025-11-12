@@ -1,0 +1,12 @@
+{
+  "model": "speech-to-text",
+  "source": "initialization",
+  "method": "Xavier/He initialization",
+  "date": "2025-11-02T11:55:05.070Z",
+  "description": "Base pretrained weights for model initialization",
+  "files": [
+    "speech-to-text_pretrained_embeddings.bin",
+    "speech-to-text_pretrained_encoder.bin",
+    "speech-to-text_pretrained_decoder.bin"
+  ]
+}

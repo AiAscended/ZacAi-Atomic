@@ -1,0 +1,60 @@
+{
+  "version": "1.0.0",
+  "type": "pretrained",
+  "domain": "repair",
+  "created": "2025-11-02T12:48:51.403Z",
+  "description": "Pretrained weights for repair domain - Basic role and task-specific functionality",
+  "architecture": {
+    "embedding_dim": 512,
+    "hidden_layers": 4,
+    "attention_heads": 8,
+    "vocab_size": 50000
+  },
+  "weights": {
+    "embeddings": {
+      "description": "Token and concept embeddings",
+      "shape": [
+        50000,
+        512
+      ],
+      "initialization": "xavier_uniform",
+      "frozen": false
+    },
+    "encoder_layers": {
+      "description": "Domain-specific encoding layers",
+      "count": 4,
+      "initialization": "he_normal"
+    },
+    "attention": {
+      "description": "Multi-head attention weights",
+      "heads": 8,
+      "initialization": "xavier_normal"
+    },
+    "output_projection": {
+      "description": "Final output layer",
+      "shape": [
+        512,
+        50000
+      ],
+      "initialization": "xavier_uniform"
+    }
+  },
+  "capabilities": [
+    "Understand repair domain concepts",
+    "Basic repair reasoning",
+    "Pattern recognition in repair context",
+    "Inference on repair-related queries"
+  ],
+  "performance": {
+    "accuracy": 0.65,
+    "f1_score": 0.6,
+    "perplexity": 45.2,
+    "inference_time_ms": 120
+  },
+  "metadata": {
+    "training_corpus": "repair documentation and examples",
+    "total_parameters": 25600000,
+    "pretrained_on": "general knowledge base",
+    "initialization_method": "xavier_uniform"
+  }
+}

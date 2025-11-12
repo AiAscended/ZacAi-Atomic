@@ -7,10 +7,10 @@
  */
 
 export const REACT_DOMAIN = "react"
-export const REACT_VOCAB_PATH = "/src/ai/data/react/react_seedVocabulary.json"
-export const REACT_LEARNED_DATA_PATH = "/src/ai/data/react/react_learnedData.json"
-export const REACT_WEIGHTS_PATH = "/src/ai/data/react/react_pretrained_weights.json"
-export const REACT_TRAINING_WEIGHTS_PATH = "/src/ai/data/react/react_trainingWeights.bin"
+export const REACT_VOCAB_PATH = "/src/ai/knowledge-domains/react/react_seeds/react_seedVocabulary.json"
+export const REACT_LEARNED_DATA_PATH = "/src/ai/knowledge-domains/react/react_learned/react_learnedData.json"
+export const REACT_WEIGHTS_PATH = "/src/ai/knowledge-domains/react/react_weights/react_pretrained_weights.json"
+export const REACT_TRAINING_WEIGHTS_PATH = "/src/ai/knowledge-domains/react/react_weights/react_trainingWeights.bin"
 
 // React-specific constants
 export const REACT_CONCEPTS = [

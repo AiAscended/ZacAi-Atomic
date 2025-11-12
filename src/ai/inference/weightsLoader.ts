@@ -25,7 +25,7 @@ export interface WeightsData {
  * For now, generates synthetic weights until real training is implemented
  */
 export async function loadWeights(domainName: string): Promise<WeightsData> {
-  const weightsPath = `src/ai/data/${domainName}/${domainName}_trainingWeights.bin`
+  const weightsPath = `src/ai/knowledge-domains/${domainName}/${domainName}_weights/${domainName}_trainingWeights.bin`
 
   try {
     logger.debug("WeightsLoader", `Loading weights for ${domainName} from ${weightsPath}`)

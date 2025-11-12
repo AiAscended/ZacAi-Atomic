@@ -10,7 +10,7 @@ import { safeParseJSON } from "./code_review_utils"
 import { storageAdapter } from "../storageAdapter"
 
 export const loadCodeReviewSeedVocabulary = async (
-  path = "/src/ai/data/code_review/code_review_seedVocabulary.json",
+  path = "/src/ai/knowledge-domains/code_review/code_review_seeds/code_review_seedVocabulary.json",
 ) => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
