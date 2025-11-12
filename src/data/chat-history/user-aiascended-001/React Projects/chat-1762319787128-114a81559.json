@@ -1,0 +1,33 @@
+{
+  "id": "chat-1762319787128-114a81559",
+  "title": "React Hooks Tutorial",
+  "folder": "React Projects",
+  "userId": "aiascended-001",
+  "messages": [
+    {
+      "id": "msg-1762319787129-5gxqt3l4y",
+      "role": "user",
+      "content": "Explain useState hook",
+      "domain": "react",
+      "timestamp": "2025-11-05T05:16:27.129Z"
+    },
+    {
+      "id": "msg-1762319787129-ozzl1ut9b",
+      "role": "assistant",
+      "content": "useState is a React hook that lets you add state to functional components...",
+      "domain": "react",
+      "confidence": 0.92,
+      "timestamp": "2025-11-05T05:16:27.129Z"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-11-05T05:16:27.128Z",
+    "updatedAt": "2025-11-05T05:16:27.131Z",
+    "lastAccessed": "2025-11-05T05:16:27.131Z",
+    "messageCount": 2,
+    "domains": [
+      "react"
+    ],
+    "tags": []
+  }
+}
