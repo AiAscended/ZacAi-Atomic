@@ -33,7 +33,7 @@ export default function SystemPage() {
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="theme">Theme</TabsTrigger>
           <TabsTrigger value="rag">RAG Settings</TabsTrigger>
           <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
         </TabsList>
@@ -95,6 +95,21 @@ export default function SystemPage() {
               <div className="space-y-2">
                 <Label htmlFor="timeout">Request Timeout (ms)</Label>
                 <Input id="timeout" type="number" defaultValue="30000" />
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="theme" className="space-y-4">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Theme Settings</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Dark Mode</Label>
+                  <p className="text-sm text-muted-foreground">Enable dark theme</p>
+                </div>
+                <Switch defaultChecked />
               </div>
             </div>
           </Card>
