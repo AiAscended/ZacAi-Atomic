@@ -43,6 +43,9 @@ import type { OrchestratorSettings } from "../shared/types/adminSettings"
 import { LearningMetricsTracker } from "../monitoring/learningMetricsTracker"
 import type { InferenceMetrics } from "../monitoring/learningMetricsTracker"
 
+// Import enhanced metrics collector for system self-awareness
+import { enhancedMetricsCollector } from "../monitoring/enhancedMetricsCollector"
+
 /**
  * Main Orchestrator Response Interface
  */
@@ -436,6 +439,16 @@ export class MainOrchestrator {
         logger.info("Failed to record learning metrics", { error: err })
       })
 
+      // Record enhanced metrics for system self-awareness and admin dashboard
+      enhancedMetricsCollector.recordInference({
+        confidence: synthesizedResponse.confidence,
+        latency: processingTime,
+        success: true,
+        domain: relevantDomains[0], // Primary domain
+        model: llmResponse ? 'unified-transformer-llm' : 'domain-inference',
+        tokensGenerated: llmResponse?.length || 0,
+      })
+
       // ============================================
       // RETURN COMPLETE RESPONSE
       // ============================================
@@ -458,6 +471,14 @@ export class MainOrchestrator {
       }
     } catch (error) {
       logger.info("Error in prompt processing", { error })
+      
+      // Record failed inference metrics
+      enhancedMetricsCollector.recordInference({
+        confidence: 0.1,
+        latency: Date.now() - processingStartTime,
+        success: false,
+        domain: 'general_knowledge',
+      })
       
       // Return error response
       return {

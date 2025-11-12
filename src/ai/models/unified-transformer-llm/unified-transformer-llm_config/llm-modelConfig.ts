@@ -37,10 +37,10 @@ export const defaultLLMConfig: LLMModelConfig = {
   numLayers: 12,
   numHeads: 12,
   hiddenSize: 768,
-  embeddingDim: 768, // Same as hiddenSize for unified architecture
-  hiddenDim: 3072, // 4x hiddenSize as per transformer standard
-  ffnSize: 3072,
-  vocabSize: 50257,
+  embeddingDim: 256, // Reduced for efficiency, matches domain embeddings
+  hiddenDim: 1024, // 4x embeddingDim
+  ffnSize: 1024,
+  vocabSize: 448, // Actual base vocabulary size from vocabularyManager
   maxSequenceLength: 2048,
   batchSize: 32,
   learningRate: 0.0001,
