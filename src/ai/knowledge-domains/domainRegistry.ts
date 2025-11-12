@@ -151,3 +151,41 @@ export class DomainRegistry extends EventEmitter {
 
 // Singleton instance
 export const domainRegistry = new DomainRegistry()
+
+/**
+ * TEMPORARY BRIDGE: Import old registry and auto-convert domains
+ * This bridges the old Map-based registry to the new class-based registry
+ * until all integration APIs are migrated
+ */
+import { listDomains as listOldDomains } from "./registry"
+
+// Auto-sync old registry domains to new registry on module load
+function syncLegacyDomains() {
+  const oldDomains = listOldDomains()
+  console.log(`[DomainRegistry] Syncing ${oldDomains.length} domains from legacy registry...`)
+  
+  for (const oldDomain of oldDomains) {
+    // Convert old domain format to new DomainMetadata format
+    const newDomainMetadata: DomainMetadata = {
+      name: oldDomain.name,
+      displayName: oldDomain.name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      description: `${oldDomain.name} knowledge domain`,
+      atomicLevel: "organ", // Default level for migrated domains
+      modules: [], // Legacy domains don't have module breakdown yet
+      seedDataPath: `src/ai/knowledge-domains/${oldDomain.name}/${oldDomain.name}_seedVocabulary.json`,
+      learnedDataPath: `src/ai/knowledge-domains/${oldDomain.name}/${oldDomain.name}_learnedData.json`,
+      weightsPath: `src/ai/knowledge-domains/${oldDomain.name}/${oldDomain.name}_pretrained_weights.json`,
+      enabled: true,
+    }
+    
+    // Only register if not already registered (avoid duplicates)
+    if (!domainRegistry.getDomain(oldDomain.name)) {
+      domainRegistry.registerDomain(newDomainMetadata)
+    }
+  }
+  
+  console.log(`[DomainRegistry] Synced ${domainRegistry.getAllDomains().length} domains total`)
+}
+
+// Auto-sync on module import
+syncLegacyDomains()

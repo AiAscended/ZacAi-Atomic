@@ -110,13 +110,23 @@ export default function HomePage() {
       })
       if (!res.ok) throw new Error(`Chat request failed (${res.status})`)
       const data = await res.json()
+      
+      console.log('[Chat UI] Received response:', {
+        hasText: !!data.text,
+        textLength: data.text?.length,
+        hasContentBlocks: !!data.contentBlocks,
+        hasMetadata: !!data.metadata,
+        thinkingSteps: data.metadata?.thinkingSteps?.length || 0
+      })
+      
       const assistantMessage: Message = {
         id: `assist-${Date.now()}`,
         role: "assistant",
-        content: data.text,
+        content: data.text || "No response text received",
         contentBlocks: {
-          textBlocks: data.metadata?.textBlocks || [],
-          codeBlocks: data.metadata?.codeBlocks || [],
+          // API returns contentBlocks at top level, not in metadata
+          textBlocks: data.contentBlocks?.textBlocks || [],
+          codeBlocks: data.contentBlocks?.codeBlocks || [],
         },
         thinkingSteps: data.metadata?.thinkingSteps || [],
       }
@@ -139,12 +149,24 @@ export default function HomePage() {
   // Render message content including modular code/text or plain text
   const renderMessageContent = (msg: Message) => {
     if (msg.role === "assistant" && msg.contentBlocks) {
-      // Map content blocks to include type field required by ResponseRenderer
-      const textBlocks = msg.contentBlocks.textBlocks.map((block) => ({
-        ...block,
-        type: "paragraph" as const,
-      }))
-      return <ResponseRenderer textBlocks={textBlocks} codeBlocks={msg.contentBlocks.codeBlocks} />
+      const hasTextBlocks = msg.contentBlocks.textBlocks && msg.contentBlocks.textBlocks.length > 0
+      const hasCodeBlocks = msg.contentBlocks.codeBlocks && msg.contentBlocks.codeBlocks.length > 0
+      
+      // If we have content blocks, render them
+      if (hasTextBlocks || hasCodeBlocks) {
+        const textBlocks = msg.contentBlocks.textBlocks.map((block) => ({
+          ...block,
+          type: "paragraph" as const,
+        }))
+        return <ResponseRenderer textBlocks={textBlocks} codeBlocks={msg.contentBlocks.codeBlocks} />
+      }
+      
+      // Fallback to plain content if blocks are empty
+      if (msg.content && msg.content.trim().length > 0) {
+        return <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
+      }
+      
+      return <div className="text-sm text-muted-foreground">No response content available</div>
     }
     return <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
   }
