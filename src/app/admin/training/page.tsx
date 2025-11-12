@@ -1,60 +1,222 @@
-/**
- * File: app/admin/training/page.tsx
- * Purpose: Training pipelines management and monitoring
- * Creator: Vercel v0 Coding Assistant
- */
+'use client';
 
-"use client"
+import { useEffect, useState } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Play, Pause, RotateCcw } from "lucide-react"
+export default function TrainingDashboard() {
+  const [status, setStatus] = useState<any>(null);
+  const [history, setHistory] = useState<any[]>([]);
+  const [settings, setSettings] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [triggering, setTriggering] = useState(false);
 
-export default function TrainingPage() {
+  const fetchData = async () => {
+    try {
+      const [statusRes, historyRes, settingsRes] = await Promise.all([
+        fetch('/api/admin/training?view=status'),
+        fetch('/api/admin/training?view=history'),
+        fetch('/api/admin/training?view=settings'),
+      ]);
+
+      const statusData = await statusRes.json();
+      const historyData = await historyRes.json();
+      const settingsData = await settingsRes.json();
+
+      if (statusData.success) setStatus(statusData.data);
+      if (historyData.success) setHistory(historyData.data);
+      if (settingsData.success) setSettings(settingsData.data);
+    } catch (error) {
+      console.error('Failed to fetch training data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const triggerTraining = async (mode: string) => {
+    setTriggering(true);
+    try {
+      const res = await fetch('/api/admin/training', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'trigger', params: { mode } }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        await fetchData();
+        alert(`Training ${mode} started successfully!`);
+      } else {
+        alert(`Failed to start training: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Training trigger failed:', error);
+      alert('Failed to trigger training');
+    } finally {
+      setTriggering(false);
+    }
+  };
+
+  const stopTraining = async () => {
+    try {
+      const res = await fetch('/api/admin/training', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'stop' }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        await fetchData();
+        alert('Training stopped successfully!');
+      }
+    } catch (error) {
+      console.error('Stop training failed:', error);
+      alert('Failed to stop training');
+    }
+  };
+
+  const updateSettings = async () => {
+    if (!settings) return;
+
+    try {
+      const res = await fetch('/api/admin/training', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert('Settings updated successfully!');
+      } else {
+        alert(`Failed to update settings: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Update settings failed:', error);
+      alert('Failed to update settings');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="p-8">
+        <h1 className="text-3xl font-bold mb-6">Training Management</h1>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Training Pipelines</h1>
-        <Button>
-          <Play className="h-4 w-4 mr-2" />
-          Start Training
-        </Button>
-      </div>
+    <div className="p-8 space-y-6">
+      <h1 className="text-3xl font-bold">Training Management</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {["React", "Next.js", "Programming", "TypeScript"].map((domain) => (
-          <Card key={domain} className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">{domain} Domain</h3>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Play className="h-3 w-3" />
+      {status && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Current Status</CardTitle>
+              <Badge className={status.isTraining ? 'bg-blue-500' : 'bg-gray-500'}>
+                {status.isTraining ? 'TRAINING' : 'IDLE'}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {status.isTraining && status.currentTraining ? (
+              <div className="space-y-2">
+                <p><span className="font-semibold">Mode:</span> {status.currentTraining.mode}</p>
+                <p><span className="font-semibold">Started:</span> {new Date(status.currentTraining.timestamp).toLocaleString()}</p>
+                <p><span className="font-semibold">Duration:</span> {(status.currentTraining.duration / 1000).toFixed(1)}s</p>
+                <Button onClick={stopTraining} variant="destructive" size="sm" className="mt-2">
+                  Stop Training
                 </Button>
-                <Button variant="outline" size="sm">
-                  <Pause className="h-3 w-3" />
-                </Button>
-                <Button variant="outline" size="sm">
-                  <RotateCcw className="h-3 w-3" />
-                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No training in progress</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Manual Training Triggers</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Button onClick={() => triggerTraining('full')} disabled={triggering || status?.isTraining}>
+              Full Training
+            </Button>
+            <Button onClick={() => triggerTraining('vocabulary')} disabled={triggering || status?.isTraining} variant="outline">
+              Vocabulary Only
+            </Button>
+            <Button onClick={() => triggerTraining('seeds')} disabled={triggering || status?.isTraining} variant="outline">
+              Seeds Only
+            </Button>
+            <Button onClick={() => triggerTraining('weights')} disabled={triggering || status?.isTraining} variant="outline">
+              Weights Only
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {settings && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Training Settings</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="schedule">Cron Schedule</Label>
+                <Input id="schedule" value={settings.schedule} onChange={(e) => setSettings({ ...settings, schedule: e.target.value })} />
+              </div>
+              <div>
+                <Label htmlFor="confidence">Confidence Threshold</Label>
+                <Input id="confidence" type="number" step="0.1" value={settings.confidenceThreshold} onChange={(e) => setSettings({ ...settings, confidenceThreshold: parseFloat(e.target.value) })} />
               </div>
             </div>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Status:</span>
-                <span className="font-medium">Ready</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Epochs:</span>
-                <span className="font-medium">0 / 100</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Loss:</span>
-                <span className="font-medium">N/A</span>
-              </div>
+            <Button onClick={updateSettings}>Save Settings</Button>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Training History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {history.length === 0 ? (
+            <p className="text-sm text-gray-500">No training history available</p>
+          ) : (
+            <div className="space-y-4">
+              {history.slice(0, 10).map((item) => (
+                <div key={item.id} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge className={item.status === 'completed' ? 'bg-green-500' : item.status === 'failed' ? 'bg-red-500' : 'bg-blue-500'}>
+                      {item.status}
+                    </Badge>
+                    <span className="text-sm text-gray-500">{new Date(item.timestamp).toLocaleString()}</span>
+                  </div>
+                  <p><span className="font-semibold">Mode:</span> {item.mode}</p>
+                  <p><span className="font-semibold">Duration:</span> {(item.duration / 1000).toFixed(1)}s</p>
+                </div>
+              ))}
             </div>
-          </Card>
-        ))}
-      </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
-  )
+  );
 }

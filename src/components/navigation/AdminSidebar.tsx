@@ -201,8 +201,7 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onClose }: Ad
     >
       <div className="flex flex-col h-full">
         {/* Header with close button */}
-        <div className="h-14 border-b flex items-center justify-between px-3">
-          {isExpanded && <span className="font-semibold text-sm">Navigation</span>}
+        <div className="h-14 border-b flex items-center justify-end px-3">
           <Button
             variant="ghost"
             size="icon"
