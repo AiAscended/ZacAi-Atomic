@@ -1,0 +1,30 @@
+[
+  {
+    "id": "user-aiascended-001",
+    "name": "AiAscended",
+    "email": "admin@aiascended.com",
+    "role": "admin",
+    "preferences": {
+      "theme": "dark",
+      "showThinking": true,
+      "codeHighlighting": true
+    },
+    "createdAt": "2025-11-05T03:13:16.475Z",
+    "updatedAt": "2025-11-05T03:13:16.475Z"
+  },
+  {
+    "id": "user-zac-system-001",
+    "name": "Zac",
+    "email": "zac@system.ai",
+    "role": "system",
+    "preferences": {
+      "theme": "dark",
+      "showThinking": true,
+      "codeHighlighting": true,
+      "autonomousActions": true,
+      "selfAwareness": true
+    },
+    "createdAt": "2025-11-05T03:13:16.475Z",
+    "updatedAt": "2025-11-05T03:13:16.475Z"
+  }
+]
