@@ -1,171 +1,93 @@
 /**
- * System Domain Inference Controller
- * Handles system-level operations, configuration, time/date, location, diagnostics, and management queries
- * Enhanced with system metrics integration for AI self-awareness
+ * File: src/ai/knowledge-domains/system/system_inferenceController.ts
+ * Purpose: System domain inference controller
+ * Handles inference for system configuration, deployment, and environment queries
  */
 
-import { DOMAIN_NAME } from './system_constants';
-import { systemMetricsIntegration } from '../../monitoring/systemMetricsIntegration';
-import { metricsCollector } from '../../monitoring/metricsCollector';
+import fs from 'fs/promises';
+import path from 'path';
 
-export const systemRunInference = async (input: string, _context?: any) => {
-  const lowerInput = input.toLowerCase();
-  
-  let responseText = '';
-  let confidence = 0.7;
-  const sources: string[] = [];
-  const metadata: any = {};
+const DOMAIN_NAME = 'system';
+const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+const SEEDS_DIR = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`);
 
-  // Handle system health/status queries
-  if (
-    lowerInput.includes('health') ||
-    lowerInput.includes('status') ||
-    lowerInput.includes('diagnostics') ||
-    lowerInput.includes('metrics') ||
-    lowerInput.includes('performance') ||
-    lowerInput.includes('memory') ||
-    lowerInput.includes('cpu')
-  ) {
-    try {
-      const diagnostics = await systemMetricsIntegration.getSystemDiagnostics();
-      const formattedDiag = systemMetricsIntegration.formatForAI(diagnostics);
+/**
+ * Load seed data for inference
+ */
+async function loadSeedData(): Promise<any[]> {
+  try {
+    const files = await fs.readdir(SEEDS_DIR);
+    const jsonFiles = files.filter(f => f.endsWith('.json'));
+    
+    const allConcepts: any[] = [];
+    for (const file of jsonFiles) {
+      const filePath = path.join(SEEDS_DIR, file);
+      const content = await fs.readFile(filePath, 'utf-8');
+      const data = JSON.parse(content);
       
-      responseText = `**System Diagnostics Report:**\n\n${formattedDiag}`;
-      confidence = 0.95;
-      sources.push('System Metrics Integration', 'Real-time Diagnostics');
-      metadata.systemDiagnostics = true;
-      metadata.metricsTimestamp = diagnostics.timestamp;
-      
-      return {
-        response: responseText,
-        confidence,
-        sources,
-        domain: DOMAIN_NAME,
-        metadata,
-      };
-    } catch (error) {
-      console.error('[SystemDomain] Failed to get diagnostics:', error);
-      responseText = 'Unable to retrieve system diagnostics at this time.';
-      confidence = 0.5;
+      if (data.concepts && Array.isArray(data.concepts)) {
+        allConcepts.push(...data.concepts);
+      } else if (Array.isArray(data)) {
+        allConcepts.push(...data);
+      }
     }
+    
+    return allConcepts;
+  } catch (error) {
+    console.error('[System] Error loading seed data:', error);
+    return [];
   }
+}
 
-  // Handle time/date queries - return actual system time/date
-  if (
-    lowerInput.includes("time") ||
-    lowerInput.includes("date") ||
-    lowerInput.includes("day") ||
-    lowerInput.includes("today") ||
-    lowerInput.includes("now") ||
-    lowerInput.includes("when") ||
-    lowerInput.includes("what's the date") ||
-    lowerInput.includes("what is the date")
-  ) {
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true,
-      timeZoneName: 'short'
+/**
+ * Run inference for system queries
+ */
+export const systemRunInference = async (input: string): Promise<any> => {
+  const normalizedInput = input.toLowerCase();
+  
+  // Keywords for system operations
+  const systemKeywords = [
+    'system', 'config', 'configuration', 'setup', 'deploy', 'deployment',
+    'environment', 'dependency', 'dependencies', 'infrastructure',
+    'server', 'host', 'network', 'resource', 'process',
+    'service', 'daemon', 'startup', 'shutdown', 'restart'
+  ];
+  
+  const hasSystemKeyword = systemKeywords.some(keyword => 
+    normalizedInput.includes(keyword)
+  );
+  
+  if (!hasSystemKeyword) {
+    return null;
+  }
+  
+  try {
+    const seedData = await loadSeedData();
+    
+    const matches = seedData.filter(concept => {
+      const conceptText = JSON.stringify(concept).toLowerCase();
+      return systemKeywords.some(keyword => conceptText.includes(keyword));
     });
-    const dateStr = now.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
     
-    responseText = `**Current System Time & Date:**\n\n`;
-    responseText += `🕐 **Time**: ${timeStr}\n`;
-    responseText += `📅 **Date**: ${dateStr}\n\n`;
-    responseText += `*Note: This is server time (UTC-based). For your local time, I'd need your timezone or location information.*`;
+    if (matches.length === 0) {
+      return null;
+    }
     
-    sources.push("System Clock (JavaScript Date API)");
-    confidence = 0.98;
-    metadata.timestamp = now.toISOString();
-    metadata.inferenceMethod = "system_time";
-    metadata.systemFunction = true;
-
     return {
-      response: responseText,
-      confidence,
-      sources,
-      domain: DOMAIN_NAME,
-      metadata,
+      response: `System operations analysis: Found ${matches.length} relevant system concepts. Review system configuration, dependencies, deployment requirements, and infrastructure settings to ensure proper operation.`,
+      confidence: 0.82,
+      topics: ['system configuration', 'deployment', 'infrastructure'],
+      metadata: {
+        domain: DOMAIN_NAME,
+        totalConcepts: seedData.length,
+        matchCount: matches.length,
+        matches: matches.slice(0, 5)
+      }
     };
+  } catch (error) {
+    console.error('[System] Inference error:', error);
+    return null;
   }
-
-  // Handle location/timezone queries
-  if (
-    lowerInput.includes("location") ||
-    lowerInput.includes("where") ||
-    lowerInput.includes("timezone") ||
-    lowerInput.includes("time zone")
-  ) {
-    responseText = `**System Location Information:**\n\n`;
-    responseText += `Server is running in a cloud environment. To provide accurate location-based information, I would need:\n\n`;
-    responseText += `- Your timezone preference\n`;
-    responseText += `- Your geographic location (city/country)\n`;
-    responseText += `- Or IP-based geolocation (with your permission)\n\n`;
-    responseText += `*Note: Location services require additional APIs and user permissions for accuracy.*`;
-    
-    confidence = 0.75;
-    sources.push("System Information");
-    metadata.systemFunction = true;
-
-    return {
-      response: responseText,
-      confidence,
-      sources,
-      domain: DOMAIN_NAME,
-      metadata,
-    };
-  }
-
-  // Handle system configuration/setup queries
-  if (
-    lowerInput.includes('system') ||
-    lowerInput.includes('config') ||
-    lowerInput.includes('setup') ||
-    lowerInput.includes('install') ||
-    lowerInput.includes('environment') ||
-    lowerInput.includes('deployment')
-  ) {
-    confidence = 0.85;
-    
-    responseText = `I can help with system-level operations and configuration:\n\n`;
-    responseText += `**Common System Tasks:**\n`;
-    responseText += `- ⚙️ Configuration management\n`;
-    responseText += `- 📦 Environment setup & dependencies\n`;
-    responseText += `- 🚀 Deployment processes\n`;
-    responseText += `- 🔧 System resource management\n`;
-    responseText += `- 🐛 System-level troubleshooting\n`;
-    responseText += `- 🕐 Time/date/timezone handling\n\n`;
-    responseText += `What specific system operation do you need help with?`;
-    
-    sources.push("System Domain Knowledge");
-    metadata.systemFunction = true;
-  } else {
-    responseText = `System domain handles:\n`;
-    responseText += `- System operations & utilities\n`;
-    responseText += `- Time, date, and timezone information\n`;
-    responseText += `- Configuration management\n`;
-    responseText += `- Environment setup\n\n`;
-    responseText += `How can I assist you?`;
-    
-    confidence = 0.6;
-    sources.push("System Domain");
-    metadata.systemFunction = true;
-  }
-
-  return {
-    response: responseText,
-    confidence,
-    sources,
-    domain: DOMAIN_NAME,
-    metadata,
-  };
 };
 
 export default systemRunInference;
