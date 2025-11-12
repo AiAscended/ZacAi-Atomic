@@ -168,6 +168,54 @@ export class SettingsStore {
   }
 
   /**
+   * Get training settings
+   */
+  async getTraining(): Promise<any> {
+    const all = await this.getAll();
+    return (all as any).training || {
+      enableAutoTraining: false,
+      trainingFrequency: 'daily',
+      trainingHour: 2,
+      minConfidenceForTraining: 0.7,
+      maxTrainingSamples: 1000,
+      batchSize: 32,
+      epochs: 10,
+      learningRate: 0.001,
+      tokenizerType: 'bpe',
+      embeddingDim: 512,
+      numLayers: 6,
+      numHeads: 8,
+      enableGradientClipping: true,
+      gradientClipValue: 1.0,
+      enableEarlyStopping: true,
+      earlyStoppingPatience: 3,
+      validationSplit: 0.2,
+      enableMetricsCollection: true,
+      metricsRetentionDays: 30,
+      enableSystemAwareness: true,
+      lastTrainingRun: null,
+      nextScheduledRun: null,
+    };
+  }
+
+  /**
+   * Update training settings
+   */
+  async updateTraining(updates: any): Promise<any> {
+    await this.initialize();
+    if (!this.settings) throw new Error("Settings not initialized");
+
+    const current = await this.getTraining();
+    (this.settings as any).training = {
+      ...current,
+      ...updates,
+    };
+    
+    await this.save();
+    return (this.settings as any).training;
+  }
+
+  /**
    * Get system settings
    */
   async getSystem(): Promise<SystemSettings> {
