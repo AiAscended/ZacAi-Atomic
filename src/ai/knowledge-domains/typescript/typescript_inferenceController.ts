@@ -822,3 +822,5 @@ function generateTypescriptSuggestions(semantics: Record<string, any>): string[]
 
   return suggestions
 }
+
+export default typescriptRunInference;

@@ -80,8 +80,23 @@ export class DomainQueryExecutor {
         };
       }
       
-      // Call domain-specific inference
-      const result = await inferenceModule(query);
+      // Call domain-specific inference with full context
+      // Build context object with tokens, embeddings, and any prior inference results
+      const context = {
+        query: query,
+        tokens: query.toLowerCase().split(/\s+/),  // Basic tokenization
+        embeddings: [],  // TODO: Add actual embeddings when available
+        inferenceResults: [],  // Can be populated with prior domain results
+        sentiment: { sentiment: 'neutral', score: 0.5 },  // Default neutral sentiment
+      };
+      
+      console.log(`[DomainQueryExecutor] Calling ${domainName} inference with query:`, query.substring(0, 50));
+      const result = await inferenceModule(query, context);
+      console.log(`[DomainQueryExecutor] ${domainName} returned:`, {
+        hasResult: !!result,
+        confidence: result?.confidence,
+        responseLength: result?.response?.length,
+      });
       
       if (!result) {
         return {

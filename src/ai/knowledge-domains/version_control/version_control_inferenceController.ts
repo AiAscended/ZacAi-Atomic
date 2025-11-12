@@ -19,3 +19,5 @@ export const versionControlRunInference = async (input: string) => {
     response: `Version control analysis: ${sem.parsed.operations.join(", ")} operations detected with ${sem.parsed.complexity} complexity.`,
   }
 }
+
+export default versionControlRunInference

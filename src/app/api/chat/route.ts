@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import "@/ai/knowledge-domains/registerAllDomains"
 import { promptHandler } from "@/ai/orchestration/promptHandler"
+import { domainRegistry } from "@/ai/knowledge-domains/domainRegistry"
 
 // Session storage
 const sessions = new Map<string, { history: Array<{ role: string; content: string }> }>()
@@ -9,8 +10,30 @@ function generateSessionId(): string {
   return `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
 
+// Ensure domains are registered before processing any requests
+let domainsReady = false
+async function ensureDomainsReady() {
+  if (domainsReady) return
+  
+  // Wait for domains to register (max 2 seconds)
+  for (let i = 0; i < 20; i++) {
+    const domains = domainRegistry.getAllDomains()
+    if (domains.length > 0) {
+      console.log(`[v0] ✅ ${domains.length} domains ready`)
+      domainsReady = true
+      return
+    }
+    await new Promise(resolve => setTimeout(resolve, 100))
+  }
+  
+  console.warn('[v0] ⚠️ Timeout waiting for domains to register')
+}
+
 export async function POST(request: Request) {
   try {
+    // Wait for domains to be ready
+    await ensureDomainsReady()
+    
     console.log("[v0] API route called")
 
     const body = await request.json()
@@ -93,14 +116,19 @@ export async function POST(request: Request) {
           contentBlocks: response.contentBlocks, // Include formatted content blocks
         })
       } catch (error) {
-        console.error("[v0] Error in AI processing:", error)
+        console.error("[v0] ❌ CRITICAL ERROR in AI processing:", error)
+        console.error("[v0] Error stack:", error instanceof Error ? error.stack : 'No stack trace')
+        console.error("[v0] Error type:", error?.constructor?.name)
+        console.error("[v0] Error message:", error instanceof Error ? error.message : String(error))
+        
         const errorText = "Sorry, something went wrong while processing your request. Please try again or check the Admin → Errors panel for details."
         return NextResponse.json({
           text: errorText,
-          domains: ["general"],
+          domains: ["general_knowledge"],
           confidence: 0.5,
           sources: [],
           error: String(error),
+          errorDetails: error instanceof Error ? { message: error.message, stack: error.stack } : { raw: String(error) },
           contentBlocks: {
             textBlocks: [{ id: "error-1", content: errorText }],
             codeBlocks: [],
