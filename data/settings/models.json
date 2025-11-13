@@ -1,0 +1,32 @@
+{
+  "orchestrator": {
+    "enabled": true,
+    "type": "llm",
+    "parameters": {},
+    "performance": {
+      "maxLatency": 5000,
+      "cacheEnabled": true
+    },
+    "updatedAt": "2025-11-05T05:51:54.575Z"
+  },
+  "intent-classifier": {
+    "enabled": true,
+    "type": "llm",
+    "parameters": {},
+    "performance": {
+      "maxLatency": 5000,
+      "cacheEnabled": true
+    },
+    "updatedAt": "2025-11-05T05:51:54.575Z"
+  },
+  "domain-router": {
+    "enabled": true,
+    "type": "llm",
+    "parameters": {},
+    "performance": {
+      "maxLatency": 5000,
+      "cacheEnabled": true
+    },
+    "updatedAt": "2025-11-05T05:51:54.575Z"
+  }
+}

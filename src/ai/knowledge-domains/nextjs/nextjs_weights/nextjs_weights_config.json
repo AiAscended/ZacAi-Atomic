@@ -1,27 +1,47 @@
 {
   "domain": "nextjs",
-  "version": "1.0.0",
-  "lastUpdated": "2025-11-02T11:51:09.751Z",
+  "version": "2.0.0",
+  "lastUpdated": "2025-11-05T06:34:16.637Z",
   "weightFiles": [
     {
-      "name": "nextjs_base_weights.bin",
-      "type": "inference",
-      "description": "Base trained weights for domain inference",
-      "size": 0,
-      "checksum": null
+      "name": "nextjs_pretrained_weights.json",
+      "type": "pretrained",
+      "description": "Baseline pretrained weights (minimal functional)",
+      "required": true,
+      "loadPriority": 2
     },
     {
-      "name": "nextjs_pretrained_weights.bin",
-      "type": "pretrained",
-      "description": "Pretrained weights from initialization",
-      "size": 0,
-      "checksum": null
+      "name": "nextjs_trained_weights_v1_2025-11-05.json",
+      "type": "trained",
+      "description": "Production-ready trained weights v1",
+      "required": false,
+      "loadPriority": 1
     }
   ],
-  "trainingMetadata": {
-    "epochs": 0,
-    "lastTrainingDate": null,
-    "accuracy": 0,
-    "loss": 0
+  "loadingStrategy": {
+    "preferLatestTrained": true,
+    "fallbackToPretrained": true,
+    "versionSelection": "timestamp_descending",
+    "caching": {
+      "enabled": true,
+      "ttlMinutes": 60
+    }
+  },
+  "architecture": {
+    "embeddingDim": 512,
+    "embeddingDimCompact": 256,
+    "numLayers": 6,
+    "numHeads": 8,
+    "ffnDim": 2048,
+    "maxSeqLength": 2048,
+    "baseVocabSize": 50000,
+    "dropout": 0.1,
+    "layerNorm": true,
+    "residualConnections": true
+  },
+  "compatibility": {
+    "minVersion": "1.0.0",
+    "maxVersion": "2.0.0",
+    "backwardCompatible": true
   }
 }

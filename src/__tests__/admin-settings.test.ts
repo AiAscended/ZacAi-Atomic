@@ -3,7 +3,7 @@
  * Purpose: Basic tests for admin settings functionality
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   validateSystemSettings,
   validateOrchestratorSettings,
