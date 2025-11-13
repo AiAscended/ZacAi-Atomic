@@ -78,10 +78,10 @@ export function getDefinition(key: string, domain?: string): string | null {
   if (!entry?.fullData) return null;
   
   const def = entry.fullData.definition || 
-         entry.fullData.description || 
-         entry.fullData.explanation;
+              entry.fullData.description || 
+              entry.fullData.explanation;
   
-  return typeof def === 'string' ? def : null;
+  return def ? String(def) : null;
 }
 
 /**
@@ -200,13 +200,12 @@ export function lookupWithContext(key: string, domain?: string): {
   }
   
   // Get related terms
-  const relatedKeys = main.fullData?.related;
-  if (Array.isArray(relatedKeys)) {
-    for (const relKey of relatedKeys as string[]) {
-      const relSeed = seedRegistry.lookup(relKey, domain);
-      if (relSeed) {
-        result.related.push(relSeed);
-      }
+  const related = main.fullData?.related;
+  const relatedKeys = Array.isArray(related) ? related : [];
+  for (const relKey of relatedKeys) {
+    const relSeed = seedRegistry.lookup(String(relKey), domain);
+    if (relSeed) {
+      result.related.push(relSeed);
     }
   }
   

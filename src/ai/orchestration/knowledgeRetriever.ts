@@ -45,7 +45,7 @@ export class KnowledgeRetriever {
     }
 
     // Step 1: Check cache
-    const cached = this.cache.get<{ content: string; relevance: number }>(query)
+    const cached = this.cache.get<{ content: string }>(query)
     if (cached) {
       results.cacheHits++
       results.documents.push({
@@ -56,20 +56,20 @@ export class KnowledgeRetriever {
     }
 
     // Step 2: Load from local knowledge base
+    const allKBDocs: Array<{ doc: import("../knowledge_retrieval/localKBLoader").KBDocument; domain: string }> = []
     for (const domain of domains) {
       const kbDocs = await this.kbLoader.load(domain)
-      results.documents.push(...kbDocs.map((doc) => ({ 
-        content: doc.text,
-        source: `kb:${domain}`,
-        relevance: 0.7
-      })))
+      allKBDocs.push(...kbDocs.map((doc) => ({ doc, domain })))
     }
 
-    // Step 3: Rank documents by relevance
-    if (results.documents.length > 0) {
-      // Simple ranking: sort by relevance score
-      results.documents.sort((a, b) => b.relevance - a.relevance)
-      results.documents = results.documents.slice(0, 5)
+    // Step 3: Retrieve and rank documents
+    if (allKBDocs.length > 0) {
+      const rankedDocs = this.retriever.retrieve(query, allKBDocs.map(item => item.doc), 5)
+      results.documents.push(...rankedDocs.map((doc, idx) => ({
+        content: doc.text,
+        relevance: 1.0 - (idx * 0.1), // Decreasing relevance
+        source: `kb:${allKBDocs.find(item => item.doc.id === doc.id)?.domain || 'unknown'}`,
+      })))
     }
 
     if (useWeb) {

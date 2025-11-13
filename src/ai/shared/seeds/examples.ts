@@ -65,8 +65,10 @@ function example3_search() {
   
   console.log(`Found ${results.length} results:`);
   results.forEach(result => {
-    const def = result.fullData?.definition as string | undefined;
-    console.log(`  - ${result.concept}: ${def?.substring(0, 60) || 'No definition'}...`);
+    if (result.fullData && result.fullData.definition) {
+      const def = String(result.fullData.definition);
+      console.log(`  - ${result.concept}: ${def.substring(0, 60)}...`);
+    }
   });
 }
 
@@ -167,10 +169,10 @@ async function example8_orchestratorUsage(userPrompt: string) {
   
   // Get enriched context for that domain
   knownSeeds
-    .filter(s => s.domain === mostRelevantDomain)
+    .filter(s => s.domain === mostRelevantDomain && s.fullData)
     .forEach(seed => {
-      const def = seed.fullData?.definition as string | undefined;
-      console.log(`  - ${seed.concept}: ${def?.substring(0, 80) || 'No definition'}...`);
+      const def = String(seed.fullData!.definition || '');
+      console.log(`  - ${seed.concept}: ${def.substring(0, 80)}...`);
     });
 }
 
@@ -220,18 +222,18 @@ async function example10_domainInference(concept: string, domain: string) {
   
   if (context.main && context.main.fullData) {
     const seed = context.main;
-    const fullData = seed.fullData!; // Non-null assertion - we just checked it above
+    const fullData = seed.fullData!; // Non-null assertion - checked above
     
     console.log(`Generating response for: ${concept}`);
     console.log(`\nSeed context available:`);
     console.log(`  - Definition: ${fullData.definition}`);
-    console.log(`  - ${Array.isArray(fullData.examples) ? fullData.examples.length : 0} examples`);
+    console.log(`  - ${(fullData.examples as unknown[])?.length || 0} examples`);
     console.log(`  - ${context.related.length} related concepts`);
     
     // Construct enhanced response
     const response = {
       answer: fullData.definition,
-      examples: Array.isArray(fullData.examples) ? fullData.examples : [],
+      examples: fullData.examples || [],
       relatedConcepts: context.related.map(r => r.concept),
       usage: fullData.usage,
       category: seed.category,
