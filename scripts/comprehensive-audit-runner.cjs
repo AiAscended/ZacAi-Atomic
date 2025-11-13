@@ -207,6 +207,8 @@ function phase3_domainRegistration() {
   total++;
   if (checkFileExists(domainRegistryPath, 'Domain registry') || checkFileExists(altDomainRegistryPath, 'Domain registry (alt)')) {
     passed++;
+  } else if (!domainRegistryPath) {
+    error('Domain registry not found in any expected location');
   }
 
   // Check for domain directories
@@ -301,7 +303,9 @@ function phase4_vocabularyAnalysis() {
       vocab = { vocabulary: [] };
     }
     
-    const size = vocab.vocabulary ? vocab.vocabulary.length : 0;
+    // Support both "vocabulary" and "vocab" keys
+    const vocabArray = vocab.vocabulary || vocab.vocab || [];
+    const size = vocabArray.length;
     vocabSizes.push({ domain, size });
     
     if (size >= 50) {
