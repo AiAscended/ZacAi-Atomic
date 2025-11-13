@@ -5,18 +5,23 @@
 
 export const detectSentiment = (
   text: string
-): { polarity: 'positive' | 'neutral' | 'negative'; emotion: string; confidence: number } => {
+): { 
+  sentiment: 'positive' | 'neutral' | 'negative'
+  score: number
+  emotion: string
+} => {
   const t = text.toLowerCase();
-  const positive = ['good', 'great', 'love', 'happy', 'awesome'];
-  const negative = ['bad', 'hate', 'angry', 'sad', 'terrible', 'awful'];
+  const positive = ['good', 'great', 'love', 'happy', 'awesome', 'excellent', 'wonderful'];
+  const negative = ['bad', 'hate', 'angry', 'sad', 'terrible', 'awful', 'frustrated'];
   
-  // Emotion patterns
+  // Emotion keywords
   const emotions = {
-    happy: ['happy', 'joy', 'excited', 'glad', 'delighted'],
-    sad: ['sad', 'unhappy', 'disappointed', 'depressed'],
-    angry: ['angry', 'furious', 'mad', 'annoyed'],
-    fearful: ['afraid', 'scared', 'worried', 'anxious'],
-    neutral: ['okay', 'fine', 'alright']
+    happy: ['happy', 'joy', 'excited', 'delighted'],
+    angry: ['angry', 'mad', 'furious', 'hate'],
+    sad: ['sad', 'disappointed', 'depressed'],
+    frustrated: ['frustrated', 'annoyed', 'irritated'],
+    surprised: ['surprised', 'amazed', 'shocked'],
+    neutral: ['okay', 'fine', 'alright'],
   };
   
   const p = positive.reduce((acc, w) => acc + (t.includes(w) ? 1 : 0), 0);
@@ -24,16 +29,14 @@ export const detectSentiment = (
   
   // Detect emotion
   let detectedEmotion = 'neutral';
-  let emotionCount = 0;
-  for (const [emotion, words] of Object.entries(emotions)) {
-    const count = words.reduce((acc, w) => acc + (t.includes(w) ? 1 : 0), 0);
-    if (count > emotionCount) {
-      emotionCount = count;
+  for (const [emotion, keywords] of Object.entries(emotions)) {
+    if (keywords.some(kw => t.includes(kw))) {
       detectedEmotion = emotion;
+      break;
     }
   }
   
-  if (p > n) return { polarity: 'positive', emotion: detectedEmotion, confidence: p / (p + n || 1) };
-  if (n > p) return { polarity: 'negative', emotion: detectedEmotion, confidence: n / (p + n || 1) };
-  return { polarity: 'neutral', emotion: detectedEmotion, confidence: 0.5 };
+  if (p > n) return { sentiment: 'positive', score: p / (p + n || 1), emotion: detectedEmotion };
+  if (n > p) return { sentiment: 'negative', score: n / (p + n || 1), emotion: detectedEmotion };
+  return { sentiment: 'neutral', score: 0.5, emotion: detectedEmotion };
 };

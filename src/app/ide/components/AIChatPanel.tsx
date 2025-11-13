@@ -52,8 +52,8 @@ export function AIChatPanel() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { tabs: openFiles, activeTabId: activeFileId, getTab: getFileById, updateTabContent: updateFileContent } = useEditorStore();
-  const { fileTree, createFile } = useFileSystem();
+  const { tabs, activeTabId, getTab, updateTabContent } = useEditorStore();
+  const { fileTree, writeFile } = useFileSystem();
 
   // Initialize AI assistant
   useEffect(() => {
@@ -76,7 +76,7 @@ export function AIChatPanel() {
 
   // Build IDE context
   const getIDEContext = (): IDEContext => {
-    const activeFile = activeFileId ? getFileById(activeFileId) : undefined;
+    const activeFile = activeTabId ? getTab(activeTabId) : undefined;
     const projectFiles = fileTree.map((node) => node.path);
 
     return {
@@ -87,10 +87,10 @@ export function AIChatPanel() {
             language: activeFile.language,
           }
         : undefined,
-      openFiles: openFiles.map((file) => ({
-        path: file.path,
-        content: file.content,
-        language: file.language,
+      openFiles: tabs.map((tab) => ({
+        path: tab.path,
+        content: tab.content,
+        language: tab.language,
       })),
       projectFiles,
     };
@@ -138,12 +138,7 @@ export function AIChatPanel() {
   };
 
   const handleQuickAction = async (action: string) => {
-    if (!activeFileId) {
-      setInput(`${action} code for: `);
-      return;
-    }
-    
-    const activeFile = getFileById(activeFileId);
+    const activeFile = activeTabId ? getTab(activeTabId) : undefined;
     
     if (!activeFile) {
       setInput(`${action} code for: `);
@@ -204,16 +199,16 @@ export function AIChatPanel() {
       // Create new file
       try {
         const path = `/${filename}`;
-        await createFile(path, code);
+        await writeFile(path, code);
         // The file system hook will refresh the tree
       } catch (error) {
         console.error('Failed to create file:', error);
       }
-    } else if (activeFileId) {
+    } else if (activeTabId) {
       // Insert into active file
-      const activeFile = getFileById(activeFileId);
+      const activeFile = getTab(activeTabId);
       if (activeFile) {
-        updateFileContent(activeFileId, code);
+        updateTabContent(activeTabId, code);
       }
     }
   };

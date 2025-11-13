@@ -146,7 +146,7 @@ export class UnifiedOrchestrator {
     console.log(`🤖 Using model: ${model.manifest.displayName}`);
     
     // Call model's inference engine
-    const instance = model.instance as { infer?: (query: string, context?: unknown) => Promise<unknown> };
+    const instance = model.instance as { infer?: (query: string, context?: unknown) => Promise<unknown> }
     if (instance && typeof instance.infer === "function") {
       return await instance.infer(request.query, request.context);
     }
@@ -166,7 +166,7 @@ export class UnifiedOrchestrator {
     console.log(`📚 Using domain: ${domain.manifest.displayName}`);
     
     // Call domain's integration API
-    const instance = domain.instance as { query?: (query: string, context?: unknown) => Promise<unknown> };
+    const instance = domain.instance as { query?: (query: string, context?: unknown) => Promise<unknown> }
     if (instance && typeof instance.query === "function") {
       return await instance.query(request.query, request.context);
     }

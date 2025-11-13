@@ -112,7 +112,7 @@ export async function performSemanticInference(
         
         // Extract code examples if available
         if (seed.fullData.examples && Array.isArray(seed.fullData.examples)) {
-          (seed.fullData.examples as string[]).forEach((ex: string) => {
+          seed.fullData.examples.forEach((ex: string) => {
             if (ex.includes('{') || ex.includes('function') || ex.includes('const') || ex.includes('import')) {
               codeExamples.push(ex);
             }
@@ -204,14 +204,15 @@ export async function searchCodeExamples(
   for (const keyword of keywords) {
     try {
       const seed = await seedRegistry.lookup(keyword, domain);
-      if (seed?.fullData && seed.fullData.examples && Array.isArray(seed.fullData.examples)) {
+      if (seed && seed.fullData && seed.fullData.examples && Array.isArray(seed.fullData.examples)) {
         const fullData = seed.fullData;
-        (fullData.examples as string[]).forEach((ex: string) => {
+        const examples_array = fullData.examples as string[]; // Type assertion
+        examples_array.forEach((ex: string) => {
           if (ex.includes('{') || ex.includes('function') || ex.includes('const')) {
             examples.push({
               code: ex,
-              concept: (fullData.word || fullData.concept) as string,
-              language: (fullData.language as string) || 'typescript'
+              concept: String(fullData.word || fullData.concept || 'unknown'),
+              language: String(fullData.language || 'typescript')
             });
           }
         });
@@ -233,11 +234,9 @@ export async function getRelatedConcepts(
 ): Promise<string[]> {
   try {
     const seed = await seedRegistry.lookup(term, domain);
-    if (seed?.fullData) {
-      const related = seed.fullData.relatedConcepts || seed.fullData.related;
-      if (Array.isArray(related)) {
-        return related as string[];
-      }
+    if (seed && seed.fullData) {
+      const relatedConcepts = seed.fullData.relatedConcepts || seed.fullData.related;
+      return Array.isArray(relatedConcepts) ? relatedConcepts as string[] : [];
     }
   } catch (error) {
     // Seed not found

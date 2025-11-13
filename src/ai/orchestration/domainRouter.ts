@@ -11,7 +11,7 @@
  */
 
 import { logger } from "./logger"
-import { listDomains, getDomain } from "../knowledge-domains/domainRegistry"
+import { domainRegistry } from "../knowledge-domains/domainRegistry"
 
 export interface DomainRoutingCriteria {
   keywords: string[]
@@ -280,7 +280,7 @@ export class DomainRouter {
     logger.info("DomainRouter: Routing to domains", { criteria })
 
     // Get all available domains from registry
-    const availableDomains = listDomains()
+    const availableDomains = domainRegistry.getAllDomains().map(d => d.name)
 
     // Score each domain based on keyword matches
     for (const domainName of availableDomains) {

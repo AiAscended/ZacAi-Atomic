@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { readEvents } from '@/lib/systemActivityLogger';
 import { addSecurityHeaders, generateRequestId } from '@/lib/productionHardening';
 
 // CommonJS require for .cjs file

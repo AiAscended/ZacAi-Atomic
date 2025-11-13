@@ -22,6 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <AdminSidebar
         isOpen={isSidebarOpen}
         isExpanded={isSidebarExpanded}
+        onClose={() => setIsSidebarOpen(false)}
         onExpandToggle={() => setIsSidebarExpanded(!isSidebarExpanded)}
         onClose={() => setIsSidebarOpen(false)}
       />

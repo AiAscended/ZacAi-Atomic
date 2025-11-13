@@ -13,17 +13,18 @@ export function CodeEditor() {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof monaco | null>(null);
   const { 
-    tabs: openFiles, 
-    activeTabId: activeFileId, 
-    closeTab: closeFile, 
-    setActiveTab: setActiveFile, 
-    updateTabContent: updateFileContent,
-    getTab: getFileById 
+    tabs, 
+    activeTabId, 
+    closeTab, 
+    setActiveTab, 
+    updateTabContent,
+    saveFile,
+    getTab 
   } = useEditorStore();
-  const { } = useFileSystem();
+  const { writeFile } = useFileSystem();
   const [theme, setTheme] = useState<'vs-dark' | 'light'>('vs-dark');
 
-  const activeFile = activeFileId ? getFileById(activeFileId) : undefined;
+  const activeFile = getTab(activeTabId);
 
   const handleEditorDidMount: OnMount = (editor, monacoInstance) => {
     editorRef.current = editor;
@@ -184,20 +185,20 @@ export function CodeEditor() {
   };
 
   const handleSave = async () => {
-    if (activeFileId && fs) {
-      await saveFile(activeFileId, fs);
+    if (activeTabId && fs) {
+      await saveFile(activeTabId, fs);
     }
   };
 
   const handleChange = (value: string | undefined) => {
-    if (value !== undefined && activeFileId) {
-      updateFileContent(activeFileId, value);
+    if (value !== undefined && activeTabId) {
+      updateTabContent(activeTabId, value);
     }
   };
 
   const handleCloseTab = (fileId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    closeFile(fileId);
+    closeTab(fileId);
   };
 
   // Update editor content when active file changes
@@ -218,7 +219,7 @@ export function CodeEditor() {
     }
   }, [activeFile?.id, activeFile?.content, activeFile?.language]);
 
-  if (openFiles.length === 0) {
+  if (tabs.length === 0) {
     return (
       <div className="h-full w-full flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
@@ -238,16 +239,16 @@ export function CodeEditor() {
     <div className="h-full w-full flex flex-col bg-background">
       {/* Tabs */}
       <div className="flex items-center bg-muted/30 border-b overflow-x-auto">
-        {openFiles.map((file) => (
+        {tabs.map((file) => (
           <div
             key={file.id}
             className={cn(
               'flex items-center gap-2 px-4 py-2 border-r cursor-pointer transition-colors group',
-              file.id === activeFileId
+              file.id === activeTabId
                 ? 'bg-background text-foreground'
                 : 'hover:bg-muted/50 text-muted-foreground'
             )}
-            onClick={() => setActiveFile(file.id)}
+            onClick={() => setActiveTab(file.id)}
           >
             <span className="text-sm font-medium truncate max-w-[150px]">
               {file.path.split('/').pop()}
