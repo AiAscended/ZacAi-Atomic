@@ -51,7 +51,7 @@ export class KnowledgeRetriever {
       results.documents.push({
         content: cached.content,
         source: "cache",
-        relevance: 1.0,
+        relevance: cached.relevance || 1.0,
       })
     }
 

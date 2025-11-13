@@ -7,6 +7,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readEvents } from '@/lib/systemActivityLogger';
 import { addSecurityHeaders, generateRequestId } from '@/lib/productionHardening';
 
+// CommonJS require for .cjs file
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { readEvents } = require('@/lib/systemActivityLogger.cjs');
+
 export async function GET(request: NextRequest) {
   const requestId = generateRequestId();
   
