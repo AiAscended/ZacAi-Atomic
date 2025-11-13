@@ -48,4 +48,11 @@ export class SlotFiller {
   addSlotPattern(slotName: string, pattern: RegExp): void {
     this.slotPatterns.set(slotName, pattern)
   }
+
+  /**
+   * Alias for extractSlots - fills slots from text
+   */
+  fill(text: string, slotNames?: string[]): Record<string, string | null> {
+    return this.extractSlots(text, slotNames)
+  }
 }

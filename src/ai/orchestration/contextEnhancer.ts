@@ -30,7 +30,7 @@ export interface EnhancedContext {
     emotion: string
     confidence: number
   }
-  slots: Record<string, string>
+  slots: Record<string, string | null>
   userProfile: {
     name?: string
     preferences?: Record<string, unknown>
