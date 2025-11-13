@@ -265,4 +265,4 @@ const seed = await lookupSeed("addition", "mathematics")
 console.log(seed.fullData.definition) // "Combining two or more numbers..."
 ```
 
-🚀 **Your hybrid AI system now has a "mental reference library"!**
+🚀 **The hybrid AI system now has a "mental reference library"!**
