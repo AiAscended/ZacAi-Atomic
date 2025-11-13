@@ -25,11 +25,13 @@ export const persistVersionControlWeights = (weights: Record<string, number[]>) 
     null,
     2,
   )
-  const { updateFile } = require("../../orchestration/fileWatcher")
-  updateFile(VERSION_CONTROL_DOMAIN, "src/ai/knowledge-domains/version_control/version_control_weights/version_control_pretrained_weights.json", content)
+  // TODO: Implement proper file writing mechanism
+  // This functionality should be handled by a dedicated file management service
+  console.warn('[version_control_embeddings] persistVersionControlWeights: File writing not implemented yet')
   return {
-    success: true,
+    success: false,
     path: "src/ai/knowledge-domains/version_control/version_control_weights/version_control_pretrained_weights.json",
+    error: "File writing not implemented"
   }
 }
 

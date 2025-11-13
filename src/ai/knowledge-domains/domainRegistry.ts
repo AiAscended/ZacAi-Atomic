@@ -54,8 +54,8 @@ export class DomainRegistry extends EventEmitter {
     this.domains.set(metadata.name, metadata)
 
     // Index all modules for quick lookup
-    for (const module of metadata.modules) {
-      this.moduleIndex.set(`${metadata.name}:${module.name}`, module)
+    for (const mod of metadata.modules) {
+      this.moduleIndex.set(`${metadata.name}:${mod.name}`, mod)
     }
 
     this.emit("domain:registered", metadata)
@@ -93,8 +93,8 @@ export class DomainRegistry extends EventEmitter {
    * Resolve module dependencies
    */
   resolveDependencies(moduleName: string): ModuleMetadata[] {
-    const module = Array.from(this.moduleIndex.values()).find((m) => m.name === moduleName)
-    if (!module) return []
+    const mod = Array.from(this.moduleIndex.values()).find((m) => m.name === moduleName)
+    if (!mod) return []
 
     const resolved: ModuleMetadata[] = []
     const visited = new Set<string>()
@@ -112,7 +112,7 @@ export class DomainRegistry extends EventEmitter {
       }
     }
 
-    resolve(module.dependencies)
+    resolve(mod.dependencies)
     return resolved
   }
 

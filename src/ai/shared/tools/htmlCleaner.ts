@@ -19,7 +19,7 @@ export function stripHtmlTags(html: string): string {
     .replace(/&quot;/g, '"') // Replace &quot;
     .replace(/&#39;/g, "'") // Replace &#39;
     .replace(/\s+/g, " ") // Normalize whitespace
-    .trim()
+    .trim();
 }
 
 /**

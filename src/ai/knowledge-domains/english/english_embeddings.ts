@@ -43,4 +43,6 @@ export const persistEnglishWeights = (weights: Record<string, number[]>) => {
   }
 };
 
-export default { getEnglishEmbedding, getEnglishEmbeddingForTokens, persistEnglishWeights };
+const english_embeddings_bundle = { getEnglishEmbedding, getEnglishEmbeddingForTokens, persistEnglishWeights };
+
+export default english_embeddings_bundle;

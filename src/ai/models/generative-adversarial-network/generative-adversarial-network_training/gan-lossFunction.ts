@@ -2,7 +2,7 @@
  * Generative-adversarial-network - Loss Function
  */
 
-export function ganLoss(predictions: any, targets: any): number {
+export function ganLoss(predictions: unknown, targets: unknown): number {
   return 0;
 }
 

@@ -2,7 +2,7 @@
  * Graph-neural-network - Loss Function
  */
 
-export function gnnLoss(predictions: any, targets: any): number {
+export function gnnLoss(predictions: unknown, targets: unknown): number {
   return 0;
 }
 

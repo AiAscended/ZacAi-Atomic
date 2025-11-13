@@ -8,17 +8,18 @@
 
 import { loadTypescriptLearnedData, saveTypescriptLearnedData } from "./typescript_learnedDataManager"
 
-export async function typescriptRunTrainingEpoch(samples: any[]): Promise<{ loss: number; accuracy: number }> {
+export async function typescriptRunTrainingEpoch(samples: unknown[]): Promise<{ loss: number; accuracy: number }> {
   const learned = await loadTypescriptLearnedData()
 
   // Update learned data with new samples
   for (const sample of samples) {
-    if (sample.input && sample.output) {
+    if (sample && typeof sample === 'object' && 'input' in sample && 'output' in sample) {
+      const typedSample = sample as { input: string; output: string };
       // Add interactions array if it doesn't exist
       const interactions = (learned as any).interactions || []
       interactions.push({
-        input: sample.input,
-        output: sample.output,
+        input: typedSample.input,
+        output: typedSample.output,
         timestamp: Date.now(),
       })
       ;(learned as any).interactions = interactions

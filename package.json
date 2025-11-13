@@ -69,6 +69,7 @@
     "embla-carousel-react": "^8.5.2",
     "idb": "^8.0.3",
     "input-otp": "^1.4.1",
+    "jscodeshift": "^17.3.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.454.0",
     "markdown-it": "^14.0.0",
