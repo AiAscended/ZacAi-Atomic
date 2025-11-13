@@ -34,9 +34,11 @@ export const getMathematicsTokenById = (id: number): string | undefined => {
 
 export const mathematicsTokenCount = () => mathematicsTokenMap.size;
 
-export default {
+const mathematics_tokenMap_bundle = {
   mathematicsTokenMap,
   getMathematicsTokenId,
   getMathematicsTokenById,
   mathematicsTokenCount,
 };
+
+export default mathematics_tokenMap_bundle;

@@ -150,12 +150,19 @@ function convertWordsToNumbers(input: string): string {
   return converted.trim()
 }
 
-export const mathematicsRunInference = async (input: string, _context?: any) => {
+export const mathematicsRunInference = async (input: string, _context?: unknown) => {
   const tk = mathematicsTokenizer(input)
   const sem = mathematicsSemanticAnalyzer(input)
 
-  const inferenceResults = _context?.inferenceResults
-  const tokens = _context?.tokens || []
+  const contextTokens = (_context && typeof _context === 'object' && 'tokens' in _context) 
+    ? (_context as { tokens: string[] }).tokens 
+    : undefined;
+  const contextInferenceResults = (_context && typeof _context === 'object' && 'inferenceResults' in _context) 
+    ? (_context as { inferenceResults: any }).inferenceResults 
+    : undefined;
+    
+  const inferenceResults = contextInferenceResults
+  const tokens = contextTokens || []
 
   const domainInferenceResult = Array.isArray(inferenceResults)
     ? inferenceResults.find((r) => r.domain === "mathematics")

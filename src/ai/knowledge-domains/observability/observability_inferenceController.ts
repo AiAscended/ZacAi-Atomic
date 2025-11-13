@@ -5,7 +5,7 @@
 
 import { DOMAIN_NAME } from './observability_constants';
 
-export const observabilityRunInference = async (input: string, _context?: any) => {
+export const observabilityRunInference = async (input: string, _context?: unknown) => {
   const lowerInput = input.toLowerCase();
   
   let responseText = '';

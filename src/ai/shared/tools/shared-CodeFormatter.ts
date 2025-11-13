@@ -176,11 +176,11 @@ export class CodeFormatter {
       .map((line) => {
         // Only remove trailing semicolons, not those in for loops
         if (line.trim().endsWith(";") && !line.includes("for (")) {
-          return line.replace(/;(\s*)$/, "$1")
+          return line.replace(/;(\s*)$/, "$1");
         }
         return line
       })
-      .join("\n")
+      .join("\n");
   }
 
   /**
@@ -224,10 +224,10 @@ export class CodeFormatter {
   private static fixQuotes(code: string, useSingleQuote: boolean): string {
     if (useSingleQuote) {
       // Convert double quotes to single quotes (except in strings containing single quotes)
-      return code.replace(/"([^"']*?)"/g, "'$1'")
+      return code.replace(/"([^"']*?)"/g, "'$1'");
     } else {
       // Convert single quotes to double quotes (except in strings containing double quotes)
-      return code.replace(/'([^'"]*?)'/g, '"$1"')
+      return code.replace(/'([^'"]*?)'/g, '"$1"');
     }
   }
 

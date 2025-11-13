@@ -15,4 +15,6 @@ export const generalTokenCount = () => tokenToId.size;
 
 export const generalTokenMap = tokenToId;
 
-export default { getGeneralTokenId, getGeneralTokenById, generalTokenCount, generalTokenMap };
+const general_knowledge_tokenMap_bundle = { getGeneralTokenId, getGeneralTokenById, generalTokenCount, generalTokenMap };
+
+export default general_knowledge_tokenMap_bundle;

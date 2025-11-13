@@ -25,11 +25,13 @@ export const persistAlgorithmsWeights = (weights: Record<string, number[]>) => {
     null,
     2,
   )
-  const { updateFile } = require("../../orchestration/fileWatcher")
-  updateFile(ALGORITHMS_DOMAIN, "src/ai/knowledge-domains/algorithms/algorithms_weights/algorithms_pretrained_weights.json", content)
+  // TODO: Implement proper file writing mechanism
+  // This functionality should be handled by a dedicated file management service
+  console.warn('[algorithms_embeddings] persistAlgorithmsWeights: File writing not implemented yet')
   return {
-    success: true,
+    success: false,
     path: "src/ai/knowledge-domains/algorithms/algorithms_weights/algorithms_pretrained_weights.json",
+    error: "File writing not implemented"
   }
 }
 

@@ -12,11 +12,11 @@ import pretrainedWeights from "./typescript_weights/typescript_pretrained_weight
 
 interface InferenceContext {
   tokens: string[]
-  inferenceResults?: any
-  sentiment?: any
-  slots?: any
-  userProfile?: any
-  dialogueState?: any
+  inferenceResults?: unknown
+  sentiment?: unknown
+  slots?: unknown
+  userProfile?: unknown
+  dialogueState?: unknown
 }
 
 function calculateConfidence(tokens: string[], input: string): number {
@@ -29,7 +29,7 @@ function calculateConfidence(tokens: string[], input: string): number {
   // Calculate token-based confidence using pretrained vocabulary
   for (const token of tokens) {
     const lowerToken = token.toLowerCase()
-    if (vocabulary[lowerToken]) {
+    if (vocabulary && vocabulary[lowerToken]) {
       tokenScore += vocabulary[lowerToken]
       matchCount++
     }
@@ -582,7 +582,7 @@ function binarySearch<T>(
 }
 
 // Memoization decorator
-function memoize<T extends (...args: any[]) => any>(fn: T): T {
+function memoize<T extends (...args: unknown[]) => any>(fn: T): T {
   const cache = new Map<string, ReturnType<T>>();
   
   return ((...args: Parameters<T>) => {
@@ -749,7 +749,10 @@ console.log(user);
 }
 
 export async function typescriptRunInference(input: string, _context?: InferenceContext): Promise<any> {
-  const tokens = _context?.tokens || typescriptTokenizer(input)
+  const contextTokens = (_context && typeof _context === 'object' && 'tokens' in _context) 
+    ? (_context as { tokens: string[] }).tokens 
+    : undefined;
+  const tokens = contextTokens || typescriptTokenizer(input)
   const semantics = typescriptSemanticAnalyzer(input)
 
   const confidence = calculateConfidence(tokens, input)

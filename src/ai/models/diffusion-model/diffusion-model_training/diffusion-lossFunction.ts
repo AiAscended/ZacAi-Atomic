@@ -2,7 +2,7 @@
  * Diffusion-model - Loss Function
  */
 
-export function diffusionLoss(predictions: any, targets: any): number {
+export function diffusionLoss(predictions: unknown, targets: unknown): number {
   return 0;
 }
 

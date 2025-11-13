@@ -6,7 +6,7 @@
 export function cleanText(text: string): string {
   if (!text) return ""
   // Basic cleanup: trim, normalize whitespace
-  return text.replace(/\s+/g, " ").trim()
+  return text.replace(/\s+/g, " ").trim();
 }
 
 export function summarizeText(text: string, maxLength = 500): string {

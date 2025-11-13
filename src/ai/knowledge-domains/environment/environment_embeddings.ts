@@ -25,11 +25,13 @@ export const persistEnvironmentWeights = (weights: Record<string, number[]>) => 
     null,
     2,
   )
-  const { updateFile } = require("../../orchestration/fileWatcher")
-  updateFile(ENVIRONMENT_DOMAIN, "src/ai/knowledge-domains/environment/environment_weights/environment_pretrained_weights.json", content)
+  // TODO: Implement proper file writing mechanism
+  // This functionality should be handled by a dedicated file management service
+  console.warn('[environment_embeddings] persistEnvironmentWeights: File writing not implemented yet')
   return {
-    success: true,
+    success: false,
     path: "src/ai/knowledge-domains/environment/environment_weights/environment_pretrained_weights.json",
+    error: "File writing not implemented"
   }
 }
 

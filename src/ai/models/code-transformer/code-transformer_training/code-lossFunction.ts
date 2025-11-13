@@ -2,7 +2,7 @@
  * Code-transformer - Loss Function
  */
 
-export function codeLoss(predictions: any, targets: any): number {
+export function codeLoss(predictions: unknown, targets: unknown): number {
   return 0;
 }
 

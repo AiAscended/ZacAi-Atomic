@@ -86,27 +86,51 @@ export async function reactRunInference(input: string): Promise<ReactInferenceRe
   }
 }
 
-function generateComponentResponse(_input: string, analysis: any): string {
-  return `React components are the building blocks of React applications. ${analysis.suggestedResponse} Components can be functional or class-based, with functional components being the modern standard.`
-}
-
-function generateHookResponse(_input: string, analysis: any): string {
-  const hookTypes = analysis.topics.filter((t: string) => t.startsWith("use"))
-  if (hookTypes.length > 0) {
-    return `React Hooks like ${hookTypes.join(", ")} allow you to use state and other React features in functional components. ${analysis.suggestedResponse}`
+// Helper to safely get suggestedResponse from analysis
+function getSuggestedResponse(analysis: unknown): string {
+  if (analysis && typeof analysis === 'object' && 'suggestedResponse' in analysis) {
+    return String((analysis as { suggestedResponse: unknown }).suggestedResponse);
   }
-  return `React Hooks are functions that let you use state and lifecycle features in functional components. ${analysis.suggestedResponse}`
+  return '';
 }
 
-function generatePatternResponse(_input: string, analysis: any): string {
-  return `React patterns help organize code and solve common problems. ${analysis.suggestedResponse} Common patterns include composition, render props, higher-order components, and custom hooks.`
+// Helper to safely get topics from analysis
+function getTopics(analysis: unknown): string[] {
+  if (analysis && typeof analysis === 'object' && 'topics' in analysis) {
+    const topics = (analysis as { topics: unknown }).topics;
+    if (Array.isArray(topics)) {
+      return topics;
+    }
+  }
+  return [];
 }
 
-function generateQuestionResponse(_input: string, analysis: any): string {
-  return `${analysis.suggestedResponse} React is a JavaScript library for building user interfaces, focusing on component-based architecture and declarative programming.`
+function generateComponentResponse(_input: string, analysis: unknown): string {
+  const response = getSuggestedResponse(analysis);
+  return `React components are the building blocks of React applications. ${response} Components can be functional or class-based, with functional components being the modern standard.`
 }
 
-function generateCodeResponse(input: string, analysis: any): string {
+function generateHookResponse(_input: string, analysis: unknown): string {
+  const topics = getTopics(analysis);
+  const hookTypes = topics.filter((t: string) => t.startsWith("use"))
+  const response = getSuggestedResponse(analysis);
+  if (hookTypes.length > 0) {
+    return `React Hooks like ${hookTypes.join(", ")} allow you to use state and other React features in functional components. ${response}`
+  }
+  return `React Hooks are functions that let you use state and lifecycle features in functional components. ${response}`
+}
+
+function generatePatternResponse(_input: string, analysis: unknown): string {
+  const response = getSuggestedResponse(analysis);
+  return `React patterns help organize code and solve common problems. ${response} Common patterns include composition, render props, higher-order components, and custom hooks.`
+}
+
+function generateQuestionResponse(_input: string, analysis: unknown): string {
+  const response = getSuggestedResponse(analysis);
+  return `${response} React is a JavaScript library for building user interfaces, focusing on component-based architecture and declarative programming.`
+}
+
+function generateCodeResponse(input: string, analysis: unknown): string {
   const lowerInput = input.toLowerCase();
   
   // Generate actual code examples based on the request
@@ -189,13 +213,15 @@ export default function MyComponent() {
 \`\`\``;
   }
   
-  return `${analysis.suggestedResponse}${codeExample}
+  const response = getSuggestedResponse(analysis);
+  return `${response}${codeExample}
 
 React uses JSX syntax to describe UI, and components manage their own state and props.`;
 }
 
-function generateGeneralResponse(_input: string, analysis: any): string {
-  return `${analysis.suggestedResponse} React provides a powerful and flexible way to build modern web applications with reusable components.`
+function generateGeneralResponse(_input: string, analysis: unknown): string {
+  const response = getSuggestedResponse(analysis);
+  return `${response} React provides a powerful and flexible way to build modern web applications with reusable components.`
 }
 
 export default reactRunInference;

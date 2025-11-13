@@ -4,4 +4,6 @@
 
 export function cnnUtility(): void {}
 
-export default { cnnUtility };
+const convolutionalBundle = { cnnUtility }; 
+
+export default convolutionalBundle;

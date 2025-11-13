@@ -4,4 +4,6 @@
 
 export function multimodalUtility(): void {}
 
-export default { multimodalUtility };
+const multimodalBundle = { multimodalUtility }; 
+
+export default multimodalBundle;

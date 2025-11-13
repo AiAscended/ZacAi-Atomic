@@ -4,6 +4,6 @@
 
 export function ttsUtility(): void {}
 
-const ttsUtils = { ttsUtility };
+const ttsUtils = { ttsUtility }; 
 
 export default ttsUtils;
