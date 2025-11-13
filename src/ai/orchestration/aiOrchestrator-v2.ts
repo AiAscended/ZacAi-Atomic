@@ -19,7 +19,7 @@ import { ThinkingTracker } from "./thinkingTracker"
 import { PromptProcessor } from "../input_processing/promptProcessor"
 import { DomainQueryExecutor } from "../inference/domainQueryExecutor"
 import { ResponseSynthesizer } from "../output_generation/responseSynthesizer"
-import { InteractionLogger } from "../context_management/interactionLogger"
+import { InteractionLogger } from "../context_management/interactionLogger-v1"
 
 export class AIOrchestrator {
   private thinkingTracker: ThinkingTracker
@@ -78,14 +78,19 @@ export class AIOrchestrator {
 
     // 4) Synthesize multi-domain results into response
     this.thinkingTracker.addStep("response_synth", "Synthesizing AI response")
-    const response = this.responseSynthesizer.synthesize(domainResults)
+    const response = this.responseSynthesizer.synthesize({
+      llmOutput: processedInput,
+      domainOutputs: domainResults as Array<{ domain: string; result: string }>,
+      originalPrompt: prompt
+    })
 
     // 5) Log interaction for analytics and debugging
-    this.interactionLogger.log(sessionId, prompt, response)
+    this.interactionLogger.log(sessionId, prompt, response.text)
 
     // Attach thinking steps to response metadata for frontend UI
     return {
       ...response,
+      domains: response.sources || [],
       metadata: {
         ...response.metadata,
         thinkingSteps: this.thinkingTracker.getSteps(),

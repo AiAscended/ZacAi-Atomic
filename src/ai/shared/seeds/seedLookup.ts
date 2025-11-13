@@ -77,10 +77,7 @@ export function getDefinition(key: string, domain?: string): string | null {
   const entry = seedRegistry.lookup(key, domain);
   if (!entry?.fullData) return null;
   
-  return entry.fullData.definition || 
-         entry.fullData.description || 
-         entry.fullData.explanation || 
-         null;
+  return (entry.fullData as any)?.definition || (entry.fullData as any)?.description || (entry.fullData as any)?.explanation || null;
 }
 
 /**
@@ -90,7 +87,7 @@ export function getExamples(key: string, domain?: string): string[] {
   const entry = seedRegistry.lookup(key, domain);
   if (!entry?.fullData) return [];
   
-  const examples = entry.fullData.examples || entry.fullData.example;
+  const examples = entry.fullData?.examples || entry.fullData?.example;
   
   if (Array.isArray(examples)) {
     return examples.map((ex: unknown) => {
@@ -115,7 +112,7 @@ export function getRelated(key: string, domain?: string): string[] {
   const entry = seedRegistry.lookup(key, domain);
   if (!entry?.fullData?.related) return [];
   
-  return Array.isArray(entry.fullData.related) ? entry.fullData.related : [];
+  return Array.isArray(entry.fullData?.related) ? entry.fullData?.related : [];
 }
 
 /**
@@ -199,7 +196,7 @@ export function lookupWithContext(key: string, domain?: string): {
   }
   
   // Get related terms
-  const relatedKeys = main.fullData?.related || [];
+  const relatedKeys = Array.isArray((main.fullData as any)?.related) ? (main.fullData as any).related : [];
   for (const relKey of relatedKeys) {
     const relSeed = seedRegistry.lookup(relKey, domain);
     if (relSeed) {
