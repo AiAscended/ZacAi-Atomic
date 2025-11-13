@@ -170,7 +170,7 @@ export async function programmingRunInference(input: string): Promise<Programmin
                            lowerInput.includes("how to")
 
     // Find relevant code example based on keywords
-    if (requestsExample || (parseResult.type as string) === "example") {
+    if (requestsExample) {
       for (const [key, example] of Object.entries(CODE_EXAMPLES)) {
         if (lowerInput.includes(key)) {
           codeExample = example

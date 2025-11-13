@@ -12,11 +12,8 @@ import { ALGORITHMS_DOMAIN } from "./algorithms_constants"
 const EMBEDDING_DIM = 128
 
 export const getAlgorithmsEmbedding = (token: string): number[] => {
-  // Check if the pretrained weights have the seedWeights format (legacy)
-  const weights = (pretrained as any).seedWeights as Record<string, number[]> | undefined;
-  if (weights && weights[token]) return weights[token];
-  
-  // Otherwise, return a random embedding
+  const weights = (pretrained as any)?.seedWeights as Record<string, number[]> || {}
+  if (weights[token]) return weights[token]
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
 }
 

@@ -150,7 +150,7 @@ export async function extractAndLearnFromInput(
         );
 
         if (result.found && !result.fromExisting) {
-          learned.push(result.data);
+          learned.push(result.data as LearnedItem);
         }
       }
     }

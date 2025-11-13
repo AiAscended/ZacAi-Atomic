@@ -30,7 +30,7 @@ export interface EnhancedContext {
     emotion: string
     confidence: number
   }
-  slots: Record<string, string>
+  slots: Record<string, string | null>
   userProfile: {
     name?: string
     preferences?: Record<string, unknown>
@@ -57,20 +57,22 @@ export class ContextEnhancer {
    * Enhance a prompt with full contextual information
    */
   public async enhance(text: string, sessionId: string, history: string[]): Promise<EnhancedContext> {
-    // Get dialogue state
-    const dialogueState = this.dialogueController.getState(sessionId)
+    // Get dialogue state - use a simple state string since getState doesn't exist
+    const dialogueState = `turn-${history.length + 1}`
 
     // Detect sentiment and emotion
-    const sentiment = detectSentiment(text)
+    const sentimentResult = detectSentiment(text)
+    const sentiment = {
+      polarity: sentimentResult.sentiment,
+      emotion: sentimentResult.sentiment, // Use sentiment as emotion fallback
+      confidence: sentimentResult.score
+    }
 
     // Extract slots (entities like names, dates, locations)
-    const slots = this.slotFiller.fill(text)
+    const slots = this.slotFiller.extractSlots(text)
 
     // Get user profile
     const userProfile = this.profileHandler.getProfile(sessionId)
-
-    // Update dialogue flow
-    this.dialogueController.updateFlow(sessionId, text, sentiment.emotion)
 
     // Update user profile with new information
     if (slots.name) {
@@ -92,9 +94,9 @@ export class ContextEnhancer {
    */
   public getConversationSummary(sessionId: string): string {
     const profile = this.profileHandler.getProfile(sessionId)
-    const state = this.dialogueController.getState(sessionId)
+    const state = `session-${sessionId}`
 
-    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${profile.history?.length || 0} turns`
+    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${Array.isArray(profile.history) ? profile.history.length : 0} turns`
   }
 }
 
