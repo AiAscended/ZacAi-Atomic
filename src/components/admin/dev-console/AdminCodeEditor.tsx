@@ -33,6 +33,7 @@ interface AdminCodeEditorProps {
   activeFile?: string;
   onFileClose: (path: string) => void;
   onActiveFileChange: (path: string) => void;
+  onEditorChange?: (content: string) => void;
   className?: string;
 }
 
@@ -41,6 +42,7 @@ export function AdminCodeEditor({
   activeFile,
   onFileClose,
   onActiveFileChange,
+  onEditorChange,
   className,
 }: AdminCodeEditorProps) {
   const [tabs, setTabs] = useState<Map<string, EditorTab>>(new Map());
@@ -131,6 +133,11 @@ export function AdminCodeEditor({
         isDirty,
       });
     });
+
+    // Notify parent component of content change
+    if (onEditorChange) {
+      onEditorChange(value);
+    }
   };
 
   const handleSave = async () => {
