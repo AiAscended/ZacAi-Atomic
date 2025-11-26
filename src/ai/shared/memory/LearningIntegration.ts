@@ -26,7 +26,7 @@ export async function lookupAndLearn(
   source: 'seed' | 'learned' | 'url-lookup';
 }> {
   // 1. Check if already in seed vocabulary
-  const seedData = lookupSeed(term, domain);
+  const seedData = await lookupSeed(term, domain);
   if (seedData) {
     return {
       found: true,
@@ -149,7 +149,7 @@ export async function extractAndLearnFromInput(
           `Extracted from user input: "${userInput}"`
         );
 
-        if (result.found && !result.fromExisting) {
+        if (result.found && !result.fromExisting && isLearnedItem(result.data)) {
           learned.push(result.data);
         }
       }
@@ -157,6 +157,15 @@ export async function extractAndLearnFromInput(
   }
 
   return learned;
+}
+
+function isLearnedItem(value: unknown): value is LearnedItem {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as LearnedItem).term === 'string' &&
+    typeof (value as LearnedItem).domain === 'string'
+  );
 }
 
 /**

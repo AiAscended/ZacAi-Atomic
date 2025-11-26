@@ -369,7 +369,7 @@ src/ai/data/[domain]/
 
 3. **Consolidate Orchestrators** (3 hours)
    - Keep mainOrchestrator.ts only
-   - Deprecate aiOrchestrator-v2, simpleOrchestrator, unifiedOrchestratorIntegration
+   - Deprecate aiOrchestrator-v2, simpleOrchestrator (unifiedOrchestratorIntegration removed 2025-11-11)
 
 4. **Add Rate Limiting** (2 hours)
    - Implement rate limiting middleware

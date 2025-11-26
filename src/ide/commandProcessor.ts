@@ -145,14 +145,17 @@ export class CommandProcessor {
         for (const item of items) {
           const type = item.type === 'directory' ? 'd' : '-';
           const perms = 'rwxr-xr-x';
-          const size = item.metadata?.size || 0;
-          const date = item.metadata?.modified
-            ? new Date(item.metadata.modified).toLocaleDateString()
+          const size = item.size || 0;
+          const date = item.updatedAt
+            ? new Date(item.updatedAt).toLocaleDateString()
             : 'Unknown';
-          output += `${type}${perms} 1 zacai zacai ${size.toString().padStart(8)} ${date} ${item.name}\n`;
+          const name = item.name || item.path.split('/').pop() || item.path;
+          output += `${type}${perms} 1 zacai zacai ${size.toString().padStart(8)} ${date} ${name}\n`;
         }
       } else {
-        output = items.map((item) => item.name).join('  ') + '\n';
+        output = items
+          .map((item) => item.name || item.path.split('/').pop() || item.path)
+          .join('  ') + '\n';
       }
 
       return { output, exitCode: 0 };

@@ -1,5 +1,6 @@
-    }
-  ]
+{
+  "models": [
+    {
       "model_id": "nlp-v5-202507",
       "name": "UltimateAI-v5",
       "type": "NLP",

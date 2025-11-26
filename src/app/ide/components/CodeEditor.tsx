@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import Editor, { OnMount } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 import { useEditorStore } from '@/ide/editorStore';
+import type { EditorTab } from '@/ide/editorStore';
 import { useFileSystem } from '@/ide/useFileSystem';
 import { Button } from '@/components/ui/button';
 import { X, Save, MoreVertical, Copy, FileCode } from 'lucide-react';
@@ -91,7 +92,7 @@ export function CodeEditor() {
     
     languages.forEach((lang) => {
       monacoInstance.languages.registerCompletionItemProvider(lang, {
-        provideCompletionItems: (model, position) => {
+        provideCompletionItems: (model, position, _context, _token) => {
           const suggestions = [
             {
               label: 'log',
@@ -99,6 +100,12 @@ export function CodeEditor() {
               insertText: "console.log('${1}');",
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Console log',
+              range: new monacoInstance.Range(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column
+              ),
             },
             {
               label: 'func',
@@ -106,6 +113,12 @@ export function CodeEditor() {
               insertText: 'function ${1:name}(${2:params}) {\n\t${3}\n}',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Function declaration',
+              range: new monacoInstance.Range(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column
+              ),
             },
             {
               label: 'arrow',
@@ -113,6 +126,12 @@ export function CodeEditor() {
               insertText: 'const ${1:name} = (${2:params}) => {\n\t${3}\n};',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Arrow function',
+              range: new monacoInstance.Range(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column
+              ),
             },
             {
               label: 'async',
@@ -120,6 +139,12 @@ export function CodeEditor() {
               insertText: 'async function ${1:name}(${2:params}) {\n\t${3}\n}',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Async function',
+              range: new monacoInstance.Range(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column
+              ),
             },
             {
               label: 'try',
@@ -127,6 +152,12 @@ export function CodeEditor() {
               insertText: 'try {\n\t${1}\n} catch (error) {\n\t${2:console.error(error);}\n}',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Try-catch block',
+              range: new monacoInstance.Range(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column
+              ),
             },
           ];
           
@@ -228,7 +259,7 @@ export function CodeEditor() {
     <div className="h-full w-full flex flex-col bg-background">
       {/* Tabs */}
       <div className="flex items-center bg-muted/30 border-b overflow-x-auto">
-        {openFiles.map((file) => (
+  {openFiles.map((file: EditorTab) => (
           <div
             key={file.id}
             className={cn(

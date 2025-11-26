@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Send, Bot, User, Code2, FileCode, Bug, Sparkles, Copy, FileDown, Play, Check } from 'lucide-react';
 import { aiAssistant, type IDEContext } from '@/ide/aiAssistant';
 import { useEditorStore } from '@/ide/editorStore';
+import type { EditorTab } from '@/ide/editorStore';
 import { useFileSystem } from '@/ide/useFileSystem';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-tomorrow.css';
@@ -32,10 +33,10 @@ interface Message {
 }
 
 const quickActions = [
-  { icon: Code2, label: 'Explain Code', action: 'explain' },
-  { icon: FileCode, label: 'Generate Code', action: 'generate' },
-  { icon: Bug, label: 'Fix Bug', action: 'fix' },
-  { icon: Sparkles, label: 'Optimize', action: 'optimize' },
+  { icon: Code2, label: 'Explain Code', action: 'explain' as const },
+  { icon: FileCode, label: 'Generate Code', action: 'generate' as const },
+  { icon: Bug, label: 'Fix Bug', action: 'fix' as const },
+  { icon: Sparkles, label: 'Optimize', action: 'optimize' as const },
 ];
 
 export function AIChatPanel() {
@@ -87,7 +88,7 @@ export function AIChatPanel() {
             language: activeFile.language,
           }
         : undefined,
-      openFiles: openFiles.map((file) => ({
+      openFiles: openFiles.map((file: EditorTab) => ({
         path: file.path,
         content: file.content,
         language: file.language,
@@ -137,7 +138,9 @@ export function AIChatPanel() {
     }
   };
 
-  const handleQuickAction = async (action: string) => {
+  const handleQuickAction = async (
+    action: (typeof quickActions)[number]['action']
+  ) => {
     const activeFile = getFileById(activeFileId);
     
     if (!activeFile) {
@@ -234,7 +237,7 @@ export function AIChatPanel() {
               variant="ghost"
               size="sm"
               className="justify-start text-xs h-8"
-              onClick={() => handleQuickAction(action.prompt)}
+              onClick={() => handleQuickAction(action.action)}
             >
               <action.icon className="h-3 w-3 mr-1" />
               {action.label}

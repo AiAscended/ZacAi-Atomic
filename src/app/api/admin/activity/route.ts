@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { readEvents } from '@/lib/systemActivityLogger.cjs';
+import { readEvents } from '@/lib/systemActivityLogger';
 import { addSecurityHeaders, generateRequestId } from '@/lib/productionHardening';
 
 export async function GET(request: NextRequest) {

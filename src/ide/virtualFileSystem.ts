@@ -1,5 +1,19 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 
+let indexedDBReady: Promise<void> | null = null;
+
+async function ensureIndexedDB(): Promise<void> {
+  if (typeof indexedDB !== 'undefined') {
+    return;
+  }
+
+  if (!indexedDBReady) {
+    indexedDBReady = import('fake-indexeddb/auto').then(() => undefined);
+  }
+
+  await indexedDBReady;
+}
+
 interface IDEFileRecord {
   path: string;
   name?: string;
@@ -27,8 +41,14 @@ export class VirtualFileSystem {
   private dbName = 'zacai-ide-fs';
   private dbVersion = 1;
 
+  async initialize(): Promise<void> {
+    await this.init();
+  }
+
   async init() {
     if (this.db) return this.db;
+
+    await ensureIndexedDB();
 
     this.db = await openDB<FileSystemDB>(this.dbName, this.dbVersion, {
       upgrade(db) {
@@ -210,6 +230,11 @@ Happy coding!`,
     return this.toIDEFile(file);
   }
 
+  async read(path: string): Promise<string | null> {
+    const file = await this.readFile(path);
+    return file?.content ?? null;
+  }
+
   async writeFile(path: string, content: string): Promise<void> {
     await this.init();
     const existing = await this.db!.get('files', path);
@@ -227,6 +252,10 @@ Happy coding!`,
     };
 
     await this.db!.put('files', file);
+  }
+
+  async write(path: string, content: string): Promise<void> {
+    await this.writeFile(path, content);
   }
 
   async createFile(path: string, content: string = ''): Promise<void> {
@@ -249,6 +278,11 @@ Happy coding!`,
     await this.db!.add('files', file);
   }
 
+  async exists(path: string): Promise<boolean> {
+    const file = await this.readFile(path);
+    return Boolean(file);
+  }
+
   async createDirectory(path: string): Promise<void> {
     await this.init();
     const existing = await this.db!.get('files', path);
@@ -267,6 +301,10 @@ Happy coding!`,
     };
 
     await this.db!.add('files', directory);
+  }
+
+  async mkdir(path: string): Promise<void> {
+    await this.createDirectory(path);
   }
 
   async deleteFile(path: string): Promise<void> {
@@ -317,6 +355,10 @@ Happy coding!`,
     return allFiles.map((file) => this.toIDEFile(file)).filter((file): file is IDEFile => Boolean(file));
   }
 
+  async list(path: string): Promise<IDEFile[]> {
+    return this.listDirectory(path);
+  }
+
   async getDirectoryTree(rootPath: string = '/'): Promise<IDEFile[]> {
     await this.init();
     const allFiles = await this.db!.getAll('files');
@@ -354,9 +396,9 @@ Happy coding!`,
   private getLanguageFromPath(path: string): string {
     const ext = path.split('.').pop()?.toLowerCase();
     const langMap: Record<string, string> = {
-      tsx: 'typescript',
+      tsx: 'typescriptreact',
       ts: 'typescript',
-      jsx: 'javascript',
+      jsx: 'javascriptreact',
       js: 'javascript',
       json: 'json',
       css: 'css',
@@ -381,6 +423,10 @@ Happy coding!`,
     const parts = path.split('/').filter(Boolean);
     parts.pop();
     return parts.length > 0 ? '/' + parts.join('/') : '/';
+  }
+
+  detectLanguage(path: string): string {
+    return this.getLanguageFromPath(path);
   }
 
   private getNameFromPath(path: string): string {
