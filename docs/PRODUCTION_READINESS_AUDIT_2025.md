@@ -83,7 +83,6 @@ src/ai/orchestration/
 ├── mainOrchestrator.ts ✅ (PRIMARY - 838 lines)
 ├── aiOrchestrator-v2.ts ⚠️ (Alternative impl)
 ├── simpleOrchestrator.ts ⚠️ (Simplified version)
-├── unifiedOrchestratorIntegration.ts ⚠️ (Unified interface)
 ├── thinkingTracker.ts ✅
 ├── promptHandler.ts ✅
 ├── responseFormatter.ts ✅
@@ -99,8 +98,8 @@ src/ai/orchestration/
 ```
 
 **Issues Found**:
-1. ⚠️ **Multiple Orchestrator Versions**: Have mainOrchestrator, aiOrchestrator-v2, simpleOrchestrator, unifiedOrchestratorIntegration
-   - **Recommendation**: Consolidate to single mainOrchestrator, deprecate others
+1. ⚠️ **Multiple Orchestrator Versions**: Legacy files mainOrchestrator, aiOrchestrator-v2, simpleOrchestrator remain (unifiedOrchestratorIntegration removed 2025-11-11)
+  - **Recommendation**: Consolidate to single mainOrchestrator, deprecate other legacy variants
 2. ⚠️ **LLM Initialization**: Uses hardcoded vocabSize, needs dynamic loading
 3. ⚠️ **Error Handling**: Fallback chain good but needs better error categorization
 

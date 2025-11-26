@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, ExternalLink, Smartphone, Tablet, Monitor, AlertCircle } from 'lucide-react';
 import { codeExecutor } from '@/ide/codeExecutor';
 import { useEditorStore } from '@/ide/editorStore';
+import type { EditorTab } from '@/ide/editorStore';
 import { useFileSystem } from '@/ide/useFileSystem';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -67,7 +68,7 @@ export function PreviewPanel() {
     
     try {
       // Get active file
-      const activeFile = openFiles.find((f) => f.id === activeFileId);
+  const activeFile = openFiles.find((f: EditorTab) => f.id === activeFileId);
       
       if (!activeFile) {
         // Show default preview
@@ -107,6 +108,10 @@ export function PreviewPanel() {
     
     try {
       const htmlContent = await fs.read(filePath);
+      if (htmlContent === null) {
+        setPreviewContent(getErrorPreview('Failed to load HTML content.'));
+        return;
+      }
       
       // Try to load referenced CSS and JS files
       const dirPath = filePath.split('/').slice(0, -1).join('/');
@@ -123,10 +128,12 @@ export function PreviewPanel() {
             const cssPath = `${dirPath}/${hrefMatch[1]}`;
             try {
               const cssContent = await fs.read(cssPath);
-              processedHTML = processedHTML.replace(
-                match,
-                `<style>${cssContent}</style>`
-              );
+              if (cssContent) {
+                processedHTML = processedHTML.replace(
+                  match,
+                  `<style>${cssContent}</style>`
+                );
+              }
             } catch {
               // CSS file not found, leave as is
             }

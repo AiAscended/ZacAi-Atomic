@@ -75,12 +75,20 @@ export function hasSeed(key: string, domain?: string): boolean {
  */
 export function getDefinition(key: string, domain?: string): string | null {
   const entry = seedRegistry.lookup(key, domain);
-  if (!entry?.fullData) return null;
-  
-  return entry.fullData.definition || 
-         entry.fullData.description || 
-         entry.fullData.explanation || 
-         null;
+  const fullData = entry?.fullData;
+  if (!fullData || typeof fullData !== 'object') return null;
+
+  const definitionFields: Array<'definition' | 'description' | 'explanation'> = ['definition', 'description', 'explanation'];
+  const dataRecord = fullData as Record<string, unknown>;
+
+  for (const field of definitionFields) {
+    const value = dataRecord[field];
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value;
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -88,23 +96,28 @@ export function getDefinition(key: string, domain?: string): string | null {
  */
 export function getExamples(key: string, domain?: string): string[] {
   const entry = seedRegistry.lookup(key, domain);
-  if (!entry?.fullData) return [];
+  const fullData = entry?.fullData;
+  if (!fullData || typeof fullData !== 'object') return [];
+
+  const examplesCandidate = (fullData as Record<string, unknown>).examples ?? (fullData as Record<string, unknown>).example;
+  const normalize = (value: unknown): string => {
+    if (typeof value === 'string') return value;
+    if (value && typeof value === 'object') {
+      const record = value as Record<string, unknown>;
+      if (typeof record.code === 'string') return record.code;
+      if (typeof record.example === 'string') return record.example;
+    }
+    return JSON.stringify(value);
+  };
   
-  const examples = entry.fullData.examples || entry.fullData.example;
-  
-  if (Array.isArray(examples)) {
-    return examples.map((ex: unknown) => {
-      if (typeof ex === 'string') return ex;
-      if (typeof ex === 'object' && ex !== null) {
-        if ('code' in ex && typeof (ex as { code: unknown }).code === 'string') return (ex as { code: string }).code;
-        if ('example' in ex && typeof (ex as { example: unknown }).example === 'string') return (ex as { example: string }).example;
-      }
-      return JSON.stringify(ex);
-    });
+  if (Array.isArray(examplesCandidate)) {
+    return examplesCandidate.map((item) => normalize(item));
   }
-  
-  if (typeof examples === 'string') return [examples];
-  
+
+  if (typeof examplesCandidate === 'string') {
+    return [examplesCandidate];
+  }
+
   return [];
 }
 
@@ -113,9 +126,15 @@ export function getExamples(key: string, domain?: string): string[] {
  */
 export function getRelated(key: string, domain?: string): string[] {
   const entry = seedRegistry.lookup(key, domain);
-  if (!entry?.fullData?.related) return [];
-  
-  return Array.isArray(entry.fullData.related) ? entry.fullData.related : [];
+  const related = entry?.fullData && typeof entry.fullData === 'object'
+    ? (entry.fullData as Record<string, unknown>).related
+    : undefined;
+
+  if (!Array.isArray(related)) {
+    return [];
+  }
+
+  return related.filter((item): item is string => typeof item === 'string');
 }
 
 /**
@@ -199,11 +218,17 @@ export function lookupWithContext(key: string, domain?: string): {
   }
   
   // Get related terms
-  const relatedKeys = main.fullData?.related || [];
-  for (const relKey of relatedKeys) {
-    const relSeed = seedRegistry.lookup(relKey, domain);
-    if (relSeed) {
-      result.related.push(relSeed);
+  const relatedCandidates = main.fullData && typeof main.fullData === 'object'
+    ? (main.fullData as Record<string, unknown>).related
+    : undefined;
+
+  if (Array.isArray(relatedCandidates)) {
+    for (const candidate of relatedCandidates) {
+      if (typeof candidate !== 'string') continue;
+      const relSeed = seedRegistry.lookup(candidate, domain);
+      if (relSeed) {
+        result.related.push(relSeed);
+      }
     }
   }
   
