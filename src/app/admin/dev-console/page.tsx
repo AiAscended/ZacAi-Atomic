@@ -1,22 +1,26 @@
 /**
  * File: src/app/admin/dev-console/page.tsx
  * Purpose: ZacAi Internal Developer Console
- * Features: File tree, code editor, integrated terminal
+ * Features: File tree, code editor, integrated terminal, GitHub operations
  */
 
 "use client"
 
 import { useState } from 'react';
-import { AlertTriangle, Code2 } from 'lucide-react';
+import { AlertTriangle, Code2, Github } from 'lucide-react';
 import { AdminFileTree } from '@/components/admin/dev-console/AdminFileTree';
 import { AdminCodeEditor } from '@/components/admin/dev-console/AdminCodeEditor';
 import { AdminTerminal } from '@/components/admin/dev-console/AdminTerminal';
+import { GitHubControls } from '@/components/admin/dev-console/GitHubControls';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 export default function DevConsolePage() {
   const [openFiles, setOpenFiles] = useState<string[]>([]);
   const [activeFile, setActiveFile] = useState<string | undefined>();
+  const [activeFileContent, setActiveFileContent] = useState<string>('');
   const [terminalVisible, setTerminalVisible] = useState(true);
+  const [githubVisible, setGithubVisible] = useState(false);
 
   const handleFileSelect = (path: string) => {
     // Open file if not already open
@@ -40,14 +44,29 @@ export default function DevConsolePage() {
     }
   };
 
+  const handleEditorChange = (content: string) => {
+    setActiveFileContent(content);
+  };
+
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
       <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
         <div className="px-6 py-4">
-          <div className="flex items-center gap-3 mb-2">
-            <Code2 className="w-6 h-6 text-blue-600" />
-            <h1 className="text-2xl font-bold">ZacAi Internal Console</h1>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <Code2 className="w-6 h-6 text-blue-600" />
+              <h1 className="text-2xl font-bold">ZacAi Internal Console</h1>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setGithubVisible(!githubVisible)}
+              className="flex items-center gap-2"
+            >
+              <Github className="w-4 h-4" />
+              {githubVisible ? 'Hide' : 'Show'} GitHub
+            </Button>
           </div>
           
           <Alert variant="default" className="mt-4">
@@ -85,6 +104,7 @@ export default function DevConsolePage() {
               activeFile={activeFile}
               onFileClose={handleFileClose}
               onActiveFileChange={setActiveFile}
+              onEditorChange={handleEditorChange}
               className="h-full"
             />
           </div>
@@ -101,6 +121,16 @@ export default function DevConsolePage() {
             </div>
           )}
         </div>
+
+        {/* Right Sidebar - GitHub Controls */}
+        {githubVisible && (
+          <div className="w-96 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-y-auto">
+            <GitHubControls
+              currentFile={activeFile}
+              fileContent={activeFileContent}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

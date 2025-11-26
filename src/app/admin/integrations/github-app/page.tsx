@@ -30,6 +30,9 @@ interface GitHubAppSettings {
   enableIssueSync: boolean;
   defaultBranch: string;
   commitMessagePrefix: string;
+  isAutoPopulated?: boolean;
+  hasPrivateKey?: boolean;
+  hasWebhookSecret?: boolean;
 }
 
 interface Installation {
@@ -189,32 +192,61 @@ export default function GitHubAppAdminPage() {
 
         {/* Configuration Tab */}
         <TabsContent value="config" className="space-y-4">
+          {settings.isAutoPopulated && (
+            <Card className="border-green-200 bg-green-50">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="text-green-600 mt-0.5">✓</div>
+                  <div>
+                    <p className="font-semibold text-green-900">Credentials Auto-Loaded</p>
+                    <p className="text-sm text-green-700 mt-1">
+                      GitHub App credentials have been automatically populated from your Codespaces secrets or environment variables.
+                    </p>
+                    <div className="mt-2 text-xs text-green-600 space-y-1">
+                      <div>✓ GITHUB_APP_ID: {settings.appId ? 'Set' : 'Missing'}</div>
+                      <div>✓ GITHUB_APP_CLIENT_ID: {settings.clientId ? 'Set' : 'Missing'}</div>
+                      <div>{settings.hasPrivateKey ? '✓' : '✗'} GITHUB_APP_PRIVATE_KEY: {settings.hasPrivateKey ? 'Set' : 'Missing'}</div>
+                      <div>{settings.hasWebhookSecret ? '✓' : '✗'} GITHUB_APP_WEBHOOK_SECRET: {settings.hasWebhookSecret ? 'Set' : 'Missing'}</div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
           <Card>
             <CardHeader>
               <CardTitle>App Credentials</CardTitle>
               <CardDescription>
                 Configure your GitHub App credentials. Set GITHUB_APP_ID, GITHUB_APP_CLIENT_ID, 
-                GITHUB_APP_PRIVATE_KEY, and GITHUB_APP_WEBHOOK_SECRET as environment variables.
+                GITHUB_APP_PRIVATE_KEY, and GITHUB_APP_WEBHOOK_SECRET as environment variables
+                or Codespaces secrets for automatic configuration.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="appId">App ID</Label>
+                <Label htmlFor="appId">
+                  App ID {settings.isAutoPopulated && <span className="text-green-600 text-xs">(Auto-loaded)</span>}
+                </Label>
                 <Input
                   id="appId"
                   value={settings.appId}
                   onChange={(e) => setSettings({ ...settings, appId: e.target.value })}
                   placeholder="123456"
+                  disabled={settings.isAutoPopulated}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="clientId">Client ID</Label>
+                <Label htmlFor="clientId">
+                  Client ID {settings.isAutoPopulated && <span className="text-green-600 text-xs">(Auto-loaded)</span>}
+                </Label>
                 <Input
                   id="clientId"
                   value={settings.clientId}
                   onChange={(e) => setSettings({ ...settings, clientId: e.target.value })}
                   placeholder="Iv1.abc123..."
+                  disabled={settings.isAutoPopulated}
                 />
               </div>
 
