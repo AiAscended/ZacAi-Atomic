@@ -6,14 +6,32 @@
 
 "use client"
 
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { AlertTriangle, Code2, Github } from 'lucide-react';
-import { AdminFileTree } from '@/components/admin/dev-console/AdminFileTree';
-import { AdminCodeEditor } from '@/components/admin/dev-console/AdminCodeEditor';
-import { AdminTerminal } from '@/components/admin/dev-console/AdminTerminal';
-import { GitHubControls } from '@/components/admin/dev-console/GitHubControls';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+
+// Dynamic imports for client-only components to avoid SSR issues
+const AdminFileTree = dynamic(() => import('@/components/admin/dev-console/AdminFileTree').then(mod => ({ default: mod.AdminFileTree })), {
+  ssr: false,
+  loading: () => <div className="p-4">Loading file tree...</div>
+});
+
+const AdminCodeEditor = dynamic(() => import('@/components/admin/dev-console/AdminCodeEditor').then(mod => ({ default: mod.AdminCodeEditor })), {
+  ssr: false,
+  loading: () => <div className="p-4">Loading editor...</div>
+});
+
+const AdminTerminal = dynamic(() => import('@/components/admin/dev-console/AdminTerminal').then(mod => ({ default: mod.AdminTerminal })), {
+  ssr: false,
+  loading: () => <div className="p-4">Loading terminal...</div>
+});
+
+const GitHubControls = dynamic(() => import('@/components/admin/dev-console/GitHubControls').then(mod => ({ default: mod.GitHubControls })), {
+  ssr: false,
+  loading: () => <div className="p-4">Loading GitHub controls...</div>
+});
 
 export default function DevConsolePage() {
   const [openFiles, setOpenFiles] = useState<string[]>([]);

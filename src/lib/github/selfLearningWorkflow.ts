@@ -11,7 +11,7 @@
  */
 
 import { GitHubBranchManager, createGitHubBranchManager } from './branchManager';
-import { systemActivityLogger } from '../logging/systemActivityLogger';
+const { logEvent } = require('../systemActivityLogger.cjs');
 
 export interface SelfLearningConfig {
   owner: string;
@@ -64,7 +64,7 @@ export class SelfLearningWorkflow {
       installationId: this.config.installationId,
     });
 
-    await systemActivityLogger.logEvent({
+    await logEvent({
       category: 'github',
       action: 'workflow_initialized',
       details: { repo: `${this.config.owner}/${this.config.repo}` },
@@ -90,7 +90,7 @@ export class SelfLearningWorkflow {
     }
 
     try {
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'experiment_started',
         details: { featureName, changesCount: changes.length },
@@ -103,7 +103,7 @@ export class SelfLearningWorkflow {
         description: `Backup before ${featureName} experiment`,
       });
 
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'backup_created',
         details: { branch: backup.branchName },
@@ -134,7 +134,7 @@ export class SelfLearningWorkflow {
         reasoning: detailedReasoning,
       });
 
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'changes_committed',
         details: { branch: branchName, sha, filesChanged: files.length },
@@ -153,7 +153,7 @@ export class SelfLearningWorkflow {
         'All manual tests passed' // TODO: Replace with actual test results
       );
 
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'pr_created',
         details: { prNumber: number, prUrl: url },
@@ -171,7 +171,7 @@ export class SelfLearningWorkflow {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'experiment_failed',
         details: { featureName, error: errorMessage },
@@ -198,7 +198,7 @@ export class SelfLearningWorkflow {
     }
 
     try {
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'self_healing_initiated',
         details: { issue: issueDescription, affectedFiles },
@@ -214,7 +214,7 @@ export class SelfLearningWorkflow {
       // Get stable version from main
       const stableCommit = await this.manager.getLatestCommit('main');
 
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'self_healing_completed',
         details: {
@@ -231,7 +231,7 @@ export class SelfLearningWorkflow {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'self_healing_failed',
         details: { error: errorMessage },
@@ -259,7 +259,7 @@ export class SelfLearningWorkflow {
         description: 'Automated scheduled backup',
       });
 
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'scheduled_backup_created',
         details: { branch: branchName },
@@ -270,7 +270,7 @@ export class SelfLearningWorkflow {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'scheduled_backup_failed',
         details: { error: errorMessage },
@@ -298,7 +298,7 @@ export class SelfLearningWorkflow {
 
       // In a real implementation, we'd check branch creation date
       // For now, we'll just log that cleanup was attempted
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'cleanup_attempted',
         details: { branchCount: branches.length, cutoffDays: daysOld },
@@ -307,7 +307,7 @@ export class SelfLearningWorkflow {
 
       return { deletedCount };
     } catch (error) {
-      await systemActivityLogger.logEvent({
+      await logEvent({
         category: 'github',
         action: 'cleanup_failed',
         details: { error: error instanceof Error ? error.message : 'Unknown error' },

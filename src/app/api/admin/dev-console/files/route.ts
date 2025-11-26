@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { logEvent } from '@/lib/systemActivityLogger';
+const { logEvent } = require('@/lib/systemActivityLogger.cjs');
 
 // Base path for file operations (project root)
 const BASE_PATH = process.env.ZACAI_CODE_ROOT || process.cwd();
