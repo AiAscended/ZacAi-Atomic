@@ -6,6 +6,10 @@
 
 import { promises as fs } from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export interface InferenceMetrics {
   // Input
@@ -125,7 +129,7 @@ export class LearningMetricsTracker {
     try {
       const data = await fs.readFile(this.metricsFile, 'utf-8');
       return JSON.parse(data) as LearningData;
-    } catch (error) {
+    } catch {
       // File doesn't exist or is invalid, return empty data
       return {
         metrics: [],

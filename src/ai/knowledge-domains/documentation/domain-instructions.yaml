@@ -1,0 +1,186 @@
+# Documentation Domain Instructions
+# Purpose: Produce authoritative, style-compliant product and API documentation
+
+domain:
+  id: documentation
+  name: Documentation
+  version: "1.2.0"
+  description: "Handles technical writing, information architecture, and changelog accuracy"
+
+role:
+  primary: "Specialized knowledge inference for documentation"
+  scope: "Plan, draft, and maintain user-facing and internal documentation"
+  orchestration_behavior: "Engages when UX copy, READMEs, or admin manuals need updates"
+
+capabilities:
+  - "Assess documentation gaps and propose outlines"
+  - "Apply product-specific style guides"
+  - "Generate examples and update tables/diagrams"
+  - "Synchronize version notes with admin metadata"
+  - "Route escalations when compliance or legal review required"
+
+seeds:
+  location: "./documentation_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./documentation_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./documentation_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  style_guide_checker:
+    enabled: true
+    capabilities:
+      - "Validate terminology and tone"
+      - "Enforce voice/tense rules"
+  example_generator:
+    enabled: true
+    capabilities:
+      - "Synthesize runnable snippets"
+      - "Highlight diff between versions"
+  glossary_builder:
+    enabled: true
+    capabilities:
+      - "Track term definitions"
+      - "Ensure cross-doc consistency"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Microsoft Writing Style Guide"
+        url: "https://learn.microsoft.com/style-guide"
+        use_for: ["tone", "voice"]
+      - name: "Google Developer Documentation Style"
+        url: "https://developers.google.com/style"
+        use_for: ["API docs"]
+      - name: "Write the Docs"
+        url: "https://www.writethedocs.org/guide"
+        use_for: ["best practices"]
+      - name: "OpenAPI Spec"
+        url: "https://spec.openapis.org/oas/latest.html"
+        use_for: ["api reference"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Microsoft Writing Style Guide"
+      url: "https://learn.microsoft.com/style-guide"
+      use_for: ["terminology"]
+    - name: "Google Developer Documentation Style"
+      url: "https://developers.google.com/style"
+      use_for: ["developer docs"]
+    - name: "Write the Docs"
+      url: "https://www.writethedocs.org/guide"
+      use_for: ["process"]
+  reference_triggers:
+    - "Tone or tense disputes"
+    - "API schema description updates"
+    - "Regulated content (GDPR, accessibility)"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.78
+    max_tokens: 900
+    temperature: 0.47
+    top_p: 0.9
+    require_style_compliance: true
+  input_processing:
+    - "Classify document type (guide, reference, changelog, FAQ)"
+    - "Gather target audience and persona"
+    - "Identify source-of-truth systems (code, admin metadata, release notes)"
+  reasoning_steps:
+    - "Outline sections"
+    - "Map inputs to consistent terminology"
+    - "Cross-check versions against admin config"
+  output_formatting:
+    - "Use markdown with heading hierarchy"
+    - "Include callouts for TODOs or approvals"
+    - "Embed code blocks with language tags"
+  validation:
+    - "Run style_guide_checker"
+    - "Ensure examples compile or reference seeds"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.00055
+  batch_size: 32
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Seeded doc templates"
+    - "Release notes archive"
+    - "Support ticket summaries"
+  focus_areas:
+    - "Consistency across touchpoints"
+    - "Accessibility and inclusive language"
+    - "Localization readiness"
+  evaluation_metrics:
+    - "Style compliance score"
+    - "Review cycle reduction"
+    - "Admin feedback signal"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Collect inputs (design docs, code diffs, admin notes)"
+    - "Normalize terminology across sources"
+  processing:
+    - "Generate outline"
+    - "Fill sections with curated content"
+  postprocessing:
+    - "Attach review checklist"
+    - "Update changelog metadata"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Missing source-of-truth"
+      action: "Request repository or spec link"
+    - error: "Conflicting tone guidance"
+      action: "Defer to admin-configured style"
+    - error: "Example fails validation"
+      action: "Regenerate with seeds or mark TODO"
+  recovery_strategies:
+    - "Escalate to english domain for general copy edits"
+    - "Flag compliance/legal review when necessary"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.style_guide_checker.enabled"
+    - "tools.example_generator.enabled"
+    - "tools.glossary_builder.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/documentation"
+    style_checker_toggle: "tools.style_guide_checker.enabled"
+    example_toggle: "tools.example_generator.enabled"
+    glossary_toggle: "tools.glossary_builder.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"

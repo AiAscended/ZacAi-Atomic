@@ -41,8 +41,12 @@ export const persistScienceWeights = (weights: Record<string, number[]>) => {
     updateFile(SCIENCE_DOMAIN, "src/ai/knowledge-domains/science/science_weights/science_pretrained_weights.json", content)
     return true
   } catch (e) {
+    const message = e instanceof Error ? e.message : String(e)
+    console.error(`[science_embeddings] Failed to persist weights: ${message}`)
     return false
   }
 }
 
-export default { getScienceEmbedding, getScienceEmbeddingForTokens, persistScienceWeights }
+const scienceEmbeddingAPI = { getScienceEmbedding, getScienceEmbeddingForTokens, persistScienceWeights }
+
+export default scienceEmbeddingAPI

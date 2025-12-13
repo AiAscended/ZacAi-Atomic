@@ -6,7 +6,7 @@
  * Supports admin and system roles for self-awareness features
  */
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -38,11 +38,13 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 
+type UserRole = "admin" | "user" | "system"
+
 interface User {
   id: string
   name: string
   email: string
-  role: "admin" | "user" | "system"
+  role: UserRole
   createdAt: string
   updatedAt: string
 }
@@ -54,19 +56,21 @@ export default function UsersPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState<User | null>(null)
-  const [formData, setFormData] = useState<{ name: string; email: string; role: "admin" | "user" | "system" }>({ 
+  const [formData, setFormData] = useState<{ name: string; email: string; role: UserRole }>({ 
     name: "", 
     email: "", 
     role: "user" 
   })
   const { toast } = useToast()
 
-  // Load users
-  useEffect(() => {
-    loadUsers()
-  }, [])
+  const getErrorMessage = (error: unknown, fallback: string) => {
+    if (error instanceof Error) return error.message
+    if (typeof error === "string") return error
+    return fallback
+  }
 
-  const loadUsers = async () => {
+  // Load users
+  const loadUsers = useCallback(async () => {
     try {
       const response = await fetch("/api/admin/settings/users")
       const result = await response.json()
@@ -82,13 +86,17 @@ export default function UsersPage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to connect to API",
+        description: getErrorMessage(error, "Failed to connect to API"),
         variant: "destructive",
       })
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    loadUsers()
+  }, [loadUsers])
 
   const handleAddUser = async () => {
     if (!formData.name || !formData.email) {
@@ -126,7 +134,7 @@ export default function UsersPage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to create user",
+        description: getErrorMessage(error, "Failed to create user"),
         variant: "destructive",
       })
     }
@@ -165,7 +173,7 @@ export default function UsersPage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to update user",
+        description: getErrorMessage(error, "Failed to update user"),
         variant: "destructive",
       })
     }
@@ -198,7 +206,7 @@ export default function UsersPage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to delete user",
+        description: getErrorMessage(error, "Failed to delete user"),
         variant: "destructive",
       })
     }
@@ -316,7 +324,7 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle>Add New User</DialogTitle>
             <DialogDescription>
-              Create a new user account. Use role "system" for AI self-awareness.
+              Create a new user account. Use role &quot;system&quot; for AI self-awareness.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -343,7 +351,7 @@ export default function UsersPage() {
               <Label htmlFor="add-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: any) => setFormData({ ...formData, role: value })}
+                onValueChange={(value: UserRole) => setFormData({ ...formData, role: value })}
               >
                 <SelectTrigger id="add-role">
                   <SelectValue />
@@ -400,7 +408,7 @@ export default function UsersPage() {
               <Label htmlFor="edit-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: any) => setFormData({ ...formData, role: value })}
+                onValueChange={(value: UserRole) => setFormData({ ...formData, role: value })}
               >
                 <SelectTrigger id="edit-role">
                   <SelectValue />
@@ -432,7 +440,7 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle>Delete User</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete user "{currentUser?.name}"? This action cannot be undone.
+              Are you sure you want to delete user &quot;{currentUser?.name}&quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

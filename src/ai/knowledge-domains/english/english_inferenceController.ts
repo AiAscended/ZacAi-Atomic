@@ -7,6 +7,35 @@ import { englishTokenizer } from "./english_tokenizer"
 import { englishSemanticAnalyzer } from "./english_semanticAnalyzer"
 import pretrainedWeights from "./english_weights/english_pretrained_weights.json"
 import seeds from "./english_seeds/english_seeds.json"
+import { normalizeThresholds, normalizeVocabularyWeights } from "../utils/embeddingUtils"
+
+type ThresholdWeights = {
+  tokenMatchWeight: number
+  semanticWeight: number
+}
+
+type EnglishSeedPattern = {
+  pattern: string
+  weight: number
+}
+
+type EnglishSeedConfig = {
+  vocabulary?: Record<string, number>
+  thresholds?: ThresholdWeights
+  patterns?: EnglishSeedPattern[]
+}
+
+type EnglishPretrainedWeights = {
+  thresholds?: ThresholdWeights
+}
+
+const seedConfig = seeds as EnglishSeedConfig
+const pretrainedConfig = pretrainedWeights as EnglishPretrainedWeights
+
+const defaultThresholds: ThresholdWeights = {
+  tokenMatchWeight: 0.5,
+  semanticWeight: 0.5,
+}
 
 const definitions: Record<string, { definition: string; synonyms: string[]; example: string }> = {
   molecular: {
@@ -35,17 +64,28 @@ const definitions: Record<string, { definition: string; synonyms: string[]; exam
   },
 }
 
+const VOCABULARY = normalizeVocabularyWeights(seedConfig.vocabulary ?? {}, 0.7)
+const THRESHOLDS = normalizeThresholds(
+  pretrainedConfig.thresholds ?? defaultThresholds,
+  seedConfig.thresholds ?? defaultThresholds,
+)
+
+export interface EnglishInferenceContext {
+  tokens?: string[]
+  sessionId?: string
+  [key: string]: unknown
+}
+
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
-  const vocabulary = (pretrainedWeights as any).vocabulary as Record<string, number>
 
   let tokenScore = 0
   let matchCount = 0
 
   for (const token of tokens) {
     const lowerToken = token.toLowerCase()
-    if (vocabulary[lowerToken]) {
-      tokenScore += vocabulary[lowerToken]
+    if (VOCABULARY[lowerToken]) {
+      tokenScore += VOCABULARY[lowerToken]
       matchCount++
     }
   }
@@ -54,7 +94,7 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   // Semantic pattern matching
   let semanticScore = 0
-  const patterns = (seeds as any).patterns as Array<{ pattern: string; weight: number }>
+  const patterns = seedConfig.patterns ?? []
 
   for (const patternObj of patterns) {
     if (lowerInput.includes(patternObj.pattern)) {
@@ -64,16 +104,19 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   semanticScore = Math.min(semanticScore / 2, 1.0)
 
-  const thresholds = (pretrainedWeights as any).thresholds
-  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
+  const finalConfidence =
+    avgTokenScore * THRESHOLDS.tokenMatchWeight + semanticScore * THRESHOLDS.semanticWeight
 
   return Math.min(finalConfidence, 1.0)
 }
 
-export const englishRunInference = async (input: string, _context?: any) => {
+export const englishRunInference = async (
+  input: string,
+  context?: EnglishInferenceContext,
+) => {
   const t = englishTokenizer(input)
   const sem = englishSemanticAnalyzer(input)
-  const tokens = _context?.tokens || t.tokens
+  const tokens = context?.tokens ?? t.tokens
 
   const confidence = calculateConfidence(tokens, input)
 
@@ -100,7 +143,7 @@ export const englishRunInference = async (input: string, _context?: any) => {
           `**Example:** ${def.example}`
 
         return {
-          tokens: t.tokens,
+          tokens,
           tokenCount: t.length,
           semantics: sem,
           response,
@@ -120,7 +163,7 @@ export const englishRunInference = async (input: string, _context?: any) => {
             `**Example:** ${def.example}`
 
           return {
-            tokens: t.tokens,
+            tokens,
             tokenCount: t.length,
             semantics: sem,
             response,
@@ -142,7 +185,7 @@ export const englishRunInference = async (input: string, _context?: any) => {
           `\n\n**Example:** ${def.example}`
 
         return {
-          tokens: t.tokens,
+          tokens,
           tokenCount: t.length,
           semantics: sem,
           response,
@@ -161,7 +204,7 @@ export const englishRunInference = async (input: string, _context?: any) => {
           `**Example sentence using "${key}":**\n\n` + `${def.example}\n\n` + `**Definition:** ${def.definition}`
 
         return {
-          tokens: t.tokens,
+          tokens,
           tokenCount: t.length,
           semantics: sem,
           response,
@@ -179,7 +222,7 @@ export const englishRunInference = async (input: string, _context?: any) => {
   }
 
   return {
-    tokens: t.tokens,
+    tokens,
     tokenCount: t.length,
     semantics: sem,
     response: `English domain processed ${t.length} tokens with ${(confidence * 100).toFixed(1)}% confidence.`,

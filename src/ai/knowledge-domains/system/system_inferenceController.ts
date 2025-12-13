@@ -5,13 +5,43 @@
 
 import { DOMAIN_NAME } from './system_constants';
 
-export const systemRunInference = async (input: string, _context?: any) => {
+interface SystemInferenceMetadata {
+  timestamp?: string;
+  inferenceMethod?: 'system_time' | 'system_location' | 'system_overview';
+  systemFunction: boolean;
+}
+
+interface SystemInferenceResponse {
+  response: string;
+  confidence: number;
+  sources: string[];
+  domain: string;
+  metadata: SystemInferenceMetadata;
+}
+
+export const systemRunInference = async (
+  input: string
+): Promise<SystemInferenceResponse> => {
   const lowerInput = input.toLowerCase();
   
   let responseText = '';
   let confidence = 0.7;
   const sources: string[] = [];
-  const metadata: any = {};
+  const metadata: SystemInferenceMetadata = { systemFunction: true };
+
+  const referencesHybridPipeline =
+    lowerInput.includes('zacai') ||
+    lowerInput.includes('hybrid ai') ||
+    lowerInput.includes('hybrid pipeline') ||
+    lowerInput.includes('pipeline') ||
+    lowerInput.includes('orchestrator') ||
+    lowerInput.includes('orchestration') ||
+    lowerInput.includes('domain router') ||
+    lowerInput.includes('inference flow') ||
+    lowerInput.includes('embeddings') ||
+    lowerInput.includes('tokenizer') ||
+    lowerInput.includes('seed') ||
+    lowerInput.includes('weights');
 
   // Handle time/date queries - return actual system time/date
   if (
@@ -47,8 +77,33 @@ export const systemRunInference = async (input: string, _context?: any) => {
     sources.push("System Clock (JavaScript Date API)");
     confidence = 0.98;
     metadata.timestamp = now.toISOString();
-    metadata.inferenceMethod = "system_time";
-    metadata.systemFunction = true;
+    metadata.inferenceMethod = 'system_time';
+
+    return {
+      response: responseText,
+      confidence,
+      sources,
+      domain: DOMAIN_NAME,
+      metadata,
+    };
+  }
+
+  if (referencesHybridPipeline) {
+    confidence = 0.9;
+    metadata.inferenceMethod = 'system_overview';
+    metadata.timestamp = new Date().toISOString();
+
+    responseText = `**ZacAi Hybrid Pipeline Overview**\n\n`;
+    responseText += `1. **Prompt Processor** – normalizes the user message, extracts tasks, and tags tokens for downstream models.\n`;
+    responseText += `2. **Domain Router** – maps the cleaned prompt to active knowledge domains (general_knowledge, system, internet_search, etc.) using the unified registry.\n`;
+    responseText += `3. **Domain Inference Layer** – each domain runs its own tokenizer, semantic analyzer, and seed-backed inference controller to return focused insights.\n`;
+    responseText += `4. **Unified Transformer LLM** – loads shared vocabulary + combined weights (seeded checkpoints + learned weights) to synthesize narrative answers when high-quality logits are available.\n`;
+    responseText += `5. **Response Synthesizer** – merges domain findings, LLM output, and heuristic fallbacks, then formats blocks for the admin/dev consoles.\n\n`;
+    responseText += `**Knowledge + Memory Stack**\n- Seeds: every domain exposes JSON seed vocabularies that the orchestrator can query even if a model is offline.\n- Weights: the LLM weights manager loads latest checkpoints and merges pretrained, learned, and scratch layers so the model always has usable tensors.\n- Metrics: every inference logs confidence, latency, and token usage for continuous training jobs.`;
+
+    responseText += `\n\n**Self-Healing Behavior**\nIf domains or the LLM are unavailable, the orchestrator still produces an answer by combining seeds, heuristics, and system status so operators always see a substantive response instead of a generic fallback.`;
+
+    sources.push('System Architecture Registry');
 
     return {
       response: responseText,
@@ -75,7 +130,7 @@ export const systemRunInference = async (input: string, _context?: any) => {
     
     confidence = 0.75;
     sources.push("System Information");
-    metadata.systemFunction = true;
+    metadata.inferenceMethod = 'system_location';
 
     return {
       response: responseText,
@@ -108,7 +163,7 @@ export const systemRunInference = async (input: string, _context?: any) => {
     responseText += `What specific system operation do you need help with?`;
     
     sources.push("System Domain Knowledge");
-    metadata.systemFunction = true;
+    metadata.inferenceMethod = 'system_overview';
   } else {
     responseText = `System domain handles:\n`;
     responseText += `- System operations & utilities\n`;
@@ -119,7 +174,7 @@ export const systemRunInference = async (input: string, _context?: any) => {
     
     confidence = 0.6;
     sources.push("System Domain");
-    metadata.systemFunction = true;
+    metadata.inferenceMethod = 'system_overview';
   }
 
   return {

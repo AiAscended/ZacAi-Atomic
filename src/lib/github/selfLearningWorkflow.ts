@@ -11,7 +11,9 @@
  */
 
 import { GitHubBranchManager, createGitHubBranchManager } from './branchManager';
-const { logEvent } = require('../systemActivityLogger.cjs');
+import systemActivityLogger from '../systemActivityLogger.cjs';
+
+const { logEvent } = systemActivityLogger;
 
 export interface SelfLearningConfig {
   owner: string;
@@ -294,7 +296,7 @@ export class SelfLearningWorkflow {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
-      let deletedCount = 0;
+      const deletedCount = 0;
 
       // In a real implementation, we'd check branch creation date
       // For now, we'll just log that cleanup was attempted

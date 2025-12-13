@@ -5,28 +5,147 @@
   "files": [
     {
       "priority": 1,
-      "file": "core_config.json",
-      "type": "config",
-      "description": "System identity and global settings"
+      "file": "mathematics_seedVocabulary.json",
+      "type": "vocabulary",
+      "description": "Canonical mathematics terminology and symbols"
     },
     {
       "priority": 2,
-      "file": "components_core1.json",
-      "type": "components",
-      "description": "Core system components"
+      "file": "mathematics_seed_math_concepts_2.json",
+      "type": "concepts",
+      "description": "Foundational arithmetic and algebra concepts"
     },
     {
       "priority": 3,
-      "file": "system_vocabulary1.json",
-      "type": "vocabulary",
-      "description": "System-specific vocabulary"
+      "file": "mathematics_seed_math_concepts_3.json",
+      "type": "concepts",
+      "description": "Geometry, trigonometry, and calculus refreshers"
     },
     {
       "priority": 4,
-      "file": "relationships_core.json",
-      "type": "relationships",
-      "description": "Core relationships and dependencies"
+      "file": "mathematics_seed_math_concepts_4.json",
+      "type": "concepts",
+      "description": "Advanced calculus, series, and transforms"
+    },
+    {
+      "priority": 5,
+      "file": "mathematics_seed_math_concepts_5.json",
+      "type": "concepts",
+      "description": "Linear algebra, tensor calculus, and manifolds"
+    },
+    {
+      "priority": 6,
+      "file": "mathematics_seed_math_concepts_6.json",
+      "type": "concepts",
+      "description": "Probability, statistics, and stochastic calculus"
+    },
+    {
+      "priority": 7,
+      "file": "mathematics_seed_math_concepts_7.json",
+      "type": "concepts",
+      "description": "Number theory, cryptography, and finite fields"
+    },
+    {
+      "priority": 8,
+      "file": "mathematics_seed_math_concepts_8.json",
+      "type": "concepts",
+      "description": "Optimization, convex analysis, and operations research"
+    },
+    {
+      "priority": 9,
+      "file": "mathematics_seed_math_concepts_9.json",
+      "type": "concepts",
+      "description": "Computational mathematics and symbolic systems"
+    },
+    {
+      "priority": 10,
+      "file": "mathematics_seed_math_concepts_10.json",
+      "type": "concepts",
+      "description": "Quantum computing math and category theory bridges"
+    },
+    {
+      "priority": 11,
+      "file": "mathematics_seed_math_historical.json",
+      "type": "history",
+      "description": "Classical mathematicians and theorem origins"
+    },
+    {
+      "priority": 12,
+      "file": "mathematics_seed_math_historical_2.json",
+      "type": "history",
+      "description": "Industrial era breakthroughs and proofs"
+    },
+    {
+      "priority": 13,
+      "file": "mathematics_seed_math_historical_3.json",
+      "type": "history",
+      "description": "Modern Nobel-equivalent advances and awards"
+    },
+    {
+      "priority": 14,
+      "file": "mathematics_seed_math_historical_4.json",
+      "type": "history",
+      "description": "Emerging mathematicians and research programs"
+    },
+    {
+      "priority": 15,
+      "file": "mathematics_seed_math_historical_5.json",
+      "type": "history",
+      "description": "Cross-discipline influences and hybrid fields"
+    },
+    {
+      "priority": 16,
+      "file": "mathematics_seed_math_pattern.json",
+      "type": "patterns",
+      "description": "Fractals, sequences, and pattern libraries"
+    },
+    {
+      "priority": 17,
+      "file": "mathematics_seed_math_pattern_2.json",
+      "type": "patterns",
+      "description": "Sacred geometry links and golden ratios"
+    },
+    {
+      "priority": 18,
+      "file": "mathematics_seed_sacred_geometry.json",
+      "type": "geometry",
+      "description": "Sacred geometry references and use cases"
+    },
+    {
+      "priority": 19,
+      "file": "mathematics_seed_advanced_geometry.json",
+      "type": "geometry",
+      "description": "Non-Euclidean, algebraic, and differential geometry"
+    },
+    {
+      "priority": 20,
+      "file": "mathematics_operations_reference.json",
+      "type": "reference",
+      "description": "Operator tables, transforms, and canonical forms"
+    },
+    {
+      "priority": 21,
+      "file": "mathematics_seed_url-lookup.json",
+      "type": "urls",
+      "description": "Official documentation and research portals"
+    },
+    {
+      "priority": 22,
+      "file": "mathematics_webDocReferences.json",
+      "type": "urls",
+      "description": "Curation of web documentation pages for scraping"
+    },
+    {
+      "priority": 23,
+      "file": "mathematics_seeds.json",
+      "type": "index",
+      "description": "Legacy index consumed by earlier loaders"
+    },
+    {
+      "priority": 24,
+      "file": "mathematics_seed_math_comcepts.json",
+      "type": "concepts",
+      "description": "Aggregated lens for compatibility with classic orchestrator"
     }
-    // ...add all other files in load order
   ]
 }

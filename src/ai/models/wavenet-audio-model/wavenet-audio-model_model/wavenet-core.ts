@@ -2,17 +2,18 @@
  * Wavenet-audio-model - Core Model Implementation
  */
 
+import type { ModelConfig, ModelPayload } from "../../shared/modelTypes"
+
 export class WAVENETModel {
-  private config: any;
-  
-  constructor(config: any) {
-    this.config = config;
+  private readonly config: ModelConfig
+
+  constructor(config: ModelConfig = {}) {
+    this.config = config
   }
-  
-  forward(input: any): any {
-    // Model forward pass implementation
-    return input;
+
+  forward(input: ModelPayload): ModelPayload {
+    return { ...input, ...this.config }
   }
 }
 
-export default WAVENETModel;
+export default WAVENETModel

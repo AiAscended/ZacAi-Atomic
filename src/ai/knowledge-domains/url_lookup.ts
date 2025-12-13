@@ -17,5 +17,6 @@ export const findSources = (domain?: string) => {
   if (!domain) return sources.slice();
   return sources.filter((s) => s.domain === domain);
 };
+const urlLookupApi = { registerSource, findSources };
 
-export default { registerSource, findSources };
+export default urlLookupApi;

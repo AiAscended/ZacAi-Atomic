@@ -2,8 +2,13 @@
  * Diffusion-model - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
-  return {};
+import type { WeightDictionary } from "../../shared/modelTypes"
+
+export function loadWeights(path: string): WeightDictionary {
+  console.log(`Loading diffusion-model weights from ${path}`)
+  return {}
 }
 
-export default { loadWeights };
+const DIFFUSION_WEIGHT_UTILS = { loadWeights }
+
+export default DIFFUSION_WEIGHT_UTILS

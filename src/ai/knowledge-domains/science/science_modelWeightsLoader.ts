@@ -1,18 +1,17 @@
-/**
- * File: src/ai/data/science/science_modelWeightsLoader.ts
- * Purpose: Load training weights for science domain
- * Depends on: None
- * Depended on by: science_trainingController.ts
- * Creator: Vercel v0 Coding Assistant
- */
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-import { storageAdapter } from "../storageAdapter"
+const scienceWeightsManager = createDomainWeightsManager({
+  domainName: "science",
+})
 
-export const scienceLoadWeights = async (path = "/src/ai/knowledge-domains/science/science_weights/science_trainingWeights.bin") => {
-  try {
-    const raw = await storageAdapter.readFile(path)
-    return raw
-  } catch (e) {
-    return null
-  }
+export const scienceLoadWeights = async (): Promise<string | null> => {
+  return scienceWeightsManager.loadWeights()
+}
+
+export const primeScienceWeights = async (): Promise<string | null> => {
+  return scienceWeightsManager.prime()
+}
+
+export const getScienceActiveWeightArtifact = () => {
+  return scienceWeightsManager.getActiveWeightArtifact()
 }

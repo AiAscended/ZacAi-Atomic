@@ -2,6 +2,27 @@ import { mathematicsTokenizer } from "./mathematics_tokenizer"
 import { mathematicsSemanticAnalyzer } from "./mathematics_semanticAnalyzer"
 import { calculator } from "../../shared/tools/shared-ScientificCalculator"
 
+type MathematicsTokenizerResult = ReturnType<typeof mathematicsTokenizer>
+type MathematicsSemanticAnalysis = ReturnType<typeof mathematicsSemanticAnalyzer>
+
+interface UpstreamInferenceResult {
+  domain?: string
+  confidence?: number
+}
+
+interface MathematicsInferenceContext {
+  tokens?: string[]
+  inferenceResults?: UpstreamInferenceResult | UpstreamInferenceResult[]
+}
+
+interface MathematicsInferenceResponse {
+  tokens: MathematicsTokenizerResult["tokens"]
+  tokenCount: number
+  semantics: MathematicsSemanticAnalysis
+  response: string
+  confidence: number
+}
+
 const wordToNumber: Record<string, number> = {
   zero: 0,
   one: 1,
@@ -150,18 +171,15 @@ function convertWordsToNumbers(input: string): string {
   return converted.trim()
 }
 
-export const mathematicsRunInference = async (input: string, _context?: any) => {
+export const mathematicsRunInference = async (
+  input: string,
+  context?: MathematicsInferenceContext,
+): Promise<MathematicsInferenceResponse | null> => {
   const tk = mathematicsTokenizer(input)
+  const tokens = tk.tokens
   const sem = mathematicsSemanticAnalyzer(input)
 
-  const inferenceResults = _context?.inferenceResults
-  const tokens = _context?.tokens || []
-
-  const domainInferenceResult = Array.isArray(inferenceResults)
-    ? inferenceResults.find((r) => r.domain === "mathematics")
-    : inferenceResults
-
-  const confidence = domainInferenceResult?.confidence || 0.05
+  const confidence = resolveContextConfidence(context?.inferenceResults) ?? 0.05
 
   const numericInput = convertWordsToNumbers(input)
   const lowerInput = numericInput.toLowerCase()
@@ -287,7 +305,7 @@ These equations form the mathematical foundation of AI systems like neural netwo
         )
       }
     } catch (error) {
-      console.log("[v0] ScientificCalculator evaluation failed, falling back to pattern matching")
+      console.error("[v0] ScientificCalculator evaluation failed, falling back to pattern matching", error)
     }
   }
 
@@ -408,4 +426,13 @@ These equations form the mathematical foundation of AI systems like neural netwo
       `(Processed ${tokens.length} tokens with ${(confidence * 100).toFixed(1)}% confidence)`,
     confidence,
   }
+}
+
+function resolveContextConfidence(
+  inferenceResults?: UpstreamInferenceResult | UpstreamInferenceResult[],
+): number | undefined {
+  if (!inferenceResults) return undefined
+  const list = Array.isArray(inferenceResults) ? inferenceResults : [inferenceResults]
+  const match = list.find((result) => result?.domain === "mathematics")
+  return match?.confidence ?? list[0]?.confidence
 }

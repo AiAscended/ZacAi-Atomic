@@ -1,15 +1,17 @@
-/**
- * File: src/ai/data/english/english_modelWeightsLoader.ts
- * Purpose: Load training weights for english domain (placeholder).
- */
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-import { storageAdapter } from "../storageAdapter"
+const englishWeightsManager = createDomainWeightsManager({
+  domainName: "english",
+})
 
-export const englishLoadWeights = async (path = "/src/ai/knowledge-domains/english/english_weights/english_trainingWeights.bin") => {
-  try {
-    const raw = await storageAdapter.readFile(path)
-    return raw
-  } catch (e) {
-    return null
-  }
+export const englishLoadWeights = async (): Promise<string | null> => {
+  return englishWeightsManager.loadWeights()
+}
+
+export const primeEnglishWeights = async (): Promise<string | null> => {
+  return englishWeightsManager.prime()
+}
+
+export const getEnglishActiveWeightArtifact = () => {
+  return englishWeightsManager.getActiveWeightArtifact()
 }

@@ -17,7 +17,7 @@
 import { DialogueFlowController } from "../context_management/dialogueFlowController"
 import { detectSentiment } from "../context_management/sentimentEmotionDetector"
 import { SlotFiller } from "../context_management/slotFiller"
-import { UserProfileHandler } from "../context_management/userProfileHandler"
+import { UserProfileHandler, type UserProfile } from "../context_management/userProfileHandler"
 
 /**
  * Enhanced context with all metadata
@@ -30,12 +30,8 @@ export interface EnhancedContext {
     emotion: string
     confidence: number
   }
-  slots: Record<string, string>
-  userProfile: {
-    name?: string
-    preferences?: Record<string, unknown>
-    history?: string[]
-  }
+  slots: Record<string, string | null>
+  userProfile: UserProfile
   conversationTurn: number
 }
 
@@ -56,12 +52,12 @@ export class ContextEnhancer {
   /**
    * Enhance a prompt with full contextual information
    */
-  public async enhance(text: string, sessionId: string, history: string[]): Promise<EnhancedContext> {
+  public async enhance(text: string, sessionId: string, history: string[] = []): Promise<EnhancedContext> {
     // Get dialogue state
     const dialogueState = this.dialogueController.getState(sessionId)
 
     // Detect sentiment and emotion
-    const sentiment = detectSentiment(text)
+    const sentiment = this.enrichSentiment(detectSentiment(text))
 
     // Extract slots (entities like names, dates, locations)
     const slots = this.slotFiller.fill(text)
@@ -94,7 +90,31 @@ export class ContextEnhancer {
     const profile = this.profileHandler.getProfile(sessionId)
     const state = this.dialogueController.getState(sessionId)
 
-    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${profile.history?.length || 0} turns`
+    const historyCount = Array.isArray(profile.history) ? profile.history.length : 0
+    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${historyCount} turns`
+  }
+
+  private enrichSentiment(raw: ReturnType<typeof detectSentiment>): {
+    polarity: "positive" | "negative" | "neutral"
+    emotion: string
+    confidence: number
+  } {
+    return {
+      polarity: raw.sentiment,
+      emotion: this.deriveEmotion(raw.sentiment),
+      confidence: raw.score,
+    }
+  }
+
+  private deriveEmotion(polarity: "positive" | "negative" | "neutral"): string {
+    switch (polarity) {
+      case "positive":
+        return "optimistic"
+      case "negative":
+        return "concerned"
+      default:
+        return "neutral"
+    }
   }
 }
 

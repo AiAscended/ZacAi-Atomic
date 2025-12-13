@@ -2,8 +2,13 @@
  * Multi-modal-fusion - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
-  return {};
+import type { WeightDictionary } from "../../shared/modelTypes"
+
+export function loadWeights(path: string): WeightDictionary {
+  console.log(`Loading multi-modal-fusion weights from ${path}`)
+  return {}
 }
 
-export default { loadWeights };
+const MULTIMODAL_WEIGHT_UTILS = { loadWeights }
+
+export default MULTIMODAL_WEIGHT_UTILS

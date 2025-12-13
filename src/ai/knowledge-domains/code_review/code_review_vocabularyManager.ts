@@ -15,7 +15,8 @@ export const loadCodeReviewSeedVocabulary = async (
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { patterns: [] }) as { patterns: string[] }
-  } catch (e) {
+  } catch (error) {
+    console.warn("Failed to load code review seed vocabulary", { path, error })
     return { patterns: [] }
   }
 }

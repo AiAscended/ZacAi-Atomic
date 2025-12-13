@@ -1,0 +1,229 @@
+# Diffusion Model Instructions
+# Purpose: Generate high-fidelity images from textual prompts with controllable guidance and safety filters
+
+model:
+  id: "diffusion_model"
+  name: "Diffusion Model"
+  version: "1.2.0"
+  description: "Latent diffusion pipeline with text encoder, UNet backbone, and decoder"
+  modality: "vision"
+  architecture:
+    text_encoder: "CLIP ViT-L/14"
+    unet: "U-Net with cross-attention"
+    scheduler: "DDIM"
+    latent_resolution: "64x64"
+    output_resolution: "1024x1024"
+  deployment:
+    runtime: "CUDA / TensorRT"
+    container_image: "registry.internal.models/diffusion-model:1.2.0"
+    supports_batching: true
+
+role:
+  primary: "Text-to-image generation"
+  scope: "Create illustrations, UI mocks, and conceptual art respecting policy filters"
+  orchestration_behavior: "Triggered for visual ideation or when prompts include #render or #concept tags"
+
+capabilities:
+  - "Interpret multi-sentence prompts with style modifiers"
+  - "Apply negative prompts to steer away from artifacts"
+  - "Support seed locking for deterministic repro"
+  - "Blend reference images for style transfer"
+  - "Run safety classifiers pre/post generation"
+
+principles:
+  - name: "Policy Compliance"
+    rule: "Reject disallowed categories before sampling"
+    priority: P1
+  - name: "Deterministic Repro"
+    rule: "Honor provided seeds and log metadata"
+    priority: P2
+  - name: "Resource Stewardship"
+    rule: "Decline ultra-high resolution requests without admin override"
+    priority: P2
+
+seeds:
+  location: "./diffusion-model_seeds/"
+  auto_load: true
+  format: "json"
+  embeddings_file: "prompt_embeddings.bin"
+  cache: "warm"
+
+weights:
+  location: "./diffusion-model_weights/"
+  auto_load: true
+  format: "safetensors"
+  current: "./diffusion-model_weights/diffusion-model_current_weights.safetensors"
+  pretrained: "./diffusion-model_pretrained_weights/diffusion-model_pretrained_embeddings.bin"
+  fallback: "./diffusion-model_pretrained_weights/diffusion-model_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  prompt_sanitizer:
+    enabled: true
+    description: "Normalizes prompts, extracts style tokens, and enforces policy filters"
+    capabilities:
+      - "Detect disallowed content"
+      - "Map synonyms to canonical tags"
+  guidance_scheduler:
+    enabled: true
+    description: "Tunes classifier-free guidance (CFG) and scheduler steps"
+    capabilities:
+      - "Auto-adjust steps for quality vs latency"
+      - "Expose manual override hooks"
+  safety_classifier:
+    enabled: true
+    description: "Evaluates generated images for policy violations"
+    capabilities:
+      - "Blur/deny disallowed outputs"
+      - "Produce audit logs"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Stable Diffusion Paper"
+        url: "https://arxiv.org/abs/2112.10752"
+        use_for: ["model reference"]
+      - name: "OpenAI Safety Guidelines"
+        url: "https://openai.com/safety"
+        use_for: ["policy"]
+      - name: "CLIP Model Card"
+        url: "https://github.com/openai/CLIP"
+        use_for: ["text encoder"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Stable Diffusion Paper"
+      url: "https://arxiv.org/abs/2112.10752"
+      use_for: ["architecture"]
+    - name: "OpenAI Safety Guidelines"
+      url: "https://openai.com/safety"
+      use_for: ["policy"]
+    - name: "CLIP Model Card"
+      url: "https://github.com/openai/CLIP"
+      use_for: ["text encoder"]
+  reference_triggers:
+    - "Architecture tuning"
+    - "Safety escalation"
+    - "Prompt interpretation disputes"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.8
+    max_tokens: 256
+    max_resolution: "1024x1024"
+    steps_default: 30
+    steps_max: 60
+    guidance_scale_default: 7.5
+    temperature: 0.35
+  input_processing:
+    - "Normalize prompt"
+    - "Apply prompt_sanitizer"
+    - "Derive seed (use user-provided or random)"
+  reasoning_steps:
+    - "Encode prompt via text encoder"
+    - "Sample latent trajectory with guidance_scheduler"
+    - "Decode latents to RGB"
+    - "Run safety_classifier"
+  output_formatting:
+    - "Return base64 images + metadata (seed, steps, guidance)"
+    - "Attach safety report"
+  validation:
+    - "Ensure image size within limits"
+    - "Verify latency budget"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adamw"
+  learning_rate: 0.0001
+  batch_size: 32
+  update_frequency: "weekly"
+  epochs: 4
+  data_sources:
+    - "diffusion-model_training/prompts.parquet"
+    - "diffusion-model_data/style_pairs.json"
+    - "Safety feedback dataset"
+  focus_areas:
+    - "Prompt adherence"
+    - "Style diversity"
+    - "Safety classifier precision"
+  evaluation_metrics:
+    - "FID"
+    - "Prompt compliance score"
+    - "Safety violation rate"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Clean prompts"
+    - "Cache embeddings"
+  processing:
+    - "Run diffusion steps"
+    - "Decode latent image"
+  postprocessing:
+    - "Apply upscalers if requested"
+    - "Watermark image if admin flag enabled"
+    - "Generate audit metadata"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Policy violation"
+      action: "Block output, provide explanation, notify admin"
+    - error: "GPU exhaustion"
+      action: "Queue request, lower steps, or reject"
+    - error: "Prompt too long"
+      action: "Truncate with warning and log"
+  recovery_strategies:
+    - "Escalate to security for repeated violations"
+    - "Escalate to observability for GPU saturation"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.prompt_sanitizer.enabled"
+    - "tools.guidance_scheduler.enabled"
+    - "tools.safety_classifier.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/diffusion-model"
+    sanitizer_toggle: "tools.prompt_sanitizer.enabled"
+    guidance_toggle: "tools.guidance_scheduler.enabled"
+    safety_toggle: "tools.safety_classifier.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "FID"
+      target: "<8"
+    - name: "Latency p95"
+      target: "<6s"
+    - name: "Policy Violations"
+      target: "<0.05%"
+metadata:
+  owners:
+    - "vision-platform@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/diffusion"

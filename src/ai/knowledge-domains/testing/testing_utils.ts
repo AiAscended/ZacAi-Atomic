@@ -9,7 +9,10 @@
 export const safeParseJSON = <T = unknown>(s: string, fallback: T): T => {
   try {
     return JSON.parse(s) as T
-  } catch (e) {
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[Testing] Unable to parse JSON, returning fallback.", error)
+    }
     return fallback
   }
 }

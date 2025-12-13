@@ -17,14 +17,50 @@ function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
+function buildEvent(typeArg, messageArg, metaArg = {}) {
+  const timestamp = new Date().toISOString();
+  const normalizedMeta = (metaArg && typeof metaArg === 'object') ? metaArg : {};
+
+  if (typeArg && typeof typeArg === 'object' && !Array.isArray(typeArg)) {
+    const eventObj = typeArg;
+    const severity = eventObj.severity || normalizedMeta.severity || 'info';
+    const category = eventObj.category || eventObj.type || 'system';
+    const action = eventObj.action || normalizedMeta.action || 'log';
+    const message = eventObj.message || messageArg || `${category}:${action}`;
+
+    return {
+      ts: timestamp,
+      type: category,
+      category,
+      action,
+      severity,
+      message: typeof message === 'string' ? message : JSON.stringify(message),
+      details: eventObj.details || normalizedMeta || {},
+    };
+  }
+
+  const type = typeof typeArg === 'string' ? typeArg : 'event';
+  const severity = normalizedMeta.severity || 'info';
+  const message = typeof messageArg === 'string'
+    ? messageArg
+    : messageArg
+    ? JSON.stringify(messageArg)
+    : type;
+
+  return {
+    ts: timestamp,
+    type,
+    category: type,
+    action: normalizedMeta.action || 'log',
+    severity,
+    message,
+    details: normalizedMeta,
+  };
+}
+
 function logEvent(type, message, meta = {}) {
   ensureDataDir();
-  const entry = {
-    ts: new Date().toISOString(),
-    type,
-    message: typeof message === 'string' ? message : JSON.stringify(message),
-    meta,
-  };
+  const entry = buildEvent(type, message, meta);
   try {
     fs.appendFileSync(LOG_PATH, JSON.stringify(entry) + '\n', 'utf-8');
   } catch (err) {

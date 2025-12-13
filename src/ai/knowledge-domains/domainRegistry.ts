@@ -7,6 +7,8 @@
  */
 
 import { EventEmitter } from "events"
+import path from "path"
+import { getUnifiedRegistry, type ModuleManifest } from "../shared/registry/unifiedRegistry"
 
 /**
  * Atomic hierarchy levels for modules
@@ -46,19 +48,20 @@ export interface DomainMetadata {
 export class DomainRegistry extends EventEmitter {
   private domains: Map<string, DomainMetadata> = new Map()
   private moduleIndex: Map<string, ModuleMetadata> = new Map()
+  private baseDomains: Map<string, DomainMetadata> = new Map()
+  private overrides: Map<string, DomainMetadata> = new Map()
+  private syncing: Promise<void> | null = null
 
   /**
    * Register a new domain with its metadata
    */
   registerDomain(metadata: DomainMetadata): void {
-    this.domains.set(metadata.name, metadata)
-
-    // Index all modules for quick lookup
-    for (const module of metadata.modules) {
-      this.moduleIndex.set(`${metadata.name}:${module.name}`, module)
+    this.overrides.set(metadata.name, metadata)
+    this.applyMergedDomain(metadata.name)
+    const effective = this.domains.get(metadata.name)
+    if (effective) {
+      this.emit("domain:registered", effective)
     }
-
-    this.emit("domain:registered", metadata)
   }
 
   /**
@@ -93,8 +96,8 @@ export class DomainRegistry extends EventEmitter {
    * Resolve module dependencies
    */
   resolveDependencies(moduleName: string): ModuleMetadata[] {
-    const module = Array.from(this.moduleIndex.values()).find((m) => m.name === moduleName)
-    if (!module) return []
+    const targetModule = Array.from(this.moduleIndex.values()).find((m) => m.name === moduleName)
+    if (!targetModule) return []
 
     const resolved: ModuleMetadata[] = []
     const visited = new Set<string>()
@@ -112,7 +115,7 @@ export class DomainRegistry extends EventEmitter {
       }
     }
 
-    resolve(module.dependencies)
+    resolve(targetModule.dependencies)
     return resolved
   }
 
@@ -121,10 +124,12 @@ export class DomainRegistry extends EventEmitter {
    */
   setDomainEnabled(name: string, enabled: boolean): void {
     const domain = this.domains.get(name)
-    if (domain) {
-      domain.enabled = enabled
-      this.emit("domain:status_changed", { name, enabled })
-    }
+    if (!domain) return
+
+    const override = { ...domain, enabled }
+    this.overrides.set(name, override)
+    this.applyMergedDomain(name)
+    this.emit("domain:status_changed", { name, enabled })
   }
 
   /**
@@ -147,7 +152,186 @@ export class DomainRegistry extends EventEmitter {
       enabledDomains: domains.filter((d) => d.enabled).length,
     }
   }
+
+  /**
+   * Synchronize registry with unified module registry
+   */
+  async synchronizeWithUnifiedRegistry(force = false): Promise<void> {
+    if (this.syncing && !force) {
+      return this.syncing
+    }
+
+    this.syncing = this.performSync(force)
+
+    try {
+      await this.syncing
+    } finally {
+      this.syncing = null
+    }
+  }
+
+  private async performSync(force: boolean): Promise<void> {
+    const registry = await getUnifiedRegistry(force)
+    const newBaseDomains = new Map<string, DomainMetadata>()
+
+    for (const manifest of Object.values(registry.modules)) {
+      if (manifest.moduleType !== "domain") continue
+      const baseMetadata = manifestToDomainMetadata(manifest)
+      newBaseDomains.set(baseMetadata.name, baseMetadata)
+    }
+
+    this.baseDomains = newBaseDomains
+    this.domains.clear()
+    this.moduleIndex.clear()
+
+    for (const domainName of this.baseDomains.keys()) {
+      this.applyMergedDomain(domainName)
+    }
+
+    for (const overrideName of this.overrides.keys()) {
+      if (!this.baseDomains.has(overrideName)) {
+        this.applyMergedDomain(overrideName)
+      }
+    }
+
+  }
+
+  private applyMergedDomain(domainName: string): void {
+    const merged = this.mergeMetadata(
+      this.baseDomains.get(domainName),
+      this.overrides.get(domainName)
+    )
+
+    if (!merged) return
+
+    this.domains.set(domainName, merged)
+    this.reindexDomainModules(domainName, merged.modules)
+  }
+
+  private mergeMetadata(base?: DomainMetadata, override?: DomainMetadata): DomainMetadata | null {
+    const source = base || override
+    if (!source) return null
+
+    const merged: DomainMetadata = {
+      name: override?.name ?? base?.name ?? source.name,
+      displayName: override?.displayName ?? base?.displayName ?? source.displayName,
+      description: override?.description ?? base?.description ?? source.description,
+      atomicLevel: override?.atomicLevel ?? base?.atomicLevel ?? source.atomicLevel,
+      modules: override?.modules ?? base?.modules ?? source.modules,
+      seedDataPath: override?.seedDataPath ?? base?.seedDataPath ?? source.seedDataPath,
+      learnedDataPath:
+        override?.learnedDataPath ?? base?.learnedDataPath ?? source.learnedDataPath,
+      weightsPath: override?.weightsPath ?? base?.weightsPath ?? source.weightsPath,
+      enabled: override?.enabled ?? base?.enabled ?? source.enabled,
+    }
+
+    return merged
+  }
+
+  private reindexDomainModules(domainName: string, modules: ModuleMetadata[]): void {
+    for (const key of Array.from(this.moduleIndex.keys())) {
+      if (key.startsWith(`${domainName}:`)) {
+        this.moduleIndex.delete(key)
+      }
+    }
+
+    for (const domainModule of modules) {
+      this.moduleIndex.set(`${domainName}:${domainModule.name}`, domainModule)
+    }
+  }
 }
 
 // Singleton instance - the ONLY registry in the system
 export const domainRegistry = new DomainRegistry()
+
+export async function synchronizeDomainRegistry(force = false): Promise<void> {
+  await domainRegistry.synchronizeWithUnifiedRegistry(force)
+}
+
+function manifestToDomainMetadata(manifest: ModuleManifest): DomainMetadata {
+  const domainRoot = path.join(
+    process.cwd(),
+    "src",
+    "ai",
+    "knowledge-domains",
+    manifest.moduleId
+  )
+
+  const resolveDomainPath = (customPath: string | undefined, fallback: string) => {
+    if (!customPath) return fallback
+    return path.isAbsolute(customPath) ? customPath : path.join(domainRoot, customPath)
+  }
+
+  const seedDataPath = resolveDomainPath(
+    manifest.paths.seedDataPath,
+    path.join(domainRoot, `${manifest.moduleId}_seeds`)
+  )
+
+  const learnedDataPath = resolveDomainPath(
+    manifest.paths.learnedDataPath,
+    path.join(domainRoot, `${manifest.moduleId}_learned`)
+  )
+
+  const weightsPath = resolveDomainPath(
+    manifest.paths.pretrainedWeightsPath,
+    path.join(domainRoot, `${manifest.moduleId}_weights`)
+  )
+
+  const modules: ModuleMetadata[] = []
+
+  if (manifest.structure.hasIntegrationAPI) {
+    modules.push({
+      name: `${manifest.moduleId}_integration`,
+      atomicLevel: "organism",
+      category: "integration_api",
+      dependencies: [],
+      capabilities: ["integration"],
+      version: manifest.version,
+    })
+  }
+
+  if (manifest.structure.hasInferenceEngine) {
+    modules.push({
+      name: `${manifest.moduleId}_inference`,
+      atomicLevel: "organ",
+      category: "inference",
+      dependencies: [],
+      capabilities: ["reasoning", "routing"],
+      version: manifest.version,
+    })
+  }
+
+  if (manifest.structure.hasTrainingPipeline) {
+    modules.push({
+      name: `${manifest.moduleId}_training`,
+      atomicLevel: "cell",
+      category: "training",
+      dependencies: [],
+      capabilities: ["learning"],
+      version: manifest.version,
+    })
+  }
+
+  if (!modules.length) {
+    modules.push({
+      name: `${manifest.moduleId}_core`,
+      atomicLevel: "organism",
+      category: "core",
+      dependencies: [],
+      capabilities: ["knowledge"],
+      version: manifest.version,
+    })
+  }
+
+  return {
+    name: manifest.moduleId,
+    displayName: manifest.displayName,
+    description: manifest.description,
+    atomicLevel: "organism",
+    modules,
+    seedDataPath,
+    learnedDataPath,
+    weightsPath,
+    enabled: manifest.enabled,
+  }
+}

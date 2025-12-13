@@ -6,13 +6,13 @@
 
 "use client"
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Editor from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
 import {
   X,
   Save,
   Loader2,
-  AlertCircle,
   FileCode,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -47,28 +47,10 @@ export function AdminCodeEditor({
 }: AdminCodeEditorProps) {
   const [tabs, setTabs] = useState<Map<string, EditorTab>>(new Map());
   const [saving, setSaving] = useState(false);
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const { toast } = useToast();
 
-  // Load file content when new file is opened
-  useEffect(() => {
-    for (const path of openFiles) {
-      if (!tabs.has(path)) {
-        loadFile(path);
-      }
-    }
-
-    // Remove tabs for closed files
-    const newTabs = new Map(tabs);
-    for (const path of tabs.keys()) {
-      if (!openFiles.includes(path)) {
-        newTabs.delete(path);
-      }
-    }
-    setTabs(newTabs);
-  }, [openFiles]);
-
-  const loadFile = async (path: string) => {
+  const loadFile = useCallback(async (path: string) => {
     try {
       // Add loading tab
       setTabs((prev) => new Map(prev).set(path, {
@@ -117,7 +99,30 @@ export function AdminCodeEditor({
         return newTabs;
       });
     }
-  };
+  }, [activeFile, onActiveFileChange, toast]);
+
+  // Load file content when new file is opened
+  useEffect(() => {
+    openFiles.forEach((path) => {
+      if (!tabs.has(path)) {
+        void loadFile(path);
+      }
+    });
+  }, [openFiles, tabs, loadFile]);
+
+  useEffect(() => {
+    setTabs((prev) => {
+      let changed = false;
+      const updated = new Map(prev);
+      for (const path of prev.keys()) {
+        if (!openFiles.includes(path)) {
+          updated.delete(path);
+          changed = true;
+        }
+      }
+      return changed ? updated : prev;
+    });
+  }, [openFiles]);
 
   const handleEditorChange = (value: string | undefined) => {
     if (!activeFile || value === undefined) return;
@@ -189,7 +194,7 @@ export function AdminCodeEditor({
     }
   };
 
-  const handleEditorMount = (editor: any) => {
+  const handleEditorMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
     editorRef.current = editor;
 
     // Add keyboard shortcut for save (Ctrl/Cmd + S)

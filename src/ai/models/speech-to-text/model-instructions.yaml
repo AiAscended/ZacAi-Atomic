@@ -1,0 +1,227 @@
+# Speech-to-Text Model Instructions
+# Purpose: Transcribe streaming or batch audio into punctuated text with speaker and timestamp metadata
+
+model:
+  id: "speech_to_text"
+  name: "Speech-to-Text"
+  version: "1.2.0"
+  description: "Hybrid conformer-transducer ASR system with language model rescoring"
+  modality: "audio-text"
+  architecture:
+    encoder: "Conformer"
+    decoder: "RNNT"
+    language_model: "Transformer LM with shallow fusion"
+    sampling_rate_hz: 16000
+  deployment:
+    runtime: "CUDA / TensorRT"
+    container_image: "registry.internal.models/speech-to-text:1.2.0"
+    supports_streaming: true
+
+role:
+  primary: "Automatic speech recognition"
+  scope: "Transcribe meetings, support calls, and audio uploads with diarization support"
+  orchestration_behavior: "Engages when audio attachments or live mic streams are detected"
+
+capabilities:
+  - "Low-latency streaming transcription"
+  - "Batch processing for long recordings"
+  - "Automatic punctuation and capitalization"
+  - "Speaker diarization up to 8 speakers"
+  - "Keyword boosting from admin lexicons"
+
+principles:
+  - name: "Accuracy"
+    rule: "Optimize word error rate before stylistic adjustments"
+    priority: P1
+  - name: "Confidentiality"
+    rule: "Mask sensitive entities per admin policy"
+    priority: P1
+  - name: "Graceful Degradation"
+    rule: "If streaming fails, offer batch fallback"
+    priority: P2
+
+seeds:
+  location: "./speech-to-text_seeds/"
+  auto_load: true
+  format: "json"
+  lexicon_file: "keywords.txt"
+  cache: "warm"
+
+weights:
+  location: "./speech-to-text_weights/"
+  auto_load: true
+  format: "binary"
+  current: "./speech-to-text_weights/speech-to-text_current_weights.bin"
+  pretrained: "./speech-to-text_pretrained_weights/speech-to-text_pretrained_embeddings.bin"
+  fallback: "./speech-to-text_pretrained_weights/speech-to-text_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  diarization_engine:
+    enabled: true
+    description: "Performs speaker segmentation using spectral clustering"
+    capabilities:
+      - "Assign speaker labels"
+      - "Handle overlap via probability masks"
+  keyword_booster:
+    enabled: true
+    description: "Boosts vocabulary probability for admin-provided terms"
+    capabilities:
+      - "Lexicon import"
+      - "Dynamic weight adjustments"
+  content_filter:
+    enabled: true
+    description: "Detects and masks PII in transcripts"
+    capabilities:
+      - "Inline redaction"
+      - "Policy tagging"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "RNNT Paper"
+        url: "https://arxiv.org/abs/1211.3711"
+        use_for: ["architecture"]
+      - name: "Conformer Paper"
+        url: "https://arxiv.org/abs/2005.08100"
+        use_for: ["encoder"]
+      - name: "W3C Captioning"
+        url: "https://www.w3.org/TR/media-accessibility-reqs"
+        use_for: ["accessibility"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "RNNT Paper"
+      url: "https://arxiv.org/abs/1211.3711"
+      use_for: ["decoder"]
+    - name: "Conformer Paper"
+      url: "https://arxiv.org/abs/2005.08100"
+      use_for: ["encoder"]
+    - name: "W3C Captioning"
+      url: "https://www.w3.org/TR/media-accessibility-reqs"
+      use_for: ["accessibility"]
+  reference_triggers:
+    - "Architecture or accuracy discussions"
+    - "Compliance questions"
+    - "Latency/streaming investigations"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.85
+    max_audio_seconds: 3600
+    streaming_chunk_ms: 640
+    beam_width: 8
+    temperature: 0.3
+  input_processing:
+    - "Decode audio to 16 kHz mono"
+    - "Apply VAD trimming"
+    - "Load keyword boosts"
+  reasoning_steps:
+    - "Encode audio frames via conformer"
+    - "Decode tokens with RNNT"
+    - "Apply language-model rescoring"
+    - "Run diarization_engine"
+    - "Pass through content_filter"
+  output_formatting:
+    - "Return JSON with segments, speaker labels, timestamps"
+    - "Provide confidence per segment"
+  validation:
+    - "Ensure audio duration under limit"
+    - "Check max speakers per policy"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adamw"
+  learning_rate: 0.00025
+  batch_size: 64
+  update_frequency: "daily"
+  epochs: 5
+  data_sources:
+    - "speech-to-text_training/call_center_corpus.jsonl"
+    - "speech-to-text_data/meeting_recordings.parquet"
+    - "Noise augmentation manifests"
+  focus_areas:
+    - "Accent robustness"
+    - "Noise resilience"
+    - "Streaming latency"
+  evaluation_metrics:
+    - "WER"
+    - "Real-time factor"
+    - "Diarization JER"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize loudness"
+    - "Split long files"
+  processing:
+    - "Run streaming or batch inference"
+    - "Apply rescoring"
+  postprocessing:
+    - "Merge segments"
+    - "Insert punctuation"
+    - "Apply redaction"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Audio sample rate unsupported"
+      action: "Convert to 16 kHz or request new file"
+    - error: "Latency budget exceeded"
+      action: "Switch to batch mode and notify user"
+    - error: "Speaker overflow"
+      action: "Limit diarization to 8 speakers, log warning"
+  recovery_strategies:
+    - "Escalate to observability for performance issues"
+    - "Escalate to security for redaction failures"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.diarization_engine.enabled"
+    - "tools.keyword_booster.enabled"
+    - "tools.content_filter.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/speech-to-text"
+    diarization_toggle: "tools.diarization_engine.enabled"
+    keyword_toggle: "tools.keyword_booster.enabled"
+    filter_toggle: "tools.content_filter.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "WER"
+      target: "<6%"
+    - name: "Latency p95"
+      target: "<400ms streaming"
+    - name: "Redaction Accuracy"
+      target: ">=99%"
+metadata:
+  owners:
+    - "asr-platform@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/speech-to-text"

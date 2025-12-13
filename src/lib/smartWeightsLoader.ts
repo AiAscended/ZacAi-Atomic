@@ -25,13 +25,13 @@ export interface WeightMetadata {
 
 export interface LoadedWeights {
   metadata: WeightMetadata;
-  weights: any;
+  weights: unknown;
   loadedAt: Date;
   loadTimeMs: number;
 }
 
 // Cache for loaded weights
-const weightsCache = new Map<string, { weights: any; loadedAt: Date }>();
+const weightsCache = new Map<string, { weights: unknown; loadedAt: Date }>();
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 /**

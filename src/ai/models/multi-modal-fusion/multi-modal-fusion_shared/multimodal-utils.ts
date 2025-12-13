@@ -4,4 +4,6 @@
 
 export function multimodalUtility(): void {}
 
-export default { multimodalUtility };
+const MULTIMODAL_UTILS = { multimodalUtility }
+
+export default MULTIMODAL_UTILS

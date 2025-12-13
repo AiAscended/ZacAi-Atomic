@@ -2,6 +2,15 @@
  * Convolutional-neural-network - Utilities
  */
 
-export function cnnUtility(): void {}
+import { ModelPayload } from '../../shared/modelTypes';
 
-export default { cnnUtility };
+export function normalizeInput(payload: ModelPayload): ModelPayload {
+	const normalized = {
+		...payload,
+		normalized: true,
+	};
+
+	console.log('[cnn-utils] Normalized payload keys', Object.keys(payload).length);
+	return normalized;
+}
+

@@ -5,7 +5,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,7 +18,7 @@ import { Save, RotateCcw, Check, AlertCircle, Activity } from "lucide-react"
 interface ModelSettings {
   enabled: boolean
   type: string
-  parameters: Record<string, any>
+  parameters: Record<string, unknown>
   performance: {
     maxLatency: number
     cacheEnabled: boolean
@@ -30,7 +30,7 @@ interface ModelSettingsPageProps {
   modelName: string
   modelTitle: string
   modelDescription: string
-  defaultParameters: Record<string, any>
+  defaultParameters: Record<string, unknown>
 }
 
 export function ModelSettingsPage({
@@ -55,11 +55,7 @@ export function ModelSettingsPage({
     updatedAt: new Date().toISOString()
   })
 
-  useEffect(() => {
-    loadSettings()
-  }, [modelName])
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -77,7 +73,11 @@ export function ModelSettingsPage({
     } finally {
       setLoading(false)
     }
-  }
+  }, [modelName])
+
+  useEffect(() => {
+    void loadSettings()
+  }, [loadSettings])
 
   const saveSettings = async () => {
     try {
@@ -127,7 +127,7 @@ export function ModelSettingsPage({
     })
   }
 
-  const updateParameter = (key: string, value: any) => {
+  const updateParameter = (key: string, value: unknown) => {
     setSettings({
       ...settings,
       parameters: {

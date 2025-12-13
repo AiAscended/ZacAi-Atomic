@@ -16,7 +16,9 @@ export interface TrainingResult {
   message: string
 }
 
-export async function reactRunTrainingEpoch(samples: any[]): Promise<TrainingResult> {
+export type ReactTrainingSample = Record<string, unknown>
+
+export async function reactRunTrainingEpoch(samples: ReactTrainingSample[]): Promise<TrainingResult> {
   try {
     console.log(`[React Domain] Starting training with ${samples.length} samples`)
 

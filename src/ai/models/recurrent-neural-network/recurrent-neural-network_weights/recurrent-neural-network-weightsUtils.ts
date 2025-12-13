@@ -2,8 +2,13 @@
  * Recurrent-neural-network - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
-  return {};
+import type { WeightDictionary } from "../../shared/modelTypes"
+
+export function loadWeights(path: string): WeightDictionary {
+  console.log(`Loading recurrent-neural-network weights from ${path}`)
+  return {}
 }
 
-export default { loadWeights };
+const RNN_WEIGHT_UTILS = { loadWeights }
+
+export default RNN_WEIGHT_UTILS

@@ -6,7 +6,13 @@
       "batch_size": 32,
       "epochs": 10,
       "optimizer": "adam"
+    },
+    {
+      "model_name": "ProbabilisticEstimator-v2",
+      "learning_rate": 0.0005,
+      "batch_size": 64,
+      "epochs": 20,
+      "optimizer": "adamw"
     }
-    // Add more models/hyperparameters as needed
   ]
 }

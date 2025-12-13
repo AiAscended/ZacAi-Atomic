@@ -2,10 +2,18 @@
  * Convolutional-neural-network - Layer Implementations
  */
 
+import { ModelPayload } from '../../shared/modelTypes';
+
 export class CNNLayer {
-  forward(input: any): any {
-    return input;
+  constructor(private readonly name: string) {}
+
+  forward(input: ModelPayload): ModelPayload {
+    return {
+      ...input,
+      lastLayer: this.name,
+    };
   }
 }
 
-export default CNNLayer;
+export const defaultCnnLayer = new CNNLayer('conv-1');
+

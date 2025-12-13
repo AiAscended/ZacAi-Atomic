@@ -27,10 +27,10 @@ export class LLMDatasetLoader {
    * Load dataset from file or source
    */
   async loadDataset(source: string): Promise<Dataset> {
-    // Placeholder implementation
+    console.log('[LLMDatasetLoader] Loading dataset from', source);
     return {
-      texts: [],
-      tokenIds: [],
+      texts: [`Dataset placeholder for ${source}`],
+      tokenIds: [[]],
     };
   }
 

@@ -18,6 +18,53 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+type SeedExample =
+  | string
+  | {
+      code?: string;
+      example?: string;
+      description?: string;
+      [key: string]: unknown;
+    };
+
+export interface SeedRawEntry {
+  word?: string;
+  concept?: string;
+  term?: string;
+  name?: string;
+  id?: string | number;
+  category?: string;
+  priority?: number;
+  frequency_rank?: number;
+  tags?: string[];
+  synonyms?: string[];
+  relatedConcepts?: string[];
+  definition?: string;
+  description?: string;
+  explanation?: string;
+  examples?: SeedExample[] | SeedExample;
+  example?: SeedExample;
+  related?: string[];
+  [key: string]: unknown;
+}
+
+type SeedFilePayload =
+  | SeedRawEntry[]
+  | {
+      concepts?: SeedRawEntry[];
+      words?: SeedRawEntry[];
+      terms?: SeedRawEntry[];
+      [key: string]: unknown;
+    };
+
+interface SeedRegistryStats {
+  totalEntries: number;
+  totalDomains: number;
+  totalFiles: number;
+  loadedAt: Date | null;
+  loadTimeMs: number;
+}
+
 /**
  * Seed entry in the registry
  */
@@ -42,7 +89,7 @@ export interface SeedEntry {
   filePath: string;
   
   // Full entry data (loaded on demand)
-  fullData?: any;
+  fullData?: SeedRawEntry;
 }
 
 /**
@@ -70,6 +117,10 @@ class SeedRegistryManager {
   
   // Reverse lookup: binary -> key
   private binaryToKey: Map<string, string> = new Map();  // packed binary string -> key
+
+  // Normalized key indices
+  private aliasIndex: Map<string, Set<string>> = new Map(); // normalized key -> registry keys
+  private domainKeyIndex: Map<string, Set<string>> = new Map(); // domain:key -> registry keys
   
   // Domain mappings
   private domainIdMap: Map<string, number> = new Map();  // domain name -> id
@@ -79,12 +130,12 @@ class SeedRegistryManager {
   private fileIdMaps: Map<number, Map<string, number>> = new Map();  // domainId -> (filename -> fileId)
   
   // Statistics
-  private stats = {
+  private stats: SeedRegistryStats = {
     totalEntries: 0,
     totalDomains: 0,
     totalFiles: 0,
-    loadedAt: null as Date | null,
-    loadTimeMs: 0
+    loadedAt: null,
+    loadTimeMs: 0,
   };
   
   private constructor() {
@@ -105,6 +156,23 @@ class SeedRegistryManager {
   public async loadAllSeeds(): Promise<void> {
     const startTime = Date.now();
     console.log('[SeedRegistry] Loading all domain seeds...');
+    
+    // Reset state for clean reloads
+    this.entries.clear();
+    this.binaryIndex.clear();
+    this.binaryToKey.clear();
+    this.aliasIndex.clear();
+    this.domainKeyIndex.clear();
+    this.domainIdMap.clear();
+    this.domainNameMap.clear();
+    this.fileIdMaps.clear();
+    this.stats = {
+      totalEntries: 0,
+      totalDomains: 0,
+      totalFiles: 0,
+      loadedAt: null,
+      loadTimeMs: 0,
+    };
     
     const domainsDir = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains');
     
@@ -177,17 +245,8 @@ class SeedRegistryManager {
         
         const filePath = path.join(seedPath, jsonFile);
         const content = await fs.readFile(filePath, 'utf-8');
-        const data = JSON.parse(content);
-        
-        // Handle different seed formats
-        let entries: any[] = [];
-        if (data.concepts && Array.isArray(data.concepts)) {
-          entries = data.concepts;
-        } else if (data.words && Array.isArray(data.words)) {
-          entries = data.words;
-        } else if (Array.isArray(data)) {
-          entries = data;
-        }
+        const data = JSON.parse(content) as SeedFilePayload;
+        const entries = this.extractEntriesFromFile(data);
         
         // Index each entry
         entries.forEach((entry, entryId) => {
@@ -206,7 +265,8 @@ class SeedRegistryManager {
       
     } catch (error) {
       // Domain might not have seeds yet - that's ok
-      if ((error as any).code !== 'ENOENT') {
+      const err = error as NodeJS.ErrnoException;
+      if (err?.code !== 'ENOENT') {
         console.warn(`[SeedRegistry] Error loading ${domainName} seeds:`, error);
       }
     }
@@ -230,54 +290,78 @@ class SeedRegistryManager {
     }
   }
   
+  private extractEntriesFromFile(data: SeedFilePayload): SeedRawEntry[] {
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    const typed = data as Record<string, unknown>;
+    const buckets = ['concepts', 'words', 'terms'];
+    const collected: SeedRawEntry[] = [];
+
+    for (const bucket of buckets) {
+      const maybe = typed[bucket];
+      if (Array.isArray(maybe)) {
+        collected.push(...(maybe as SeedRawEntry[]));
+      }
+    }
+
+    return collected;
+  }
+
   /**
    * Index a single seed entry
    */
   private indexEntry(
-    entry: any,
+    entry: SeedRawEntry,
     domainName: string,
     domainId: number,
     fileId: number,
     entryId: number,
     filePath: string
   ): void {
-    // Extract key (word, concept, or term)
-    const key = (entry.word || entry.concept || entry.term || entry.name || entry.id || '').toLowerCase();
-    
-    if (!key) return;  // Skip entries without identifiable key
-    
-    // Create seed entry
+    const candidateKeys = this.collectKeyCandidates(entry);
+    if (candidateKeys.length === 0) {
+      return;
+    }
+
+    const registryKey = this.buildRegistryKey(domainName, fileId, entryId);
+
     const seedEntry: SeedEntry = {
       domainId,
       fileId,
       entryId,
       word: entry.word,
       concept: entry.concept,
-      term: entry.term || entry.name,
+      term: typeof entry.term === 'string' ? entry.term : typeof entry.name === 'string' ? entry.name : undefined,
       domain: domainName,
       category: entry.category,
-      priority: entry.priority || entry.frequency_rank,
+      priority:
+        typeof entry.priority === 'number'
+          ? entry.priority
+          : typeof entry.frequency_rank === 'number'
+          ? entry.frequency_rank
+          : undefined,
       tags: entry.tags || [],
       filePath,
-      fullData: entry  // Store full data for now (can be lazy-loaded later)
+      fullData: entry,
     };
-    
-    // Store in main registry
-    const registryKey = `${domainName}:${key}`;
+
     this.entries.set(registryKey, seedEntry);
-    
-    // Create binary index
+
     const binary = this.createBinaryIndex(domainId, fileId, entryId);
     const binaryIndex: BinaryIndex = {
       binary,
-      key: registryKey
+      key: registryKey,
     };
-    
+
     this.binaryIndex.set(registryKey, binaryIndex);
-    
-    // Reverse lookup
-    const binaryString = this.binaryToString(binary);
-    this.binaryToKey.set(binaryString, registryKey);
+    this.binaryToKey.set(this.binaryToString(binary), registryKey);
+
+    for (const normalizedKey of candidateKeys) {
+      this.registerDomainKey(domainName, normalizedKey, registryKey);
+      this.registerAlias(normalizedKey, registryKey);
+    }
   }
   
   /**
@@ -311,27 +395,128 @@ class SeedRegistryManager {
       entryId: (parts[2] << 8) | parts[3]
     };
   }
+
+  private buildRegistryKey(domainName: string, fileId: number, entryId: number): string {
+    return `${domainName}:${fileId}:${entryId}`;
+  }
+
+  private buildDomainNormalizedKey(domainName: string, normalizedKey: string): string {
+    return `${domainName}:${normalizedKey}`;
+  }
+
+  private normalizeKey(value: unknown): string | null {
+    if (value === null || value === undefined) {
+      return null;
+    }
+
+    const str = typeof value === 'string'
+      ? value
+      : typeof value === 'number'
+      ? value.toString()
+      : null;
+    
+    if (!str) {
+      return null;
+    }
+    
+    const normalized = str.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    return normalized || null;
+  }
+
+  private collectKeyCandidates(entry: SeedRawEntry): string[] {
+    const keys = new Set<string>();
+
+    const addKey = (value: unknown) => {
+      if (!value) {
+        return;
+      }
+      if (Array.isArray(value)) {
+        value.forEach(addKey);
+        return;
+      }
+      const normalized = this.normalizeKey(value);
+      if (normalized) {
+        keys.add(normalized);
+      }
+    };
+
+    addKey(entry.word);
+    addKey(entry.concept);
+    addKey(entry.term);
+    addKey(entry.name);
+    addKey(entry.id);
+    addKey(entry.synonyms);
+    addKey(entry.relatedConcepts);
+    addKey(entry.related);
+
+    return Array.from(keys);
+  }
+
+  private collectNormalizedKeys(value: unknown): string[] {
+    const normalized = this.normalizeKey(value);
+    return normalized ? [normalized] : [];
+  }
+
+  private registerDomainKey(domainName: string, normalizedKey: string, registryKey: string): void {
+    const domainKey = this.buildDomainNormalizedKey(domainName, normalizedKey);
+    if (!this.domainKeyIndex.has(domainKey)) {
+      this.domainKeyIndex.set(domainKey, new Set());
+    }
+    this.domainKeyIndex.get(domainKey)!.add(registryKey);
+  }
+
+  private registerAlias(normalizedKey: string, registryKey: string): void {
+    if (!this.aliasIndex.has(normalizedKey)) {
+      this.aliasIndex.set(normalizedKey, new Set());
+    }
+    this.aliasIndex.get(normalizedKey)!.add(registryKey);
+  }
+
+  private getFirstRegistryKey(keys: Set<string> | undefined, domainFilter?: string): string | null {
+    if (!keys) {
+      return null;
+    }
+    for (const registryKey of keys) {
+      if (domainFilter && !registryKey.startsWith(`${domainFilter}:`)) {
+        continue;
+      }
+      return registryKey;
+    }
+    return null;
+  }
+
+  private getFirstEntryFromSet(keys: Set<string> | undefined, domainFilter?: string): SeedEntry | null {
+    const registryKey = this.getFirstRegistryKey(keys, domainFilter);
+    return registryKey ? this.entries.get(registryKey) || null : null;
+  }
   
   /**
    * Lookup by key (word/concept/term)
    * Fast O(1) hash lookup
    */
   public lookup(key: string, domain?: string): SeedEntry | null {
-    const lookupKey = domain ? `${domain}:${key.toLowerCase()}` : key.toLowerCase();
-    
-    // Try with domain prefix first
-    if (domain) {
-      const entry = this.entries.get(lookupKey);
-      if (entry) return entry;
+    const normalizedKeys = this.collectNormalizedKeys(key);
+    if (normalizedKeys.length === 0) {
+      return null;
     }
-    
-    // Search across all domains
-    for (const [entryKey, entry] of this.entries.entries()) {
-      if (entryKey.endsWith(`:${key.toLowerCase()}`)) {
+
+    if (domain) {
+      for (const normalized of normalizedKeys) {
+        const domainKey = this.buildDomainNormalizedKey(domain, normalized);
+        const entry = this.getFirstEntryFromSet(this.domainKeyIndex.get(domainKey));
+        if (entry) {
+          return entry;
+        }
+      }
+    }
+
+    for (const normalized of normalizedKeys) {
+      const entry = this.getFirstEntryFromSet(this.aliasIndex.get(normalized), domain);
+      if (entry) {
         return entry;
       }
     }
-    
+
     return null;
   }
   
@@ -349,9 +534,33 @@ class SeedRegistryManager {
    * Get binary index for a key
    */
   public getBinaryIndex(key: string, domain?: string): Uint8Array | null {
-    const lookupKey = domain ? `${domain}:${key.toLowerCase()}` : key.toLowerCase();
-    const binaryIndex = this.binaryIndex.get(lookupKey);
-    return binaryIndex?.binary || null;
+    const normalizedKeys = this.collectNormalizedKeys(key);
+    if (normalizedKeys.length === 0) {
+      return null;
+    }
+
+    for (const normalized of normalizedKeys) {
+      if (domain) {
+        const domainKey = this.buildDomainNormalizedKey(domain, normalized);
+        const registryKey = this.getFirstRegistryKey(this.domainKeyIndex.get(domainKey));
+        if (registryKey) {
+          const binaryIndex = this.binaryIndex.get(registryKey);
+          if (binaryIndex) {
+            return binaryIndex.binary;
+          }
+        }
+      }
+
+      const registryKey = this.getFirstRegistryKey(this.aliasIndex.get(normalized), domain);
+      if (registryKey) {
+        const binaryIndex = this.binaryIndex.get(registryKey);
+        if (binaryIndex) {
+          return binaryIndex.binary;
+        }
+      }
+    }
+
+    return null;
   }
   
   /**
@@ -359,7 +568,7 @@ class SeedRegistryManager {
    */
   public getDomainEntries(domainName: string): SeedEntry[] {
     const entries: SeedEntry[] = [];
-    for (const [key, entry] of this.entries.entries()) {
+    for (const entry of this.entries.values()) {
       if (entry.domain === domainName) {
         entries.push(entry);
       }
@@ -405,7 +614,7 @@ class SeedRegistryManager {
   /**
    * Get statistics
    */
-  public getStats() {
+  public getStats(): SeedRegistryStats {
     return { ...this.stats };
   }
   
@@ -426,7 +635,23 @@ class SeedRegistryManager {
    * Get complete vocabulary list (all keys)
    */
   public getVocabularyList(): string[] {
-    return Array.from(this.entries.keys()).map(key => key.split(':')[1]);
+    const seen = new Set<string>();
+    const vocab: string[] = [];
+
+    for (const entry of this.entries.values()) {
+      const uniqueKey = `${entry.domain}:${entry.fileId}:${entry.entryId}`;
+      if (seen.has(uniqueKey)) {
+        continue;
+      }
+      seen.add(uniqueKey);
+
+      const label = entry.word || entry.concept || entry.term;
+      if (label) {
+        vocab.push(label);
+      }
+    }
+
+    return vocab;
   }
 }
 

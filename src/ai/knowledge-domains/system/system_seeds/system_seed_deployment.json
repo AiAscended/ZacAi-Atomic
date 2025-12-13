@@ -8,7 +8,24 @@
         "memory_gb": 32,
         "storage_gb": 500
       }
+    },
+    {
+      "environment": "staging",
+      "region": "eu-central-1",
+      "resources": {
+        "cpu": 4,
+        "memory_gb": 16,
+        "storage_gb": 200
+      }
+    },
+    {
+      "environment": "edge",
+      "region": "ap-southeast-2",
+      "resources": {
+        "cpu": 16,
+        "memory_gb": 48,
+        "storage_gb": 300
+      }
     }
-    // Add more deployment targets as needed
   ]
 }

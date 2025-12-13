@@ -2,6 +2,17 @@
  * Speech-to-text - Utilities
  */
 
-export function sttUtility(): void {}
+import type { ModelPayload } from '../../shared/modelTypes';
 
-export default { sttUtility };
+export function normalizeAudioFeatures(payload: ModelPayload): ModelPayload {
+	const length = payload.audioLengthMs ?? 0;
+	const normalized = {
+		...payload,
+		normalized: true,
+		audioLengthMs: length,
+	};
+
+	console.log('[stt-utils] Normalized audio payload', length);
+	return normalized;
+}
+

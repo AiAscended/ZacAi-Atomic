@@ -1,3 +1,5 @@
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
+
 interface ModelWeights {
   embedding_layer: number[][]
   attention_weights: Record<string, Record<string, number[][]>>
@@ -5,13 +7,41 @@ interface ModelWeights {
   output_layer: Record<string, number[][]>
 }
 
-let weightsLoaded = false
-let modelWeights: ModelWeights | null = null
+const programmingWeightsManager = createDomainWeightsManager({
+  domainName: "programming",
+})
+
+let cachedWeights: ModelWeights | null = null
 
 export async function loadProgrammingModelWeights(): Promise<ModelWeights> {
-  if (weightsLoaded && modelWeights) return modelWeights
+  if (cachedWeights) {
+    return cachedWeights
+  }
 
-  modelWeights = {
+  const rawWeights = await programmingWeightsManager.loadWeights()
+  if (rawWeights) {
+    try {
+      cachedWeights = JSON.parse(rawWeights) as ModelWeights
+      return cachedWeights
+    } catch (error) {
+      console.warn("[Programming Domain] Failed to parse weights file, falling back to baseline", { error })
+    }
+  }
+
+  cachedWeights = buildFallbackWeights()
+  return cachedWeights
+}
+
+export const primeProgrammingWeights = async (): Promise<string | null> => {
+  return programmingWeightsManager.prime()
+}
+
+export const getProgrammingActiveWeightArtifact = () => {
+  return programmingWeightsManager.getActiveWeightArtifact()
+}
+
+const buildFallbackWeights = (): ModelWeights => {
+  return {
     embedding_layer: initializeMatrix(72, 128),
     attention_weights: {
       layer_0: {
@@ -28,9 +58,6 @@ export async function loadProgrammingModelWeights(): Promise<ModelWeights> {
     },
     output_layer: { w: initializeMatrix(128, 72) },
   }
-
-  weightsLoaded = true
-  return modelWeights
 }
 
 function initializeMatrix(rows: number, cols: number): number[][] {

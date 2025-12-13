@@ -67,13 +67,3 @@ export function normalize(vector: number[]): number[] {
 export function clip(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
-
-export default {
-  matMul,
-  add,
-  transpose,
-  dropout,
-  cosineSimilarity,
-  normalize,
-  clip,
-};

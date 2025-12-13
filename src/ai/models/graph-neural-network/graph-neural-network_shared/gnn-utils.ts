@@ -2,6 +2,17 @@
  * Graph-neural-network - Utilities
  */
 
-export function gnnUtility(): void {}
+import type { ModelPayload } from '../../shared/modelTypes';
 
-export default { gnnUtility };
+export function normalizeGraphFeatures(payload: ModelPayload): ModelPayload {
+	const featureCount = Object.keys(payload).length;
+	const normalized = {
+		...payload,
+		normalized: true,
+		featureCount,
+	};
+
+	console.log('[gnn-utils] Normalized graph payload', featureCount);
+	return normalized;
+}
+

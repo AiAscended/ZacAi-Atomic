@@ -11,7 +11,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { headers } from 'next/headers';
+import fs from 'fs';
+import path from 'path';
 
 // ============================================================================
 // Rate Limiting (In-Memory Token Bucket)
@@ -111,37 +112,47 @@ export function addSecurityHeaders(response: NextResponse): NextResponse {
 export interface ValidationError {
   field: string;
   message: string;
-  value?: any;
+  value?: unknown;
 }
 
-export function validateChatInput(input: any): { valid: boolean; errors: ValidationError[] } {
+export function validateChatInput(input: unknown): { valid: boolean; errors: ValidationError[] } {
   const errors: ValidationError[] = [];
   
+  if (typeof input !== 'object' || input === null) {
+    errors.push({ field: 'payload', message: 'Request payload must be an object' });
+    return { valid: false, errors };
+  }
+  
+  const payload = input as Record<string, unknown>;
+  const message = payload.message;
+  
   // Check message exists
-  if (!input.message || typeof input.message !== 'string') {
+  if (typeof message !== 'string') {
     errors.push({ field: 'message', message: 'Message is required and must be a string' });
   } else {
     // Check message length
-    if (input.message.length === 0) {
+    if (message.length === 0) {
       errors.push({ field: 'message', message: 'Message cannot be empty' });
     }
-    if (input.message.length > 10000) {
-      errors.push({ field: 'message', message: 'Message exceeds maximum length of 10000 characters', value: input.message.length });
+    if (message.length > 10000) {
+      errors.push({ field: 'message', message: 'Message exceeds maximum length of 10000 characters', value: message.length });
     }
     
     // Check for null bytes (potential injection)
-    if (input.message.includes('\0')) {
+    if (message.includes('\0')) {
       errors.push({ field: 'message', message: 'Invalid characters in message' });
     }
   }
   
   // Validate session ID if provided
-  if (input.sessionId && typeof input.sessionId !== 'string') {
+  const sessionId = payload.sessionId;
+  if (sessionId !== undefined && typeof sessionId !== 'string') {
     errors.push({ field: 'sessionId', message: 'Session ID must be a string' });
   }
   
   // Validate model if provided
-  if (input.model && typeof input.model !== 'string') {
+  const model = payload.model;
+  if (model !== undefined && typeof model !== 'string') {
     errors.push({ field: 'model', message: 'Model must be a string' });
   }
   
@@ -161,21 +172,19 @@ export function sanitizeHtml(input: string): string {
     .replace(/\//g, '&#x2F;');
 }
 
-export function sanitizeInput(input: any): any {
+export function sanitizeInput<T>(input: T): T {
   if (typeof input === 'string') {
-    return sanitizeHtml(input);
+    return sanitizeHtml(input) as T;
   }
   
   if (Array.isArray(input)) {
-    return input.map(sanitizeInput);
+    return input.map((value) => sanitizeInput(value)) as T;
   }
   
   if (typeof input === 'object' && input !== null) {
-    const sanitized: any = {};
-    for (const [key, value] of Object.entries(input)) {
-      sanitized[key] = sanitizeInput(value);
-    }
-    return sanitized;
+    const entries = Object.entries(input as Record<string, unknown>)
+      .map(([key, value]) => [key, sanitizeInput(value)] as const);
+    return Object.fromEntries(entries) as T;
   }
   
   return input;
@@ -214,8 +223,6 @@ export function captureError(error: Error, context: ErrorContext): void {
   
   // Write to error log file
   try {
-    const fs = require('fs');
-    const path = require('path');
     const logPath = path.join(process.cwd(), 'data', 'error.log');
     const logEntry = JSON.stringify({
       timestamp: context.timestamp,
@@ -249,14 +256,27 @@ export function getClientIp(request: NextRequest): string {
   if (forwarded) {
     return forwarded.split(',')[0].trim();
   }
-  
+
+  const cfConnectingIp = request.headers.get('cf-connecting-ip');
+  if (cfConnectingIp) {
+    return cfConnectingIp;
+  }
+
   const realIp = request.headers.get('x-real-ip');
   if (realIp) {
     return realIp;
   }
-  
-  // Fallback to connection IP
-  return request.ip || 'unknown';
+
+  const forwardedHeader = request.headers.get('forwarded');
+  if (forwardedHeader) {
+    const match = forwardedHeader.match(/for="?([^;,"]+)/i);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+
+  // Fallback to host information (may be localhost in dev)
+  return request.nextUrl.hostname || 'unknown';
 }
 
 // ============================================================================
@@ -271,11 +291,13 @@ export interface MiddlewareConfig {
   trackErrors?: boolean;
 }
 
-export function withHardening(
-  handler: (req: NextRequest, context: any) => Promise<NextResponse>,
+type RouteHandler<TContext> = (req: NextRequest, context: TContext) => Promise<NextResponse>;
+
+export function withHardening<TContext = Record<string, unknown>>(
+  handler: RouteHandler<TContext>,
   config: MiddlewareConfig = {}
 ) {
-  return async (req: NextRequest, context: any) => {
+  return async (req: NextRequest, context: TContext) => {
     const requestId = generateRequestId();
     const clientIp = getClientIp(req);
     const startTime = Date.now();
@@ -320,7 +342,7 @@ export function withHardening(
               { status: 400 }
             );
           }
-        } catch (e) {
+        } catch {
           return NextResponse.json(
             { error: 'Invalid JSON payload' },
             { status: 400 }
@@ -395,13 +417,11 @@ export async function getHealthStatus(): Promise<HealthStatus> {
   
   // Check storage (file system)
   try {
-    const fs = require('fs');
-    const path = require('path');
     const testPath = path.join(process.cwd(), 'data', '.health-check');
     fs.writeFileSync(testPath, 'OK', 'utf-8');
     fs.unlinkSync(testPath);
     checks.storage = 'pass';
-  } catch (e) {
+  } catch {
     checks.storage = 'fail';
     overallStatus = 'degraded';
   }
@@ -410,7 +430,7 @@ export async function getHealthStatus(): Promise<HealthStatus> {
   try {
     // Verify key modules can be imported
     checks.ai = 'pass';
-  } catch (e) {
+  } catch {
     checks.ai = 'fail';
     overallStatus = 'unhealthy';
   }

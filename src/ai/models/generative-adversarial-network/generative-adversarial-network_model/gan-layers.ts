@@ -2,10 +2,18 @@
  * Generative-adversarial-network - Layer Implementations
  */
 
+import type { ModelPayload } from '../../shared/modelTypes';
+
 export class GANLayer {
-  forward(input: any): any {
-    return input;
+  constructor(private readonly identifier: string) {}
+
+  forward(input: ModelPayload): ModelPayload {
+    return {
+      ...input,
+      lastLayer: this.identifier,
+    };
   }
 }
 
-export default GANLayer;
+export const defaultGanLayer = new GANLayer('gan-layer-1');
+

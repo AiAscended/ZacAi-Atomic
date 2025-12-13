@@ -16,7 +16,7 @@
 
 import { enhancedMetricsCollector } from '@/ai/monitoring/enhancedMetricsCollector';
 import * as logger from '../orchestration/logger';
-import cron from 'node-cron';
+import cron, { type ScheduledTask } from 'node-cron';
 
 export interface TrainingSettings {
   enabled: boolean;
@@ -77,7 +77,7 @@ class TrainingScheduler {
   };
 
   private history: TrainingHistory[] = [];
-  private cronJob: any | null = null; // cron.ScheduledTask
+  private cronJob: ScheduledTask | null = null;
   private currentTraining: TrainingHistory | null = null;
 
   constructor() {

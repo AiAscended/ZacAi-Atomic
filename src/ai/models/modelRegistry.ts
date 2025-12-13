@@ -239,7 +239,7 @@ export class ModelScanner {
         }
       }
     } catch (error) {
-      // Directory might not exist
+      console.warn(`[ModelScanner] Unable to read directory ${dir}`, error)
     }
     
     return files;

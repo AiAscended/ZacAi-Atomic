@@ -6,15 +6,25 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { storageAdapter } from "../storageAdapter"
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-export const versionControlLoadWeights = async (
-  path = "/src/ai/knowledge-domains/version_control/version_control_weights/version_control_trainingWeights.bin",
-) => {
-  try {
-    const buffer = await storageAdapter.readFile(path)
-    return { success: true, weights: buffer }
-  } catch {
+const versionControlWeightsManager = createDomainWeightsManager({
+  domainName: "version_control",
+})
+
+export const versionControlLoadWeights = async () => {
+  const weights = await versionControlWeightsManager.loadWeights()
+  if (!weights) {
     return { success: false, weights: null }
   }
+
+  return { success: true, weights }
+}
+
+export const primeVersionControlWeights = async (): Promise<string | null> => {
+  return versionControlWeightsManager.prime()
+}
+
+export const getVersionControlActiveWeightArtifact = () => {
+  return versionControlWeightsManager.getActiveWeightArtifact()
 }

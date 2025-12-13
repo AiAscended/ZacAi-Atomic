@@ -6,8 +6,8 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { parseReactInput } from "./react_parser"
-import { analyzeReactSemantics } from "./react_semanticAnalyzer"
+import { parseReactInput, type ReactParseResult } from "./react_parser"
+import { analyzeReactSemantics, type ReactSemanticAnalysis } from "./react_semanticAnalyzer"
 
 export interface ReactInferenceResult {
   response: string
@@ -20,8 +20,28 @@ export interface ReactInferenceResult {
   }
 }
 
-export async function reactRunInference(input: string): Promise<ReactInferenceResult | null> {
+export type ReactInferenceContext = Record<string, unknown>
+
+type ResponseGenerator = (analysis: ReactSemanticAnalysis) => string
+
+const RESPONSE_GENERATORS: Record<ReactParseResult["type"], ResponseGenerator> = {
+  component: generateComponentResponse,
+  hook: generateHookResponse,
+  pattern: generatePatternResponse,
+  question: generateQuestionResponse,
+  code: generateCodeResponse,
+  general: generateGeneralResponse,
+}
+
+export async function reactRunInference(
+  input: string,
+  context?: ReactInferenceContext,
+): Promise<ReactInferenceResult | null> {
   const lowerInput = input.toLowerCase()
+
+  if (context && Object.keys(context).length > 0) {
+    console.log(`[React Domain] Context keys: ${Object.keys(context).join(", ")}`)
+  }
 
   // Check if this query is relevant to React
   const reactKeywords = [
@@ -47,28 +67,8 @@ export async function reactRunInference(input: string): Promise<ReactInferenceRe
     const parseResult = parseReactInput(input)
     const semanticAnalysis = analyzeReactSemantics(input)
 
-    let response = ""
-
-    // Generate response based on parse type and semantic analysis
-    switch (parseResult.type) {
-      case "component":
-        response = generateComponentResponse(input, semanticAnalysis)
-        break
-      case "hook":
-        response = generateHookResponse(input, semanticAnalysis)
-        break
-      case "pattern":
-        response = generatePatternResponse(input, semanticAnalysis)
-        break
-      case "question":
-        response = generateQuestionResponse(input, semanticAnalysis)
-        break
-      case "code":
-        response = generateCodeResponse(input, semanticAnalysis)
-        break
-      default:
-        response = generateGeneralResponse(input, semanticAnalysis)
-    }
+    const responseGenerator = RESPONSE_GENERATORS[parseResult.type] ?? generateGeneralResponse
+    const response = responseGenerator(semanticAnalysis)
 
     return {
       response,
@@ -86,32 +86,30 @@ export async function reactRunInference(input: string): Promise<ReactInferenceRe
   }
 }
 
-function generateComponentResponse(_input: string, analysis: any): string {
+function generateComponentResponse(analysis: ReactSemanticAnalysis): string {
   return `React components are the building blocks of React applications. ${analysis.suggestedResponse} Components can be functional or class-based, with functional components being the modern standard.`
 }
 
-function generateHookResponse(_input: string, analysis: any): string {
-  const hookTypes = analysis.topics.filter((t: string) => t.startsWith("use"))
+function generateHookResponse(analysis: ReactSemanticAnalysis): string {
+  const hookTypes = analysis.topics.filter((topic) => topic.startsWith("use"))
   if (hookTypes.length > 0) {
     return `React Hooks like ${hookTypes.join(", ")} allow you to use state and other React features in functional components. ${analysis.suggestedResponse}`
   }
   return `React Hooks are functions that let you use state and lifecycle features in functional components. ${analysis.suggestedResponse}`
 }
 
-function generatePatternResponse(_input: string, analysis: any): string {
+function generatePatternResponse(analysis: ReactSemanticAnalysis): string {
   return `React patterns help organize code and solve common problems. ${analysis.suggestedResponse} Common patterns include composition, render props, higher-order components, and custom hooks.`
 }
 
-function generateQuestionResponse(_input: string, analysis: any): string {
+function generateQuestionResponse(analysis: ReactSemanticAnalysis): string {
   return `${analysis.suggestedResponse} React is a JavaScript library for building user interfaces, focusing on component-based architecture and declarative programming.`
 }
 
-function generateCodeResponse(_input: string, analysis: any): string {
+function generateCodeResponse(analysis: ReactSemanticAnalysis): string {
   return `Here's guidance for React code: ${analysis.suggestedResponse} React uses JSX syntax to describe UI, and components manage their own state and props.`
 }
 
-function generateGeneralResponse(_input: string, analysis: any): string {
+function generateGeneralResponse(analysis: ReactSemanticAnalysis): string {
   return `${analysis.suggestedResponse} React provides a powerful and flexible way to build modern web applications with reusable components.`
 }
-
-export default reactRunInference;

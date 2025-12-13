@@ -5,76 +5,173 @@
  * Provides automated and semi-automated repair capabilities.
  */
 
-import { domainRegistry } from '../domainRegistry';
 import fs from 'fs/promises';
 import path from 'path';
+
+import { domainRegistry, type ModuleMetadata } from '../domainRegistry';
 
 const DOMAIN_NAME = 'repair';
 const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
 const SEEDS_DIR = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`);
 
-/**
- * Load all seed data for repair domain
- */
-async function loadSeedData(): Promise<any[]> {
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+export interface RepairSeedEntry {
+  name: string;
+  category?: string;
+  issueType?: string;
+  solution?: string;
+  severity?: string;
+  tags?: string[];
+  [key: string]: JsonValue | undefined;
+}
+
+interface RepairQueryMetadata {
+  totalConcepts: number;
+  matchCount: number;
+}
+
+export interface RepairQueryResult {
+  domain: string;
+  confidence: number;
+  matches: RepairSeedEntry[];
+  suggestion: string;
+  metadata: RepairQueryMetadata;
+}
+
+const REPAIR_KEYWORDS = [
+  'fix', 'repair', 'debug', 'debugging', 'error', 'bug',
+  'broken', 'issue', 'problem', 'solve', 'troubleshoot',
+  'crash', 'failure', 'exception', 'self-heal', 'recover',
+  'restore', 'correct', 'patch'
+];
+
+const REPAIR_MODULES: ModuleMetadata[] = [
+  {
+    name: 'repair_integration',
+    atomicLevel: 'organism',
+    category: 'integration_api',
+    dependencies: [],
+    capabilities: ['integration'],
+    version: '1.0.0'
+  },
+  {
+    name: 'repair_inference',
+    atomicLevel: 'organ',
+    category: 'inference',
+    dependencies: [],
+    capabilities: ['reasoning', 'debugging'],
+    version: '1.0.0'
+  },
+  {
+    name: 'repair_training',
+    atomicLevel: 'cell',
+    category: 'training',
+    dependencies: [],
+    capabilities: ['learning'],
+    version: '1.0.0'
+  }
+];
+
+const isRecord = (value: unknown): value is Record<string, JsonValue> =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+const sanitizeStringArray = (value: unknown): string[] | undefined => {
+  if (!Array.isArray(value)) return undefined;
+  const strings = value.filter((entry): entry is string => typeof entry === 'string');
+  return strings.length ? strings : undefined;
+};
+
+const normalizeEntry = (value: unknown, fallbackName: string): RepairSeedEntry | null => {
+  if (!isRecord(value)) return null;
+
+  const {
+    name,
+    category,
+    issueType,
+    solution,
+    severity,
+    tags,
+    ...rest
+  } = value;
+
+  const derivedName = typeof name === 'string' && name.trim().length > 0 ? name : fallbackName;
+
+  return {
+    name: derivedName,
+    category: typeof category === 'string' ? category : undefined,
+    issueType: typeof issueType === 'string' ? issueType : undefined,
+    solution: typeof solution === 'string' ? solution : undefined,
+    severity: typeof severity === 'string' ? severity : undefined,
+    tags: sanitizeStringArray(tags),
+    ...rest
+  };
+};
+
+const normalizePayload = (payload: unknown, sourceName: string): RepairSeedEntry[] => {
+  if (Array.isArray(payload)) {
+    return payload
+      .map((entry, index) => normalizeEntry(entry, `${sourceName}:${index + 1}`))
+      .filter((entry): entry is RepairSeedEntry => Boolean(entry));
+  }
+
+  const entry = normalizeEntry(payload, sourceName);
+  return entry ? [entry] : [];
+};
+
+const parseSeedFile = async (filePath: string): Promise<RepairSeedEntry[]> => {
+  try {
+    const raw = await fs.readFile(filePath, 'utf-8');
+    const parsed = JSON.parse(raw) as unknown;
+    return normalizePayload(parsed, path.basename(filePath));
+  } catch (error) {
+    console.error(`[Repair] Failed to parse seed file ${filePath}:`, error);
+    return [];
+  }
+};
+
+export const loadSeedData = async (): Promise<RepairSeedEntry[]> => {
   try {
     const files = await fs.readdir(SEEDS_DIR);
-    const jsonFiles = files.filter(f => f.endsWith('.json'));
-    
-    const allConcepts: any[] = [];
+    const jsonFiles = files.filter((file) => file.endsWith('.json'));
+
+    const seedEntries: RepairSeedEntry[] = [];
     for (const file of jsonFiles) {
       const filePath = path.join(SEEDS_DIR, file);
-      const content = await fs.readFile(filePath, 'utf-8');
-      const data = JSON.parse(content);
-      
-      if (data.concepts && Array.isArray(data.concepts)) {
-        allConcepts.push(...data.concepts);
-      } else if (Array.isArray(data)) {
-        allConcepts.push(...data);
-      }
+      const entries = await parseSeedFile(filePath);
+      seedEntries.push(...entries);
     }
-    
-    console.log(`[Repair] Loaded ${allConcepts.length} concepts from ${jsonFiles.length} seed files`);
-    return allConcepts;
+
+    console.log(`[Repair] Loaded ${seedEntries.length} seed entries from ${jsonFiles.length} file(s).`);
+    return seedEntries;
   } catch (error) {
     console.error('[Repair] Error loading seed data:', error);
     return [];
   }
-}
+};
 
-/**
- * Query the repair domain with a prompt
- */
-async function query(prompt: string): Promise<any> {
+export const query = async (prompt: string): Promise<RepairQueryResult | null> => {
   const normalizedPrompt = prompt.toLowerCase();
-  
-  // Keywords for repair and debugging
-  const repairKeywords = [
-    'fix', 'repair', 'debug', 'debugging', 'error', 'bug',
-    'broken', 'issue', 'problem', 'solve', 'troubleshoot',
-    'crash', 'failure', 'exception', 'self-heal', 'recover',
-    'restore', 'correct', 'patch'
-  ];
-  
-  const hasRepairKeyword = repairKeywords.some(keyword => 
-    normalizedPrompt.includes(keyword)
-  );
-  
+  const hasRepairKeyword = REPAIR_KEYWORDS.some((keyword) => normalizedPrompt.includes(keyword));
+
   if (!hasRepairKeyword) {
     return null;
   }
-  
+
   const seedData = await loadSeedData();
-  
-  const matches = seedData.filter(concept => {
-    const conceptText = JSON.stringify(concept).toLowerCase();
-    return repairKeywords.some(keyword => conceptText.includes(keyword));
-  });
-  
-  if (matches.length === 0) {
+  if (!seedData.length) {
     return null;
   }
-  
+
+  const matches = seedData.filter((concept) => {
+    const conceptText = JSON.stringify(concept).toLowerCase();
+    return REPAIR_KEYWORDS.some((keyword) => conceptText.includes(keyword));
+  });
+
+  if (!matches.length) {
+    return null;
+  }
+
   return {
     domain: DOMAIN_NAME,
     confidence: 0.88,
@@ -82,48 +179,42 @@ async function query(prompt: string): Promise<any> {
     suggestion: 'Analyze error patterns, apply debugging strategies, and implement repair solutions',
     metadata: {
       totalConcepts: seedData.length,
-      matchCount: matches.length
-    }
+      matchCount: matches.length,
+    },
   };
-}
+};
 
-/**
- * Initialize and register the repair domain
- */
-export const repairInit = async () => {
+const registerRepairDomain = (): void => {
+  domainRegistry.registerDomain({
+    name: DOMAIN_NAME,
+    displayName: 'Repair & Debugging',
+    description: 'Error fixing, code repair, debugging strategies, and self-healing operations',
+    atomicLevel: 'molecule',
+    modules: REPAIR_MODULES,
+    seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+    learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+    weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+    enabled: true,
+  });
+};
+
+export const repairInit = async (): Promise<void> => {
+  registerRepairDomain();
+
   try {
     console.log('[Repair] Initializing domain...');
-    
     const seedData = await loadSeedData();
-    
-    if (seedData.length === 0) {
+
+    if (!seedData.length) {
       console.warn('[Repair] No seed data loaded - domain may have limited capabilities');
     }
-    
+
     console.log('[Repair] Domain initialized successfully');
   } catch (error) {
     console.error('[Repair] Initialization error:', error);
   }
-
-  // Register domain files for tracking;
-
 };
 
-// Register the domain with the unified registry
-domainRegistry.registerDomain({
-  name: DOMAIN_NAME,
-  displayName: 'Repair & Debugging',
-  description: 'Error fixing, code repair, debugging strategies, and self-healing operations',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
-
-// Auto-initialize when imported
 void repairInit();
 
 export default repairInit;
-export { query, loadSeedData };

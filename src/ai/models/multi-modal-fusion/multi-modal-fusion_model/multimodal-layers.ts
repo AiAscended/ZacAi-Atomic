@@ -2,10 +2,12 @@
  * Multi-modal-fusion - Layer Implementations
  */
 
+import type { ModelPayload } from "../../shared/modelTypes"
+
 export class MULTIMODALLayer {
-  forward(input: any): any {
-    return input;
+  forward(input: ModelPayload): ModelPayload {
+    return input
   }
 }
 
-export default MULTIMODALLayer;
+export default MULTIMODALLayer

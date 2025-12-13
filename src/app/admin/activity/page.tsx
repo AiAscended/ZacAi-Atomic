@@ -11,11 +11,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCcw, Activity, Database, MessageSquare, Settings } from 'lucide-react';
 
+type ActivityEventMetaValue = string | number | boolean | null | ActivityEventMeta;
+
+interface ActivityEventMeta {
+  [key: string]: ActivityEventMetaValue | ActivityEventMetaValue[];
+}
+
 interface ActivityEvent {
   ts: string;
   type: string;
   message: string;
-  meta?: Record<string, any>;
+  meta?: ActivityEventMeta;
 }
 
 export default function ActivityPage() {

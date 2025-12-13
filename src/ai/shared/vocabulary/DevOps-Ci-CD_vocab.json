@@ -482,7 +482,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Terraform is widely used for cloud automation."[1]
+      "notes": "Terraform is widely used for cloud automation."
     },
     {
       "priority": 23,
@@ -504,7 +504,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Ansible is agentless and easy to use."[1]
+      "notes": "Ansible is agentless and easy to use."
     },
     {
       "priority": 24,
@@ -526,7 +526,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Jenkins is free and open source."[1][2][3][4]
+      "notes": "Jenkins is free and open source."
     },
     {
       "priority": 25,
@@ -548,7 +548,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Commercial alternative to Jenkins."[1][3]
+      "notes": "Commercial alternative to Jenkins."
     },
     {
       "priority": 26,
@@ -570,7 +570,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Standard for browser automation."[1][2][3]
+      "notes": "Standard for browser automation."
     },
     {
       "priority": 27,
@@ -592,7 +592,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Enables traceability and quality control."[3][9]
+      "notes": "Enables traceability and quality control."
     },
     {
       "priority": 28,
@@ -614,7 +614,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Essential for stable releases."[1][2][3]
+      "notes": "Essential for stable releases."
     },
     {
       "priority": 29,
@@ -636,7 +636,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Forms the base of the test automation pyramid."[1]
+      "notes": "Forms the base of the test automation pyramid."
     },
     {
       "priority": 30,
@@ -658,7 +658,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Bridges unit and system testing."[1]
+      "notes": "Bridges unit and system testing."
     },
     {
       "priority": 31,
@@ -680,7 +680,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Ensures software meets requirements."[1]
+      "notes": "Ensures software meets requirements."
     },
     {
       "priority": 32,
@@ -702,7 +702,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Simulates real-world usage conditions."[1]
+      "notes": "Simulates real-world usage conditions."
     },
     {
       "priority": 33,
@@ -724,7 +724,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Essential for compliance and risk management."[1]
+      "notes": "Essential for compliance and risk management."
     },
     {
       "priority": 34,
@@ -746,7 +746,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Validates business value and requirements."[1]
+      "notes": "Validates business value and requirements."
     },
     {
       "priority": 35,
@@ -768,7 +768,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Also called build verification testing."[1]
+      "notes": "Also called build verification testing."
     },
     {
       "priority": 36,

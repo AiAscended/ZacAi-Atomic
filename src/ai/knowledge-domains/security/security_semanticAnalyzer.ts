@@ -6,9 +6,13 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { securityParser } from "./security_parser"
+import { securityParser, type SecurityParserResult } from "./security_parser"
 
-export const securitySemanticAnalyzer = (code: string) => {
+export interface SecuritySemanticAnalysis extends SecurityParserResult {
+  recommendations: string[]
+}
+
+export const securitySemanticAnalyzer = (code: string): SecuritySemanticAnalysis => {
   const parsed = securityParser(code)
 
   return {
@@ -17,6 +21,6 @@ export const securitySemanticAnalyzer = (code: string) => {
     severity: parsed.severity,
     hasAuth: parsed.hasAuth,
     hasEncryption: parsed.hasEncryption,
-    recommendations: parsed.issues.map((i) => `Fix ${i} vulnerability`),
+    recommendations: parsed.issues.map((issue) => `Fix ${issue} vulnerability`),
   }
 }

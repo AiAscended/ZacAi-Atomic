@@ -13,7 +13,8 @@ export const loadSecurityLearnedData = async (path = "/src/ai/knowledge-domains/
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { notes: [], concepts: {} })
-  } catch (e) {
+  } catch (error) {
+    console.warn("[security] Failed to load learned data:", error)
     return { notes: [], concepts: {} }
   }
 }
@@ -25,7 +26,8 @@ export const saveSecurityLearnedData = async (
   try {
     await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
     return true
-  } catch (e) {
+  } catch (error) {
+    console.warn("[security] Failed to save learned data:", error)
     return false
   }
 }

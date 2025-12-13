@@ -10,7 +10,7 @@
  * - Graceful error handling
  */
 
-import type { ModuleManifest, ModuleRegistry, ModuleType, ScannerConfig } from "./moduleRegistry";
+import type { ModuleManifest, ScannerConfig } from "./moduleRegistry";
 import { getRegistry } from "./moduleRegistry";
 
 // ============================================================================
@@ -19,7 +19,7 @@ import { getRegistry } from "./moduleRegistry";
 
 export interface LoadedModule {
   manifest: ModuleManifest;
-  instance: any;
+  instance: unknown;
   loadedAt: string;
   status: "ready" | "loading" | "error" | "disabled";
   errorMessage?: string;
@@ -124,7 +124,7 @@ export class UnifiedModuleLoader {
   /**
    * Import module dynamically
    */
-  private async importModule(moduleId: string, manifest: ModuleManifest): Promise<any> {
+  private async importModule(moduleId: string, manifest: ModuleManifest): Promise<unknown> {
     // Determine entry point based on module type
     let entryPath: string | undefined;
     
@@ -141,8 +141,8 @@ export class UnifiedModuleLoader {
     // Construct import path
     const importPath = `../${this.config.moduleType === "model" ? "models" : "knowledge-domains"}/${moduleId}/${entryPath}`;
     
-    const module = await import(importPath);
-    return module.default || module;
+    const importedModule = await import(importPath);
+    return importedModule.default || importedModule;
   }
   
   /**

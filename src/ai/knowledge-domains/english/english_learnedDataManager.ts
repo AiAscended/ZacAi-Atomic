@@ -10,7 +10,8 @@ export const loadEnglishLearnedData = async (path = "/src/ai/knowledge-domains/e
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { notes: [], concepts: {} })
-  } catch (e) {
+  } catch (error) {
+    console.warn("Failed to load English learned data", { path, error })
     return { notes: [], concepts: {} }
   }
 }
@@ -19,7 +20,8 @@ export const saveEnglishLearnedData = async (data: unknown, path = "/src/ai/know
   try {
     await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
     return true
-  } catch (e) {
+  } catch (error) {
+    console.warn("Failed to save English learned data", { path, error })
     return false
   }
 }

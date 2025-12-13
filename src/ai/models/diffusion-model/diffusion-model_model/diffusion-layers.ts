@@ -2,10 +2,12 @@
  * Diffusion-model - Layer Implementations
  */
 
+import type { ModelPayload } from "../../shared/modelTypes"
+
 export class DIFFUSIONLayer {
-  forward(input: any): any {
-    return input;
+  forward(input: ModelPayload): ModelPayload {
+    return input
   }
 }
 
-export default DIFFUSIONLayer;
+export default DIFFUSIONLayer

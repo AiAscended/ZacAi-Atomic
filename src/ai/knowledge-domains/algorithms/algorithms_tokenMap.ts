@@ -28,4 +28,11 @@ export const getAlgorithmsTokenById = (id: number): string | undefined => {
   return undefined
 }
 export const algorithmsTokenCount = () => algorithmsTokenMap.size
-export default { algorithmsTokenMap, getAlgorithmsTokenId, getAlgorithmsTokenById, algorithmsTokenCount }
+const algorithmsTokenExports = {
+  algorithmsTokenMap,
+  getAlgorithmsTokenId,
+  getAlgorithmsTokenById,
+  algorithmsTokenCount,
+}
+
+export default algorithmsTokenExports

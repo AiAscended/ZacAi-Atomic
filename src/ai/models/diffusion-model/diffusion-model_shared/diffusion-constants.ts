@@ -2,6 +2,8 @@
  * Diffusion-model - Constants
  */
 
-export const DIFFUSION_VERSION = '1.0.0';
+export const DIFFUSION_VERSION = "1.0.0"
 
-export default { DIFFUSION_VERSION };
+const DIFFUSION_CONSTANTS = { DIFFUSION_VERSION }
+
+export default DIFFUSION_CONSTANTS

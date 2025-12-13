@@ -1,0 +1,137 @@
+{
+  "metrics": [
+    {
+      "prompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "preprocessedPrompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "response": "I've analyzed your question \"Summarize the current ZacAi orchestration pipeline status and readiness.\" using my general_knowledge domains, but the results have low confidence.\n\nHere's what I found:\n\n- **general_knowledge** (65% confident): Based on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.\n\nCould you rephrase or provide more details to help me give you a better answer?\n\n**Domain-Specific Knowledge:**\n**General Knowledge:**\nBased on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.",
+      "confidence": 0.85,
+      "domains": [
+        "general_knowledge"
+      ],
+      "modelsUsed": [
+        "scientific-calculator",
+        "unified-transformer-llm"
+      ],
+      "processingTime": 881081,
+      "tokensGenerated": 155,
+      "sessionId": "diagnostic-session",
+      "timestamp": "2025-12-04T06:02:23.250Z"
+    },
+    {
+      "prompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "preprocessedPrompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "response": "I've analyzed your question \"Summarize the current ZacAi orchestration pipeline status and readiness.\" using my general_knowledge domains, but the results have low confidence.\n\nHere's what I found:\n\n- **general_knowledge** (65% confident): Based on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.\n\nCould you rephrase or provide more details to help me give you a better answer?\n\n**Domain-Specific Knowledge:**\n**General Knowledge:**\nBased on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.",
+      "confidence": 0.85,
+      "domains": [
+        "general_knowledge"
+      ],
+      "modelsUsed": [
+        "scientific-calculator",
+        "unified-transformer-llm"
+      ],
+      "processingTime": 949199,
+      "tokensGenerated": 155,
+      "sessionId": "diagnostic-session",
+      "timestamp": "2025-12-04T06:27:13.949Z"
+    },
+    {
+      "prompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "preprocessedPrompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "response": "I've analyzed your question \"Summarize the current ZacAi orchestration pipeline status and readiness.\" using my general_knowledge domains, but the results have low confidence.\n\nHere's what I found:\n\n- **general_knowledge** (65% confident): Based on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.\n\nCould you rephrase or provide more details to help me give you a better answer?\n\n**Domain-Specific Knowledge:**\n**General Knowledge:**\nBased on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.",
+      "confidence": 0.85,
+      "domains": [
+        "general_knowledge"
+      ],
+      "modelsUsed": [
+        "scientific-calculator",
+        "unified-transformer-llm"
+      ],
+      "processingTime": 939662,
+      "tokensGenerated": 155,
+      "sessionId": "diagnostic-session",
+      "timestamp": "2025-12-04T06:48:05.730Z"
+    },
+    {
+      "prompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "preprocessedPrompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "response": "I've analyzed your question \"Summarize the current ZacAi orchestration pipeline status and readiness.\" using my general_knowledge domains, but the results have low confidence.\n\nHere's what I found:\n\n- **general_knowledge** (65% confident): Based on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.\n\nCould you rephrase or provide more details to help me give you a better answer?\n\n**Domain-Specific Knowledge:**\n**General Knowledge:**\nBased on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.",
+      "confidence": 0.85,
+      "domains": [
+        "general_knowledge"
+      ],
+      "modelsUsed": [
+        "scientific-calculator",
+        "unified-transformer-llm"
+      ],
+      "processingTime": 9,
+      "tokensGenerated": 155,
+      "sessionId": "diagnostic-session",
+      "timestamp": "2025-12-04T06:56:41.093Z"
+    },
+    {
+      "prompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "preprocessedPrompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "response": "LLM semantic composer fused domain intelligence for \"Summarize the current ZacAi orchestration pipeline status and readiness.\".\n\nHere is my synthesized answer for \"Summarize the current ZacAi orchestration pipeline status and readiness.\":\n\nDomains engaged: system, general_knowledge.\n\n1. **ZacAi Hybrid Pipeline Overview**\n\n1. **Prompt Processor** – normalizes the user message, extracts tasks, and tags tokens for downstream models.\n2. **Domain Router** – maps the cleaned prompt to active knowledge domains (general_knowledge, system, internet_search, etc.) using the unified registry.\n3. **Domain Inference Layer** – each domain runs its own tokenizer, semantic analyzer, and seed-backed inference controller to return focused insights.\n4. **Unified Transformer LLM** – loads shared vocabulary + combined weights (seeded checkpoints + learned weights) to synthesize narrative answers when high-quality logits are available.\n5. **Response Synthesizer** – merges domain findings, LLM output, and heuristic fallbacks, then formats blocks for the admin/dev consoles.\n\n**Knowledge + Memory Stack**\n- Seeds: every domain exposes JSON seed vocabularies that the orchestrator can query even if a model is offline.\n- Weights: the LLM weights manager loads latest checkpoints and merges pretrained, learned, and scratch layers so the model always has usable tensors.\n- Metrics: every inference logs confidence, latency, and token usage for continuous training jobs.\n\n**Self-Healing Behavior**\nIf domains or the LLM are unavailable, the orchestrator still produces an answer by combining seeds, heuristics, and system status so operators always see a substantive response instead of a generic fallback. (source: system, confidence: 90%)\n2. Based on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention. (source: general_knowledge, confidence: 65%)\n\nThese insights combine the strongest signals returned by the specialized domain engines.\n\n\nKnowledge seed highlights:\n1. CI/CD (nextjs) – reference entry\n2. state (nextjs) – reference entry\n3. Mean (mathematics) – The arithmetic average of a set of values.\n4. Quartiles (mathematics) – Values that divide a data set into four equal parts.\n5. Markov Chain (mathematics) – A stochastic process with the Markov property: future state depends only on current state.\n6. Workshop Networking and Community Engagement (repair) – Participate in industry events, training, and peer networks to stay current with trends and best practices.\n7. nextjs-edge-tenant-data-breach-orchestration (nextjs) – reference entry\n8. nextjs-edge-tenant-api-data-breach-orchestration (nextjs) – reference entry\n\n**Domain-Specific Knowledge:**\n**System:**\n**ZacAi Hybrid Pipeline Overview**\n\n1. **Prompt Processor** – normalizes the user message, extracts tasks, and tags tokens for downstream models.\n2. **Domain Router** – maps the cleaned prompt to active knowledge domains (general_knowledge, system, internet_search, etc.) using the unified registry.\n3. **Domain Inference Layer** – each domain runs its own tokenizer, semantic analyzer, and seed-backed inference controller to return focused insights.\n4. **Unified Transformer LLM** – loads shared vocabulary + combined weights (seeded checkpoints + learned weights) to synthesize narrative answers when high-quality logits are available.\n5. **Response Synthesizer** – merges domain findings, LLM output, and heuristic fallbacks, then formats blocks for the admin/dev consoles.\n\n**Knowledge + Memory Stack**\n- Seeds: every domain exposes JSON seed vocabularies that the orchestrator can query even if a model is offline.\n- Weights: the LLM weights manager loads latest checkpoints and merges pretrained, learned, and scratch layers so the model always has usable tensors.\n- Metrics: every inference logs confidence, latency, and token usage for continuous training jobs.\n\n**Self-Healing Behavior**\nIf domains or the LLM are unavailable, the orchestrator still produces an answer by combining seeds, heuristics, and system status so operators always see a substantive response instead of a generic fallback.\n\n**General Knowledge:**\nBased on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.",
+      "confidence": 0.85,
+      "domains": [
+        "system",
+        "general_knowledge"
+      ],
+      "modelsUsed": [
+        "scientific-calculator",
+        "unified-transformer-llm"
+      ],
+      "processingTime": 49124,
+      "tokensGenerated": 665,
+      "sessionId": "diagnostic-session",
+      "timestamp": "2025-12-07T14:45:19.450Z"
+    },
+    {
+      "prompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "preprocessedPrompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "response": "LLM semantic composer fused domain intelligence for \"Summarize the current ZacAi orchestration pipeline status and readiness.\".\n\nHere is my synthesized answer for \"Summarize the current ZacAi orchestration pipeline status and readiness.\":\n\nDomains engaged: mathematics, system, general_knowledge.\n\n1. **ZacAi Hybrid Pipeline Overview**\n\n1. **Prompt Processor** – normalizes the user message, extracts tasks, and tags tokens for downstream models.\n2. **Domain Router** – maps the cleaned prompt to active knowledge domains (general_knowledge, system, internet_search, etc.) using the unified registry.\n3. **Domain Inference Layer** – each domain runs its own tokenizer, semantic analyzer, and seed-backed inference controller to return focused insights.\n4. **Unified Transformer LLM** – loads shared vocabulary + combined weights (seeded checkpoints + learned weights) to synthesize narrative answers when high-quality logits are available.\n5. **Response Synthesizer** – merges domain findings, LLM output, and heuristic fallbacks, then formats blocks for the admin/dev consoles.\n\n**Knowledge + Memory Stack**\n- Seeds: every domain exposes JSON seed vocabularies that the orchestrator can query even if a model is offline.\n- Weights: the LLM weights manager loads latest checkpoints and merges pretrained, learned, and scratch layers so the model always has usable tensors.\n- Metrics: every inference logs confidence, latency, and token usage for continuous training jobs.\n\n**Self-Healing Behavior**\nIf domains or the LLM are unavailable, the orchestrator still produces an answer by combining seeds, heuristics, and system status so operators always see a substantive response instead of a generic fallback. (source: system, confidence: 90%)\n2. Based on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention. (source: general_knowledge, confidence: 65%)\n\nThese insights combine the strongest signals returned by the specialized domain engines.\n\n\nKnowledge seed highlights:\n1. CI/CD (nextjs) – reference entry\n2. state (nextjs) – reference entry\n3. Mean (mathematics) – The arithmetic average of a set of values.\n4. Quartiles (mathematics) – Values that divide a data set into four equal parts.\n5. Markov Chain (mathematics) – A stochastic process with the Markov property: future state depends only on current state.\n6. Workshop Networking and Community Engagement (repair) – Participate in industry events, training, and peer networks to stay current with trends and best practices.\n7. nextjs-edge-tenant-data-breach-orchestration (nextjs) – reference entry\n8. nextjs-edge-tenant-api-data-breach-orchestration (nextjs) – reference entry\n\nKey findings:\n- **System:** **ZacAi Hybrid Pipeline Overview**\n\n1.\n- **General Knowledge:** Based on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence.\n\n**System details:**\n**ZacAi Hybrid Pipeline Overview**\n\n1. **Prompt Processor** – normalizes the user message, extracts tasks, and tags tokens for downstream models.\n2.  – maps the cleaned prompt to active knowledge domains (general_knowledge, system, internet_search, etc.) using the unified registry.\n3.  – each domain runs its own tokenizer, semantic analyzer, and seed-backed inference controller to return focused insights.\n4. **Unified Transformer LLM** – loads shared vocabulary + combined weights (seeded checkpoints + learned weights) to synthesize narrative answers when high-quality logits are available.\n5. **Response Synthesizer** – merges domain findings, LLM output, and heuristic fallbacks, then formats blocks for the admin/dev consoles.\n\n**Knowledge + Memory Stack**\n- Seeds: every domain exposes JSON seed vocabularies that the orchestrator can query even if a model is offline.\n- Weights: the LLM weights manager loads latest checkpoints and merges pretrained, learned, and scratch layers so the model always has usable tensors.\n- Metrics: every inference logs confidence, latency, and token usage for continuous training jobs.\n\n**Self-Healing Behavior**\nIf domains or the LLM are unavailable, the orchestrator still produces an answer by combining seeds, heuristics, and system status so operators always see a substantive response instead of a generic fallback.\n\n**General Knowledge details:**\nBased on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.",
+      "confidence": 0.8600000000000001,
+      "domains": [
+        "mathematics",
+        "system",
+        "general_knowledge"
+      ],
+      "modelsUsed": [
+        "unified-transformer-llm"
+      ],
+      "processingTime": 24107,
+      "tokensGenerated": 699,
+      "sessionId": "diagnostic-session",
+      "timestamp": "2025-12-07T23:25:45.575Z"
+    },
+    {
+      "prompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "preprocessedPrompt": "Summarize the current ZacAi orchestration pipeline status and readiness.",
+      "response": "LLM semantic composer fused domain intelligence for \"Summarize the current ZacAi orchestration pipeline status and readiness.\".\n\nHere is my synthesized answer for \"Summarize the current ZacAi orchestration pipeline status and readiness.\":\n\nDomains engaged: mathematics, system, general_knowledge.\n\n1. **ZacAi Hybrid Pipeline Overview**\n\n1. **Prompt Processor** – normalizes the user message, extracts tasks, and tags tokens for downstream models.\n2. **Domain Router** – maps the cleaned prompt to active knowledge domains (general_knowledge, system, internet_search, etc.) using the unified registry.\n3. **Domain Inference Layer** – each domain runs its own tokenizer, semantic analyzer, and seed-backed inference controller to return focused insights.\n4. **Unified Transformer LLM** – loads shared vocabulary + combined weights (seeded checkpoints + learned weights) to synthesize narrative answers when high-quality logits are available.\n5. **Response Synthesizer** – merges domain findings, LLM output, and heuristic fallbacks, then formats blocks for the admin/dev consoles.\n\n**Knowledge + Memory Stack**\n- Seeds: every domain exposes JSON seed vocabularies that the orchestrator can query even if a model is offline.\n- Weights: the LLM weights manager loads latest checkpoints and merges pretrained, learned, and scratch layers so the model always has usable tensors.\n- Metrics: every inference logs confidence, latency, and token usage for continuous training jobs.\n\n**Self-Healing Behavior**\nIf domains or the LLM are unavailable, the orchestrator still produces an answer by combining seeds, heuristics, and system status so operators always see a substantive response instead of a generic fallback. (source: system, confidence: 90%)\n2. Based on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention. (source: general_knowledge, confidence: 65%)\n\nThese insights combine the strongest signals returned by the specialized domain engines.\n\n\nKnowledge seed highlights:\n1. CI/CD (nextjs) – reference entry\n2. state (nextjs) – reference entry\n3. Mean (mathematics) – The arithmetic average of a set of values.\n4. Quartiles (mathematics) – Values that divide a data set into four equal parts.\n5. Markov Chain (mathematics) – A stochastic process with the Markov property: future state depends only on current state.\n6. Workshop Networking and Community Engagement (repair) – Participate in industry events, training, and peer networks to stay current with trends and best practices.\n7. nextjs-edge-tenant-data-breach-orchestration (nextjs) – reference entry\n8. nextjs-edge-tenant-api-data-breach-orchestration (nextjs) – reference entry\n\nKey findings:\n- **System:** **ZacAi Hybrid Pipeline Overview**\n\n1.\n- **General Knowledge:** Based on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence.\n\n**System details:**\n**ZacAi Hybrid Pipeline Overview**\n\n1. **Prompt Processor** – normalizes the user message, extracts tasks, and tags tokens for downstream models.\n2.  – maps the cleaned prompt to active knowledge domains (general_knowledge, system, internet_search, etc.) using the unified registry.\n3.  – each domain runs its own tokenizer, semantic analyzer, and seed-backed inference controller to return focused insights.\n4. **Unified Transformer LLM** – loads shared vocabulary + combined weights (seeded checkpoints + learned weights) to synthesize narrative answers when high-quality logits are available.\n5. **Response Synthesizer** – merges domain findings, LLM output, and heuristic fallbacks, then formats blocks for the admin/dev consoles.\n\n**Knowledge + Memory Stack**\n- Seeds: every domain exposes JSON seed vocabularies that the orchestrator can query even if a model is offline.\n- Weights: the LLM weights manager loads latest checkpoints and merges pretrained, learned, and scratch layers so the model always has usable tensors.\n- Metrics: every inference logs confidence, latency, and token usage for continuous training jobs.\n\n**Self-Healing Behavior**\nIf domains or the LLM are unavailable, the orchestrator still produces an answer by combining seeds, heuristics, and system status so operators always see a substantive response instead of a generic fallback.\n\n**General Knowledge details:**\nBased on general knowledge: AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.",
+      "confidence": 0.8600000000000001,
+      "domains": [
+        "mathematics",
+        "system",
+        "general_knowledge"
+      ],
+      "modelsUsed": [
+        "unified-transformer-llm"
+      ],
+      "processingTime": 366578,
+      "tokensGenerated": 699,
+      "sessionId": "diagnostic-session",
+      "timestamp": "2025-12-08T20:20:51.687Z"
+    }
+  ],
+  "statistics": {
+    "totalInferences": 7,
+    "avgConfidence": 0.852857142857143,
+    "avgProcessingTime": 458537.14285714284,
+    "domainUsage": {
+      "general_knowledge": 7,
+      "system": 3,
+      "mathematics": 2
+    },
+    "lastUpdated": "2025-12-08T20:20:51.704Z"
+  }
+}

@@ -6,9 +6,9 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams } from "next/navigation"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -18,6 +18,8 @@ import { Slider } from "@/components/ui/slider"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Upload, Download, Save, RefreshCw, X, Check, AlertCircle, RotateCcw } from "lucide-react"
+import type { ModuleManifest } from "@/ai/shared/registry/unifiedRegistry"
+import type { AdminConfig } from "@/ai/shared/config/instructionLoader"
 
 interface DomainSettings {
   enabled: boolean
@@ -28,6 +30,18 @@ interface DomainSettings {
   keywords: string[]
   priority: number
   updatedAt: string
+}
+
+interface DomainInstructionsSummary {
+  role?: { primary?: string; scope?: string }
+  capabilities?: string[]
+  principles?: Array<{ name: string; rule: string; priority: number }>
+  admin_config?: AdminConfig
+}
+
+interface DomainMetadataPayload {
+  manifest: ModuleManifest
+  instructions: DomainInstructionsSummary | null
 }
 
 export default function DomainSettingsPage() {
@@ -54,12 +68,15 @@ export default function DomainSettingsPage() {
 
   const [seedData, setSeedData] = useState("")
   const [weightsData, setWeightsData] = useState("")
+  const [metadata, setMetadata] = useState<DomainMetadataPayload | null>(null)
+  const [metadataLoading, setMetadataLoading] = useState(true)
+  const [metadataError, setMetadataError] = useState<string | null>(null)
+  const displayName = metadata?.manifest.displayName ?? domainName
+  const heroDescription = metadata?.manifest.description ?? settings.description
+  const instructions = metadata?.instructions
+  const adminConfig = instructions?.admin_config
 
-  useEffect(() => {
-    loadSettings()
-  }, [domain])
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -77,7 +94,45 @@ export default function DomainSettingsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [domain])
+
+  useEffect(() => {
+    loadSettings()
+  }, [loadSettings])
+
+  useEffect(() => {
+    let isMounted = true
+    async function loadMetadata() {
+      setMetadataLoading(true)
+      setMetadataError(null)
+      try {
+        const response = await fetch(`/api/admin/domains/${domain}/metadata`)
+        const result = await response.json()
+
+        if (!response.ok || !result?.success) {
+          throw new Error(result?.error || "Unable to load domain metadata")
+        }
+
+        if (isMounted) {
+          setMetadata(result.data as DomainMetadataPayload)
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err)
+        if (isMounted) {
+          setMetadataError(message)
+        }
+      } finally {
+        if (isMounted) {
+          setMetadataLoading(false)
+        }
+      }
+    }
+
+    loadMetadata()
+    return () => {
+      isMounted = false
+    }
+  }, [domain])
 
   const saveSettings = async () => {
     try {
@@ -159,8 +214,8 @@ export default function DomainSettingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{domainName} Domain</h1>
-          <p className="text-muted-foreground mt-1">{settings.description}</p>
+          <h1 className="text-3xl font-bold">{displayName} Domain</h1>
+          <p className="text-muted-foreground mt-1">{heroDescription}</p>
         </div>
         <div className="text-sm text-muted-foreground">
           Last updated: {new Date(settings.updatedAt).toLocaleString()}
@@ -183,6 +238,108 @@ export default function DomainSettingsPage() {
             <p>Domain settings saved successfully!</p>
           </div>
         </Card>
+      )}
+
+      {metadataLoading && (
+        <Card className="p-4">
+          <p className="text-sm text-muted-foreground">Loading domain metadata...</p>
+        </Card>
+      )}
+
+      {!metadataLoading && metadataError && (
+        <Card className="p-4 bg-amber-500/10 border border-amber-500">
+          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+            <AlertCircle className="h-4 w-4" />
+            <p>{metadataError}</p>
+          </div>
+        </Card>
+      )}
+
+      {!metadataLoading && metadata && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Domain Snapshot</CardTitle>
+              <CardDescription>Live view from unified registry.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <Badge variant={metadata.manifest.enabled ? "default" : "secondary"}>
+                  {metadata.manifest.enabled ? "Enabled" : "Disabled"}
+                </Badge>
+                <Badge variant="outline">v{metadata.manifest.version}</Badge>
+                <Badge variant="outline">{metadata.manifest.moduleId}</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Last Updated</p>
+                  <p>{new Date(metadata.manifest.metadata.lastUpdated).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Discovered</p>
+                  <p>{new Date(metadata.manifest.metadata.discoveredAt).toLocaleDateString()}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Role & Capabilities</CardTitle>
+              <CardDescription>{instructions?.role?.primary ?? "Role description unavailable."}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {instructions?.role?.scope && (
+                <p className="text-sm text-muted-foreground">Scope: {instructions.role.scope}</p>
+              )}
+              {instructions?.capabilities && instructions.capabilities.length > 0 ? (
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  {instructions.capabilities.map((capability) => (
+                    <li key={capability}>{capability}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground">No capabilities recorded.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {adminConfig && (
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle>Admin Config Bindings</CardTitle>
+                <CardDescription>Editable fields and wiring pulled from instructions.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {adminConfig.editable_fields && adminConfig.editable_fields.length > 0 && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Editable Fields</p>
+                    <div className="flex flex-wrap gap-2">
+                      {adminConfig.editable_fields.map((field) => (
+                        <Badge key={field} variant="secondary">
+                          {field}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {adminConfig.field_bindings ? (
+                  <div className="grid gap-2 md:grid-cols-2">
+                    {Object.entries(adminConfig.field_bindings).map(([label, pathValue]) => (
+                      <div key={label} className="rounded-md border p-3">
+                        <p className="text-xs text-muted-foreground">{label}</p>
+                        <p className="font-mono text-sm break-all">{pathValue}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No field bindings provided for this domain.</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
       )}
 
       <Tabs defaultValue="settings" className="space-y-4">

@@ -243,7 +243,11 @@ export class DomainScanner {
         }
       }
     } catch (error) {
-      // Directory might not exist
+      const err = error as NodeJS.ErrnoException;
+      if (!err || err.code !== "ENOENT") {
+        const message = err?.message ?? String(error);
+        console.warn(`DomainScanner: failed to read directory ${dir}: ${message}`);
+      }
     }
     
     return files;

@@ -40,9 +40,11 @@ export const persistSecurityWeights = (weights: Record<string, number[]>) => {
     )
     updateFile(SECURITY_DOMAIN, "src/ai/knowledge-domains/security/security_weights/security_pretrained_weights.json", content)
     return true
-  } catch (e) {
+  } catch (error) {
+    console.warn("[security] Failed to persist weights:", error)
     return false
   }
 }
+const securityEmbeddingApi = { getSecurityEmbedding, getSecurityEmbeddingForTokens, persistSecurityWeights }
 
-export default { getSecurityEmbedding, getSecurityEmbeddingForTokens, persistSecurityWeights }
+export default securityEmbeddingApi

@@ -1,18 +1,21 @@
-/**
- * File: src/ai/data/algorithms/algorithms_modelWeightsLoader.ts
- * Purpose: Load training weights for algorithms domain
- * Depends on: storageAdapter.ts
- * Depended on by: algorithms_trainingController.ts
- * Creator: Vercel v0 Coding Assistant
- */
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-import { storageAdapter } from "../storageAdapter"
+const algorithmsWeightsManager = createDomainWeightsManager({
+  domainName: "algorithms",
+})
 
-export const algorithmsLoadWeights = async (path = "/src/ai/knowledge-domains/algorithms/algorithms_weights/algorithms_trainingWeights.bin") => {
-  try {
-    const buffer = await storageAdapter.readFile(path)
-    return { success: true, weights: buffer }
-  } catch {
+export const algorithmsLoadWeights = async () => {
+  const weights = await algorithmsWeightsManager.loadWeights()
+  if (!weights) {
     return { success: false, weights: null }
   }
+  return { success: true, weights }
+}
+
+export const primeAlgorithmsWeights = async (): Promise<string | null> => {
+  return algorithmsWeightsManager.prime()
+}
+
+export const getAlgorithmsActiveWeightArtifact = () => {
+  return algorithmsWeightsManager.getActiveWeightArtifact()
 }

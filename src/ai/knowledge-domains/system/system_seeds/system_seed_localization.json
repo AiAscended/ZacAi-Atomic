@@ -11,7 +11,21 @@
       "term": "relationship",
       "language": "zh",
       "translation": "关系"
+    },
+    {
+      "term": "deployment",
+      "language": "fr",
+      "translation": "déploiement"
+    },
+    {
+      "term": "inference",
+      "language": "de",
+      "translation": "Inferenz"
+    },
+    {
+      "term": "observability",
+      "language": "ja",
+      "translation": "可観測性"
     }
-    // Add more translations as needed
   ]
 }

@@ -5,7 +5,12 @@ export interface ProgrammingInferenceResult {
   response: string
   confidence: number
   topics: string[]
-  metadata: { intent: string; complexity: string; parseType: string }
+  metadata: {
+    intent: string
+    complexity: string
+    parseType: string
+    hasCodeExample: boolean
+  }
 }
 
 // Code examples library
@@ -134,8 +139,17 @@ const results = await Promise.all([
   }
 };
 
-export async function programmingRunInference(input: string): Promise<ProgrammingInferenceResult | null> {
+export type ProgrammingInferenceContext = Record<string, unknown>
+
+export async function programmingRunInference(
+  input: string,
+  context?: ProgrammingInferenceContext,
+): Promise<ProgrammingInferenceResult | null> {
   const lowerInput = input.toLowerCase()
+
+  if (context && Object.keys(context).length > 0) {
+    console.log(`[Programming Domain] Context keys: ${Object.keys(context).join(", ")}`)
+  }
 
   const programmingKeywords = [
     "code",
@@ -216,5 +230,3 @@ export async function programmingRunInference(input: string): Promise<Programmin
     return null
   }
 }
-
-export default programmingRunInference;

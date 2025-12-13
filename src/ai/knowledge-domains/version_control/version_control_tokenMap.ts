@@ -28,9 +28,11 @@ export const getVersionControlTokenById = (id: number): string | undefined => {
   return undefined
 }
 export const versionControlTokenCount = () => versionControlTokenMap.size
-export default {
+const versionControlTokenApi = {
   versionControlTokenMap,
   getVersionControlTokenId,
   getVersionControlTokenById,
   versionControlTokenCount,
 }
+
+export default versionControlTokenApi

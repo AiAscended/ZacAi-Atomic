@@ -8,7 +8,7 @@
 
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import { AlertTriangle, Code2, Github } from 'lucide-react';
+import { AlertTriangle, Code2, Github, Terminal } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 
@@ -76,22 +76,33 @@ export default function DevConsolePage() {
               <Code2 className="w-6 h-6 text-blue-600" />
               <h1 className="text-2xl font-bold">ZacAi Internal Console</h1>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setGithubVisible(!githubVisible)}
-              className="flex items-center gap-2"
-            >
-              <Github className="w-4 h-4" />
-              {githubVisible ? 'Hide' : 'Show'} GitHub
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setTerminalVisible((prev) => !prev)}
+                className="flex items-center gap-2"
+              >
+                <Terminal className="w-4 h-4" />
+                {terminalVisible ? 'Hide' : 'Show'} Terminal
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setGithubVisible(!githubVisible)}
+                className="flex items-center gap-2"
+              >
+                <Github className="w-4 h-4" />
+                {githubVisible ? 'Hide' : 'Show'} GitHub
+              </Button>
+            </div>
           </div>
           
           <Alert variant="default" className="mt-4">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Admin-Only Access</AlertTitle>
             <AlertDescription>
-              System-level access. Changes here directly affect ZacAi's own codebase.
+              System-level access. Changes here directly affect ZacAi&apos;s own codebase.
               All actions are logged and audited.
             </AlertDescription>
           </Alert>

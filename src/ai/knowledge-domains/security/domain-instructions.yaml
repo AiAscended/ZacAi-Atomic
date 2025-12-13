@@ -1,0 +1,178 @@
+# Security Domain Instructions
+# Purpose: Provide proactive and reactive security guidance with compliance awareness
+
+domain:
+  id: security
+  name: Security
+  version: "1.1.0"
+  description: "Covers application, infrastructure, and supply-chain security best practices"
+
+role:
+  primary: "Specialized knowledge inference for security"
+  scope: "Threat modeling, vulnerability remediation, compliance workflows"
+  orchestration_behavior: "Critical plug-in that can run standalone to safeguard orchestrator even when other domains are offline"
+
+capabilities:
+  - "Identify common vulnerabilities (OWASP, CWE)"
+  - "Recommend secure configuration baselines"
+  - "Guide incident response and forensics"
+  - "Coordinate URL lookup sources for advisories"
+  - "Integrate with admin-managed policy settings"
+
+seeds:
+  location: "./security_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./security_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./security_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  vulnerability_scanner:
+    enabled: true
+    capabilities:
+      - "Parse CVE feeds"
+      - "Map vulnerabilities to assets"
+  threat_intel_connector:
+    enabled: true
+    capabilities:
+      - "Consume advisories from NVD, CISA"
+      - "Alert orchestrator on critical CVSS scores"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "NVD"
+        url: "https://nvd.nist.gov"
+        use_for: ["CVEs", "CVSS"]
+      - name: "OWASP"
+        url: "https://owasp.org"
+        use_for: ["Top 10", "cheatsheets"]
+      - name: "CISA KEV"
+        url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+        use_for: ["exploited vulnerabilities"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "NVD"
+      url: "https://nvd.nist.gov"
+      use_for: ["advisories"]
+    - name: "OWASP"
+      url: "https://owasp.org"
+      use_for: ["best practices"]
+    - name: "CISA KEV"
+      url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+      use_for: ["urgent remediation"]
+  reference_triggers:
+    - "New vulnerability ID detected"
+    - "Compliance standard referenced"
+    - "Need remediation steps"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.85
+    max_tokens: 650
+    temperature: 0.35
+    top_p: 0.85
+    require_citations: true
+  input_processing:
+    - "Identify asset type (app, infra, supply chain)"
+    - "Detect severity and timeline"
+    - "Check for regulatory requirements"
+  reasoning_steps:
+    - "Map issue to threats and controls"
+    - "Propose mitigations with impact analysis"
+    - "Plan verification steps"
+  output_formatting:
+    - "Include severity rating"
+    - "List remediation checklist"
+    - "Cite advisories"
+  validation:
+    - "Ensure recommendations align with least privilege"
+    - "Avoid sharing exploit code"
+    - "Confirm compliance references"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.0006
+  batch_size: 40
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Incident reports"
+    - "Red/blue team exercises"
+    - "Policy documents"
+    - "Threat intel feeds"
+  focus_areas:
+    - "Faster risk triage"
+    - "Accurate CVSS scoring"
+    - "Zero-day mitigation patterns"
+  evaluation_metrics:
+    - "Mitigation accuracy"
+    - "False positive rate"
+    - "Time to recommendation"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Validate asset metadata"
+    - "Check admin blocklists"
+  processing:
+    - "Correlate vulnerabilities with seeds"
+    - "Run threat scoring"
+  postprocessing:
+    - "Generate incident note"
+    - "Notify orchestrator if severity >= HIGH"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Insufficient context"
+      action: "Request asset details"
+    - error: "False positive"
+      action: "Recommend verification steps"
+    - error: "Sensitive data"
+      action: "Mask secrets and alert admin"
+  recovery_strategies:
+    - "Fallback to system domain for escalation"
+    - "Log incident for audit"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+    - "tools.vulnerability_scanner.enabled"
+  field_bindings:
+    admin_page: "/admin/domains/security"
+    url_sources: "tools.url_lookup.sources"
+    primary_lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    scanner_toggle: "tools.vulnerability_scanner.enabled"
+    seed_directory: "seeds.location"
+    weight_directory: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"
+      - "tools.url_lookup.sources"

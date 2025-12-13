@@ -147,10 +147,17 @@ Real-time knowledge acquisition:
 ### 3. Weight Management
 
 Comprehensive weight versioning:
+- **Unified Manifests** – Every model and domain writes to `weights-manifest.json`, recording bootstrapped, pretrained, trained, and checkpoint artifacts with provenance so the orchestrator always selects the best available snapshot.
 - **Pretrained Weights** - Basic task-specific functionality
 - **Trained Weights** - Date-stamped training runs (e.g., `_trained_weights_02-11-25.json`)
 - **Weight History** - Complete training lineage
 - **Automatic Loading** - Smart weight discovery and loading
+
+Use the migration script to register legacy weight files into their manifest:
+
+```bash
+npx tsx scripts/migrate-weight-manifests.ts
+```
 
 ### 4. GitHub Backup Integration
 

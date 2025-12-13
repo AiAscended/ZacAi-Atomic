@@ -3,14 +3,23 @@
  * Handles logging, monitoring, metrics, and observability queries
  */
 
-import { DOMAIN_NAME } from './observability_constants';
+import { DOMAIN_NAME } from "./observability_constants"
 
-export const observabilityRunInference = async (input: string, _context?: any) => {
+export type ObservabilityInferenceContext = Record<string, unknown>
+
+export const observabilityRunInference = async (
+  input: string,
+  context?: ObservabilityInferenceContext,
+) => {
   const lowerInput = input.toLowerCase();
   
   let responseText = '';
   let confidence = 0.7;
   const sources: string[] = [];
+
+  if (context && Object.keys(context).length > 0) {
+    console.log(`[Observability] Context keys: ${Object.keys(context).join(', ')}`)
+  }
 
   // Detect observability keywords
   if (
@@ -69,5 +78,3 @@ How can I help you improve your system's observability?`;
     domain: DOMAIN_NAME,
   };
 };
-
-export default observabilityRunInference;

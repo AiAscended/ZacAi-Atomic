@@ -10,7 +10,8 @@ export const loadEnglishSeedVocabulary = async (path = "/src/ai/knowledge-domain
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { words: [] }) as { words: string[] }
-  } catch (e) {
+  } catch (error) {
+    console.warn("Failed to load English seed vocabulary", { path, error })
     return { words: [] }
   }
 }

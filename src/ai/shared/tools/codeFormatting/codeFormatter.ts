@@ -19,10 +19,10 @@ export function detectLanguage(code: string): string {
  * Format code using Prettier with appropriate parser.
  * Falls back to unformatted code on errors.
  */
-export function formatCode(code: string, options?: { language: string }): string {
+export async function formatCode(code: string, options?: { language: string }): Promise<string> {
   try {
     const parser = options?.language === "typescript" ? "typescript" : "babel"
-    return prettier.format(code, {
+    return await prettier.format(code, {
       parser,
       plugins: [parserTypescript, parserBabel],
       semi: true,
@@ -32,6 +32,7 @@ export function formatCode(code: string, options?: { language: string }): string
     })
   } catch (err) {
     // Return unformatted code if error encountered
+    console.warn("[codeFormatter] Failed to format code:", err)
     return code
   }
 }

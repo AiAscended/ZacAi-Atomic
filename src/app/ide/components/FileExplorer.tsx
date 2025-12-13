@@ -7,7 +7,7 @@ import {
   FileIcon,
   FileCode,
   FileJson,
-  Image,
+  Image as ImageIcon,
   ChevronRight,
   ChevronDown,
   Plus,
@@ -82,7 +82,7 @@ function getFileIcon(fileName: string) {
     case 'jpg':
     case 'svg':
     case 'gif':
-      return <Image className="w-4 h-4 text-purple-400" />;
+      return <ImageIcon className="w-4 h-4 text-purple-400" aria-hidden="true" />;
     default:
       return <FileIcon className="w-4 h-4 text-gray-400" />;
   }

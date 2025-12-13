@@ -8,10 +8,18 @@ export interface TrainingResult {
   message: string
 }
 
-export async function programmingRunTrainingEpoch(_samples: any[]): Promise<TrainingResult> {
+export type ProgrammingTrainingSample = Record<string, unknown>
+
+export async function programmingRunTrainingEpoch(
+  samples: ProgrammingTrainingSample[],
+): Promise<TrainingResult> {
   try {
     await loadProgrammingModelWeights()
     const interactions = getLearnedInteractions()
+
+    if (samples.length > 0) {
+      console.log(`[Programming Domain] Training with ${samples.length} samples`)
+    }
 
     const epochsCompleted = 1
     const finalLoss = 0.1 + Math.random() * 0.05

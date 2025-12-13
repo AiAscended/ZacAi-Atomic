@@ -6,23 +6,43 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { loadTypescriptLearnedData, saveTypescriptLearnedData } from "./typescript_learnedDataManager"
+import {
+  loadTypescriptLearnedData,
+  saveTypescriptLearnedData,
+  type TypescriptLearnedData,
+} from "./typescript_learnedDataManager"
 
-export async function typescriptRunTrainingEpoch(samples: any[]): Promise<{ loss: number; accuracy: number }> {
+export interface TypescriptTrainingSample {
+  input: unknown
+  output: unknown
+}
+
+export interface TypescriptTrainingMetrics {
+  loss: number
+  accuracy: number
+}
+
+const addInteraction = (
+  learned: TypescriptLearnedData,
+  sample: TypescriptTrainingSample,
+): void => {
+  learned.interactions.push({
+    input: sample.input,
+    output: sample.output,
+    timestamp: Date.now(),
+  })
+}
+
+export async function typescriptRunTrainingEpoch(
+  samples: TypescriptTrainingSample[],
+): Promise<TypescriptTrainingMetrics> {
   const learned = await loadTypescriptLearnedData()
 
-  // Update learned data with new samples
   for (const sample of samples) {
-    if (sample.input && sample.output) {
-      // Add interactions array if it doesn't exist
-      const interactions = (learned as any).interactions || []
-      interactions.push({
-        input: sample.input,
-        output: sample.output,
-        timestamp: Date.now(),
-      })
-      ;(learned as any).interactions = interactions
+    if (sample.input === undefined || sample.output === undefined) {
+      continue
     }
+    addInteraction(learned, sample)
   }
 
   await saveTypescriptLearnedData(learned)

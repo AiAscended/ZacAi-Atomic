@@ -13,13 +13,29 @@ export interface VocabularyMetadata {
   updated: string
 }
 
+const VOCAB_CATEGORY_KEYS = [
+  'special_tokens',
+  'system_tokens',
+  'common_words',
+  'ai_domain_terms',
+  'programming_terms',
+  'mathematics_terms'
+] as const
+
+type VocabularyCategoryKey = (typeof VOCAB_CATEGORY_KEYS)[number]
+type TokenCategoryMap = Record<string, number>
+type BaseVocabularyFile = { metadata: VocabularyMetadata } & Record<VocabularyCategoryKey, TokenCategoryMap>
+
+const baseVocabularyData: BaseVocabularyFile = baseVocabulary
+
 export class VocabularyManager {
   private vocabulary: Map<string, number> = new Map()
   private reverseVocabulary: Map<number, string> = new Map()
+  private maxTokenId: number = 0
   private metadata: VocabularyMetadata
   
   constructor() {
-    this.metadata = baseVocabulary.metadata
+    this.metadata = baseVocabularyData.metadata
     this.loadBaseVocabulary()
   }
   
@@ -27,24 +43,10 @@ export class VocabularyManager {
    * Load base vocabulary from JSON
    */
   private loadBaseVocabulary(): void {
-    const vocab = baseVocabulary as any
-    
-    // Load all token categories
-    const categories = [
-      'special_tokens',
-      'system_tokens',
-      'common_words',
-      'ai_domain_terms',
-      'programming_terms',
-      'mathematics_terms'
-    ]
-    
-    for (const category of categories) {
-      if (vocab[category]) {
-        for (const [token, id] of Object.entries(vocab[category])) {
-          this.vocabulary.set(token.toLowerCase(), id as number)
-          this.reverseVocabulary.set(id as number, token.toLowerCase())
-        }
+    for (const category of VOCAB_CATEGORY_KEYS) {
+      const categoryEntries = baseVocabularyData[category]
+      for (const token of Object.keys(categoryEntries)) {
+        this.registerToken(token, categoryEntries[token])
       }
     }
     
@@ -58,8 +60,7 @@ export class VocabularyManager {
     let added = 0
     for (const [token, id] of Object.entries(tokens)) {
       if (!this.vocabulary.has(token.toLowerCase())) {
-        this.vocabulary.set(token.toLowerCase(), id)
-        this.reverseVocabulary.set(id, token.toLowerCase())
+        this.registerToken(token, id)
         added++
       }
     }
@@ -100,6 +101,10 @@ export class VocabularyManager {
   public getVocabSize(): number {
     return this.vocabulary.size
   }
+
+  public getEffectiveVocabSize(): number {
+    return this.maxTokenId + 1
+  }
   
   /**
    * Get metadata
@@ -125,6 +130,15 @@ export class VocabularyManager {
       eos: this.getTokenId('<EOS>'),
       unk: this.getTokenId('<UNK>'),
       mask: this.getTokenId('<MASK>')
+    }
+  }
+
+  private registerToken(token: string, id: number): void {
+    const normalized = token.toLowerCase()
+    this.vocabulary.set(normalized, id)
+    this.reverseVocabulary.set(id, normalized)
+    if (id > this.maxTokenId) {
+      this.maxTokenId = id
     }
   }
 }

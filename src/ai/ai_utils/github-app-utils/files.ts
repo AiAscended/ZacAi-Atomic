@@ -6,6 +6,25 @@
 import { getInstallationAccessToken } from "./auth";
 import { request } from "@octokit/request";
 
+type AuthorizationHeader = {
+  authorization: string;
+};
+
+type WriteFileParams = {
+  owner: string;
+  repo: string;
+  path: string;
+  message: string;
+  content: string;
+  branch?: string;
+  sha?: string;
+  headers: AuthorizationHeader;
+};
+
+type GitHubError = {
+  status?: number;
+};
+
 /**
  * Reads the content of a file from a repo.
  */
@@ -52,7 +71,7 @@ export async function writeFile(
   const token = await getInstallationAccessToken(installationId);
   const encoded = Buffer.from(content).toString("base64");
 
-  const params: any = {
+  const params: WriteFileParams = {
     owner,
     repo,
     path,
@@ -93,8 +112,16 @@ export async function getFileSha(
     }
     
     return response.data.sha;
-  } catch (error: any) {
-    if (error.status === 404) return null;
+  } catch (error: unknown) {
+    if (isNotFoundError(error)) return null;
     throw error;
   }
+}
+
+function isNotFoundError(error: unknown): error is GitHubError {
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
+
+  return "status" in error && (error as GitHubError).status === 404;
 }

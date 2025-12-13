@@ -1,0 +1,1100 @@
+{
+  "version": "2.0.0",
+  "lastScanned": "2025-11-29T11:20:33.825Z",
+  "modules": {
+    "code-transformer": {
+      "moduleId": "code-transformer",
+      "moduleType": "model",
+      "displayName": "Code Transformer",
+      "version": "1.0.0",
+      "description": "Code Transformer model",
+      "enabled": false,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "code-transformer_data/code-seedData.json",
+        "pretrainedWeightsPath": "code-transformer_pretrained_weights/code-transformer_pretrained_info.json",
+        "inferenceEnginePath": "code-transformer_inference/code-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.760Z",
+        "discoveredAt": "2025-11-29T11:20:33.760Z"
+      }
+    },
+    "convolutional-neural-network": {
+      "moduleId": "convolutional-neural-network",
+      "moduleType": "model",
+      "displayName": "Convolutional Neural Network",
+      "version": "1.0.0",
+      "description": "Convolutional Neural Network model",
+      "enabled": false,
+      "modelType": "cnn",
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "convolutional-neural-network_data/cnn-seedData.json",
+        "pretrainedWeightsPath": "convolutional-neural-network_pretrained_weights/convolutional-neural-network_pretrained_info.json",
+        "inferenceEnginePath": "convolutional-neural-network_inference/cnn-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.764Z",
+        "discoveredAt": "2025-11-29T11:20:33.764Z"
+      }
+    },
+    "diffusion-model": {
+      "moduleId": "diffusion-model",
+      "moduleType": "model",
+      "displayName": "Diffusion Model",
+      "version": "1.0.0",
+      "description": "Diffusion Model model",
+      "enabled": false,
+      "modelType": "diffusion",
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "diffusion-model_data/diffusion-seedData.json",
+        "pretrainedWeightsPath": "diffusion-model_pretrained_weights/diffusion-model_pretrained_info.json",
+        "inferenceEnginePath": "diffusion-model_inference/diffusion-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.767Z",
+        "discoveredAt": "2025-11-29T11:20:33.767Z"
+      }
+    },
+    "generative-adversarial-network": {
+      "moduleId": "generative-adversarial-network",
+      "moduleType": "model",
+      "displayName": "Generative Adversarial Network",
+      "version": "1.0.0",
+      "description": "Generative Adversarial Network model",
+      "enabled": false,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "generative-adversarial-network_data/gan-seedData.json",
+        "pretrainedWeightsPath": "generative-adversarial-network_pretrained_weights/generative-adversarial-network_pretrained_info.json",
+        "inferenceEnginePath": "generative-adversarial-network_inference/gan-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.771Z",
+        "discoveredAt": "2025-11-29T11:20:33.771Z"
+      }
+    },
+    "graph-neural-network": {
+      "moduleId": "graph-neural-network",
+      "moduleType": "model",
+      "displayName": "Graph Neural Network",
+      "version": "1.0.0",
+      "description": "Graph Neural Network model",
+      "enabled": false,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "graph-neural-network_data/gnn-seedData.json",
+        "pretrainedWeightsPath": "graph-neural-network_pretrained_weights/graph-neural-network_pretrained_info.json",
+        "inferenceEnginePath": "graph-neural-network_inference/gnn-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.775Z",
+        "discoveredAt": "2025-11-29T11:20:33.775Z"
+      }
+    },
+    "multi-modal-fusion": {
+      "moduleId": "multi-modal-fusion",
+      "moduleType": "model",
+      "displayName": "Multi Modal Fusion",
+      "version": "1.0.0",
+      "description": "Multi Modal Fusion model",
+      "enabled": false,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "multi-modal-fusion_data/multimodal-seedData.json",
+        "pretrainedWeightsPath": "multi-modal-fusion_pretrained_weights/multi-modal-fusion_pretrained_info.json",
+        "inferenceEnginePath": "multi-modal-fusion_inference/multimodal-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.778Z",
+        "discoveredAt": "2025-11-29T11:20:33.778Z"
+      }
+    },
+    "neuro-symbolic-reasoning": {
+      "moduleId": "neuro-symbolic-reasoning",
+      "moduleType": "model",
+      "displayName": "Neuro Symbolic Reasoning",
+      "version": "1.0.0",
+      "description": "Neuro Symbolic Reasoning model",
+      "enabled": false,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "neuro-symbolic-reasoning_data/neuro-seedData.json",
+        "pretrainedWeightsPath": "neuro-symbolic-reasoning_pretrained_weights/neuro-symbolic-reasoning_pretrained_info.json",
+        "inferenceEnginePath": "neuro-symbolic-reasoning_inference/neuro-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.781Z",
+        "discoveredAt": "2025-11-29T11:20:33.781Z"
+      }
+    },
+    "recurrent-neural-network": {
+      "moduleId": "recurrent-neural-network",
+      "moduleType": "model",
+      "displayName": "Recurrent Neural Network",
+      "version": "1.0.0",
+      "description": "Recurrent Neural Network model",
+      "enabled": false,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "recurrent-neural-network_data/rnn-seedData.json",
+        "pretrainedWeightsPath": "recurrent-neural-network_pretrained_weights/recurrent-neural-network_pretrained_info.json",
+        "inferenceEnginePath": "recurrent-neural-network_inference/rnn-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.784Z",
+        "discoveredAt": "2025-11-29T11:20:33.784Z"
+      }
+    },
+    "speech-to-text": {
+      "moduleId": "speech-to-text",
+      "moduleType": "model",
+      "displayName": "Speech To Text",
+      "version": "1.0.0",
+      "description": "Speech To Text model",
+      "enabled": false,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "speech-to-text_data/stt-seedData.json",
+        "pretrainedWeightsPath": "speech-to-text_pretrained_weights/speech-to-text_pretrained_info.json",
+        "inferenceEnginePath": "speech-to-text_inference/stt-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.786Z",
+        "discoveredAt": "2025-11-29T11:20:33.786Z"
+      }
+    },
+    "text-to-speech": {
+      "moduleId": "text-to-speech",
+      "moduleType": "model",
+      "displayName": "Text To Speech",
+      "version": "1.0.0",
+      "description": "Text To Speech model",
+      "enabled": false,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "text-to-speech_data/tts-seedData.json",
+        "pretrainedWeightsPath": "text-to-speech_pretrained_weights/text-to-speech_pretrained_info.json",
+        "inferenceEnginePath": "text-to-speech_inference/tts-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.789Z",
+        "discoveredAt": "2025-11-29T11:20:33.789Z"
+      }
+    },
+    "unified-transformer-llm": {
+      "moduleId": "unified-transformer-llm",
+      "moduleType": "model",
+      "displayName": "Unified Transformer Llm",
+      "version": "1.0.0",
+      "description": "Unified Transformer Llm model",
+      "enabled": true,
+      "modelType": "llm",
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "unified-transformer-llm_data/llm-seedData.json",
+        "pretrainedWeightsPath": "unified-transformer-llm_pretrained_weights/unified-transformer-llm_pretrained_info.json",
+        "tokenizerPath": "unified-transformer-llm_model/llm-tokenizer.ts",
+        "inferenceEnginePath": "unified-transformer-llm_inference/llm-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.792Z",
+        "discoveredAt": "2025-11-29T11:20:33.792Z"
+      }
+    },
+    "vision-transformer": {
+      "moduleId": "vision-transformer",
+      "moduleType": "model",
+      "displayName": "Vision Transformer",
+      "version": "1.0.0",
+      "description": "Vision Transformer model",
+      "enabled": false,
+      "modelType": "multimodal",
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "vision-transformer_data/vit-seedData.json",
+        "pretrainedWeightsPath": "vision-transformer_pretrained_weights/vision-transformer_pretrained_info.json",
+        "inferenceEnginePath": "vision-transformer_inference/vit-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.794Z",
+        "discoveredAt": "2025-11-29T11:20:33.794Z"
+      }
+    },
+    "wavenet-audio-model": {
+      "moduleId": "wavenet-audio-model",
+      "moduleType": "model",
+      "displayName": "Wavenet Audio Model",
+      "version": "1.0.0",
+      "description": "Wavenet Audio Model model",
+      "enabled": false,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": false,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {
+        "seedDataPath": "wavenet-audio-model_data/wavenet-seedData.json",
+        "pretrainedWeightsPath": "wavenet-audio-model_pretrained_weights/wavenet-audio-model_pretrained_info.json",
+        "inferenceEnginePath": "wavenet-audio-model_inference/wavenet-inferenceEngine.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.797Z",
+        "discoveredAt": "2025-11-29T11:20:33.797Z"
+      }
+    },
+    "algorithms": {
+      "moduleId": "algorithms",
+      "moduleType": "domain",
+      "displayName": "Algorithms",
+      "version": "1.0.0",
+      "description": "Algorithms domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "algorithms_seeds/algorithms_learnedData.json",
+        "pretrainedWeightsPath": "algorithms_weights/algorithms_pretrained_weights.json",
+        "learnedDataPath": "algorithms_seeds/algorithms_learnedData.json",
+        "trainingWeightsPath": "algorithms_trainingWeights.bin",
+        "tokenizerPath": "algorithms_tokenizer.ts",
+        "inferenceEnginePath": "algorithms_inferenceController.ts",
+        "trainingPipelinePath": "algorithms_trainingController.ts",
+        "integrationAPIPath": "algorithms_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.798Z",
+        "discoveredAt": "2025-11-29T11:20:33.798Z"
+      }
+    },
+    "code_review": {
+      "moduleId": "code_review",
+      "moduleType": "domain",
+      "displayName": "Code Review",
+      "version": "1.0.0",
+      "description": "Code Review domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "code_review_seeds/code_review_learnedData.json",
+        "pretrainedWeightsPath": "code_review_weights/code_review_pretrained_weights.json",
+        "learnedDataPath": "code_review_seeds/code_review_learnedData.json",
+        "trainingWeightsPath": "code_review_trainingWeights.bin",
+        "tokenizerPath": "code_review_tokenizer.ts",
+        "inferenceEnginePath": "code_review_inferenceController.ts",
+        "trainingPipelinePath": "code_review_trainingController.ts",
+        "integrationAPIPath": "code_review_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.799Z",
+        "discoveredAt": "2025-11-29T11:20:33.799Z"
+      }
+    },
+    "data_integrity": {
+      "moduleId": "data_integrity",
+      "moduleType": "domain",
+      "displayName": "Data Integrity",
+      "version": "1.0.0",
+      "description": "Data Integrity domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "pretrainedWeightsPath": "data_integrity_weights/data_integrity_pretrained_weights.json",
+        "tokenizerPath": "data_integrity_tokenizer.ts",
+        "inferenceEnginePath": "data_integrity_inferenceController.ts",
+        "integrationAPIPath": "data_integrity_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.800Z",
+        "discoveredAt": "2025-11-29T11:20:33.800Z"
+      }
+    },
+    "data_structures": {
+      "moduleId": "data_structures",
+      "moduleType": "domain",
+      "displayName": "Data Structures",
+      "version": "1.0.0",
+      "description": "Data Structures domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "data_structures_seeds/data_structures_learnedData.json",
+        "pretrainedWeightsPath": "data_structures_weights/data_structures_pretrained_weights.json",
+        "learnedDataPath": "data_structures_seeds/data_structures_learnedData.json",
+        "trainingWeightsPath": "data_structures_trainingWeights.bin",
+        "tokenizerPath": "data_structures_tokenizer.ts",
+        "inferenceEnginePath": "data_structures_inferenceController.ts",
+        "trainingPipelinePath": "data_structures_trainingController.ts",
+        "integrationAPIPath": "data_structures_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.801Z",
+        "discoveredAt": "2025-11-29T11:20:33.801Z"
+      }
+    },
+    "documentation": {
+      "moduleId": "documentation",
+      "moduleType": "domain",
+      "displayName": "Documentation",
+      "version": "1.0.0",
+      "description": "Documentation domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "documentation_seeds/documentation_learnedData.json",
+        "pretrainedWeightsPath": "documentation_weights/documentation_pretrained_weights.json",
+        "learnedDataPath": "documentation_seeds/documentation_learnedData.json",
+        "trainingWeightsPath": "documentation_trainingWeights.bin",
+        "tokenizerPath": "documentation_tokenizer.ts",
+        "inferenceEnginePath": "documentation_inferenceController.ts",
+        "trainingPipelinePath": "documentation_trainingController.ts",
+        "integrationAPIPath": "documentation_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.802Z",
+        "discoveredAt": "2025-11-29T11:20:33.802Z"
+      }
+    },
+    "english": {
+      "moduleId": "english",
+      "moduleType": "domain",
+      "displayName": "English",
+      "version": "1.0.0",
+      "description": "English domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "english_seeds/english_learnedData.json",
+        "pretrainedWeightsPath": "english_weights/english_pretrained_weights.json",
+        "learnedDataPath": "english_seeds/english_learnedData.json",
+        "trainingWeightsPath": "english_trainingWeights.bin",
+        "tokenizerPath": "english_tokenizer.ts",
+        "inferenceEnginePath": "english_inferenceController.ts",
+        "trainingPipelinePath": "english_trainingController.ts",
+        "integrationAPIPath": "english_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.803Z",
+        "discoveredAt": "2025-11-29T11:20:33.803Z"
+      }
+    },
+    "environment": {
+      "moduleId": "environment",
+      "moduleType": "domain",
+      "displayName": "Environment",
+      "version": "1.0.0",
+      "description": "Environment domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "environment_seeds/environment_learnedData.json",
+        "pretrainedWeightsPath": "environment_weights/environment_pretrained_weights.json",
+        "learnedDataPath": "environment_seeds/environment_learnedData.json",
+        "trainingWeightsPath": "environment_trainingWeights.bin",
+        "tokenizerPath": "environment_tokenizer.ts",
+        "inferenceEnginePath": "environment_inferenceController.ts",
+        "trainingPipelinePath": "environment_trainingController.ts",
+        "integrationAPIPath": "environment_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.804Z",
+        "discoveredAt": "2025-11-29T11:20:33.804Z"
+      }
+    },
+    "error_detection": {
+      "moduleId": "error_detection",
+      "moduleType": "domain",
+      "displayName": "Error Detection",
+      "version": "1.0.0",
+      "description": "Error Detection domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "error_detection_seeds/error_detection_learnedData.json",
+        "pretrainedWeightsPath": "error_detection_weights/error_detection_pretrained_weights.json",
+        "learnedDataPath": "error_detection_seeds/error_detection_learnedData.json",
+        "trainingWeightsPath": "error_detection_trainingWeights.bin",
+        "tokenizerPath": "error_detection_tokenizer.ts",
+        "inferenceEnginePath": "error_detection_inferenceController.ts",
+        "trainingPipelinePath": "error_detection_trainingController.ts",
+        "integrationAPIPath": "error_detection_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.805Z",
+        "discoveredAt": "2025-11-29T11:20:33.805Z"
+      }
+    },
+    "general_knowledge": {
+      "moduleId": "general_knowledge",
+      "moduleType": "domain",
+      "displayName": "General Knowledge",
+      "version": "1.0.0",
+      "description": "General Knowledge domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "general_knowledge_seeds/general_knowledge_learnedData.json",
+        "pretrainedWeightsPath": "general_knowledge_weights/general_knowledge_pretrained_weights.json",
+        "learnedDataPath": "general_knowledge_seeds/general_knowledge_learnedData.json",
+        "trainingWeightsPath": "general_knowledge_trainingWeights.bin",
+        "tokenizerPath": "general_knowledge_tokenizer.ts",
+        "inferenceEnginePath": "general_knowledge_inferenceController.ts",
+        "trainingPipelinePath": "general_knowledge_trainingController.ts",
+        "integrationAPIPath": "general_knowledge_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.806Z",
+        "discoveredAt": "2025-11-29T11:20:33.806Z"
+      }
+    },
+    "grammar": {
+      "moduleId": "grammar",
+      "moduleType": "domain",
+      "displayName": "Grammar",
+      "version": "1.0.0",
+      "description": "Grammar domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "grammar_seeds/grammar_learnedData.json",
+        "pretrainedWeightsPath": "grammar_weights/grammar_pretrained_weights.json",
+        "learnedDataPath": "grammar_seeds/grammar_learnedData.json",
+        "trainingWeightsPath": "grammar_trainingWeights.bin",
+        "tokenizerPath": "grammar_tokenizer.ts",
+        "inferenceEnginePath": "grammar_inferenceController.ts",
+        "trainingPipelinePath": "grammar_trainingController.ts",
+        "integrationAPIPath": "grammar_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.811Z",
+        "discoveredAt": "2025-11-29T11:20:33.811Z"
+      }
+    },
+    "internet_search": {
+      "moduleId": "internet_search",
+      "moduleType": "domain",
+      "displayName": "Internet Search",
+      "version": "1.0.0",
+      "description": "Internet Search domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "internet_search_seeds/internet_search_learnedData.json",
+        "pretrainedWeightsPath": "internet_search_weights/internet_search_pretrained_weights.json",
+        "learnedDataPath": "internet_search_seeds/internet_search_learnedData.json",
+        "trainingWeightsPath": "internet_search_trainingWeights.bin",
+        "tokenizerPath": "internet_search_tokenizer.ts",
+        "inferenceEnginePath": "internet_search_inferenceController.ts",
+        "integrationAPIPath": "internet_search_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.812Z",
+        "discoveredAt": "2025-11-29T11:20:33.812Z"
+      }
+    },
+    "mathematics": {
+      "moduleId": "mathematics",
+      "moduleType": "domain",
+      "displayName": "Mathematics",
+      "version": "1.0.0",
+      "description": "Mathematics domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "mathematics_seeds/mathematics_learnedData.json",
+        "pretrainedWeightsPath": "mathematics_weights/mathematics_pretrained_weights.json",
+        "learnedDataPath": "mathematics_seeds/mathematics_learnedData.json",
+        "trainingWeightsPath": "mathematics_trainingWeights.bin",
+        "tokenizerPath": "mathematics_tokenizer.ts",
+        "inferenceEnginePath": "mathematics_inferenceController.ts",
+        "trainingPipelinePath": "mathematics_trainingController.ts",
+        "integrationAPIPath": "mathematics_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.813Z",
+        "discoveredAt": "2025-11-29T11:20:33.813Z"
+      }
+    },
+    "nextjs": {
+      "moduleId": "nextjs",
+      "moduleType": "domain",
+      "displayName": "Nextjs",
+      "version": "1.0.0",
+      "description": "Nextjs domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "nextjs_seeds/nextjs_learnedData.json",
+        "pretrainedWeightsPath": "nextjs_weights/nextjs_pretrained_weights.json",
+        "learnedDataPath": "nextjs_seeds/nextjs_learnedData.json",
+        "tokenizerPath": "nextjs_tokenizer.ts",
+        "inferenceEnginePath": "nextjs_inferenceController.ts",
+        "trainingPipelinePath": "nextjs_trainingController.ts",
+        "integrationAPIPath": "nextjs_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.814Z",
+        "discoveredAt": "2025-11-29T11:20:33.814Z"
+      }
+    },
+    "observability": {
+      "moduleId": "observability",
+      "moduleType": "domain",
+      "displayName": "Observability",
+      "version": "1.0.0",
+      "description": "Observability domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "pretrainedWeightsPath": "observability_weights/observability_pretrained_weights.json",
+        "tokenizerPath": "observability_tokenizer.ts",
+        "inferenceEnginePath": "observability_inferenceController.ts",
+        "integrationAPIPath": "observability_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.815Z",
+        "discoveredAt": "2025-11-29T11:20:33.815Z"
+      }
+    },
+    "programming": {
+      "moduleId": "programming",
+      "moduleType": "domain",
+      "displayName": "Programming",
+      "version": "1.0.0",
+      "description": "Programming domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "programming_seeds/programming_learnedData.json",
+        "pretrainedWeightsPath": "programming_weights/pretrained_weights.bin",
+        "learnedDataPath": "programming_seeds/programming_learnedData.json",
+        "tokenizerPath": "programming_tokenizer.ts",
+        "inferenceEnginePath": "programming_inferenceController.ts",
+        "trainingPipelinePath": "programming_trainingController.ts",
+        "integrationAPIPath": "programming_integrationAPI.ts",
+        "scriptsPath": "programming_seeds/scripts/autoPopulateSeedData.js"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.817Z",
+        "discoveredAt": "2025-11-29T11:20:33.817Z"
+      }
+    },
+    "react": {
+      "moduleId": "react",
+      "moduleType": "domain",
+      "displayName": "React",
+      "version": "1.0.0",
+      "description": "React domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "react_seeds/react_learnedData.json",
+        "pretrainedWeightsPath": "react_weights/pretrained_weights.bin",
+        "learnedDataPath": "react_seeds/react_learnedData.json",
+        "tokenizerPath": "react_tokenizer.ts",
+        "inferenceEnginePath": "react_inferenceController.ts",
+        "trainingPipelinePath": "react_trainingController.ts",
+        "integrationAPIPath": "react_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.818Z",
+        "discoveredAt": "2025-11-29T11:20:33.818Z"
+      }
+    },
+    "repair": {
+      "moduleId": "repair",
+      "moduleType": "domain",
+      "displayName": "Repair",
+      "version": "1.0.0",
+      "description": "Repair domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "pretrainedWeightsPath": "repair_weights/repair_pretrained_weights.json",
+        "tokenizerPath": "repair_tokenizer.ts",
+        "inferenceEnginePath": "repair_inferenceController.ts",
+        "integrationAPIPath": "repair_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.819Z",
+        "discoveredAt": "2025-11-29T11:20:33.819Z"
+      }
+    },
+    "science": {
+      "moduleId": "science",
+      "moduleType": "domain",
+      "displayName": "Science",
+      "version": "1.0.0",
+      "description": "Science domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "science_seeds/science_learnedData.json",
+        "pretrainedWeightsPath": "science_weights/science_pretrained_weights.json",
+        "learnedDataPath": "science_seeds/science_learnedData.json",
+        "trainingWeightsPath": "science_trainingWeights.bin",
+        "tokenizerPath": "science_tokenizer.ts",
+        "inferenceEnginePath": "science_inferenceController.ts",
+        "trainingPipelinePath": "science_trainingController.ts",
+        "integrationAPIPath": "science_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.820Z",
+        "discoveredAt": "2025-11-29T11:20:33.820Z"
+      }
+    },
+    "security": {
+      "moduleId": "security",
+      "moduleType": "domain",
+      "displayName": "Security",
+      "version": "1.0.0",
+      "description": "Security domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "security_seeds/security_learnedData.json",
+        "pretrainedWeightsPath": "security_weights/security_pretrained_weights.json",
+        "learnedDataPath": "security_seeds/security_learnedData.json",
+        "trainingWeightsPath": "security_trainingWeights.bin",
+        "tokenizerPath": "security_tokenizer.ts",
+        "inferenceEnginePath": "security_inferenceController.ts",
+        "trainingPipelinePath": "security_trainingController.ts",
+        "integrationAPIPath": "security_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.821Z",
+        "discoveredAt": "2025-11-29T11:20:33.821Z"
+      }
+    },
+    "system": {
+      "moduleId": "system",
+      "moduleType": "domain",
+      "displayName": "System",
+      "version": "1.0.0",
+      "description": "System domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "system_seeds/system_seed_metadata.json",
+        "pretrainedWeightsPath": "system_weights/system_pretrained_weights.json",
+        "tokenizerPath": "system_tokenizer.ts",
+        "inferenceEnginePath": "system_inferenceController.ts",
+        "integrationAPIPath": "system_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.821Z",
+        "discoveredAt": "2025-11-29T11:20:33.821Z"
+      }
+    },
+    "testing": {
+      "moduleId": "testing",
+      "moduleType": "domain",
+      "displayName": "Testing",
+      "version": "1.0.0",
+      "description": "Testing domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "testing_seeds/testing_learnedData.json",
+        "pretrainedWeightsPath": "testing_weights/testing_pretrained_weights.json",
+        "learnedDataPath": "testing_seeds/testing_learnedData.json",
+        "trainingWeightsPath": "testing_trainingWeights.bin",
+        "tokenizerPath": "testing_tokenizer.ts",
+        "inferenceEnginePath": "testing_inferenceController.ts",
+        "trainingPipelinePath": "testing_trainingController.ts",
+        "integrationAPIPath": "testing_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.823Z",
+        "discoveredAt": "2025-11-29T11:20:33.823Z"
+      }
+    },
+    "typescript": {
+      "moduleId": "typescript",
+      "moduleType": "domain",
+      "displayName": "Typescript",
+      "version": "1.0.0",
+      "description": "Typescript domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "typescript_seeds/typescript_learnedData.json",
+        "pretrainedWeightsPath": "typescript_weights/pretrained_weights.bin",
+        "learnedDataPath": "typescript_seeds/typescript_learnedData.json",
+        "trainingWeightsPath": "typescript_trainingWeights.bin",
+        "tokenizerPath": "typescript_tokenizer.ts",
+        "inferenceEnginePath": "typescript_inferenceController.ts",
+        "trainingPipelinePath": "typescript_trainingController.ts",
+        "integrationAPIPath": "typescript_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.824Z",
+        "discoveredAt": "2025-11-29T11:20:33.824Z"
+      }
+    },
+    "utils": {
+      "moduleId": "utils",
+      "moduleType": "domain",
+      "displayName": "Utils",
+      "version": "1.0.0",
+      "description": "Utils domain",
+      "enabled": false,
+      "structure": {
+        "hasSeedsFolder": false,
+        "hasWeightsFolder": false,
+        "hasTokenizer": false,
+        "hasInferenceEngine": false,
+        "hasTrainingPipeline": false,
+        "hasIntegrationAPI": false
+      },
+      "paths": {},
+      "metadata": {
+        "hasLearnedData": false,
+        "lastUpdated": "2025-11-29T11:20:33.824Z",
+        "discoveredAt": "2025-11-29T11:20:33.824Z"
+      }
+    },
+    "version_control": {
+      "moduleId": "version_control",
+      "moduleType": "domain",
+      "displayName": "Version Control",
+      "version": "1.0.0",
+      "description": "Version Control domain",
+      "enabled": true,
+      "structure": {
+        "hasSeedsFolder": true,
+        "hasWeightsFolder": true,
+        "hasTokenizer": true,
+        "hasInferenceEngine": true,
+        "hasTrainingPipeline": true,
+        "hasIntegrationAPI": true
+      },
+      "paths": {
+        "seedDataPath": "version_control_seeds/version_control_learnedData.json",
+        "pretrainedWeightsPath": "version_control_weights/version_control_pretrained_weights.json",
+        "learnedDataPath": "version_control_seeds/version_control_learnedData.json",
+        "trainingWeightsPath": "version_control_trainingWeights.bin",
+        "tokenizerPath": "version_control_tokenizer.ts",
+        "inferenceEnginePath": "version_control_inferenceController.ts",
+        "trainingPipelinePath": "version_control_trainingController.ts",
+        "integrationAPIPath": "version_control_integrationAPI.ts"
+      },
+      "metadata": {
+        "hasLearnedData": true,
+        "lastUpdated": "2025-11-29T11:20:33.825Z",
+        "discoveredAt": "2025-11-29T11:20:33.825Z"
+      }
+    }
+  },
+  "enabledModels": [
+    "unified-transformer-llm"
+  ],
+  "enabledDomains": [
+    "algorithms",
+    "code_review",
+    "data_integrity",
+    "data_structures",
+    "documentation",
+    "english",
+    "environment",
+    "error_detection",
+    "general_knowledge",
+    "grammar",
+    "internet_search",
+    "mathematics",
+    "nextjs",
+    "observability",
+    "programming",
+    "react",
+    "repair",
+    "science",
+    "security",
+    "system",
+    "testing",
+    "typescript",
+    "version_control"
+  ],
+  "stats": {
+    "totalModels": 13,
+    "totalDomains": 24,
+    "enabledModels": 1,
+    "enabledDomains": 23
+  }
+}

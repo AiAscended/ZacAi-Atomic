@@ -29,7 +29,24 @@
       "definition": "The order in which system blocks or tasks should be processed.",
       "example": "Core configuration has the highest priority.",
       "related": ["order", "importance"]
+    },
+    {
+      "term": "observability",
+      "definition": "Practice of instrumenting systems so engineers can understand internal state from outputs.",
+      "example": "The ObservabilityStack ingests traces, metrics, and logs for every deployment.",
+      "related": ["monitoring", "telemetry", "logging"]
+    },
+    {
+      "term": "feature flag",
+      "definition": "A runtime switch that enables or disables functionality without redeploying.",
+      "example": "FeatureFlagService controls beta inference paths via feature flags.",
+      "related": ["toggle", "control", "experiment"]
+    },
+    {
+      "term": "deployment target",
+      "definition": "An environment-region pair with allocated compute resources for the platform.",
+      "example": "The edge deployment target runs in ap-southeast-2 with 16 CPUs.",
+      "related": ["environment", "cluster", "infrastructure"]
     }
-    // Add up to 36 system-specific terms; if more, create system_vocabulary2.json, etc.
   ]
 }

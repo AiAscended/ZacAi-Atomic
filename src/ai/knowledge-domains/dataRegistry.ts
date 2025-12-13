@@ -66,8 +66,8 @@ export function updateFile(domain: string, filePath: string, content: string): b
 
     publish("data:changed", { domain, file: filePath, action: "updated", timestamp: now })
     return true
-  } catch (e) {
-    publish("data:error", { domain, file: filePath, error: e })
+  } catch (error) {
+    publish("data:error", { domain, file: filePath, error })
     return false
   }
 }
@@ -83,7 +83,8 @@ export function readFile(filePath: string, domain?: string): string | null {
       return content
     }
     return null
-  } catch (e) {
+  } catch (error) {
+    publish("data:error", { domain, file: filePath, error })
     return null
   }
 }
@@ -97,7 +98,7 @@ export function watchDomainFiles(domain: string): boolean {
   return false
 }
 
-export default {
+const dataRegistry = {
   registerDomainFiles,
   listDomainFiles,
   getFileRecord,
@@ -105,3 +106,5 @@ export default {
   readFile,
   watchDomainFiles,
 }
+
+export default dataRegistry
