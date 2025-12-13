@@ -1,0 +1,185 @@
+# Data Integrity Domain Instructions
+# Purpose: Guard data fidelity across ingestion, processing, and storage layers
+
+domain:
+  id: data_integrity
+  name: Data Integrity
+  version: "1.2.0"
+  description: "Monitors checksums, lineage, validation contracts, and compliance with governance rules"
+
+role:
+  primary: "Specialized knowledge inference for data integrity"
+  scope: "Detect, explain, and remediate data corruption or drift"
+  orchestration_behavior: "Auto-joins plans when pipelines or state sync operations are in play"
+
+capabilities:
+  - "Define validation rulesets (schema, statistical, semantic)"
+  - "Recommend redundancy and reconciliation strategies"
+  - "Trace lineage and highlight breakpoints"
+  - "Interact with governance checklists and admin overrides"
+  - "Route critical incidents to observability/security domains"
+
+seeds:
+  location: "./data_integrity_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./data_integrity_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./data_integrity_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  checksum_auditor:
+    enabled: true
+    capabilities:
+      - "Compute and compare hashes"
+      - "Spot incremental corruption"
+  schema_profiler:
+    enabled: true
+    capabilities:
+      - "Inspect schema evolution"
+      - "Flag nullability drift"
+  lineage_tracker:
+    enabled: true
+    capabilities:
+      - "Map source → sink chains"
+      - "Pinpoint missing hops"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Great Expectations"
+        url: "https://greatexpectations.io"
+        use_for: ["validation patterns"]
+      - name: "dbt Docs"
+        url: "https://docs.getdbt.com"
+        use_for: ["model lineage"]
+      - name: "Data Fold"
+        url: "https://datafold.com/blog"
+        use_for: ["diffing"]
+      - name: "Delta Lake"
+        url: "https://docs.delta.io"
+        use_for: ["storage guarantees"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Great Expectations"
+      url: "https://greatexpectations.io"
+      use_for: ["rule sets"]
+    - name: "dbt Docs"
+      url: "https://docs.getdbt.com"
+      use_for: ["lineage"]
+    - name: "Delta Lake"
+      url: "https://docs.delta.io"
+      use_for: ["storage"]
+  reference_triggers:
+    - "Regulatory or compliance references"
+    - "Claims about ACID/transactional guarantees"
+    - "Need for validated checksum algorithms"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.83
+    max_tokens: 720
+    temperature: 0.4
+    top_p: 0.9
+    require_validation_plan: true
+  input_processing:
+    - "Identify data domain (finance, telemetry, ML, etc.)"
+    - "Capture SLA/SLO requirements"
+    - "Detect upstream/downstream dependencies"
+  reasoning_steps:
+    - "Assess current validation coverage"
+    - "Recommend guardrails (checksums, constraints, anomaly detection)"
+    - "Link to governance policies"
+  output_formatting:
+    - "Provide incident summary, root cause hypotheses, and remediation steps"
+    - "Include recommended monitoring hooks"
+  validation:
+    - "Ensure suggested controls map to actual tooling"
+    - "Double-check calculations for tolerance bands"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.00055
+  batch_size: 38
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Seeded incident reports"
+    - "Governance playbooks"
+    - "Observability alerts"
+  focus_areas:
+    - "Lineage explanation clarity"
+    - "Anomaly differentiation"
+    - "Admin override responsiveness"
+  evaluation_metrics:
+    - "False positive rate"
+    - "Remediation completeness"
+    - "Admin satisfaction"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Ingest schema metadata"
+    - "Collect recent incident context"
+  processing:
+    - "Simulate validations"
+    - "Run lineage_tracker for breakpoints"
+  postprocessing:
+    - "Emit remediation checklist"
+    - "Propose monitoring/alert updates"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Missing lineage info"
+      action: "Request dbt manifest or admin input"
+    - error: "Tool unavailable"
+      action: "Fallback to manual reasoning and flag admin"
+    - error: "Conflicting SLAs"
+      action: "Create trade-off matrix and ask for priority"
+  recovery_strategies:
+    - "Escalate to observability domain for metrics-based validation"
+    - "Escalate to security when tampering suspected"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.checksum_auditor.enabled"
+    - "tools.schema_profiler.enabled"
+    - "tools.lineage_tracker.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/data-integrity"
+    checksum_toggle: "tools.checksum_auditor.enabled"
+    schema_toggle: "tools.schema_profiler.enabled"
+    lineage_toggle: "tools.lineage_tracker.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"

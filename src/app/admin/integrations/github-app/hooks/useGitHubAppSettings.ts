@@ -5,7 +5,7 @@
  * React hook for managing GitHub App settings in the admin UI.
  */
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 
 export interface GitHubAppSettings {
   appId: string
@@ -22,7 +22,12 @@ export function useGitHubAppSettings() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function fetchSettings() {
+  const toMessage = (error: unknown) => {
+    if (error instanceof Error) return error.message
+    return typeof error === "string" ? error : "Unknown error"
+  }
+
+  const fetchSettings = useCallback(async () => {
     setLoading(true)
     setError(null)
 
@@ -31,12 +36,12 @@ export function useGitHubAppSettings() {
       if (!res.ok) throw new Error("Failed to load settings")
       const data = await res.json()
       setSettings(data)
-    } catch (e: any) {
-      setError(e.message)
+    } catch (error) {
+      setError(toMessage(error))
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   async function updateSettings(newSettings: GitHubAppSettings) {
     setLoading(true)
@@ -51,8 +56,8 @@ export function useGitHubAppSettings() {
       if (!res.ok) throw new Error("Failed to update settings")
       const data = await res.json()
       setSettings(data)
-    } catch (e: any) {
-      setError(e.message)
+    } catch (error) {
+      setError(toMessage(error))
     } finally {
       setLoading(false)
     }
@@ -60,7 +65,7 @@ export function useGitHubAppSettings() {
 
   useEffect(() => {
     fetchSettings()
-  }, [])
+  }, [fetchSettings])
 
   return { settings, loading, error, updateSettings }
 }

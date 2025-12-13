@@ -6,15 +6,29 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-export function loadTypescriptModelWeights(
-  _path = "/src/ai/knowledge-domains/typescript/typescript_weights/typescript_trainingWeights.bin",
-): ArrayBuffer | null {
+import { storageAdapter } from "../storageAdapter"
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
+
+const typescriptWeightsManager = createDomainWeightsManager({
+  domainName: "typescript",
+})
+
+export async function loadTypescriptModelWeights(): Promise<ArrayBuffer | null> {
   try {
-    // In production, this would load actual binary weights
-    // For MVP, return null to indicate no weights loaded yet
-    return null
+    const filename = await typescriptWeightsManager.resolveActiveWeightFile()
+    const fullPath = `${typescriptWeightsManager.storageBasePath}/${filename}`
+    console.debug(`[TypeScript] Loading model weights from ${fullPath}`)
+    return await storageAdapter.readBinaryFile(fullPath)
   } catch (error) {
     console.error("[TypeScript] Failed to load model weights:", error)
     return null
   }
+}
+
+export const primeTypescriptWeights = async (): Promise<string | null> => {
+  return typescriptWeightsManager.prime()
+}
+
+export const getTypescriptActiveWeightArtifact = () => {
+  return typescriptWeightsManager.getActiveWeightArtifact()
 }

@@ -3,7 +3,6 @@
  * Manages training loop, batching, and backpropagation
  */
 
-import { LLMModelConfig } from '../llm-config/llm-modelConfig';
 import { batchCrossEntropyLoss } from './llm-lossFunction';
 
 export interface TrainingConfig {

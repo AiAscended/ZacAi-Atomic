@@ -3,8 +3,6 @@
  * Handles shell-like commands in the browser
  */
 
-import { VirtualFileSystem } from './virtualFileSystem';
-
 export interface CommandResult {
   output: string;
   exitCode: number;
@@ -12,9 +10,29 @@ export interface CommandResult {
 }
 
 export interface CommandContext {
-  fs: VirtualFileSystem;
+  fs: CommandFileSystem;
   currentPath: string;
   environment: Record<string, string>;
+}
+
+export interface CommandFileSystemEntry {
+  name: string;
+  path: string;
+  type: 'file' | 'directory';
+  metadata?: {
+    size?: number;
+    modified?: number;
+  };
+}
+
+export interface CommandFileSystem {
+  read(path: string): Promise<string>;
+  write(path: string, content: string): Promise<void>;
+  mkdir(path: string): Promise<void>;
+  delete(path: string): Promise<void>;
+  list(path: string): Promise<CommandFileSystemEntry[]>;
+  exists(path: string): Promise<boolean>;
+  search(query: string): Promise<CommandFileSystemEntry[]>;
 }
 
 export class CommandProcessor {
@@ -22,7 +40,7 @@ export class CommandProcessor {
   private commandHistory: string[] = [];
   private historyIndex = -1;
 
-  constructor(fs: VirtualFileSystem) {
+  constructor(fs: CommandFileSystem) {
     this.context = {
       fs,
       currentPath: '/',
@@ -136,14 +154,17 @@ export class CommandProcessor {
 
     try {
       const items = await this.context.fs.list(resolvedPath);
+      const visibleItems = showAll
+        ? items
+        : items.filter((item) => !item.name.startsWith('.'));
       
-      if (items.length === 0) {
+      if (visibleItems.length === 0) {
         return { output: '', exitCode: 0 };
       }
 
       let output = '';
       if (longFormat) {
-        for (const item of items) {
+        for (const item of visibleItems) {
           const type = item.type === 'directory' ? 'd' : '-';
           const perms = 'rwxr-xr-x';
           const size = item.metadata?.size || 0;
@@ -153,7 +174,7 @@ export class CommandProcessor {
           output += `${type}${perms} 1 zacai zacai ${size.toString().padStart(8)} ${date} ${item.name}\n`;
         }
       } else {
-        output = items.map((item) => item.name).join('  ') + '\n';
+        output = visibleItems.map((item) => item.name).join('  ') + '\n';
       }
 
       return { output, exitCode: 0 };
@@ -225,7 +246,7 @@ export class CommandProcessor {
       try {
         const content = await this.context.fs.read(path);
         output += content + '\n';
-      } catch (error) {
+      } catch {
         output += `cat: ${arg}: No such file or directory\n`;
       }
     }
@@ -302,6 +323,23 @@ export class CommandProcessor {
     for (const file of files) {
       const path = this.resolvePath(file);
       try {
+        if (!recursive) {
+          const parentPath = path.split('/').slice(0, -1).join('/') || '/';
+          try {
+            const siblings = await this.context.fs.list(parentPath);
+            const target = siblings.find((entry) => entry.path === path);
+            if (target?.type === 'directory') {
+              return {
+                output: `rm: cannot remove '${file}': Is a directory\n`,
+                exitCode: 1,
+                error: 'Is a directory',
+              };
+            }
+          } catch {
+            // Ignore parent listing errors and attempt deletion
+          }
+        }
+
         await this.context.fs.delete(path);
       } catch (error) {
         return {
@@ -357,7 +395,7 @@ For more information, type: man <command>
     const path = args[0] || this.context.currentPath;
     const resolvedPath = this.resolvePath(path);
 
-    const buildTree = async (dirPath: string, prefix = '', isLast = true): Promise<string> => {
+    const buildTree = async (dirPath: string, prefix = ''): Promise<string> => {
       let output = '';
       try {
         const items = await this.context.fs.list(dirPath);
@@ -377,10 +415,10 @@ For more information, type: man <command>
 
           if (item.type === 'directory') {
             const newPrefix = prefix + (isLastItem ? '    ' : '│   ');
-            output += await buildTree(item.path, newPrefix, isLastItem);
+            output += await buildTree(item.path, newPrefix);
           }
         }
-      } catch (error) {
+      } catch {
         // Silently ignore errors in subdirectories
       }
       return output;

@@ -29,106 +29,135 @@ export class ResponseSynthesizer {
     domainOutputs: Array<{ domain: string; result: string }>
     originalPrompt: string
   }): SynthesizedResponse {
-    const { llmOutput, domainOutputs, originalPrompt } = inputs;
-    
-    // Filter out empty or low-quality domain results
-    const validDomainOutputs = domainOutputs.filter(
-      d => d.result && d.result.trim().length > 0 && !d.result.includes('[object Object]')
-    );
-    
-    // Strategy 1: If we have high-quality domain results, prioritize them
-    if (validDomainOutputs.length > 0) {
-      // Check if domain results are substantial (not just echoes)
-      const substantialResults = validDomainOutputs.filter(
-        d => d.result.length > 50 && !d.result.includes('Processing query:')
-      );
-      
-      if (substantialResults.length > 0) {
-        // Use domain-specific knowledge
-        const domainText = substantialResults
-          .map(d => this.formatDomainResult(d))
-          .join('\n\n');
-        
-        // Optionally prepend LLM context if it adds value
-        const finalText = llmOutput && llmOutput.length > 20
-          ? `${llmOutput}\n\n**Domain-Specific Knowledge:**\n${domainText}`
-          : domainText;
-        
-        return {
-          text: finalText,
-          confidence: 0.85, // High confidence with domain expertise
-          sources: substantialResults.map(d => d.domain),
-          metadata: {
-            combinedDomains: substantialResults.map(d => d.domain),
-            responseLength: finalText.length,
-          },
-        };
+    const { llmOutput, domainOutputs, originalPrompt } = inputs
+    const trimmedLlm = llmOutput?.trim() ?? ""
+    const insights = this.buildDomainInsights(domainOutputs)
+
+    const mergedResponse = this.composeNarrative(trimmedLlm, insights)
+    if (mergedResponse) {
+      const sources = insights.map((insight) => insight.domain)
+      return {
+        text: mergedResponse,
+        confidence: this.estimateConfidence(Boolean(trimmedLlm), insights.length),
+        sources,
+        metadata: {
+          combinedDomains: sources,
+          responseLength: mergedResponse.length,
+        },
       }
     }
-    
-    // Strategy 2: Use LLM output as primary if available
-    if (llmOutput && llmOutput.trim().length > 0) {
-      // Add domain context if available
-      const domainContext = validDomainOutputs.length > 0
-        ? `\n\n*Based on ${validDomainOutputs.map(d => d.domain).join(', ')} knowledge*`
-        : '';
-      
+
+    if (trimmedLlm) {
       return {
-        text: llmOutput + domainContext,
-        confidence: validDomainOutputs.length > 0 ? 0.75 : 0.6,
-        sources: validDomainOutputs.map(d => d.domain),
+        text: trimmedLlm,
+        confidence: this.estimateConfidence(true, 0),
+        sources: [],
         metadata: {
-          combinedDomains: validDomainOutputs.map(d => d.domain),
-          responseLength: llmOutput.length,
+          combinedDomains: [],
+          responseLength: trimmedLlm.length,
         },
-      };
+      }
     }
-    
-    // Strategy 3: Fallback to basic response with helpful message
-    console.warn("[ResponseSynthesizer] No valid LLM or domain outputs, using fallback");
-    const fallbackText = `I understand you're asking about: "${originalPrompt}". 
 
-I'm processing your request, but the AI models are still being trained. Here's what I can tell you:
-
-- The system identified ${domainOutputs.length} relevant knowledge domain(s)
-- Your query has been processed and logged for training
-- More detailed responses will be available as the models improve
-
-Please try again with a different question, or check back later as the system continues learning.`;
-    
+    const fallbackText = this.buildFallbackResponse(originalPrompt, domainOutputs)
     return {
       text: fallbackText,
-      confidence: 0.3,
-      sources: domainOutputs.map(d => d.domain),
+      confidence: 0.35,
+      sources: domainOutputs.map((d) => d.domain),
       metadata: {
-        combinedDomains: domainOutputs.map(d => d.domain),
+        combinedDomains: domainOutputs.map((d) => d.domain),
         responseLength: fallbackText.length,
       },
-    };
-  }
-  
-  /**
-   * Format a single domain result for display
-   */
-  private formatDomainResult(domainOutput: { domain: string; result: string }): string {
-    const domainName = this.formatDomainName(domainOutput.domain);
-    
-    // If result already includes formatting, use as-is
-    if (domainOutput.result.includes('\n') || domainOutput.result.length > 200) {
-      return `**${domainName}:**\n${domainOutput.result}`;
     }
-    
-    // Otherwise, simple format
-    return `**${domainName}:** ${domainOutput.result}`;
   }
-  
-  /**
-   * Format domain name for display
-   */
+
+  private buildDomainInsights(domainOutputs: Array<{ domain: string; result: string }>): DomainInsight[] {
+    return domainOutputs
+      .map(({ domain, result }) => {
+        const cleaned = this.stripBoilerplate(result)
+        if (!cleaned) {
+          return null
+        }
+        return {
+          domain,
+          summary: this.extractSummary(cleaned),
+          detail: cleaned,
+        }
+      })
+      .filter(Boolean) as DomainInsight[]
+  }
+
+  private composeNarrative(llmOutput: string, insights: DomainInsight[]): string {
+    const sections: string[] = []
+
+    if (llmOutput.length > 0) {
+      sections.push(llmOutput)
+    }
+
+    if (insights.length > 0) {
+      const highlights = insights
+        .map((insight) => `- **${this.formatDomainName(insight.domain)}:** ${insight.summary}`)
+        .join("\n")
+      sections.push(`Key findings:\n${highlights}`)
+
+      const detailedInsights = insights
+        .filter((insight) => insight.detail && insight.detail !== insight.summary)
+        .map((insight) => `**${this.formatDomainName(insight.domain)} details:**\n${insight.detail}`)
+
+      if (detailedInsights.length > 0) {
+        sections.push(detailedInsights.join("\n\n"))
+      }
+    }
+
+    return sections.join("\n\n").trim()
+  }
+
+  private stripBoilerplate(text: string): string {
+    if (!text) {
+      return ""
+    }
+
+    return text
+      .replace(/Processing query:[^\n]*\n?/gi, "")
+      .replace(/Domain response:?/gi, "")
+      .replace(/\*{2}?Domain.*?\*{2}?/gi, "")
+      .trim()
+  }
+
+  private extractSummary(text: string): string {
+    const sentences = text.split(/(?<=[.!?])\s+/)
+    const primary = sentences.find((sentence) => sentence && sentence.length > 25)
+    return (primary ?? sentences[0] ?? text).trim()
+  }
+
+  private estimateConfidence(hasLlm: boolean, insightCount: number): number {
+    const base = 0.55
+    const llmBoost = hasLlm ? 0.15 : 0
+    const insightBoost = Math.min(0.3, insightCount * 0.08)
+    return Math.min(0.95, base + llmBoost + insightBoost)
+  }
+
+  private buildFallbackResponse(
+    originalPrompt: string,
+    domainOutputs: Array<{ domain: string; result: string }>,
+  ): string {
+    const attemptedDomains = domainOutputs.length
+      ? domainOutputs.map((d) => this.formatDomainName(d.domain)).join(", ")
+      : "the available knowledge domains"
+
+    return `I couldn't produce a complete answer for "${originalPrompt}" yet. The system attempted to consult ${attemptedDomains}, but none of the engines returned usable data. Please rephrase the question with more context or try again in a moment while the models refresh.`
+  }
+
   private formatDomainName(domain: string): string {
     return domain
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ")
   }
+}
+
+type DomainInsight = {
+  domain: string
+  summary: string
+  detail: string
 }

@@ -63,7 +63,6 @@ export default function EnhancedHomePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(true);
   const [aiReady, setAiReady] = useState(false);
   const [systemStatus, setSystemStatus] = useState('Initializing AI system...');
   const [sessionId, setSessionId] = useState('');
@@ -92,9 +91,14 @@ export default function EnhancedHomePage() {
   }, [input, resizeInput]);
 
   useEffect(() => {
+    if (aiReady && !isLoading) {
+      inputRef.current?.focus();
+    }
+  }, [aiReady, isLoading]);
+
+  useEffect(() => {
     async function initializeSession() {
       setSystemStatus('Connecting to AI system...');
-      setIsInitializing(true);
       try {
         const res = await fetch('/api/chat', {
           method: 'POST',
@@ -108,8 +112,6 @@ export default function EnhancedHomePage() {
         setSystemStatus('AI system ready');
       } catch {
         setSystemStatus('Failed to initialize AI system');
-      } finally {
-        setIsInitializing(false);
       }
     }
     initializeSession();
@@ -134,8 +136,9 @@ export default function EnhancedHomePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: 'chat',
           sessionId,
-          prompt: finalPrompt,
+          message: finalPrompt,
         }),
       });
 
@@ -247,7 +250,7 @@ export default function EnhancedHomePage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask me anything about React, Next.js, TypeScript, programming..."
-                disabled={!aiReady || isLoading}
+                disabled={!aiReady}
                 className="flex-1 resize-none rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent p-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
                 rows={3}
                 onInput={resizeInput}
@@ -382,7 +385,7 @@ export default function EnhancedHomePage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me anything..."
-              disabled={!aiReady || isLoading}
+              disabled={!aiReady}
               className="flex-1 resize-none rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
               rows={1}
               onInput={resizeInput}

@@ -11,6 +11,14 @@ import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 interface SystemMetrics {
   timestamp: string;
@@ -45,24 +53,49 @@ interface HealthStatus {
   recommendations: string[];
 }
 
+interface DomainMetricRow {
+  domain: string;
+  inferenceCount: number;
+  averageConfidence: number;
+  averageLatency: number;
+  successRate: number;
+  lastUsed: string;
+}
+
+interface ModelMetricRow {
+  model: string;
+  inferenceCount: number;
+  averageLatency: number;
+  tokensGenerated: number;
+  successRate: number;
+}
+
 export default function MetricsDashboard() {
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
   const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [domainMetrics, setDomainMetrics] = useState<DomainMetricRow[]>([]);
+  const [modelMetrics, setModelMetrics] = useState<ModelMetricRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   const fetchMetrics = async () => {
     try {
-      const [metricsRes, healthRes] = await Promise.all([
+      const [metricsRes, healthRes, domainsRes, modelsRes] = await Promise.all([
         fetch('/api/admin/metrics?type=system'),
         fetch('/api/admin/metrics?type=health'),
+        fetch('/api/admin/metrics?type=domains'),
+        fetch('/api/admin/metrics?type=models'),
       ]);
 
       const metricsData = await metricsRes.json();
       const healthData = await healthRes.json();
+      const domainsData = await domainsRes.json();
+      const modelsData = await modelsRes.json();
 
       if (metricsData.success) setMetrics(metricsData.data);
       if (healthData.success) setHealth(healthData.data);
+      if (domainsData.success) setDomainMetrics(domainsData.data);
+      if (modelsData.success) setModelMetrics(modelsData.data);
     } catch (error) {
       console.error('Failed to fetch metrics:', error);
     } finally {
@@ -102,6 +135,16 @@ export default function MetricsDashboard() {
   const formatBytes = (bytes: number) => {
     return (bytes / (1024 ** 3)).toFixed(2) + ' GB';
   };
+
+  const getSuccessBadgeClass = (rate: number) => {
+    if (rate >= 90) return 'bg-green-100 text-green-700';
+    if (rate >= 70) return 'bg-yellow-100 text-yellow-700';
+    return 'bg-red-100 text-red-700';
+  };
+
+  const formatPercent = (value: number, precision: number = 1) => `${value.toFixed(precision)}%`;
+
+  const formatLatency = (value: number) => `${value.toFixed(0)}ms`;
 
   return (
     <div className="p-8 space-y-6">
@@ -278,6 +321,96 @@ export default function MetricsDashboard() {
               </div>
             </CardContent>
           </Card>
+
+          {domainMetrics.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Domain Inference Metrics</CardTitle>
+                  <Badge variant="outline">
+                    {domainMetrics.length} active domain{domainMetrics.length === 1 ? '' : 's'}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Domain</TableHead>
+                        <TableHead className="text-right">Inferences</TableHead>
+                        <TableHead className="text-right">Avg Confidence</TableHead>
+                        <TableHead className="text-right">Avg Latency</TableHead>
+                        <TableHead className="text-right">Success Rate</TableHead>
+                        <TableHead className="text-right">Last Used</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {domainMetrics.map((domain) => (
+                        <TableRow key={domain.domain}>
+                          <TableCell className="font-medium capitalize">{domain.domain.replace(/_/g, ' ')}</TableCell>
+                          <TableCell className="text-right">{domain.inferenceCount}</TableCell>
+                          <TableCell className="text-right">{formatPercent(domain.averageConfidence * 100)}</TableCell>
+                          <TableCell className="text-right">{formatLatency(domain.averageLatency)}</TableCell>
+                          <TableCell className="text-right">
+                            <Badge className={getSuccessBadgeClass(domain.successRate)}>
+                              {formatPercent(domain.successRate)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right text-xs text-gray-500">
+                            {new Date(domain.lastUsed).toLocaleTimeString()}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {modelMetrics.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Model Performance</CardTitle>
+                  <Badge variant="outline">
+                    {modelMetrics.length} model{modelMetrics.length === 1 ? '' : 's'} tracked
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Model</TableHead>
+                        <TableHead className="text-right">Inferences</TableHead>
+                        <TableHead className="text-right">Tokens Generated</TableHead>
+                        <TableHead className="text-right">Avg Latency</TableHead>
+                        <TableHead className="text-right">Success Rate</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {modelMetrics.map((model) => (
+                        <TableRow key={model.model}>
+                          <TableCell className="font-medium capitalize">{model.model.replace(/_/g, ' ')}</TableCell>
+                          <TableCell className="text-right">{model.inferenceCount}</TableCell>
+                          <TableCell className="text-right">{model.tokensGenerated.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">{formatLatency(model.averageLatency)}</TableCell>
+                          <TableCell className="text-right">
+                            <Badge className={getSuccessBadgeClass(model.successRate)}>
+                              {formatPercent(model.successRate)}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
     </div>

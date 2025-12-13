@@ -2,10 +2,12 @@
  * Neuro-symbolic-reasoning - Inference Engine
  */
 
+import type { InferenceContext, ModelPayload } from "../../shared/modelTypes"
+
 export class NEUROInferenceEngine {
-  predict(input: any): any {
-    return input;
+  predict(input: ModelPayload, context: InferenceContext = {}): ModelPayload {
+    return { ...context, ...input }
   }
 }
 
-export default NEUROInferenceEngine;
+export default NEUROInferenceEngine

@@ -35,4 +35,6 @@ export const getScienceTokenById = (id: number): string | undefined => {
 
 export const scienceTokenCount = () => scienceTokenMap.size
 
-export default { scienceTokenMap, getScienceTokenId, getScienceTokenById, scienceTokenCount }
+const scienceTokenApi = { scienceTokenMap, getScienceTokenId, getScienceTokenById, scienceTokenCount }
+
+export default scienceTokenApi

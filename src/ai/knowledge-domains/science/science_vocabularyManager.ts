@@ -13,7 +13,8 @@ export const loadScienceSeedVocabulary = async (path = "/src/ai/knowledge-domain
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { concepts: [] }) as { concepts: string[] }
-  } catch (e) {
+  } catch (error) {
+    console.warn("[science] Failed to load seed vocabulary:", error)
     return { concepts: [] }
   }
 }

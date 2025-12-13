@@ -1,0 +1,184 @@
+# Science Domain Instructions
+# Purpose: Provide multidisciplinary scientific reasoning with proper sourcing and tooling
+
+domain:
+  id: science
+  name: Science
+  version: "1.1.0"
+  description: "Covers physics, chemistry, biology, earth science, and emerging research topics"
+
+role:
+  primary: "Specialized knowledge inference for science"
+  scope: "Scientific explanations, experiment design, data interpretation"
+  orchestration_behavior: "Modular plug-in enabling rigorous, citation-backed responses"
+
+capabilities:
+  - "Summarize peer-reviewed research"
+  - "Design experiments with control/variable separation"
+  - "Explain equations, units, and dimensional analysis"
+  - "Provide safety and ethics guidance for lab scenarios"
+  - "Synchronize authoritative source lists with admin settings"
+
+seeds:
+  location: "./science_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./science_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./science_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  scientific_calculator:
+    enabled: true
+    capabilities:
+      - "Unit conversions"
+      - "Constants lookup"
+      - "Statistical analysis"
+  literature_recommender:
+    enabled: true
+    capabilities:
+      - "Retrieve DOI metadata"
+      - "Suggest related publications"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "PubMed"
+        url: "https://pubmed.ncbi.nlm.nih.gov"
+        use_for: ["biomedical", "clinical"]
+      - name: "arXiv"
+        url: "https://arxiv.org"
+        use_for: ["physics", "computer science", "math"]
+      - name: "NASA ADS"
+        url: "https://ui.adsabs.harvard.edu"
+        use_for: ["astronomy", "astrophysics"]
+      - name: "USGS"
+        url: "https://www.usgs.gov"
+        use_for: ["earth sciences"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "PubMed"
+      url: "https://pubmed.ncbi.nlm.nih.gov"
+      use_for: ["peer-reviewed medicine"]
+    - name: "arXiv"
+      url: "https://arxiv.org"
+      use_for: ["preprints", "physics"]
+    - name: "NASA ADS"
+      url: "https://ui.adsabs.harvard.edu"
+      use_for: ["space science"]
+  reference_triggers:
+    - "Claims referencing published research"
+    - "Need DOI or citation"
+    - "User requests latest study or dataset"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.8
+    max_tokens: 750
+    temperature: 0.45
+    top_p: 0.85
+    require_citations: true
+  input_processing:
+    - "Identify field (physics, biology, chemistry, etc.)"
+    - "Detect whether explanation, calculation, or experimental design"
+    - "Confirm safety requirements"
+  reasoning_steps:
+    - "Gather known formulas or laws"
+    - "Check for empirical data"
+    - "Validate assumptions"
+    - "Plan answer structure (theory → evidence → application)"
+  output_formatting:
+    - "Provide citations with title + DOI/URL"
+    - "Include units and constants"
+    - "Highlight uncertainties"
+  validation:
+    - "Ensure calculations consistent with units"
+    - "Avoid overclaiming beyond evidence"
+    - "Respect safety and ethics"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.0007
+  batch_size: 48
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Curated research summaries"
+    - "Lab procedure templates"
+    - "Scientific calculators outputs"
+  focus_areas:
+    - "Accuracy of physical constants"
+    - "Experimental reproducibility"
+    - "Bias mitigation"
+  evaluation_metrics:
+    - "Citation accuracy"
+    - "Dimensional correctness"
+    - "User-rated clarity"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Parse units and convert to SI as baseline"
+    - "Identify requested output format (explanation, table, formula)"
+  processing:
+    - "Apply domain-specific equations"
+    - "Consult seeds for canonical values"
+    - "Invoke calculator when necessary"
+  postprocessing:
+    - "Generate citation list"
+    - "Summarize key points"
+    - "Flag if additional lab verification required"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Unit mismatch"
+      action: "Convert units and re-evaluate"
+    - error: "Insufficient data"
+      action: "Request missing parameters or reference"
+    - error: "Safety concern"
+      action: "Advise lab protocol consultation"
+  recovery_strategies:
+    - "Route to general_knowledge for lay explanation"
+    - "Escalate to admin if conflicting data detected"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+    - "tools.scientific_calculator.enabled"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/science"
+    url_sources: "tools.url_lookup.sources"
+    primary_lookup_sources: "url_lookup_config.primary_sources"
+    calculator_toggle: "tools.scientific_calculator.enabled"
+    inference_knobs: "inference.parameters"
+    seed_directory: "seeds.location"
+    weight_directory: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"
+      - "tools.url_lookup.sources"

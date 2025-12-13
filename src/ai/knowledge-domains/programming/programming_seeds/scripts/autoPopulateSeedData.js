@@ -1,11 +1,15 @@
-const fs = require('fs');
-const path = require('path');
-const axios = require('axios');
-const cheerio = require('cheerio');
-const Ajv = require('ajv');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import axios from 'axios';
+import * as cheerio from 'cheerio';
+import Ajv from 'ajv';
 
-const schemaTemplate = require('../lib/schema');
-const schemaValidation = require('../lib/schema.validation.json');
+import schemaTemplate from '../lib/schema.js';
+import schemaValidation from '../lib/schema.validation.json' assert { type: 'json' };
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const TEST_MODE = process.env.TEST_MODE === 'true';
 const TEST_LIMIT = 5;
@@ -103,7 +107,8 @@ function loadAllStructures() {
   const all = {};
   for (const file of seedFiles) {
     console.log("Loading structure:", file);
-    const structure = require(path.join(seedDir, file));
+    const filePath = path.join(seedDir, file);
+    const structure = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     Object.assign(all, structure);
   }
   return all;
@@ -162,7 +167,7 @@ async function scrapeDocs(lang, folder, concept) {
 
       // Generate tags from concept/lang/folder
       tags = [concept, lang, folder];
-    } catch (e) {
+    } catch (error) {
       description = null;
       usage = null;
       examples = [];
@@ -170,7 +175,7 @@ async function scrapeDocs(lang, folder, concept) {
       security_notes = [];
       instructions = [];
       tags = [];
-      console.error(`Failed to scrape ${lang}/${folder}/${concept}: ${url}`);
+      console.error(`Failed to scrape ${lang}/${folder}/${concept}: ${url}`, error);
     }
   }
   return { description, usage, examples, url, performance_notes, security_notes, instructions, tags };

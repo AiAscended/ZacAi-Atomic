@@ -11,7 +11,33 @@
  * - LLM Tokenizer: Get full context for unknown tokens
  */
 
-import { seedRegistry, SeedEntry } from './seedRegistry';
+import { seedRegistry, SeedEntry, SeedRawEntry } from './seedRegistry';
+
+type ExampleSource = SeedRawEntry['examples'] | SeedRawEntry['example'];
+
+function normalizeExamples(source?: ExampleSource): string[] {
+  if (!source) return [];
+
+  const arraySource = Array.isArray(source) ? source : [source];
+
+  return arraySource
+    .map(example => {
+      if (typeof example === 'string') {
+        return example;
+      }
+      if (example?.code) {
+        return example.code;
+      }
+      if (example?.example) {
+        return example.example;
+      }
+      if (example && 'description' in example && typeof example.description === 'string') {
+        return example.description;
+      }
+      return JSON.stringify(example);
+    })
+    .filter((value): value is string => Boolean(value));
+}
 
 /**
  * Quick lookup - like human vocabulary recall
@@ -90,20 +116,7 @@ export function getExamples(key: string, domain?: string): string[] {
   const entry = seedRegistry.lookup(key, domain);
   if (!entry?.fullData) return [];
   
-  const examples = entry.fullData.examples || entry.fullData.example;
-  
-  if (Array.isArray(examples)) {
-    return examples.map((ex: any) => {
-      if (typeof ex === 'string') return ex;
-      if (ex.code) return ex.code;
-      if (ex.example) return ex.example;
-      return JSON.stringify(ex);
-    });
-  }
-  
-  if (typeof examples === 'string') return [examples];
-  
-  return [];
+  return normalizeExamples(entry.fullData.examples ?? entry.fullData.example);
 }
 
 /**

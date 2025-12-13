@@ -1,0 +1,226 @@
+# Unified Transformer LLM Instructions
+# Purpose: Provide general-purpose large language modeling with tool routing, retrieval hooks, and safety guardrails
+
+model:
+  id: "unified_transformer_llm"
+  name: "Unified Transformer LLM"
+  version: "1.3.0"
+  description: "Decoder-only transformer spanning 16k tokens, tuned for reasoning, coding, and orchestration control"
+  modality: "text"
+  architecture:
+    type: "decoder-only"
+    parameters: "~34B"
+    context_window: 16384
+    activation: "SwiGLU"
+    rotary_embedding: true
+  deployment:
+    runtime: "TensorRT-LLM"
+    container_image: "registry.internal.models/unified-llm:1.3.0"
+    supports_function_calls: true
+
+role:
+  primary: "Generalist reasoning and synthesis"
+  scope: "Answer questions, draft plans, route tasks, and synthesize cross-domain responses"
+  orchestration_behavior: "Default fallback model when no specialized domain claims a task, and parent of tool-invocation graph"
+
+capabilities:
+  - "Chain-of-thought reasoning with scratchpad visibility"
+  - "Refinement loop for drafts and diffs"
+  - "Tool invocation via structured function calls"
+  - "Retrieval-aware responses using admin-configured stores"
+  - "Strict policy compliance with guardrail hooks"
+
+principles:
+  - name: "Transparency"
+    rule: "Expose reasoning summaries when confidence < 0.9"
+    priority: P1
+  - name: "Least Privilege"
+    rule: "Call external tools only when required and log every call"
+    priority: P1
+  - name: "Latency Budget"
+    rule: "Honor admin-configured max latency per request"
+    priority: P2
+
+seeds:
+  location: "./unified-transformer-llm_seeds/"
+  auto_load: true
+  format: "json"
+  tokens_file: "unified-transformer-llm_seed_tokens.json"
+  prompt_templates: "prompt_templates.yaml"
+
+weights:
+  location: "./unified-transformer-llm_weights/"
+  auto_load: true
+  format: "safetensors"
+  current: "./unified-transformer-llm_weights/unified-transformer-llm_current_weights.safetensors"
+  pretrained: "./unified-transformer-llm_pretrained_weights/unified-transformer-llm_pretrained_embeddings.bin"
+  fallback: "./unified-transformer-llm_pretrained_weights/unified-transformer-llm_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  reasoning_sandbox:
+    enabled: true
+    description: "Isolated scratchpad for multi-step reasoning"
+    capabilities:
+      - "Store intermediate steps"
+      - "Surface sanitized chain-of-thought"
+  guardrail_engine:
+    enabled: true
+    description: "Policy and safety enforcement"
+    capabilities:
+      - "Classify outputs"
+      - "Redact policy violations"
+  retrieval_bridge:
+    enabled: true
+    description: "Connects to admin-configured vector/db stores"
+    capabilities:
+      - "Hybrid BM25 + embedding search"
+      - "Citation management"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "OpenAI Policy"
+        url: "https://openai.com/policies/usage-policies"
+        use_for: ["safety"]
+      - name: "Prompt Engineering Guide"
+        url: "https://www.promptingguide.ai"
+        use_for: ["chain-of-thought"]
+      - name: "LangChain Docs"
+        url: "https://python.langchain.com"
+        use_for: ["tool calling"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "OpenAI Policy"
+      url: "https://openai.com/policies/usage-policies"
+      use_for: ["safety"]
+    - name: "Prompt Engineering Guide"
+      url: "https://www.promptingguide.ai"
+      use_for: ["reasoning patterns"]
+    - name: "LangChain Docs"
+      url: "https://python.langchain.com"
+      use_for: ["tool router"]
+  reference_triggers:
+    - "Policy clarifications"
+    - "Tool routing decisions"
+    - "Prompt template updates"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.82
+    max_tokens: 1200
+    temperature: 0.65
+    top_p: 0.92
+    repetition_penalty: 1.05
+    enable_chain_of_thought: true
+  input_processing:
+    - "Detect user intent and match to domain"
+    - "Load relevant prompt template"
+    - "Check admin throttles and quotas"
+  reasoning_steps:
+    - "Draft outline in reasoning_sandbox"
+    - "Query retrieval_bridge if facts required"
+    - "Generate response"
+    - "Pass through guardrail_engine"
+  output_formatting:
+    - "Enforce markdown policies"
+    - "Include citations when retrieval used"
+  validation:
+    - "Ensure tokens under limit"
+    - "Confirm no policy violations"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adamw"
+  learning_rate: 0.00015
+  batch_size: 256
+  update_frequency: "daily"
+  epochs: 3
+  data_sources:
+    - "unified-transformer-llm_training/multi-domain.jsonl"
+    - "unified-transformer-llm_data/tool_calls.parquet"
+    - "Safety reinforcement logs"
+  focus_areas:
+    - "Tool-use grounding"
+    - "Citations accuracy"
+    - "Latency-aware decoding"
+  evaluation_metrics:
+    - "Hallucination rate"
+    - "Tool-call success"
+    - "Policy compliance score"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize prompt"
+    - "Attach admin context"
+  processing:
+    - "Generate tokens with streaming enabled"
+  postprocessing:
+    - "Apply guardrail filters"
+    - "Emit rationale summary"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Tool call failure"
+      action: "Retry once, then provide fallback answer with note"
+    - error: "Guardrail block"
+      action: "Return sanitized response and alert admin"
+    - error: "Context overflow"
+      action: "Summarize older context and continue"
+  recovery_strategies:
+    - "Escalate to system domain when orchestration loops"
+    - "Log blocked outputs for audit"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.reasoning_sandbox.enabled"
+    - "tools.guardrail_engine.enabled"
+    - "tools.retrieval_bridge.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/unified-transformer-llm"
+    sandbox_toggle: "tools.reasoning_sandbox.enabled"
+    guardrail_toggle: "tools.guardrail_engine.enabled"
+    retrieval_toggle: "tools.retrieval_bridge.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "Cited Response Rate"
+      target: ">=85% when retrieval used"
+    - name: "Tool-call Success"
+      target: ">=95%"
+    - name: "Policy Violation"
+      target: "<0.1%"
+metadata:
+  owners:
+    - "llm-platform@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/unified-transformer-llm"

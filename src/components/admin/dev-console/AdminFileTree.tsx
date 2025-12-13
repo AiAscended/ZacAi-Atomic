@@ -6,7 +6,7 @@
 
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   ChevronRight,
   ChevronDown,
@@ -37,16 +37,32 @@ interface AdminFileTreeProps {
   className?: string;
 }
 
+function updateNodeInTree(node: FileItem, targetPath: string, items: FileItem[]): FileItem {
+  if (node.path === targetPath) {
+    return {
+      ...node,
+      children: items,
+      isExpanded: true,
+      isLoading: false,
+    };
+  }
+
+  if (node.children) {
+    return {
+      ...node,
+      children: node.children.map((child) => updateNodeInTree(child, targetPath, items)),
+    };
+  }
+
+  return node;
+}
+
 export function AdminFileTree({ onFileSelect, selectedPath, className }: AdminFileTreeProps) {
   const [root, setRoot] = useState<FileItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadDirectory('');
-  }, []);
-
-  const loadDirectory = async (path: string) => {
+  const loadDirectory = useCallback(async (path: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -72,7 +88,10 @@ export function AdminFileTree({ onFileSelect, selectedPath, className }: AdminFi
         });
       } else {
         // Update specific directory in tree
-        updateDirectoryInTree(path, data.items);
+        setRoot((prevRoot) => {
+          if (!prevRoot) return null;
+          return updateNodeInTree(prevRoot, path, data.items);
+        });
       }
     } catch (error) {
       console.error('Error loading directory:', error);
@@ -80,34 +99,11 @@ export function AdminFileTree({ onFileSelect, selectedPath, className }: AdminFi
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updateDirectoryInTree = (path: string, items: FileItem[]) => {
-    setRoot((prevRoot) => {
-      if (!prevRoot) return null;
-      return updateNodeInTree(prevRoot, path, items);
-    });
-  };
-
-  const updateNodeInTree = (node: FileItem, targetPath: string, items: FileItem[]): FileItem => {
-    if (node.path === targetPath) {
-      return {
-        ...node,
-        children: items,
-        isExpanded: true,
-        isLoading: false,
-      };
-    }
-
-    if (node.children) {
-      return {
-        ...node,
-        children: node.children.map((child) => updateNodeInTree(child, targetPath, items)),
-      };
-    }
-
-    return node;
-  };
+  useEffect(() => {
+    void loadDirectory('');
+  }, [loadDirectory]);
 
   const handleDirectoryClick = async (item: FileItem) => {
     if (item.type !== 'directory') return;

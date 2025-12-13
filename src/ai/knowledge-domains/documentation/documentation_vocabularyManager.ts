@@ -15,7 +15,8 @@ export const loadDocumentationSeedVocabulary = async (
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { tags: [] }) as { tags: string[] }
-  } catch (e) {
+  } catch (error) {
+    console.warn("Failed to load documentation seed vocabulary", { path, error })
     return { tags: [] }
   }
 }

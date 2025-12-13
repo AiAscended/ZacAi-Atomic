@@ -2,10 +2,16 @@
  * Text-to-speech - Training Pipeline
  */
 
+import type { TrainingBatch } from '../../shared/modelTypes';
+
 export class TTSTrainer {
-  train(data: any): void {
-    console.log('Training text-to-speech...');
+  train(batch: TrainingBatch): void {
+    const sampleCount = batch.length;
+    const labeledSamples = batch.filter(example => example.target).length;
+
+    console.log('[TTSTrainer] Training batch received', { sampleCount, labeledSamples });
   }
 }
 
-export default TTSTrainer;
+export const ttsTrainer = new TTSTrainer();
+

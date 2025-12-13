@@ -1,0 +1,183 @@
+# Observability Domain Instructions
+# Purpose: Unified telemetry guidance for metrics, logs, traces, and alerts
+
+domain:
+  id: observability
+  name: "Observability"
+  version: "1.1.0"
+  description: "Helps teams instrument, monitor, and troubleshoot complex systems"
+
+role:
+  primary: "Specialized knowledge inference for observability"
+  scope: "Instrumenting services, building dashboards, triaging alerts"
+  orchestration_behavior: "Optional plug-in enabling telemetry-aware reasoning even if other domains are offline"
+
+capabilities:
+  - "Translate SLO/SLA requirements into telemetry plans"
+  - "Correlate metrics, logs, traces, and events"
+  - "Recommend dashboards and alert rules"
+  - "Integrate with admin-managed source lists and tool settings"
+  - "Guide hot-swaps of observability backends without downtime"
+
+seeds:
+  location: "./observability_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./observability_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./observability_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  telemetry_inspector:
+    enabled: true
+    capabilities:
+      - "Ingest metric snapshots"
+      - "Parse structured/unstructured logs"
+      - "Visualize trace spans"
+  alert_rule_advisor:
+    enabled: true
+    capabilities:
+      - "Recommend PromQL/Grafana MQL queries"
+      - "Suggest thresholds based on SLOs"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "OpenTelemetry"
+        url: "https://opentelemetry.io/docs/"
+        use_for: ["instrumentation", "SDK setup"]
+      - name: "Prometheus Docs"
+        url: "https://prometheus.io/docs"
+        use_for: ["metrics", "alertmanager"]
+      - name: "Grafana Docs"
+        url: "https://grafana.com/docs/grafana/latest/"
+        use_for: ["dashboards", "alerting"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "OpenTelemetry"
+      url: "https://opentelemetry.io/docs/"
+      use_for: ["signals", "SDKs"]
+    - name: "Prometheus"
+      url: "https://prometheus.io/docs"
+      use_for: ["PromQL", "alerting"]
+    - name: "Grafana"
+      url: "https://grafana.com/docs"
+      use_for: ["dashboards", "alerts"]
+  reference_triggers:
+    - "Unknown telemetry exporter"
+    - "Need exact PromQL syntax"
+    - "Cross-backend migration guidance"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.78
+    max_tokens: 700
+    temperature: 0.45
+    top_p: 0.9
+    require_citations: true
+  input_processing:
+    - "Identify signal type (metrics/logs/traces/events)"
+    - "Extract environment (prod, staging, dev)"
+    - "Determine urgency level from alerts"
+  reasoning_steps:
+    - "Correlate telemetry sources"
+    - "Detect anomalies vs baseline"
+    - "Recommend mitigation or instrumentation steps"
+  output_formatting:
+    - "Provide timeline with key events"
+    - "List dashboards or queries to inspect"
+    - "Include runbook links or create new instructions"
+  validation:
+    - "Ensure recommended metrics/logs exist"
+    - "Check admin-defined guardrails (PII handling, data retention)"
+    - "Verify commands safe for read-only environments"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.0007
+  batch_size: 48
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Incident retrospectives"
+    - "Telemetry baselines"
+    - "Runbooks"
+    - "Synthetic alert scenarios"
+  focus_areas:
+    - "Noise reduction"
+    - "Root-cause summarization"
+    - "Instrumentation coverage"
+  evaluation_metrics:
+    - "Detection accuracy"
+    - "Mean time to recommendation"
+    - "Runbook adherence"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Fetch SLO/SLA definitions"
+    - "Normalize metric names and labels"
+    - "Load admin overrides for alert severity"
+  processing:
+    - "Correlate metrics/logs/traces"
+    - "Apply anomaly detection"
+    - "Consult seeds for known patterns"
+  postprocessing:
+    - "Package summary with action items"
+    - "Update observability knowledge cache"
+    - "Notify orchestrator of degraded services"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Missing telemetry"
+      action: "Suggest instrumentation via OpenTelemetry"
+    - error: "Alert storm"
+      action: "Recommend deduplication and severity tuning"
+    - error: "Backend outage"
+      action: "Switch to fallback provider or cached data"
+  recovery_strategies:
+    - "Escalate to system domain"
+    - "Trigger synthetic checks"
+    - "Defer to admin if compliance blockers"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+    - "tools.telemetry_inspector.enabled"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/observability"
+    url_sources: "tools.url_lookup.sources"
+    primary_lookup_sources: "url_lookup_config.primary_sources"
+    telemetry_toggle: "tools.telemetry_inspector.enabled"
+    inference_knobs: "inference.parameters"
+    seed_directory: "seeds.location"
+    weight_directory: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"
+      - "tools.url_lookup.sources"

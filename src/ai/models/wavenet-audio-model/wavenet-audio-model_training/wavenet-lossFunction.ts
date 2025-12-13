@@ -2,8 +2,12 @@
  * Wavenet-audio-model - Loss Function
  */
 
-export function wavenetLoss(predictions: any, targets: any): number {
-  return 0;
+import type { ModelPayload } from "../../shared/modelTypes"
+
+export function wavenetLoss(predictions: ModelPayload, targets: ModelPayload): number {
+  const predictionSignature = JSON.stringify(predictions)
+  const targetSignature = JSON.stringify(targets)
+  return predictionSignature === targetSignature ? 0 : 1
 }
 
-export default wavenetLoss;
+export default wavenetLoss

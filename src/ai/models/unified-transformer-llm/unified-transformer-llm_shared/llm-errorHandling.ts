@@ -48,11 +48,12 @@ export function handleLLMError(error: unknown): void {
   }
 }
 
-export default {
+export const LLM_ERROR_HELPERS = {
   LLMError,
   LLMTokenizationError,
   LLMInferenceError,
   LLMTrainingError,
   LLMConfigError,
   handleLLMError,
-};
+} as const;
+

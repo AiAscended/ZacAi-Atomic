@@ -144,7 +144,7 @@ export class PromptHandler {
   /**
    * Create an error response
    */
-  private createErrorResponse(message: string, _originalPrompt: string): OrchestratorResponse {
+  private createErrorResponse(message: string, originalPrompt: string): OrchestratorResponse {
     return {
       text: message,
       sources: [],
@@ -153,6 +153,7 @@ export class PromptHandler {
       metadata: {
         processingTime: 0,
         tokensUsed: 0,
+        originalPromptLength: originalPrompt.length,
       },
       contentBlocks: {
         textBlocks: [{ id: "error-1", content: message }],
@@ -164,8 +165,8 @@ export class PromptHandler {
   /**
    * Get session history
    */
-  public getSessionHistory(_sessionId: string): string[] {
-    // TODO: Implement session history retrieval from stateManager
+  public getSessionHistory(sessionId: string): string[] {
+    console.warn(`[PromptHandler] Session history requested for ${sessionId}, persistence not yet implemented.`)
     return []
   }
 

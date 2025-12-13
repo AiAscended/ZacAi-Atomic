@@ -8,35 +8,71 @@
 import { domainRegistry } from '../domainRegistry';
 import fs from 'fs/promises';
 import path from 'path';
+import { getSystemActiveWeightArtifact, primeSystemWeights } from './system_modelWeightsLoader';
 
 const DOMAIN_NAME = 'system';
 const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
 
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+type SystemSeedEntry = Record<string, JsonValue>;
+
+interface SystemQueryMetadata {
+  totalConcepts: number;
+  matchCount: number;
+}
+
+interface SystemQueryResult {
+  domain: string;
+  confidence: number;
+  matches: SystemSeedEntry[];
+  suggestion: string;
+  metadata: SystemQueryMetadata;
+}
+
+const isRecord = (value: unknown): value is Record<string, JsonValue> => {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+};
+
+const normalizeEntry = (entry: unknown): SystemSeedEntry | null => {
+  if (isRecord(entry)) {
+    return entry;
+  }
+  return null;
+};
+
 /**
  * Load all seed data for system domain
  */
-async function loadSeedData(): Promise<any[]> {
+async function loadSeedData(): Promise<SystemSeedEntry[]> {
   try {
     const files = await fs.readdir(DOMAIN_DIR);
     const jsonFiles = files.filter(f => f.endsWith('.json'));
     
-    const allConcepts: any[] = [];
+    const allConcepts: SystemSeedEntry[] = [];
     for (const file of jsonFiles) {
       const filePath = path.join(DOMAIN_DIR, file);
       const content = await fs.readFile(filePath, 'utf-8');
-      const data = JSON.parse(content);
+      const data = JSON.parse(content) as unknown;
       
-      // System domain may have various formats - handle flexibly
-      if (data.concepts && Array.isArray(data.concepts)) {
-        allConcepts.push(...data.concepts);
+      if (isRecord(data) && Array.isArray(data.concepts)) {
+        data.concepts.forEach(concept => {
+          const normalized = normalizeEntry(concept);
+          if (normalized) {
+            allConcepts.push(normalized);
+          }
+        });
       } else if (Array.isArray(data)) {
-        allConcepts.push(...data);
-      } else if (typeof data === 'object') {
-        // For configuration files, wrap them as concepts
+        data.forEach(concept => {
+          const normalized = normalizeEntry(concept);
+          if (normalized) {
+            allConcepts.push(normalized);
+          }
+        });
+      } else if (isRecord(data)) {
         allConcepts.push({
           name: file.replace('.json', ''),
           type: 'configuration',
-          data: data
+          data: data as JsonValue
         });
       }
     }
@@ -52,7 +88,7 @@ async function loadSeedData(): Promise<any[]> {
 /**
  * Query the system domain with a prompt
  */
-async function query(prompt: string): Promise<any> {
+async function query(prompt: string): Promise<SystemQueryResult | null> {
   const normalizedPrompt = prompt.toLowerCase();
   
   // Keywords for system operations
@@ -105,6 +141,20 @@ async function systemInit(): Promise<void> {
     
     if (seedData.length === 0) {
       console.warn('[System] No seed data loaded - domain may have limited capabilities');
+    }
+
+    const activeWeightFile = await primeSystemWeights();
+    if (activeWeightFile) {
+      const activeArtifact = await getSystemActiveWeightArtifact();
+      if (activeArtifact) {
+        console.log(
+          `[System] Active weight artifact: ${activeArtifact.file} (type=${activeArtifact.type})`
+        );
+      } else {
+        console.log(`[System] Active weight file resolved: ${activeWeightFile}`);
+      }
+    } else {
+      console.warn('[System] Failed to resolve any system weight artifact - using heuristics only');
     }
     
     console.log('[System] Domain initialized successfully');

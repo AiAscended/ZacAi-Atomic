@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "outDir": "dist",
+    "types": ["vitest"],
+    "baseUrl": "./",
+    "paths": {
+      "@/agents/*": ["src/agents/*"],
+      "@/shared/*": ["src/shared/*"],
+      "@/config/*": ["src/config/*"],
+      "@/prompts/*": ["src/prompts/*"]
+    }
+  },
+  "include": ["src", "tests"],
+  "exclude": ["node_modules", "dist"]
+}

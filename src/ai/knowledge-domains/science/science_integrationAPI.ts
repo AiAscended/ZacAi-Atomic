@@ -10,9 +10,7 @@ import path from 'path'
 
 import { domainRegistry } from '../domainRegistry'
 import { SCIENCE_DOMAIN } from "./science_constants"
-import { loadScienceSeedVocabulary } from "./science_vocabularyManager"
-import { scienceRunInference } from "./science_inferenceController"
-import { scienceRunTrainingEpoch } from "./science_trainingController"
+import { loadScienceSeedVocabulary } from './science_vocabularyManager'
 
 const DOMAIN_NAME = 'science';
 const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);

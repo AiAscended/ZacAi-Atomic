@@ -1,0 +1,225 @@
+# Vision Transformer Model Instructions
+# Purpose: Perform image classification, tagging, and patch-level reasoning for UI/visual audits
+
+model:
+  id: "vision_transformer"
+  name: "Vision Transformer"
+  version: "1.2.0"
+  description: "ViT-L/16 backbone fine-tuned for product UI review, artifact detection, and accessibility checks"
+  modality: "vision"
+  architecture:
+    backbone: "ViT-L/16"
+    input_resolution: "384x384"
+    patch_size: 16
+    heads: 16
+    parameters: "~300M"
+  deployment:
+    runtime: "TensorRT"
+    container_image: "registry.internal.models/vision-transformer:1.2.0"
+    supports_batching: true
+
+role:
+  primary: "Visual understanding"
+  scope: "Classify UI states, detect visual regressions, and support documentation snapshots"
+  orchestration_behavior: "Engages when image attachments or screenshot diffs appear in tasks"
+
+capabilities:
+  - "Multi-label tagging with confidence ranks"
+  - "Detect layout drift between baseline and candidate"
+  - "Extract accessibility violations (color contrast, text size)"
+  - "Summarize visuals into textual descriptions"
+  - "Coordinate with documentation/testing domains"
+
+principles:
+  - name: "Accessibility First"
+    rule: "Always run contrast and legibility checks, even when not explicitly requested"
+    priority: P1
+  - name: "Deterministic Baselines"
+    rule: "Compare against stored baseline embeddings before raising regressions"
+    priority: P2
+  - name: "Privacy Respect"
+    rule: "Blur PII zones per admin masks"
+    priority: P1
+
+seeds:
+  location: "./vision-transformer_seeds/"
+  auto_load: true
+  format: "json"
+  baseline_embeddings: "baseline_embeddings.npy"
+  label_map: "labels.json"
+
+weights:
+  location: "./vision-transformer_weights/"
+  auto_load: true
+  format: "safetensors"
+  current: "./vision-transformer_weights/vision-transformer_current_weights.safetensors"
+  pretrained: "./vision-transformer_pretrained_weights/vision-transformer_pretrained_embeddings.bin"
+  fallback: "./vision-transformer_pretrained_weights/vision-transformer_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  contrast_checker:
+    enabled: true
+    description: "Computes WCAG contrast ratios"
+    capabilities:
+      - "Report failing pairs"
+      - "Suggest compliant colors"
+  layout_diff:
+    enabled: true
+    description: "Aligns screenshots and highlights changed regions"
+    capabilities:
+      - "Structural similarity index"
+      - "Heatmap exports"
+  pii_blurrer:
+    enabled: true
+    description: "Masks user-identifiable regions based on admin templates"
+    capabilities:
+      - "Face detection"
+      - "Custom polygon masks"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Vision Transformer Paper"
+        url: "https://arxiv.org/abs/2010.11929"
+        use_for: ["architecture"]
+      - name: "WCAG 2.2"
+        url: "https://www.w3.org/TR/WCAG22/"
+        use_for: ["accessibility"]
+      - name: "SSIM Documentation"
+        url: "https://ece.uwaterloo.ca/~z70wang/research/ssim/"
+        use_for: ["image diff"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Vision Transformer Paper"
+      url: "https://arxiv.org/abs/2010.11929"
+      use_for: ["architecture"]
+    - name: "WCAG 2.2"
+      url: "https://www.w3.org/TR/WCAG22/"
+      use_for: ["accessibility"]
+    - name: "SSIM"
+      url: "https://ece.uwaterloo.ca/~z70wang/research/ssim/"
+      use_for: ["diff methodology"]
+  reference_triggers:
+    - "Accessibility disputes"
+    - "Model architecture tuning"
+    - "Diff metric justification"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.82
+    max_batch: 16
+    temperature: 0.35
+    top_k: 10
+  input_processing:
+    - "Validate resolution"
+    - "Apply pii_blurrer"
+    - "Normalize colors"
+  reasoning_steps:
+    - "Compute embeddings"
+    - "Run classifier"
+    - "Compare to baseline"
+    - "Execute contrast_checker"
+  output_formatting:
+    - "Return JSON with labels, scores, accessibility findings"
+    - "Attach layout diff heatmap references"
+  validation:
+    - "Ensure baseline exists for diff requests"
+    - "Limit processing time under latency budget"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adamw"
+  learning_rate: 0.00015
+  batch_size: 128
+  update_frequency: "weekly"
+  epochs: 5
+  data_sources:
+    - "vision-transformer_training/ui_panels.parquet"
+    - "vision-transformer_data/accessibility_labels.json"
+    - "Diff replay buffers"
+  focus_areas:
+    - "Contrast violation detection"
+    - "Layout drift sensitivity"
+    - "Privacy mask accuracy"
+  evaluation_metrics:
+    - "mAP"
+    - "Contrast detection F1"
+    - "Latency p95"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Resize/crop images"
+    - "Apply privacy masks"
+  processing:
+    - "Embed + classify"
+    - "Compute layout diff if baseline provided"
+  postprocessing:
+    - "Generate textual summary"
+    - "Upload artifacts to audit bucket"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Unsupported image format"
+      action: "Request PNG/JPEG or auto-convert"
+    - error: "Missing baseline"
+      action: "Perform single-frame analysis and warn"
+    - error: "Privacy mask download failure"
+      action: "Fallback to default blur and notify admin"
+  recovery_strategies:
+    - "Escalate to security for privacy incidents"
+    - "Escalate to documentation for summary disputes"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.contrast_checker.enabled"
+    - "tools.layout_diff.enabled"
+    - "tools.pii_blurrer.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/vision-transformer"
+    contrast_toggle: "tools.contrast_checker.enabled"
+    layout_toggle: "tools.layout_diff.enabled"
+    pii_toggle: "tools.pii_blurrer.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "mAP"
+      target: ">=0.82"
+    - name: "Contrast Detection Recall"
+      target: ">=0.95"
+    - name: "Latency p95"
+      target: "<800ms for 384x384"
+metadata:
+  owners:
+    - "vision-platform@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/vision-transformer"

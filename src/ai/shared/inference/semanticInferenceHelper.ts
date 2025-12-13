@@ -10,7 +10,7 @@
  * This replaces hardcoded pattern matching with actual AI logic.
  */
 
-import { seedRegistry } from '../seeds/seedRegistry';
+import { seedRegistry, type SeedEntry } from '../seeds/seedRegistry';
 import { cosineSimilarity } from '@/ai/models/unified-transformer-llm/unified-transformer-llm_model/llm-utilities';
 import { l2Normalize } from '@/ai/embedding/embeddingNormalizer';
 
@@ -28,6 +28,35 @@ export interface SemanticInferenceResult {
   };
 }
 
+type SemanticContext = {
+  referenceText?: string;
+  conversationSnippet?: string;
+  [key: string]: unknown;
+};
+
+interface SeedDefinition {
+  meaning: string;
+  example?: string;
+}
+
+interface SeedFullData {
+  word?: string;
+  concept?: string;
+  term?: string;
+  definitions?: SeedDefinition[];
+  definition?: string;
+  bestPractice?: string;
+  examples?: string[];
+  priority?: number;
+  category?: string;
+  language?: string;
+  relatedConcepts?: string[];
+  related?: string[];
+  [key: string]: unknown;
+}
+
+type SeedEntryWithData = SeedEntry & { fullData?: SeedFullData };
+
 /**
  * Generate simple embedding from text (basic implementation)
  * TODO: Replace with actual embedding model when available
@@ -35,14 +64,14 @@ export interface SemanticInferenceResult {
 function generateSimpleEmbedding(text: string): number[] {
   const words = text.toLowerCase().split(/\s+/);
   const embedding = new Array(128).fill(0);
-  
+
   // Simple word-based embedding using character codes and positions
   words.forEach((word, idx) => {
     for (let i = 0; i < word.length && i < embedding.length; i++) {
-      embedding[i] += word.charCodeAt(i) * (idx + 1) / (words.length + 1);
+      embedding[i] += (word.charCodeAt(i) * (idx + 1)) / (words.length + 1);
     }
   });
-  
+
   return l2Normalize(embedding);
 }
 
@@ -58,7 +87,7 @@ function extractKeyTerms(text: string): string[] {
     'why', 'who', 'which', 'this', 'that', 'these', 'those', 'i', 'you',
     'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them'
   ]);
-  
+
   return text
     .toLowerCase()
     .split(/\s+/)
@@ -67,85 +96,98 @@ function extractKeyTerms(text: string): string[] {
     .filter(word => word.length > 0);
 }
 
+function computeSemanticScore(query: string, anchorText: string): number {
+  if (!anchorText) {
+    return 0;
+  }
+
+  const queryEmbedding = generateSimpleEmbedding(query);
+  const anchorEmbedding = generateSimpleEmbedding(anchorText);
+  const score = cosineSimilarity(queryEmbedding, anchorEmbedding);
+  return Number.isFinite(score) ? score : 0;
+}
+
 /**
  * Perform semantic inference using seed data and embeddings
  */
 export async function performSemanticInference(
   query: string,
   domain: string,
-  context?: any
+  context?: SemanticContext
 ): Promise<SemanticInferenceResult> {
-  
   const keyTerms = extractKeyTerms(query);
-  const matchedSeeds: any[] = [];
+  const matchedSeeds: SeedEntryWithData[] = [];
   const codeExamples: string[] = [];
-  
+
   console.log(`[SemanticInference] Analyzing query for ${domain}: "${query.substring(0, 50)}..."`);
-  console.log(`[SemanticInference] Extracted key terms:`, keyTerms);
-  
+  console.log('[SemanticInference] Extracted key terms:', keyTerms);
+
   // Step 1: Look up seeds for key terms in the registry
   for (const term of keyTerms) {
     try {
-      const seed = await seedRegistry.lookup(term, domain);
-      if (seed && seed.fullData) {
-        matchedSeeds.push(seed.fullData);
+      const seed = seedRegistry.lookup(term, domain) as SeedEntryWithData | null;
+      if (seed?.fullData) {
+        matchedSeeds.push(seed);
         console.log(`[SemanticInference] Found seed for "${term}":`, {
           concept: seed.fullData.word || seed.fullData.concept,
           priority: seed.fullData.priority,
-          category: seed.fullData.category
+          category: seed.fullData.category,
         });
-        
-        // Extract code examples if available
-        if (seed.fullData.examples) {
-          seed.fullData.examples.forEach((ex: string) => {
-            if (ex.includes('{') || ex.includes('function') || ex.includes('const') || ex.includes('import')) {
-              codeExamples.push(ex);
-            }
-          });
-        }
+
+        seed.fullData.examples?.forEach((example: string) => {
+          if (
+            example.includes('{') ||
+            example.includes('function') ||
+            example.includes('const') ||
+            example.includes('import')
+          ) {
+            codeExamples.push(example);
+          }
+        });
       }
-    } catch (error) {
+    } catch {
       console.log(`[SemanticInference] No seed found for "${term}" in ${domain}`);
     }
   }
-  
-  // Step 2: If we found matching seeds, construct response from them
+
   if (matchedSeeds.length > 0) {
     let response = '';
     const concepts: string[] = [];
     const sources: string[] = [];
-    
-    // Sort by priority (lower priority = more important)
+
     matchedSeeds.sort((a, b) => (a.priority || 999) - (b.priority || 999));
-    
-    // Build response from seed data
+
     matchedSeeds.forEach(seed => {
-      const concept = seed.word || seed.concept || seed.term;
+      const seedData = seed.fullData;
+      const concept =
+        seedData?.word ||
+        seedData?.concept ||
+        seedData?.term ||
+        seed.word ||
+        seed.concept ||
+        seed.term ||
+        'Concept';
       concepts.push(concept);
       sources.push(`${domain} seed: ${concept}`);
-      
-      // Add definition
-      if (seed.definitions && seed.definitions.length > 0) {
-        response += `**${concept}**: ${seed.definitions[0].meaning}\n\n`;
-      } else if (seed.definition) {
-        response += `**${concept}**: ${seed.definition}\n\n`;
+
+      if (seedData?.definitions && seedData.definitions.length > 0) {
+        response += `**${concept}**: ${seedData.definitions[0].meaning}\n\n`;
+      } else if (seedData?.definition) {
+        response += `**${concept}**: ${seedData.definition}\n\n`;
       }
-      
-      // Add example
-      if (seed.definitions && seed.definitions.length > 0 && seed.definitions[0].example) {
-        response += `*Example*: ${seed.definitions[0].example}\n\n`;
+
+      if (seedData?.definitions && seedData.definitions.length > 0 && seedData.definitions[0].example) {
+        response += `*Example*: ${seedData.definitions[0].example}\n\n`;
       }
-      
-      // Add best practice if available
-      if (seed.bestPractice) {
-        response += `💡 *Best Practice*: ${seed.bestPractice}\n\n`;
+
+      if (seedData?.bestPractice) {
+        response += `💡 *Best Practice*: ${seedData.bestPractice}\n\n`;
       }
     });
-    
-    // Calculate confidence based on number of matches and their priority
-    const avgPriority = matchedSeeds.reduce((sum, s) => sum + (s.priority || 50), 0) / matchedSeeds.length;
-    const confidence = Math.min(0.95, Math.max(0.4, 1.0 - (avgPriority / 100)));
-    
+
+    const avgPriority = matchedSeeds.reduce((sum, seed) => sum + (seed.priority || 50), 0) / matchedSeeds.length;
+    const confidence = Math.min(0.95, Math.max(0.4, 1 - avgPriority / 100));
+
     return {
       response: response.trim(),
       confidence,
@@ -156,22 +198,25 @@ export async function performSemanticInference(
         inferenceMethod: 'seed_lookup',
         matchedSeeds: matchedSeeds.length,
         tokensAnalyzed: keyTerms.length,
-      }
+      },
     };
   }
-  
-  // Step 3: No direct seed matches - use embedding similarity (future enhancement)
-  // For now, return low confidence result indicating no semantic match
+
+  const fallbackAnchor = context?.referenceText || context?.conversationSnippet || domain;
+  const semanticScore = computeSemanticScore(query, fallbackAnchor);
+  const fallbackConfidence = Math.max(0.15, Math.min(0.4 + semanticScore * 0.3, 0.65));
+
   return {
     response: `I searched my ${domain} knowledge base for information about "${query.substring(0, 100)}" but couldn't find specific seed data. I'm still learning about this topic.`,
-    confidence: 0.2,
+    confidence: fallbackConfidence,
     sources: [`${domain} domain (no matches)`],
     concepts: keyTerms,
     metadata: {
       inferenceMethod: 'semantic_similarity',
       matchedSeeds: 0,
       tokensAnalyzed: keyTerms.length,
-    }
+      semanticScore,
+    },
   };
 }
 
@@ -183,26 +228,25 @@ export async function searchCodeExamples(
   domain: string
 ): Promise<{ code: string; concept: string; language?: string }[]> {
   const examples: { code: string; concept: string; language?: string }[] = [];
-  
+
   for (const keyword of keywords) {
     try {
-      const seed = await seedRegistry.lookup(keyword, domain);
-      if (seed && seed.fullData && seed.fullData.examples) {
-        seed.fullData.examples.forEach((ex: string) => {
-          if (ex.includes('{') || ex.includes('function') || ex.includes('const')) {
-            examples.push({
-              code: ex,
-              concept: seed.fullData.word || seed.fullData.concept,
-              language: seed.fullData.language || 'typescript'
-            });
-          }
-        });
-      }
-    } catch (error) {
+      const seed = seedRegistry.lookup(keyword, domain) as SeedEntryWithData | null;
+      const seedData = seed?.fullData;
+      seedData?.examples?.forEach((example: string) => {
+        if (example.includes('{') || example.includes('function') || example.includes('const')) {
+          examples.push({
+            code: example,
+            concept: seedData.word || seedData.concept || keyword,
+            language: seedData.language || 'typescript',
+          });
+        }
+      });
+    } catch {
       // Seed not found, continue
     }
   }
-  
+
   return examples;
 }
 
@@ -214,11 +258,11 @@ export async function getRelatedConcepts(
   domain: string
 ): Promise<string[]> {
   try {
-    const seed = await seedRegistry.lookup(term, domain);
-    if (seed && seed.fullData) {
+    const seed = seedRegistry.lookup(term, domain) as SeedEntryWithData | null;
+    if (seed?.fullData) {
       return seed.fullData.relatedConcepts || seed.fullData.related || [];
     }
-  } catch (error) {
+  } catch {
     // Seed not found
   }
   return [];

@@ -27,4 +27,6 @@ export const getTestingTokenById = (id: number): string | undefined => {
   return undefined
 }
 export const testingTokenCount = () => testingTokenMap.size
-export default { testingTokenMap, getTestingTokenId, getTestingTokenById, testingTokenCount }
+const testingTokenMapApi = { testingTokenMap, getTestingTokenId, getTestingTokenById, testingTokenCount }
+
+export default testingTokenMapApi

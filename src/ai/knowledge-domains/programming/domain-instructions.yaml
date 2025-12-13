@@ -1,0 +1,405 @@
+# Programming Domain Instructions
+# Purpose: Governance, guidelines, and operational instructions for programming domain
+
+domain:
+  id: programming
+  name: Programming
+  version: "1.0.0"
+  description: "Expert programming domain with multi-language support and best practices"
+
+role:
+  primary: "Specialized knowledge inference for programming"
+  scope: "Language-agnostic architectural and implementation guidance"
+  orchestration_behavior: "Loads as a plug-in module and can run independently of other domains"
+
+capabilities:
+  - "Understand programming concepts across multiple languages"
+  - "Provide accurate domain-specific responses"
+  - "Reference code seeds and examples for context"
+  - "Integrate with admin-managed lookup sources"
+  - "Learn from user interactions and code reviews"
+
+seeds:
+  location: "./programming_seeds/"
+  auto_load: true
+  format: "json"
+  caching: "warm"
+
+weights:
+  location: "./programming_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./programming_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Core Principles
+principles:
+  - name: "Code Quality"
+    rule: "Write clean, readable, maintainable code following best practices"
+    priority: 1
+  
+  - name: "DRY (Don't Repeat Yourself)"
+    rule: "Avoid code duplication; extract reusable components"
+    priority: 2
+  
+  - name: "SOLID Principles"
+    rule: "Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion"
+    priority: 3
+  
+  - name: "Security First"
+    rule: "Consider security implications; validate inputs, sanitize outputs"
+    priority: 4
+
+# Supported Languages
+languages:
+  - name: "TypeScript/JavaScript"
+    version: "ES2023+"
+    standards: ["ESLint", "Prettier", "TypeScript strict mode"]
+    
+  - name: "Python"
+    version: "3.11+"
+    standards: ["PEP 8", "Type hints", "Black formatter"]
+  
+  - name: "Java"
+    version: "17+"
+    standards: ["Google Java Style", "Clean Code"]
+  
+  - name: "C++"
+    version: "C++20"
+    standards: ["ISO C++", "Google C++ Style"]
+  
+  - name: "Rust"
+    version: "Latest stable"
+    standards: ["Rust official guidelines"]
+
+# Domain-Specific Knowledge
+foundational_concepts:
+  data_structures:
+    - "Arrays and lists"
+    - "Stacks and queues"
+    - "Trees and graphs"
+    - "Hash tables and maps"
+    - "Heaps and priority queues"
+  
+  algorithms:
+    - "Sorting: quicksort, mergesort, heapsort"
+    - "Searching: binary search, DFS, BFS"
+    - "Dynamic programming"
+    - "Greedy algorithms"
+    - "Graph algorithms: Dijkstra, A*"
+  
+  design_patterns:
+    - "Creational: Singleton, Factory, Builder"
+    - "Structural: Adapter, Decorator, Facade"
+    - "Behavioral: Observer, Strategy, Command"
+  
+  web_development:
+    - "HTTP/HTTPS protocols"
+    - "RESTful API design"
+    - "Authentication and authorization"
+    - "Frontend frameworks: React, Vue, Angular"
+    - "Backend frameworks: Express, Django, Spring"
+  
+  databases:
+    - "SQL: PostgreSQL, MySQL"
+    - "NoSQL: MongoDB, Redis"
+    - "ORMs and query builders"
+    - "Database design and normalization"
+
+# Tool Configuration
+tools:
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "MDN Web Docs"
+        url: "https://developer.mozilla.org"
+        use_for: ["JavaScript APIs", "browser features"]
+      - name: "W3Schools"
+        url: "https://www.w3schools.com"
+        use_for: ["syntax references", "HTML/CSS refreshers"]
+      - name: "GitHub"
+        url: "https://github.com"
+        use_for: ["real-world examples", "library source"]
+      - name: "Stack Overflow"
+        url: "https://stackoverflow.com"
+        use_for: ["troubleshooting", "bug fixes"]
+    usage_guidelines:
+      - "Look up API documentation"
+      - "Find code examples and patterns"
+      - "Search for bug solutions"
+      - "Verify framework usage"
+  
+  code_analyzer:
+    enabled: true
+    capabilities:
+      - "Syntax validation"
+      - "Linting and style checking"
+      - "Security vulnerability scanning"
+      - "Performance analysis"
+    usage_guidelines:
+      - "Validate generated code"
+      - "Check for common mistakes"
+      - "Identify security issues"
+  
+  scientific_calculator:
+    enabled: true
+    usage_guidelines:
+      - "Algorithm complexity calculations"
+      - "Performance metric computations"
+      - "Big O notation analysis"
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "MDN Web Docs"
+      url: "https://developer.mozilla.org"
+      use_for: ["JavaScript", "Web APIs"]
+    - name: "Stack Overflow"
+      url: "https://stackoverflow.com"
+      use_for: ["debugging", "community patterns"]
+    - name: "GitHub"
+      url: "https://github.com"
+      use_for: ["source code", "examples"]
+  reference_triggers:
+    - "Unknown API detected"
+    - "Security-sensitive snippet requested"
+    - "Need to cite real-world example"
+    - "User requests latest framework guidance"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.75
+    max_tokens: 700
+    temperature: 0.45
+    top_p: 0.9
+    allow_tool_invocations: true
+
+  input_processing:
+    - "Identify programming language"
+    - "Parse code structure and syntax"
+    - "Extract requirements from natural language"
+    - "Recognize design patterns and idioms"
+  
+  reasoning_steps:
+    - "Break problem into smaller functions/modules"
+    - "Consider edge cases and error handling"
+    - "Apply appropriate design patterns"
+    - "Optimize for readability first, performance second"
+  
+  output_formatting:
+    - "Use syntax highlighting in code blocks"
+    - "Include inline comments for complex logic"
+    - "Provide usage examples"
+    - "Add error handling and validation"
+  
+  validation:
+    - "Check syntax correctness"
+    - "Verify logic flow"
+    - "Test edge cases"
+    - "Ensure security best practices"
+
+# Code Generation Guidelines
+code_generation:
+  structure:
+    - "Start with imports/includes"
+    - "Define types/interfaces first"
+    - "Implement main logic"
+    - "Add error handling"
+    - "Include tests when appropriate"
+  
+  style:
+    - "Use meaningful variable names"
+    - "Keep functions small and focused"
+    - "Add comments for complex algorithms"
+    - "Follow language-specific conventions"
+  
+  security:
+    - "Validate and sanitize inputs"
+    - "Use parameterized queries for databases"
+    - "Implement proper authentication checks"
+    - "Handle sensitive data securely"
+    - "Avoid hardcoded credentials"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.0008
+  batch_size: 64
+  update_frequency: "daily"
+  optimizer: "adamw"
+  replay_buffers:
+    - "code_reviews"
+    - "user_fixes"
+
+  data_sources:
+    - "Open source repositories (GitHub)"
+    - "Programming textbooks"
+    - "Technical documentation"
+    - "Code review comments"
+    - "Bug fix commits"
+  
+  focus_areas:
+    - "Language-specific idioms"
+    - "Framework best practices"
+    - "Common bug patterns"
+    - "Optimization techniques"
+  
+  evaluation_metrics:
+    - "Code correctness"
+    - "Style compliance"
+    - "Performance efficiency"
+    - "Security considerations"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Tokenize code appropriately"
+    - "Preserve indentation and structure"
+    - "Identify code vs. comments"
+  
+  processing:
+    - "Apply language-specific transformations"
+    - "Maintain code context"
+    - "Track variable scope"
+  
+  postprocessing:
+    - "Format code according to style guide"
+    - "Add necessary imports"
+    - "Optimize generated code"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Syntax errors"
+      action: "Validate syntax before output; provide corrections"
+    
+    - error: "Type mismatches"
+      action: "Check type compatibility; suggest fixes"
+    
+    - error: "Undefined references"
+      action: "Verify all variables/functions are defined"
+    
+    - error: "Logic errors"
+      action: "Trace execution flow; identify incorrect assumptions"
+  
+  recovery_strategies:
+    - "Consult documentation via URL lookup"
+    - "Search for similar solutions on GitHub/Stack Overflow"
+    - "Suggest alternative approaches"
+    - "Ask for clarification on requirements"
+
+# Integration Guidelines
+integration:
+  with_llm:
+    - "LLM interprets natural language requirements"
+    - "Programming domain generates implementation"
+    - "LLM adds explanatory comments"
+  
+  with_other_domains:
+    - mathematics: "Implement mathematical algorithms"
+    - internet_search: "Find code examples and documentation"
+    - general_knowledge: "Explain programming concepts"
+  
+  orchestrator_routing:
+    keywords:
+      - "code"
+      - "function"
+      - "algorithm"
+      - "program"
+      - "implement"
+      - "debug"
+      - "refactor"
+      - "API"
+    priority: "High for explicit programming queries"
+
+# Admin Configuration
+admin_config:
+  editable_fields:
+    - "languages"
+    - "code_generation.structure"
+    - "code_generation.style"
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/programming"
+    language_matrix: "languages"
+    url_sources: "tools.url_lookup.sources"
+    primary_lookup_sources: "url_lookup_config.primary_sources"
+    security_rules: "code_generation.security"
+    inference_knobs: "inference.parameters"
+    seed_directory: "seeds.location"
+    weight_directory: "weights.location"
+  upload_capabilities:
+    - "Custom code templates (JSON)"
+    - "Language-specific rules (YAML)"
+    - "Linting configurations (XML)"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"
+      - "tools.url_lookup.sources"
+
+# Tokenizer Configuration
+tokenizer:
+  special_tokens:
+    # Common keywords across languages
+    - "function"
+    - "class"
+    - "interface"
+    - "type"
+    - "const"
+    - "let"
+    - "var"
+    - "return"
+    - "if"
+    - "else"
+    - "for"
+    - "while"
+    - "try"
+    - "catch"
+    - "import"
+    - "export"
+  
+  operator_tokens:
+    - "==" # Equality
+    - "===" # Strict equality
+    - "!=" # Inequality
+    - "!==" # Strict inequality
+    - "&&" # Logical AND
+    - "||" # Logical OR
+    - "=>" # Arrow function
+    - "..." # Spread operator
+  
+  framework_tokens:
+    - "React"
+    - "Vue"
+    - "Angular"
+    - "Express"
+    - "Django"
+    - "Flask"
+    - "Spring"
+
+# Quality Assurance
+quality:
+  verification_steps:
+    - "Syntax validation"
+    - "Style guide compliance"
+    - "Security audit"
+    - "Performance review"
+  
+  performance_metrics:
+    - "Code correctness"
+    - "Generation speed"
+    - "Code quality score"
+    - "Security compliance"

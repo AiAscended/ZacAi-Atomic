@@ -8,10 +8,22 @@
 
 import { typescriptTokenizer } from "./typescript_tokenizer"
 
-export function typescriptSemanticAnalyzer(input: string): Record<string, any> {
+export interface TypescriptSemanticAnalysis {
+  hasTypeAnnotations: boolean
+  hasInterfaces: boolean
+  hasClasses: boolean
+  hasFunctions: boolean
+  hasAsyncCode: boolean
+  hasImports: boolean
+  hasExports: boolean
+  complexity: number
+  codeQuality: "valid" | "empty"
+}
+
+export function typescriptSemanticAnalyzer(input: string): TypescriptSemanticAnalysis {
   const tokens = typescriptTokenizer(input)
 
-  const analysis = {
+  const analysis: TypescriptSemanticAnalysis = {
     hasTypeAnnotations: tokens.some((t) => ["string", "number", "boolean", "any"].includes(t)),
     hasInterfaces: tokens.includes("interface"),
     hasClasses: tokens.includes("class"),

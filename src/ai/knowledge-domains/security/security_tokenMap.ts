@@ -28,4 +28,6 @@ export const getSecurityTokenById = (id: number): string | undefined => {
   return undefined
 }
 export const securityTokenCount = () => securityTokenMap.size
-export default { securityTokenMap, getSecurityTokenId, getSecurityTokenById, securityTokenCount }
+const securityTokenApi = { securityTokenMap, getSecurityTokenId, getSecurityTokenById, securityTokenCount }
+
+export default securityTokenApi

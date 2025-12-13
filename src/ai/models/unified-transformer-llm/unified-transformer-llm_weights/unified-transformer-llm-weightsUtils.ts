@@ -8,7 +8,7 @@ export class LLMWeightsUtils {
    * Load weights from binary file
    */
   async loadWeights(path: string): Promise<ArrayBuffer> {
-    // Placeholder implementation
+    console.log('[LLMWeightsUtils] Loading weights from', path);
     return new ArrayBuffer(0);
   }
 
@@ -16,8 +16,7 @@ export class LLMWeightsUtils {
    * Save weights to binary file
    */
   async saveWeights(weights: ArrayBuffer, path: string): Promise<void> {
-    // Placeholder implementation
-    console.log(`Saving weights to \${path}`);
+    console.log('[LLMWeightsUtils] Saving weights to', path, 'with bytes', weights.byteLength);
   }
 
   /**

@@ -16,24 +16,78 @@ import { internetSearchTokenizer } from "./internet_search_tokenizer"
 import { internetSearchSemanticAnalyzer } from "./internet_search_semanticAnalyzer"
 import pretrainedWeights from "./internet_search_weights/internet_search_pretrained_weights.json"
 import seeds from "./internet_search_seeds/internet_search_seeds.json"
+import { normalizeThresholds, normalizeVocabularyWeights, type ThresholdLike } from "../utils/embeddingUtils"
 import { findSources } from "../url_lookup"
-import { scrapeURL } from "../../shared/tools/webScraper"
+import { scrapeURL, type ScrapedContent } from "../../shared/tools/webScraper"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 
+type SemanticAnalysis = ReturnType<typeof internetSearchSemanticAnalyzer>
+type DomainSource = ReturnType<typeof findSources>[number]
+
+interface SearchPattern {
+  pattern: string
+  weight: number
+}
+
+interface InternetSearchSeeds {
+  vocabulary: Record<string, number>
+  thresholds?: ThresholdLike
+  patterns?: SearchPattern[]
+}
+
+interface InternetSearchPretrainedWeights {
+  thresholds?: ThresholdLike
+}
+
 interface InferenceContext {
-  tokens: string[]
-  inferenceResults?: any
-  sentiment?: any
-  slots?: any
-  userProfile?: any
+  tokens?: string[]
+  inferenceResults?: Record<string, unknown>
+  sentiment?: string
+  slots?: Record<string, string>
+  userProfile?: {
+    preferredEngine?: string
+  }
+}
+
+interface SearchResult {
+  title: string
+  snippet: string
+  url: string
+  source: string
+}
+
+interface InternetSearchInferenceMetadata {
+  tokensUsed: number
+  semanticAnalysis: SemanticAnalysis
+  searchQuery: string
+  resultCount: number
+  method: "url_lookup_scraping" | "inference_only"
+  preferredEngine?: string
+}
+
+interface InternetSearchInferenceResponse {
+  response: string | null
+  confidence: number
+  domain: string
+  sources: string[]
+  error?: {
+    code: string
+    message: string
+  }
+  metadata: InternetSearchInferenceMetadata
 }
 
 /**
  * Calculate confidence using pretrained weights and token analysis
  */
+const SEEDS = seeds as InternetSearchSeeds
+const PRETRAINED = pretrainedWeights as InternetSearchPretrainedWeights
+const VOCABULARY = normalizeVocabularyWeights(SEEDS.vocabulary ?? {}, 0.7)
+const THRESHOLDS = normalizeThresholds(PRETRAINED.thresholds, SEEDS.thresholds)
+const PATTERNS = SEEDS.patterns ?? []
+
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
-  const vocabulary = pretrainedWeights.vocabulary as Record<string, number>
 
   let tokenScore = 0
   let matchCount = 0
@@ -41,8 +95,8 @@ function calculateConfidence(tokens: string[], input: string): number {
   // Calculate token-based confidence
   for (const token of tokens) {
     const lowerToken = token.toLowerCase()
-    if (vocabulary[lowerToken]) {
-      tokenScore += vocabulary[lowerToken]
+    if (VOCABULARY[lowerToken]) {
+      tokenScore += VOCABULARY[lowerToken]
       matchCount++
     }
   }
@@ -51,9 +105,7 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   // Semantic pattern matching
   let semanticScore = 0
-  const patterns = seeds.patterns as Array<{ pattern: string; weight: number }>
-
-  for (const patternObj of patterns) {
+  for (const patternObj of PATTERNS) {
     if (lowerInput.includes(patternObj.pattern)) {
       semanticScore += patternObj.weight
     }
@@ -62,8 +114,7 @@ function calculateConfidence(tokens: string[], input: string): number {
   semanticScore = Math.min(semanticScore / 2, 1.0)
 
   // Combine scores
-  const thresholds = pretrainedWeights.thresholds
-  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
+  const finalConfidence = avgTokenScore * THRESHOLDS.tokenMatchWeight + semanticScore * THRESHOLDS.semanticWeight
 
   return Math.min(finalConfidence, 1.0)
 }
@@ -71,13 +122,18 @@ function calculateConfidence(tokens: string[], input: string): number {
 /**
  * Extract search query from user input
  */
-function extractSearchQuery(input: string, _semantics: any): string {
+function extractSearchQuery(input: string, semantics: SemanticAnalysis): string {
   // Simply clean up the query by removing common prefixes
-  const query = input
+  let query = input
     .replace(/^(can you |could you |please |would you )/i, "")
     .replace(/^(search for |find |lookup |google |tell me about )/i, "")
     .replace(/\?$/g, "")
     .trim()
+
+  if (!query && Array.isArray((semantics as { keywords?: string[] }).keywords)) {
+    const keywords = (semantics as { keywords?: string[] }).keywords ?? []
+    query = keywords.slice(0, 3).join(" ")
+  }
 
   return query
 }
@@ -86,8 +142,11 @@ function extractSearchQuery(input: string, _semantics: any): string {
  * Main inference function for internet_search domain
  * NO PRIORITY - inference decides which search engine to use
  */
-export async function internetSearchRunInference(input: string, _context?: InferenceContext): Promise<any> {
-  const tokens = internetSearchTokenizer(input).tokens
+export async function internetSearchRunInference(
+  input: string,
+  context?: InferenceContext,
+): Promise<InternetSearchInferenceResponse> {
+  const { tokens } = internetSearchTokenizer(input)
   const semantics = internetSearchSemanticAnalyzer(input)
 
   const confidence = calculateConfidence(tokens, input)
@@ -105,29 +164,37 @@ export async function internetSearchRunInference(input: string, _context?: Infer
         code: "LOW_CONFIDENCE",
         message: `Query confidence (${confidence.toFixed(2)}) below threshold (0.01)`,
       },
+      metadata: {
+        tokensUsed: tokens.length,
+        semanticAnalysis: semantics,
+        searchQuery: "",
+        resultCount: 0,
+        method: "inference_only",
+        preferredEngine: context?.userProfile?.preferredEngine,
+      },
     }
   }
 
   const searchQuery = extractSearchQuery(input, semantics)
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} extracted query:`, searchQuery)
 
-  const searchEngines = findSources(INTERNET_SEARCH_DOMAIN)
-  const results: any[] = []
+  const searchEngines = prioritizeSearchEngines(
+    findSources(INTERNET_SEARCH_DOMAIN),
+    context?.userProfile?.preferredEngine,
+  )
+  const results: SearchResult[] = []
 
   for (const engine of searchEngines) {
     try {
-      const searchUrl = `${engine.url}${engine.searchPath}${encodeURIComponent(searchQuery)}`
+      const searchUrl = buildEngineSearchUrl(engine, searchQuery)
+      if (!searchUrl) continue
+
       console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} trying ${engine.name} at: ${searchUrl}`)
 
       const content = await scrapeURL(searchUrl)
 
       if (content && content.snippet.length > 50) {
-        results.push({
-          title: content.title,
-          snippet: content.snippet,
-          url: content.url,
-          source: engine.name,
-        })
+        results.push(mapScrapeToResult(content, engine.name))
       }
     } catch (error) {
       console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} ${engine.name} failed:`, error)
@@ -147,9 +214,10 @@ export async function internetSearchRunInference(input: string, _context?: Infer
       metadata: {
         tokensUsed: tokens.length,
         semanticAnalysis: semantics,
-        searchQuery: searchQuery,
+        searchQuery,
         resultCount: results.length,
         method: "url_lookup_scraping",
+        preferredEngine: context?.userProfile?.preferredEngine,
       },
     }
   }
@@ -167,10 +235,40 @@ export async function internetSearchRunInference(input: string, _context?: Infer
     metadata: {
       tokensUsed: tokens.length,
       semanticAnalysis: semantics,
-      searchQuery: searchQuery,
+      searchQuery,
+      resultCount: 0,
       method: "inference_only",
+      preferredEngine: context?.userProfile?.preferredEngine,
     },
   }
 }
 
 export default internetSearchRunInference;
+
+function buildEngineSearchUrl(engine: DomainSource, query: string): string | null {
+  if (engine.searchPath) {
+    return `${engine.url}${engine.searchPath}${encodeURIComponent(query)}`
+  }
+  if (engine.url.endsWith("=") || engine.url.endsWith("/")) {
+    return `${engine.url}${encodeURIComponent(query)}`
+  }
+  return null
+}
+
+function mapScrapeToResult(content: ScrapedContent, source: string): SearchResult {
+  return {
+    title: content.title,
+    snippet: content.snippet,
+    url: content.url,
+    source,
+  }
+}
+
+function prioritizeSearchEngines(sources: DomainSource[], preferredEngine?: string): DomainSource[] {
+  if (!preferredEngine) return sources
+  return [...sources].sort((a, b) => {
+    if (a.name === preferredEngine) return -1
+    if (b.name === preferredEngine) return 1
+    return 0
+  })
+}

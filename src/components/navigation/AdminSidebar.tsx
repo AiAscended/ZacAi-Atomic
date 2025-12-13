@@ -53,26 +53,31 @@ const menuItems: MenuItem[] = [
     id: "knowledge-domains",
     label: "Knowledge Domains",
     icon: Database,
+    path: "/admin/domains",
     children: [
-      { id: "react", label: "React", icon: Database, path: "/admin/domains/react" },
-      { id: "nextjs", label: "Next.js", icon: Database, path: "/admin/domains/nextjs" },
+      { id: "english", label: "English", icon: Database, path: "/admin/domains/english" },
+      { id: "grammar", label: "Grammar", icon: Database, path: "/admin/domains/grammar" },
+      { id: "general_knowledge", label: "General Knowledge", icon: Database, path: "/admin/domains/general_knowledge" },
       { id: "programming", label: "Programming", icon: Database, path: "/admin/domains/programming" },
       { id: "typescript", label: "TypeScript", icon: Database, path: "/admin/domains/typescript" },
-      { id: "english", label: "English", icon: Database, path: "/admin/domains/english" },
-      { id: "mathematics", label: "Mathematics", icon: Database, path: "/admin/domains/mathematics" },
-      { id: "internet-search", label: "Internet Search", icon: Database, path: "/admin/domains/internet-search" },
-      { id: "grammar", label: "Grammar", icon: Database, path: "/admin/domains/grammar" },
-      { id: "science", label: "Science", icon: Database, path: "/admin/domains/science" },
-      { id: "code-review", label: "Code Review", icon: Database, path: "/admin/domains/code-review" },
-      { id: "error-detection", label: "Error Detection", icon: Database, path: "/admin/domains/error-detection" },
+      { id: "react", label: "React", icon: Database, path: "/admin/domains/react" },
+      { id: "nextjs", label: "Next.js", icon: Database, path: "/admin/domains/nextjs" },
+      { id: "version_control", label: "Version Control", icon: Database, path: "/admin/domains/version_control" },
+      { id: "code_review", label: "Code Review", icon: Database, path: "/admin/domains/code_review" },
+      { id: "error_detection", label: "Error Detection", icon: Database, path: "/admin/domains/error_detection" },
       { id: "testing", label: "Testing", icon: Database, path: "/admin/domains/testing" },
       { id: "documentation", label: "Documentation", icon: Database, path: "/admin/domains/documentation" },
-      { id: "security", label: "Security", icon: Database, path: "/admin/domains/security" },
+      { id: "mathematics", label: "Mathematics", icon: Database, path: "/admin/domains/mathematics" },
+      { id: "science", label: "Science", icon: Database, path: "/admin/domains/science" },
       { id: "algorithms", label: "Algorithms", icon: Database, path: "/admin/domains/algorithms" },
-      { id: "data-structures", label: "Data Structures", icon: Database, path: "/admin/domains/data-structures" },
-      { id: "version-control", label: "Version Control", icon: Database, path: "/admin/domains/version-control" },
+      { id: "data_structures", label: "Data Structures", icon: Database, path: "/admin/domains/data_structures" },
+      { id: "security", label: "Security", icon: Database, path: "/admin/domains/security" },
+      { id: "system", label: "System", icon: Database, path: "/admin/domains/system" },
       { id: "environment", label: "Environment", icon: Database, path: "/admin/domains/environment" },
-      { id: "general", label: "General", icon: Database, path: "/admin/domains/general" },
+      { id: "repair", label: "Repair", icon: Database, path: "/admin/domains/repair" },
+      { id: "data_integrity", label: "Data Integrity", icon: Database, path: "/admin/domains/data_integrity" },
+      { id: "observability", label: "Observability", icon: Database, path: "/admin/domains/observability" },
+      { id: "internet_search", label: "Internet Search", icon: Database, path: "/admin/domains/internet_search" },
     ],
   },
   {
@@ -80,6 +85,21 @@ const menuItems: MenuItem[] = [
     label: "AI Models",
     icon: Brain,
     path: "/admin/models",
+    children: [
+      { id: "unified-transformer-llm", label: "Unified Transformer LLM", icon: Brain, path: "/admin/models/unified-transformer-llm" },
+      { id: "code-transformer", label: "Code Transformer", icon: Brain, path: "/admin/models/code-transformer" },
+      { id: "convolutional-neural-network", label: "Convolutional Neural Network", icon: Brain, path: "/admin/models/convolutional-neural-network" },
+      { id: "vision-transformer", label: "Vision Transformer", icon: Brain, path: "/admin/models/vision-transformer" },
+      { id: "diffusion-model", label: "Diffusion Model", icon: Brain, path: "/admin/models/diffusion-model" },
+      { id: "generative-adversarial-network", label: "Generative Adversarial Network", icon: Brain, path: "/admin/models/generative-adversarial-network" },
+      { id: "recurrent-neural-network", label: "Recurrent Neural Network", icon: Brain, path: "/admin/models/recurrent-neural-network" },
+      { id: "graph-neural-network", label: "Graph Neural Network", icon: Brain, path: "/admin/models/graph-neural-network" },
+      { id: "neuro-symbolic-reasoning", label: "Neuro-Symbolic Reasoning", icon: Brain, path: "/admin/models/neuro-symbolic-reasoning" },
+      { id: "multi-modal-fusion", label: "Multi-Modal Fusion", icon: Brain, path: "/admin/models/multi-modal-fusion" },
+      { id: "speech-to-text", label: "Speech-to-Text", icon: Brain, path: "/admin/models/speech-to-text" },
+      { id: "text-to-speech", label: "Text-to-Speech", icon: Brain, path: "/admin/models/text-to-speech" },
+      { id: "wavenet-audio-model", label: "WaveNet Audio Model", icon: Brain, path: "/admin/models/wavenet-audio-model" },
+    ],
   },
   {
     id: "training-pipelines",
@@ -149,7 +169,14 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onClose }: Ad
 
   const handleItemClick = (item: MenuItem) => {
     if (item.children) {
-      toggleExpanded(item.id)
+      // If item has both path and children, navigate to path on first click, toggle on second click
+      if (item.path && !expandedItems.has(item.id)) {
+        router.push(item.path)
+        // Also expand to show children
+        toggleExpanded(item.id)
+      } else {
+        toggleExpanded(item.id)
+      }
       // Expand menu if collapsed when clicking parent items
       if (!isExpanded) {
         onExpandToggle()

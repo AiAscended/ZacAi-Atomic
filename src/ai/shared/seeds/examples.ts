@@ -27,9 +27,14 @@ async function example1_simpleLookup() {
   
   if (addition) {
     console.log(`Found: ${addition.concept}`);
-    console.log(`Definition: ${addition.fullData.definition}`);
-    console.log(`Examples:`, addition.fullData.examples);
-    console.log(`Related:`, addition.fullData.related);
+    const fullData = addition.fullData;
+    if (fullData) {
+      console.log(`Definition: ${fullData.definition}`);
+      console.log(`Examples:`, fullData.examples);
+      console.log(`Related:`, fullData.related);
+    } else {
+      console.log('No detailed seed data available.');
+    }
     console.log(`Binary Index: [${addition.domainId}, ${addition.fileId}, ${addition.entryId}]`);
   }
 }
@@ -65,7 +70,8 @@ function example3_search() {
   
   console.log(`Found ${results.length} results:`);
   results.forEach(result => {
-    console.log(`  - ${result.concept}: ${result.fullData.definition?.substring(0, 60)}...`);
+    const preview = result.fullData?.definition?.substring(0, 60) ?? 'No definition available';
+    console.log(`  - ${result.concept}: ${preview}...`);
   });
 }
 
@@ -79,7 +85,8 @@ async function example4_contextualLookup() {
   
   if (context.main) {
     console.log(`Main concept: ${context.main.concept}`);
-    console.log(`Definition: ${context.main.fullData.definition}`);
+    const definition = context.main.fullData?.definition ?? 'No definition available';
+    console.log(`Definition: ${definition}`);
     
     console.log(`\nRelated concepts:`);
     context.related.forEach(rel => {
@@ -168,7 +175,8 @@ async function example8_orchestratorUsage(userPrompt: string) {
   knownSeeds
     .filter(s => s.domain === mostRelevantDomain)
     .forEach(seed => {
-      console.log(`  - ${seed.concept}: ${seed.fullData.definition?.substring(0, 80)}...`);
+      const summary = seed.fullData?.definition?.substring(0, 80) ?? 'No definition available';
+      console.log(`  - ${seed.concept}: ${summary}...`);
     });
 }
 
@@ -186,7 +194,8 @@ async function example9_llmTokenizerUsage(unknownToken: string) {
   if (seed) {
     console.log(`✅ Found in seeds!`);
     console.log(`Domain: ${seed.domain}`);
-    console.log(`Definition: ${seed.fullData.definition}`);
+    const seedData = seed.fullData;
+    console.log(`Definition: ${seedData?.definition ?? 'No definition available'}`);
     console.log(`\nCan now generate contextual embedding for this token`);
     
     // Instead of mapping to [UNK] token, use seed data to create
@@ -194,7 +203,7 @@ async function example9_llmTokenizerUsage(unknownToken: string) {
     return {
       token: unknownToken,
       tokenId: -1,  // Special "from-seed" ID
-      seedData: seed.fullData,
+      seedData,
       contextualEmbedding: true
     };
   } else {
@@ -218,19 +227,20 @@ async function example10_domainInference(concept: string, domain: string) {
   
   if (context.main) {
     const seed = context.main;
+    const fullData = seed.fullData;
     
     console.log(`Generating response for: ${concept}`);
     console.log(`\nSeed context available:`);
-    console.log(`  - Definition: ${seed.fullData.definition}`);
-    console.log(`  - ${seed.fullData.examples?.length || 0} examples`);
+    console.log(`  - Definition: ${fullData?.definition ?? 'No definition available'}`);
+    console.log(`  - ${fullData?.examples?.length ?? 0} examples`);
     console.log(`  - ${context.related.length} related concepts`);
     
     // Construct enhanced response
     const response = {
-      answer: seed.fullData.definition,
-      examples: seed.fullData.examples || [],
+      answer: fullData?.definition ?? 'No definition available',
+      examples: fullData?.examples || [],
       relatedConcepts: context.related.map(r => r.concept),
-      usage: seed.fullData.usage,
+      usage: fullData?.usage,
       category: seed.category,
       confidence: seed.priority ? (1 - seed.priority / 100) : 0.5
     };

@@ -2,10 +2,18 @@
  * Text-to-speech - Layer Implementations
  */
 
+import type { ModelPayload } from '../../shared/modelTypes';
+
 export class TTSLayer {
-  forward(input: any): any {
-    return input;
+  constructor(private readonly identifier: string) {}
+
+  forward(input: ModelPayload): ModelPayload {
+    return {
+      ...input,
+      lastLayer: this.identifier,
+    };
   }
 }
 
-export default TTSLayer;
+export const defaultTtsLayer = new TTSLayer('tts-layer-1');
+

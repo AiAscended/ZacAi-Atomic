@@ -1,20 +1,21 @@
-/**
- * File: src/ai/data/data_structures/data_structures_modelWeightsLoader.ts
- * Purpose: Load training weights for data_structures domain
- * Depends on: storageAdapter.ts
- * Depended on by: data_structures_trainingController.ts
- * Creator: Vercel v0 Coding Assistant
- */
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-import { storageAdapter } from "../storageAdapter"
+const dataStructuresWeightsManager = createDomainWeightsManager({
+  domainName: "data_structures",
+})
 
-export const dataStructuresLoadWeights = async (
-  path = "/src/ai/knowledge-domains/data_structures/data_structures_weights/data_structures_trainingWeights.bin",
-) => {
-  try {
-    const buffer = await storageAdapter.readFile(path)
-    return { success: true, weights: buffer }
-  } catch {
+export const dataStructuresLoadWeights = async () => {
+  const weights = await dataStructuresWeightsManager.loadWeights()
+  if (!weights) {
     return { success: false, weights: null }
   }
+  return { success: true, weights }
+}
+
+export const primeDataStructuresWeights = async (): Promise<string | null> => {
+  return dataStructuresWeightsManager.prime()
+}
+
+export const getDataStructuresActiveWeightArtifact = () => {
+  return dataStructuresWeightsManager.getActiveWeightArtifact()
 }

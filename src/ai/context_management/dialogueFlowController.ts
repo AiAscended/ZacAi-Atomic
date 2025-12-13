@@ -21,6 +21,7 @@ export const handleTurn = async (text: string, context: Record<string, unknown> 
 
 export class DialogueFlowController {
   private handlers: Map<string, Handler> = new Map()
+  private sessionStates: Map<string, string> = new Map()
 
   registerHandler(intent: string, handler: Handler): void {
     this.handlers.set(intent, handler)
@@ -42,10 +43,21 @@ export class DialogueFlowController {
     }
 
     const result = await handler(text, context)
+    const sessionId = typeof context.sessionId === "string" ? (context.sessionId as string) : "global"
+    this.updateFlow(sessionId, text, intent)
     return { status: "handled", intent, result }
   }
 
   getRegisteredIntents(): string[] {
     return Array.from(this.handlers.keys())
+  }
+
+  getState(sessionId: string): string {
+    return this.sessionStates.get(sessionId) ?? "neutral"
+  }
+
+  updateFlow(sessionId: string, text: string, emotionOrIntent?: string): void {
+    const stateDescriptor = emotionOrIntent || this.sessionStates.get(sessionId) || "neutral"
+    this.sessionStates.set(sessionId, stateDescriptor)
   }
 }

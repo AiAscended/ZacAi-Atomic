@@ -6,8 +6,6 @@
 import { domainRegistry } from '../domainRegistry';
 import { ENGLISH_DOMAIN } from './english_constants';
 import { loadEnglishSeedVocabulary } from './english_vocabularyManager';
-import { englishRunInference } from './english_inferenceController';
-import { englishRunTrainingEpoch } from './english_trainingController';
 import path from 'path';
 
 export const englishInit = async () => {

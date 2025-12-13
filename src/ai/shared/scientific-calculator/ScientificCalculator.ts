@@ -77,7 +77,8 @@ export class ScientificCalculator {
       // Use Function constructor for safe evaluation
       return new Function(`return ${jsExpression}`)()
     } catch (error) {
-      throw new Error(`Invalid mathematical expression: ${expression}`)
+      const reason = error instanceof Error ? error.message : String(error)
+      throw new Error(`Invalid mathematical expression: ${expression}. Details: ${reason}`)
     }
   }
 }

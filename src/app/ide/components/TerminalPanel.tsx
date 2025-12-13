@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Terminal as XTerm } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { WebLinksAddon } from 'xterm-addon-web-links';
 import 'xterm/css/xterm.css';
 import { Button } from '@/components/ui/button';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import { CommandProcessor } from '@/lib/ide/commandProcessor';
-import { useFileSystem } from '@/lib/ide/useFileSystem';
+import type { CommandFileSystem, CommandFileSystemEntry } from '@/lib/ide/commandProcessor';
+import { vfs } from '@/lib/ide/virtualFileSystem';
+import type { IDEFile } from '@/lib/ide/virtualFileSystem';
 
 interface TerminalSession {
   id: string;
@@ -23,11 +25,13 @@ export function TerminalPanel() {
   const terminalRef = useRef<HTMLDivElement>(null);
   const [sessions, setSessions] = useState<TerminalSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const sessionsRef = useRef<TerminalSession[]>([]);
   const fitAddonRef = useRef<FitAddon | null>(null);
-  const { fs } = useFileSystem();
 
-  const createSession = (title: string, index: number) => {
-    if (!terminalRef.current || !fs) return null;
+  const commandFs = useMemo(() => createCommandFileSystem(), []);
+
+  const createSession = useCallback((title: string, index: number) => {
+    if (!terminalRef.current) return null;
 
     const terminal = new XTerm({
       cursorBlink: true,
@@ -69,7 +73,7 @@ export function TerminalPanel() {
     terminal.open(terminalRef.current);
     fitAddon.fit();
 
-    const commandProcessor = new CommandProcessor(fs);
+    const commandProcessor = new CommandProcessor(commandFs);
     const sessionId = `session-${Date.now()}-${index}`;
 
     // Welcome message
@@ -177,10 +181,14 @@ export function TerminalPanel() {
     });
 
     return session;
-  };
+  }, [commandFs]);
 
   useEffect(() => {
-    if (!terminalRef.current || !fs) return;
+    sessionsRef.current = sessions;
+  }, [sessions]);
+
+  useEffect(() => {
+    if (!terminalRef.current) return;
 
     const session = createSession('Terminal 1', 0);
     if (session) {
@@ -201,9 +209,9 @@ export function TerminalPanel() {
 
     return () => {
       resizeObserver.disconnect();
-      sessions.forEach((s) => s.terminal.dispose());
+      sessionsRef.current.forEach((s) => s.terminal.dispose());
     };
-  }, [fs]);
+  }, [createSession]);
 
   const addSession = () => {
     const newSession = createSession(`Terminal ${sessions.length + 1}`, sessions.length);
@@ -215,14 +223,19 @@ export function TerminalPanel() {
 
   const closeSession = (sessionId: string) => {
     const session = sessions.find((s) => s.id === sessionId);
-    if (session) {
-      session.terminal.dispose();
-      const newSessions = sessions.filter((s) => s.id !== sessionId);
-      setSessions(newSessions);
-      
-      if (activeSessionId === sessionId && newSessions.length > 0) {
-        setActiveSessionId(newSessions[0].id);
-      }
+    if (!session) return;
+
+    session.terminal.dispose();
+    const newSessions = sessions.filter((s) => s.id !== sessionId);
+    setSessions(newSessions);
+
+    if (newSessions.length === 0) {
+      setActiveSessionId(null);
+      return;
+    }
+
+    if (activeSessionId === sessionId) {
+      setActiveSessionId(newSessions[0].id);
     }
   };
 
@@ -273,3 +286,55 @@ export function TerminalPanel() {
     </div>
   );
 }
+
+const toEntry = (file: IDEFile): CommandFileSystemEntry => ({
+  name: file.path === '/' ? '/' : file.path.split('/').pop() || file.path,
+  path: file.path,
+  type: file.type,
+  metadata: {
+    size: file.size,
+    modified: file.updatedAt,
+  },
+});
+
+const createCommandFileSystem = (): CommandFileSystem => ({
+  async read(path: string) {
+    const file = await vfs.readFile(path);
+    if (!file) {
+      throw new Error(`File not found: ${path}`);
+    }
+    if (file.type === 'directory') {
+      throw new Error(`${path} is a directory`);
+    }
+    return file.content;
+  },
+  async write(path: string, content: string) {
+    await vfs.writeFile(path, content);
+  },
+  async mkdir(path: string) {
+    await vfs.createDirectory(path);
+  },
+  async delete(path: string) {
+    await vfs.deleteFile(path);
+  },
+  async list(path: string) {
+    const targetPath = path || '/';
+    const node = await vfs.readFile(targetPath);
+    if (!node) {
+      throw new Error(`Path not found: ${path}`);
+    }
+    if (node.type === 'file') {
+      return [toEntry(node)];
+    }
+    const children = await vfs.listDirectory(targetPath);
+    return children.map(toEntry);
+  },
+  async exists(path: string) {
+    const file = await vfs.readFile(path);
+    return Boolean(file);
+  },
+  async search(query: string) {
+    const results = await vfs.searchFiles(query);
+    return results.map(toEntry);
+  },
+});

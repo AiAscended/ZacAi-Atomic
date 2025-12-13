@@ -1,18 +1,25 @@
-/**
- * File: src/ai/data/grammar/grammar_modelWeightsLoader.ts
- * Purpose: Load training weights for grammar domain
- * Depends on: None
- * Depended on by: grammar_trainingController.ts
- * Creator: Vercel v0 Coding Assistant
- */
-
 import { storageAdapter } from "../storageAdapter"
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-export const grammarLoadWeights = async (path = "/src/ai/knowledge-domains/grammar/grammar_weights/grammar_trainingWeights.bin") => {
+const grammarWeightsManager = createDomainWeightsManager({
+  domainName: "grammar",
+})
+
+export const grammarLoadWeights = async (): Promise<ArrayBuffer | null> => {
   try {
-    const raw = await storageAdapter.readFile(path)
-    return raw
-  } catch (e) {
+    const filename = await grammarWeightsManager.resolveActiveWeightFile()
+    const fullPath = `${grammarWeightsManager.storageBasePath}/${filename}`
+    return await storageAdapter.readBinaryFile(fullPath)
+  } catch (error) {
+    console.error("[grammar][weights] Failed to load weights", { error })
     return null
   }
+}
+
+export const primeGrammarWeights = async (): Promise<string | null> => {
+  return grammarWeightsManager.prime()
+}
+
+export const getGrammarActiveWeightArtifact = () => {
+  return grammarWeightsManager.getActiveWeightArtifact()
 }

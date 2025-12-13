@@ -7,10 +7,38 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+interface TrainingStatus {
+  isTraining: boolean;
+  currentTraining?: {
+    mode: string;
+    timestamp: string;
+    duration: number;
+  } | null;
+}
+
+interface TrainingHistoryItem {
+  id: string;
+  timestamp: string;
+  status: 'running' | 'completed' | 'failed';
+  mode: string;
+  duration: number;
+}
+
+interface TrainingSettings {
+  schedule: string;
+  confidenceThreshold: number;
+}
+
+interface TrainingResponse<T> {
+  success: boolean;
+  data: T;
+  error?: string;
+}
+
 export default function TrainingDashboard() {
-  const [status, setStatus] = useState<any>(null);
-  const [history, setHistory] = useState<any[]>([]);
-  const [settings, setSettings] = useState<any>(null);
+  const [status, setStatus] = useState<TrainingStatus | null>(null);
+  const [history, setHistory] = useState<TrainingHistoryItem[]>([]);
+  const [settings, setSettings] = useState<TrainingSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [triggering, setTriggering] = useState(false);
 
@@ -22,9 +50,9 @@ export default function TrainingDashboard() {
         fetch('/api/admin/training?view=settings'),
       ]);
 
-      const statusData = await statusRes.json();
-      const historyData = await historyRes.json();
-      const settingsData = await settingsRes.json();
+      const statusData: TrainingResponse<TrainingStatus> = await statusRes.json();
+      const historyData: TrainingResponse<TrainingHistoryItem[]> = await historyRes.json();
+      const settingsData: TrainingResponse<TrainingSettings> = await settingsRes.json();
 
       if (statusData.success) setStatus(statusData.data);
       if (historyData.success) setHistory(historyData.data);
@@ -51,7 +79,7 @@ export default function TrainingDashboard() {
         body: JSON.stringify({ action: 'trigger', params: { mode } }),
       });
 
-      const data = await res.json();
+      const data: TrainingResponse<TrainingStatus> = await res.json();
       if (data.success) {
         await fetchData();
         alert(`Training ${mode} started successfully!`);
@@ -74,7 +102,7 @@ export default function TrainingDashboard() {
         body: JSON.stringify({ action: 'stop' }),
       });
 
-      const data = await res.json();
+      const data: TrainingResponse<TrainingStatus> = await res.json();
       if (data.success) {
         await fetchData();
         alert('Training stopped successfully!');
@@ -95,7 +123,7 @@ export default function TrainingDashboard() {
         body: JSON.stringify({ settings }),
       });
 
-      const data = await res.json();
+      const data: TrainingResponse<TrainingSettings> = await res.json();
       if (data.success) {
         alert('Settings updated successfully!');
       } else {

@@ -27,7 +27,7 @@ export function WindowControls({
     <div className="flex items-center justify-between bg-muted/50 border-b px-3 py-1.5 h-10">
       <span className="text-sm font-medium text-foreground/70">{title}</span>
       <div className="flex items-center gap-1">
-        {isMaximized && onRestore && (
+        {(isMaximized || isMinimized) && onRestore && (
           <Button
             variant="ghost"
             size="icon"
@@ -38,7 +38,7 @@ export function WindowControls({
             <RotateCcw className="h-3.5 w-3.5" />
           </Button>
         )}
-        {!isMaximized && onMinimize && (
+        {!isMaximized && !isMinimized && onMinimize && (
           <Button
             variant="ghost"
             size="icon"

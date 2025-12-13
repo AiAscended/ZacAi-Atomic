@@ -1,0 +1,185 @@
+# Data Structures Domain Instructions
+# Purpose: Ensure consistent reasoning about storage layouts, complexity trade-offs, and schema evolution
+
+domain:
+  id: data_structures
+  name: Data Structures
+  version: "1.2.0"
+  description: "Design, optimize, and reason about abstract and concrete data containers"
+
+role:
+  primary: "Specialized knowledge inference for data structures"
+  scope: "Evaluate options, reason about invariants, and explain trade-offs"
+  orchestration_behavior: "Attaches to planning graph whenever storage/layout concerns are detected"
+
+capabilities:
+  - "Classify workloads and match appropriate structures"
+  - "Compute time/space complexity envelopes"
+  - "Describe invariants, mutation rules, and concurrency considerations"
+  - "Offer migration plans between structures"
+  - "Surface reference implementations tied to seeds"
+
+seeds:
+  location: "./data_structures_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./data_structures_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./data_structures_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  complexity_profiler:
+    enabled: true
+    capabilities:
+      - "Approximate amortized costs"
+      - "Visualize complexity curves"
+  memory_layout_estimator:
+    enabled: true
+    capabilities:
+      - "Estimate cache friendliness"
+      - "Highlight fragmentation risk"
+  invariants_checker:
+    enabled: true
+    capabilities:
+      - "Validate pre/post conditions"
+      - "Flag required rebalancing"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Stanford CS Library"
+        url: "https://web.stanford.edu/class/archive/cs/cs166"
+        use_for: ["analysis", "balanced trees"]
+      - name: "CP-Algorithms"
+        url: "https://cp-algorithms.com"
+        use_for: ["fenwick", "segment trees", "bitsets"]
+      - name: "GeeksforGeeks Data Structures"
+        url: "https://www.geeksforgeeks.org/data-structures"
+        use_for: ["reference implementations"]
+      - name: "Wikipedia Data Structures Portal"
+        url: "https://en.wikipedia.org/wiki/Data_structure"
+        use_for: ["definitions", "historical context"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "CP-Algorithms"
+      url: "https://cp-algorithms.com"
+      use_for: ["advanced structures"]
+    - name: "Stanford CS Library"
+      url: "https://web.stanford.edu/class/archive/cs/cs166"
+      use_for: ["course notes"]
+    - name: "GeeksforGeeks Data Structures"
+      url: "https://www.geeksforgeeks.org/data-structures"
+      use_for: ["code samples"]
+  reference_triggers:
+    - "Requests for derivations or proofs"
+    - "Need for canonical pseudocode"
+    - "Comparing competing structures"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.82
+    max_tokens: 700
+    temperature: 0.4
+    top_p: 0.85
+    require_complexity_table: true
+  input_processing:
+    - "Detect workload pattern (read-heavy, write-heavy, range queries, etc.)"
+    - "Collect constraints: memory budget, concurrency, ordering"
+    - "Check if interoperability with other domains is required"
+  reasoning_steps:
+    - "List candidate structures"
+    - "Score candidates using complexity_profiler"
+    - "Validate invariants"
+    - "Select recommendation with explanation"
+  output_formatting:
+    - "Present summary table (structure vs operations vs cost)"
+    - "Call out edge cases and invariants"
+    - "Link to seeds/weights when specific code exists"
+  validation:
+    - "Ensure complexity math consistent"
+    - "Confirm references when citing sources"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.0006
+  batch_size: 40
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Annotated seed snippets"
+    - "Benchmark traces"
+    - "Academic lecture notes"
+  focus_areas:
+    - "Trade-off articulation"
+    - "Cache/memory reasoning"
+    - "Concurrent structures"
+  evaluation_metrics:
+    - "Recommendation accuracy"
+    - "Complexity explanation clarity"
+    - "Admin feedback incorporation"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize operation set and required guarantees"
+    - "Map terminology to canonical names"
+  processing:
+    - "Simulate operations with complexity_profiler"
+    - "Consult seeds for implementation details"
+  postprocessing:
+    - "Summarize migration/rollout guidance"
+    - "Expose toggles for admin overrides"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Insufficient workload detail"
+      action: "Ask clarifying questions about access patterns"
+    - error: "Conflicting constraints"
+      action: "Present trade-off matrix and request priority"
+    - error: "Tool failure"
+      action: "Fallback to general_knowledge domain"
+  recovery_strategies:
+    - "Escalate to system domain when orchestration rules conflict"
+    - "Log event to admin dashboard with context"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.complexity_profiler.enabled"
+    - "tools.memory_layout_estimator.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/data-structures"
+    profiler_toggle: "tools.complexity_profiler.enabled"
+    memory_tool_toggle: "tools.memory_layout_estimator.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"

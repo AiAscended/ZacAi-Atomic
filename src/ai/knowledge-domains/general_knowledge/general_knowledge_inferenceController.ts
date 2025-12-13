@@ -2,6 +2,22 @@ import { findSources } from "../url_lookup"
 import { scrapeURL } from "../../shared/tools/webScraper"
 import { GENERAL_DOMAIN } from "./general_knowledge_constants"
 
+type SentimentAnalysis = {
+  sentiment?: string
+}
+
+type DomainInferenceResult = {
+  domain: string
+  confidence: number
+}
+
+type GeneralInferenceContext = {
+  tokens?: string[]
+  embeddings?: number[][]
+  inferenceResults?: DomainInferenceResult | DomainInferenceResult[]
+  sentiment?: SentimentAnalysis
+}
+
 const stopWords = [
   "what",
   "is",
@@ -46,11 +62,11 @@ const stopWords = [
   "your",
 ]
 
-export const generalRunInference = async (input: string, _context?: any) => {
-  const tokens = _context?.tokens || []
-  const embeddings = _context?.embeddings || []
-  const inferenceResults = _context?.inferenceResults
-  const sentiment = _context?.sentiment
+export const generalRunInference = async (input: string, context: GeneralInferenceContext = {}) => {
+  const tokens = context.tokens ?? []
+  const embeddings = context.embeddings ?? []
+  const inferenceResults = context.inferenceResults
+  const sentiment = context.sentiment
   // TODO: Use userProfile for personalized responses
   // const userProfile = _context?.userProfile || {}
 

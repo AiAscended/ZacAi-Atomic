@@ -42,20 +42,41 @@ export const REACT_DOC_REFERENCES: ReactDocReference[] = [
   },
 ]
 
-registerSource("react", "React Official Docs", "https://react.dev", "Official React documentation and guides")
-registerSource(
-  "react",
-  "React Hooks Reference",
-  "https://react.dev/reference/react",
-  "Complete reference for all React Hooks",
-)
-registerSource(
-  "react",
-  "React Components Reference",
-  "https://react.dev/reference/react/components",
-  "Built-in React components reference",
-)
-registerSource("react", "React Patterns", "https://react.dev/learn", "Learn React patterns and best practices")
+const REGISTERED_SOURCES: ReactDocReference[] = [
+  ...REACT_DOC_REFERENCES,
+  {
+    title: "React Official Docs",
+    url: "https://react.dev",
+    topics: ["general", "docs"],
+    description: "Official React documentation and guides",
+  },
+  {
+    title: "React Hooks Reference",
+    url: "https://react.dev/reference/react",
+    topics: ["hooks", "reference"],
+    description: "Complete reference for all React Hooks",
+  },
+  {
+    title: "React Components Reference",
+    url: "https://react.dev/reference/react/components",
+    topics: ["components", "reference"],
+    description: "Built-in React components reference",
+  },
+  {
+    title: "React Patterns",
+    url: "https://react.dev/learn",
+    topics: ["patterns", "best-practices"],
+    description: "Learn React patterns and best practices",
+  },
+]
+
+export function registerReactDocumentationSources(): void {
+  for (const reference of REGISTERED_SOURCES) {
+    registerSource("react", reference.title, reference.url, reference.description)
+  }
+}
+
+registerReactDocumentationSources()
 
 export function findReactDocumentation(query: string): ReactDocReference[] {
   const lowerQuery = query.toLowerCase()
@@ -67,4 +88,3 @@ export function findReactDocumentation(query: string): ReactDocReference[] {
   )
 }
 
-export default () => registerSource

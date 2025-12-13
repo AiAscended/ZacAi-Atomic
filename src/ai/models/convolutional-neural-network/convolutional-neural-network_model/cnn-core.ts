@@ -2,17 +2,27 @@
  * Convolutional-neural-network - Core Model Implementation
  */
 
+import { ModelConfig, ModelPayload } from '../../shared/modelTypes';
+
 export class CNNModel {
-  private config: any;
-  
-  constructor(config: any) {
+  private readonly config: ModelConfig;
+
+  constructor(config: ModelConfig) {
     this.config = config;
   }
-  
-  forward(input: any): any {
-    // Model forward pass implementation
-    return input;
+
+  forward(input: ModelPayload): ModelPayload {
+    const activations = this.config.layers ?? 0;
+    return {
+      ...input,
+      activations,
+      lastRun: Date.now(),
+    };
   }
 }
 
-export default CNNModel;
+export const defaultCnnModelConfig: ModelConfig = {
+  layers: 3,
+  learningRate: 0.001,
+};
+

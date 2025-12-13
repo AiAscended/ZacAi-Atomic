@@ -42,20 +42,13 @@ export const NEXTJS_DOC_REFERENCES: NextjsDocReference[] = [
   },
 ]
 
-registerSource("nextjs", "Next.js Documentation", "https://nextjs.org/docs", "Official Next.js documentation")
-registerSource(
-  "nextjs",
-  "App Router Documentation",
-  "https://nextjs.org/docs/app",
-  "Complete guide to the Next.js App Router",
-)
-registerSource(
-  "nextjs",
-  "Data Fetching",
-  "https://nextjs.org/docs/app/building-your-application/data-fetching",
-  "Learn about data fetching patterns in Next.js",
-)
-registerSource("nextjs", "Deployment", "https://nextjs.org/docs/deployment", "Deploy your Next.js application")
+export function registerNextjsDocumentationSources(): void {
+  for (const reference of NEXTJS_DOC_REFERENCES) {
+    registerSource("nextjs", reference.title, reference.url, reference.description)
+  }
+}
+
+registerNextjsDocumentationSources()
 
 export function findNextjsDocumentation(query: string): NextjsDocReference[] {
   const lowerQuery = query.toLowerCase()
@@ -66,5 +59,3 @@ export function findNextjsDocumentation(query: string): NextjsDocReference[] {
       ref.topics.some((topic) => topic.toLowerCase().includes(lowerQuery)),
   )
 }
-
-export default () => registerSource

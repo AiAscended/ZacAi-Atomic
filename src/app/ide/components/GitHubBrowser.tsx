@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Github, Search, GitBranch, Star, GitFork, Loader2, Download } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Github, Search, Star, GitFork, Loader2, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -21,19 +21,39 @@ interface GitHubBrowserProps {
   onCloneRepo?: (path: string) => void;
 }
 
+type RepoList = Awaited<ReturnType<typeof github.listRepositories>>;
+type GitHubRepository = RepoList extends Array<infer Item> ? Item : never;
+
 export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowserProps) {
-  const [repos, setRepos] = useState<any[]>([]);
+  const [repos, setRepos] = useState<GitHubRepository[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [token, setToken] = useState('');
   const [authenticated, setAuthenticated] = useState(false);
   const { toast } = useToast();
 
+  const loadRepositories = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await github.listRepositories();
+      setRepos(data);
+    } catch (error) {
+      console.error('Failed to load repositories:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load repositories',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
   useEffect(() => {
     if (authenticated) {
-      loadRepositories();
+      void loadRepositories();
     }
-  }, [authenticated]);
+  }, [authenticated, loadRepositories]);
 
   const handleAuthenticate = () => {
     if (!token.trim()) {
@@ -53,6 +73,7 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
         description: 'Authenticated with GitHub',
       });
     } catch (error) {
+      console.error('GitHub authentication failed:', error);
       toast({
         title: 'Error',
         description: 'Failed to authenticate',
@@ -61,33 +82,18 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
     }
   };
 
-  const loadRepositories = async () => {
-    setLoading(true);
-    try {
-      const data = await github.listRepositories();
-      setRepos(data);
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to load repositories',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
-      loadRepositories();
+      void loadRepositories();
       return;
     }
 
     setLoading(true);
     try {
       const data = await github.searchRepositories(searchQuery);
-      setRepos(data);
+      setRepos(data as GitHubRepository[]);
     } catch (error) {
+      console.error('GitHub search failed:', error);
       toast({
         title: 'Error',
         description: 'Search failed',
@@ -109,6 +115,7 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
       onCloneRepo?.(path);
       onOpenChange(false);
     } catch (error) {
+      console.error('Failed to clone repository:', error);
       toast({
         title: 'Error',
         description: `Failed to clone ${owner}/${repoName}`,

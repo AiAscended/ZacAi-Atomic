@@ -2,17 +2,27 @@
  * Speech-to-text - Core Model Implementation
  */
 
+import type { ModelConfig, ModelPayload } from '../../shared/modelTypes';
+
 export class STTModel {
-  private config: any;
-  
-  constructor(config: any) {
+  private readonly config: ModelConfig;
+
+  constructor(config: ModelConfig = {}) {
     this.config = config;
   }
-  
-  forward(input: any): any {
-    // Model forward pass implementation
-    return input;
+
+  forward(input: ModelPayload): ModelPayload {
+    return {
+      ...input,
+      configuration: this.config,
+      lastRun: Date.now(),
+    };
   }
 }
 
-export default STTModel;
+export const defaultSttConfig: ModelConfig = {
+  samplingRate: 16000,
+  encoderLayers: 6,
+  decoderLayers: 4,
+};
+

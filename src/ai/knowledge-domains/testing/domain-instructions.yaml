@@ -1,0 +1,185 @@
+# Testing Domain Instructions
+# Purpose: Deliver comprehensive test strategy design, automation guidance, and signal interpretation
+
+domain:
+  id: testing
+  name: Testing
+  version: "1.2.0"
+  description: "Focuses on verification methodologies, coverage strategy, and CI signal triage"
+
+role:
+  primary: "Specialized knowledge inference for software testing"
+  scope: "Plan, execute, and interpret automated and manual testing workflows"
+  orchestration_behavior: "Auto-attaches when quality gates, CI failures, or validation intents appear"
+
+capabilities:
+  - "Map requirements to test plans"
+  - "Design unit, integration, contract, and e2e suites"
+  - "Interpret flaky failures and suggest mitigations"
+  - "Optimize coverage vs runtime"
+  - "Integrate with admin-managed test data sources"
+
+seeds:
+  location: "./testing_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./testing_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./testing_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  test_matrix_builder:
+    enabled: true
+    capabilities:
+      - "Derive coverage matrices"
+      - "Highlight missing scenarios"
+  coverage_analyzer:
+    enabled: true
+    capabilities:
+      - "Correlate statements/branches to features"
+      - "Spot diminishing returns"
+  ci_signal_monitor:
+    enabled: true
+    capabilities:
+      - "Ingest CI logs"
+      - "Classify flakes vs regressions"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Testing Manifesto"
+        url: "https://www.agiletesting.org"
+        use_for: ["principles"]
+      - name: "OWASP Testing Guide"
+        url: "https://owasp.org/www-project-web-security-testing-guide"
+        use_for: ["security testing"]
+      - name: "Google Testing Blog"
+        url: "https://testing.googleblog.com"
+        use_for: ["case studies"]
+      - name: "Martin Fowler"
+        url: "https://martinfowler.com/testing"
+        use_for: ["patterns"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Google Testing Blog"
+      url: "https://testing.googleblog.com"
+      use_for: ["practices"]
+    - name: "OWASP Testing Guide"
+      url: "https://owasp.org/www-project-web-security-testing-guide"
+      use_for: ["security"]
+    - name: "Martin Fowler"
+      url: "https://martinfowler.com/testing"
+      use_for: ["patterns"]
+  reference_triggers:
+    - "Need to cite testing heuristics"
+    - "Security or compliance-oriented QA"
+    - "Program wants proven flake mitigation"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.8
+    max_tokens: 650
+    temperature: 0.42
+    top_p: 0.88
+    require_verification_steps: true
+  input_processing:
+    - "Classify system type (web, mobile, API, data pipeline)"
+    - "Detect SDLC phase and release cadence"
+    - "Capture tooling constraints (jest, vitest, playwright, etc.)"
+  reasoning_steps:
+    - "Map coverage goals"
+    - "Design layered strategy"
+    - "Align with ci_signal_monitor telemetry"
+  output_formatting:
+    - "Provide table of test types vs scope"
+    - "List prioritized next steps"
+  validation:
+    - "Ensure recommended tooling exists in stack"
+    - "Avoid conflicting requirements"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.00065
+  batch_size: 36
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "CI failure archives"
+    - "Seeded playbooks"
+    - "Industry testing whitepapers"
+  focus_areas:
+    - "Flake classification accuracy"
+    - "Security testing coverage"
+    - "Integration with admin overrides"
+  evaluation_metrics:
+    - "False positive rate"
+    - "Plan completeness"
+    - "Admin satisfaction"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize failure logs"
+    - "Tag feature areas"
+  processing:
+    - "Build test matrix"
+    - "Assign tooling by layer"
+  postprocessing:
+    - "Emit mitigation backlog"
+    - "Suggest telemetry improvements"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Missing CI context"
+      action: "Request pipeline logs and rerun"
+    - error: "Tooling mismatch"
+      action: "Suggest migration path or fallback"
+    - error: "Unclear severity"
+      action: "Ask user/admin to label impact"
+  recovery_strategies:
+    - "Escalate to system domain if release blocker detected"
+    - "Log unresolved flakes for admin review"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.test_matrix_builder.enabled"
+    - "tools.coverage_analyzer.enabled"
+    - "tools.ci_signal_monitor.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/testing"
+    matrix_toggle: "tools.test_matrix_builder.enabled"
+    coverage_toggle: "tools.coverage_analyzer.enabled"
+    ci_monitor_toggle: "tools.ci_signal_monitor.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"

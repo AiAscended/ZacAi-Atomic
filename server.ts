@@ -7,7 +7,7 @@
 import { createServer } from 'http';
 import { parse } from 'url';
 import next from 'next';
-import { terminalManager } from '@/lib/terminalManager';
+import terminalManager from '@/lib/terminalManager';
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = 'localhost';
@@ -31,7 +31,7 @@ export async function startServer() {
   });
 
   // Initialize WebSocket terminal manager
-  terminalManager.initialize(server);
+  await terminalManager.initialize(server);
 
   server.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port}`);
@@ -40,7 +40,7 @@ export async function startServer() {
   // Graceful shutdown
   process.on('SIGTERM', () => {
     console.log('SIGTERM signal received: closing HTTP server');
-    terminalManager.cleanup();
+    terminalManager.closeAllTerminals();
     server.close(() => {
       console.log('HTTP server closed');
     });
@@ -48,7 +48,7 @@ export async function startServer() {
 
   process.on('SIGINT', () => {
     console.log('SIGINT signal received: closing HTTP server');
-    terminalManager.cleanup();
+    terminalManager.closeAllTerminals();
     server.close(() => {
       console.log('HTTP server closed');
       process.exit(0);
@@ -56,8 +56,8 @@ export async function startServer() {
   });
 }
 
-// Start server if this file is run directly
-if (require.main === module) {
+// Start server if this file is run directly (ESM compatible)
+if (import.meta.url === `file://${process.argv[1]}`) {
   startServer().catch((err) => {
     console.error('Error starting server:', err);
     process.exit(1);

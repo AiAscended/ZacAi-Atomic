@@ -19,7 +19,7 @@ interface FileSystemDB extends DBSchema {
   };
 }
 
-class VirtualFileSystem {
+export class VirtualFileSystem {
   private db: IDBPDatabase<FileSystemDB> | null = null;
   private dbName = 'zacai-ide-fs';
   private dbVersion = 1;
@@ -42,6 +42,10 @@ class VirtualFileSystem {
     }
 
     return this.db;
+  }
+
+  async initialize() {
+    return this.init();
   }
 
   private async initializeSampleStructure() {
@@ -334,9 +338,9 @@ Happy coding!`,
   private getLanguageFromPath(path: string): string {
     const ext = path.split('.').pop()?.toLowerCase();
     const langMap: Record<string, string> = {
-      tsx: 'typescript',
+      tsx: 'typescriptreact',
       ts: 'typescript',
-      jsx: 'javascript',
+      jsx: 'javascriptreact',
       js: 'javascript',
       json: 'json',
       css: 'css',
@@ -361,6 +365,42 @@ Happy coding!`,
     const parts = path.split('/').filter(Boolean);
     parts.pop();
     return parts.length > 0 ? '/' + parts.join('/') : '/';
+  }
+
+  // ---------------------------------------------------------------------------
+  // Convenience helpers (used by tests + app code)
+  // ---------------------------------------------------------------------------
+
+  async read(path: string): Promise<string | null> {
+    const file = await this.readFile(path);
+    return file?.content ?? null;
+  }
+
+  async write(path: string, content: string): Promise<void> {
+    await this.writeFile(path, content);
+  }
+
+  async exists(path: string): Promise<boolean> {
+    const file = await this.readFile(path);
+    return Boolean(file);
+  }
+
+  async mkdir(path: string): Promise<void> {
+    await this.createDirectory(path);
+  }
+
+  async list(path: string): Promise<Array<{ name: string; path: string; type: IDEFile['type']; language: string }>> {
+    const entries = await this.listDirectory(path);
+    return entries.map((entry) => ({
+      name: entry.path.split('/').pop() || '',
+      path: entry.path,
+      type: entry.type,
+      language: entry.language,
+    }));
+  }
+
+  detectLanguage(filename: string): string {
+    return this.getLanguageFromPath(filename);
   }
 }
 

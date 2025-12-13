@@ -5,7 +5,7 @@
  * GET - Retrieve all installations for the GitHub App
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,14 @@ export const dynamic = "force-dynamic";
  * GET /api/admin/github-app/installations
  * List all installations of the GitHub App
  */
-export async function GET(request: NextRequest) {
+type GitHubInstallation = {
+  id: number;
+  account: { login: string; type: string };
+  created_at: string;
+  permissions?: Record<string, string>;
+};
+
+export async function GET() {
   try {
     // Get JWT token from internal endpoint
     const jwtResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/admin/github-app/jwt`, {
@@ -48,10 +55,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const installations = await response.json();
+    const installations: GitHubInstallation[] = await response.json();
 
     // Transform to our format
-    const formatted = installations.map((install: any) => ({
+    const formatted = installations.map((install) => ({
       installationId: install.id.toString(),
       accountLogin: install.account.login,
       accountType: install.account.type,

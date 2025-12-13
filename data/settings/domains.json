@@ -58,5 +58,15 @@
     "keywords": [],
     "priority": 5,
     "updatedAt": "2025-11-05T05:51:52.148Z"
+  },
+  "general_knowledge": {
+    "enabled": true,
+    "confidenceThreshold": 0.11,
+    "maxTokens": 2048,
+    "temperature": 1.6,
+    "description": "",
+    "keywords": [],
+    "priority": 3,
+    "updatedAt": "2025-12-06T02:09:04.029Z"
   }
 }

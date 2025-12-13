@@ -28,4 +28,11 @@ export const getEnvironmentTokenById = (id: number): string | undefined => {
   return undefined
 }
 export const environmentTokenCount = () => environmentTokenMap.size
-export default { environmentTokenMap, getEnvironmentTokenId, getEnvironmentTokenById, environmentTokenCount }
+const environmentTokenExports = {
+  environmentTokenMap,
+  getEnvironmentTokenId,
+  getEnvironmentTokenById,
+  environmentTokenCount,
+}
+
+export default environmentTokenExports

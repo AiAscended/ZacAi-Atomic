@@ -42,13 +42,16 @@ export const persistTypeScriptWeights = (weights: Record<string, number[]>) => {
       content
     );
     return true;
-  } catch (e) {
+  } catch (error) {
+    console.error('[TypeScript] Failed to persist pretrained weights:', error);
     return false;
   }
 };
 
-export default {
+const typescriptEmbeddingApi = {
   getTypescriptEmbedding,
   getTypescriptEmbeddingsForTokens,
   persistTypeScriptWeights,
 };
+
+export default typescriptEmbeddingApi;

@@ -2,10 +2,12 @@
  * Wavenet-audio-model - Layer Implementations
  */
 
+import type { ModelPayload } from "../../shared/modelTypes"
+
 export class WAVENETLayer {
-  forward(input: any): any {
-    return input;
+  forward(input: ModelPayload): ModelPayload {
+    return input
   }
 }
 
-export default WAVENETLayer;
+export default WAVENETLayer

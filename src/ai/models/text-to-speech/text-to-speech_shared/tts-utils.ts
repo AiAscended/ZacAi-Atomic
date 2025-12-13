@@ -2,6 +2,17 @@
  * Text-to-speech - Utilities
  */
 
-export function ttsUtility(): void {}
+import type { ModelPayload } from '../../shared/modelTypes';
 
-export default { ttsUtility };
+export function synthesizePhonemes(payload: ModelPayload): ModelPayload {
+	const phonemeSequence = (payload.text as string | undefined)?.split(' ') ?? [];
+	const annotated = {
+		...payload,
+		phonemeSequence,
+		synthesizedAt: Date.now(),
+	};
+
+	console.log('[tts-utils] Generated phoneme sequence', phonemeSequence.length);
+	return annotated;
+}
+

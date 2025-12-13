@@ -1,6 +1,34 @@
 /**
  * File: src/ai/orchestration/aiOrchestrator.ts
- * Re-export from aiOrchestrator-v2.ts for compatibility
+ * Compatibility adapter exposing the legacy AIOrchestrator
+ * name while delegating all work to MainOrchestrator.
  */
 
-export { AIOrchestrator } from "./aiOrchestrator-v2"
+import {
+	MainOrchestrator,
+	type OrchestratorResponse,
+} from "./mainOrchestrator"
+
+export class AIOrchestrator {
+	private readonly orchestrator: MainOrchestrator
+
+	constructor() {
+		this.orchestrator = MainOrchestrator.getInstance()
+	}
+
+	async initialize(): Promise<void> {
+		await this.orchestrator.initialize()
+	}
+
+	async processPrompt(
+		prompt: string,
+		sessionId: string,
+		context?: Record<string, unknown>
+	): Promise<OrchestratorResponse> {
+		return this.orchestrator.processPrompt(prompt, sessionId, context)
+	}
+
+	public getStatus() {
+		return this.orchestrator.getStatus()
+	}
+}

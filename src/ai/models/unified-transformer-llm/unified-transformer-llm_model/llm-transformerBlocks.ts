@@ -74,8 +74,7 @@ export class LLMTransformerBlock {
   private initializeAttentionWeights(numHeads: number, inDim: number, outDim: number): number[][][] {
     const weights: number[][][] = [];
     for (let h = 0; h < numHeads; h++) {
-      // Swap dimensions: we want [outDim, inDim] so transpose gives us [inDim, outDim]
-      weights.push(this.initializeMatrix(outDim, inDim));
+      weights.push(this.initializeMatrix(inDim, outDim));
     }
     return weights;
   }
@@ -191,9 +190,9 @@ export class LLMTransformerBlock {
     // Process each attention head independently
     for (let h = 0; h < numHeads; h++) {
       // Project Q, K, V for this head
-      const Q = this.matmul(queries, this.transpose(this.Wq[h])); // [seqLen, headDim]
-      const K = this.matmul(keys, this.transpose(this.Wk[h]));    // [seqLen, headDim]
-      const V = this.matmul(values, this.transpose(this.Wv[h]));  // [seqLen, headDim]
+      const Q = this.matmul(queries, this.Wq[h]); // [seqLen, headDim]
+      const K = this.matmul(keys, this.Wk[h]);    // [seqLen, headDim]
+      const V = this.matmul(values, this.Wv[h]);  // [seqLen, headDim]
       
       // Compute attention scores: QK^T / sqrt(d_k)
       const KT = this.transpose(K); // [headDim, seqLen]

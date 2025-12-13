@@ -1,0 +1,183 @@
+# Version Control Domain Instructions
+# Purpose: Git/GitHub/GitLab expertise with branching, reviews, and automation
+
+domain:
+  id: version_control
+  name: "Version Control"
+  version: "1.1.0"
+  description: "Guides branching strategies, merge workflows, and repository hygiene"
+
+role:
+  primary: "Specialized knowledge inference for version control"
+  scope: "Distributed VCS (Git), hosting platforms, CI triggers"
+  orchestration_behavior: "Plug-in module that can be loaded/unloaded without impacting other domains"
+
+capabilities:
+  - "Explain Git plumbing and porcelain commands"
+  - "Diagnose merge conflicts and divergent histories"
+  - "Recommend branching models (GitFlow, trunk-based, release trains)"
+  - "Enforce commit policy and sign-off rules"
+  - "Sync documentation links with admin-managed URL sources"
+
+seeds:
+  location: "./version_control_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./version_control_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./version_control_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  git_cli:
+    enabled: true
+    capabilities:
+      - "Simulate git commands (status, log, diff)"
+      - "Explain command outputs for users"
+  diff_analyzer:
+    enabled: true
+    capabilities:
+      - "Highlight conflict regions"
+      - "Recommend resolution strategy"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Git SCM Book"
+        url: "https://git-scm.com/book/en/v2"
+        use_for: ["core concepts", "plumbing commands"]
+      - name: "GitHub Docs"
+        url: "https://docs.github.com"
+        use_for: ["actions", "pull requests", "security"]
+      - name: "GitLab Docs"
+        url: "https://docs.gitlab.com"
+        use_for: ["CI/CD", "branch protection"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Git SCM"
+      url: "https://git-scm.com/docs"
+      use_for: ["command reference"]
+    - name: "GitHub Docs"
+      url: "https://docs.github.com"
+      use_for: ["pull requests", "protected branches"]
+    - name: "GitLab Docs"
+      url: "https://docs.gitlab.com"
+      use_for: ["pipelines", "permissions"]
+  reference_triggers:
+    - "Unknown git error code"
+    - "Platform-specific configuration"
+    - "Compliance requirement (signed commits, DCO)"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.75
+    max_tokens: 550
+    temperature: 0.45
+    top_p: 0.9
+    enforce_command_safety: true
+  input_processing:
+    - "Detect VCS provider (git CLI, GitHub, GitLab, Azure DevOps)"
+    - "Identify desired operation (commit, merge, rebase, tag, release)"
+    - "Parse error messages if provided"
+  reasoning_steps:
+    - "Map issue to underlying git concept"
+    - "Select safe command sequence"
+    - "Consider branch protection and hooks"
+    - "Surface risk level"
+  output_formatting:
+    - "Show commands in ordered blocks"
+    - "Explain each command in plain language"
+    - "Reference relevant policies (sign-off, review)"
+  validation:
+    - "Ensure commands are idempotent or note destructive impact"
+    - "Check for admin-enforced signing requirements"
+    - "Confirm branch names exist"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.0008
+  batch_size: 40
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Commit histories"
+    - "Merge conflict transcripts"
+    - "Pull request reviews"
+    - "CI/CD logs"
+  focus_areas:
+    - "Conflict resolution patterns"
+    - "Automation best practices"
+    - "Security policies"
+  evaluation_metrics:
+    - "Resolution accuracy"
+    - "Policy compliance"
+    - "User satisfaction"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Validate branch inputs"
+    - "Normalize repo URLs"
+    - "Fetch admin overrides"
+  processing:
+    - "Simulate git operations"
+    - "Generate diffs"
+    - "Assess risk"
+  postprocessing:
+    - "Provide step-by-step guidance"
+    - "Log recommended actions"
+    - "Cache solutions for repeated errors"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Detached HEAD"
+      action: "Explain cause and provide reconnection steps"
+    - error: "Rebase conflict"
+      action: "List conflicting files and resolution options"
+    - error: "Push rejected"
+      action: "Check branch protection or missing fetch"
+  recovery_strategies:
+    - "Create temporary backup branch"
+    - "Stash local changes"
+    - "Request admin assistance if permissions issue"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+    - "tools.git_cli.enabled"
+  field_bindings:
+    admin_page: "/admin/domains/version-control"
+    url_sources: "tools.url_lookup.sources"
+    primary_lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    git_cli_toggle: "tools.git_cli.enabled"
+    seed_directory: "seeds.location"
+    weight_directory: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"
+      - "tools.url_lookup.sources"

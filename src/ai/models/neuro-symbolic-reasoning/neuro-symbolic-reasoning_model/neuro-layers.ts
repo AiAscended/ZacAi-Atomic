@@ -2,10 +2,12 @@
  * Neuro-symbolic-reasoning - Layer Implementations
  */
 
+import type { ModelPayload } from "../../shared/modelTypes"
+
 export class NEUROLayer {
-  forward(input: any): any {
-    return input;
+  forward(input: ModelPayload): ModelPayload {
+    return input
   }
 }
 
-export default NEUROLayer;
+export default NEUROLayer

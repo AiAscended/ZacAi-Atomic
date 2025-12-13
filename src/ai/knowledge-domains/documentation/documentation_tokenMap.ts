@@ -28,4 +28,11 @@ export const getDocumentationTokenById = (id: number): string | undefined => {
   return undefined
 }
 export const documentationTokenCount = () => documentationTokenMap.size
-export default { documentationTokenMap, getDocumentationTokenId, getDocumentationTokenById, documentationTokenCount }
+const documentationTokenExports = {
+  documentationTokenMap,
+  getDocumentationTokenId,
+  getDocumentationTokenById,
+  documentationTokenCount,
+}
+
+export default documentationTokenExports

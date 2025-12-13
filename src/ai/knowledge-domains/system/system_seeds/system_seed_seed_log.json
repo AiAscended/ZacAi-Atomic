@@ -5,7 +5,18 @@
       "timestamp": "2025-07-07T19:40:00+10:00",
       "action": "Initial core_config.json loaded",
       "user": "UltimateAI Team"
+    },
+    {
+      "event_id": "seed-20250707-014",
+      "timestamp": "2025-07-07T20:05:00+10:00",
+      "action": "Vocabulary set synchronized to shared registry",
+      "user": "SeedAutomation"
+    },
+    {
+      "event_id": "seed-20250708-003",
+      "timestamp": "2025-07-08T09:12:00+10:00",
+      "action": "Hyperparameters validated for UltimateAI-v5",
+      "user": "ModelIntegrity"
     }
-    // Add more events as seeding occurs
   ]
 }

@@ -1,7 +1,7 @@
 import { tokenizeProgrammingInput, type TokenizedProgrammingInput } from "./programming_tokenizer"
 
 export interface ProgrammingParseResult {
-  type: "concept" | "syntax" | "debugging" | "design" | "algorithm" | "question" | "general"
+  type: "concept" | "syntax" | "debugging" | "design" | "algorithm" | "question" | "example" | "general"
   tokens: TokenizedProgrammingInput
   metadata: {
     language?: string
@@ -31,7 +31,10 @@ export function parseProgrammingInput(input: string): ProgrammingParseResult {
 
   let type: ProgrammingParseResult["type"] = "general"
 
-  if (lowerInput.includes("concept") || lowerInput.includes("what is")) type = "concept"
+  const exampleKeywords = ["example", "show me", "code snippet", "snippet", "demo"]
+
+  if (exampleKeywords.some((keyword) => lowerInput.includes(keyword))) type = "example"
+  else if (lowerInput.includes("concept") || lowerInput.includes("what is")) type = "concept"
   else if (lowerInput.includes("syntax") || lowerInput.includes("how to write")) type = "syntax"
   else if (lowerInput.includes("debug") || lowerInput.includes("error") || lowerInput.includes("bug"))
     type = "debugging"
