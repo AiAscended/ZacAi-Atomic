@@ -39,7 +39,8 @@
       "@/hooks/*": ["./src/hooks/*"],
       "@/styles/*": ["./src/styles/*"],
       "@/ai/*": ["./src/ai/*"],
-      "@/app/*": ["./src/app/*"]
+      "@/app/*": ["./src/app/*"],
+      "@hco/*": ["./zacai-hco/src/*"]
     },
     
     /* Next.js specific */
