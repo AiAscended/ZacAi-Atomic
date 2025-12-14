@@ -35,6 +35,7 @@ const nextConfig = {
   experimental: {
     // Enable optimized package imports
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    externalDir: true,
   },
   
   // Webpack configuration
@@ -51,6 +52,7 @@ const nextConfig = {
       '@/styles': '/workspaces/ZacAi-Atomic/src/styles',
       '@/ai': '/workspaces/ZacAi-Atomic/src/ai',
       '@/app': '/workspaces/ZacAi-Atomic/src/app',
+      '@hco': '/workspaces/ZacAi-Atomic/zacai-hco/src',
     };
     
     // For server-side (API routes), handle Node.js modules properly
