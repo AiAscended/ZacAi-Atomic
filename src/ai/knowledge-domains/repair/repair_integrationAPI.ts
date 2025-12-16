@@ -5,7 +5,6 @@
  * Provides automated and semi-automated repair capabilities.
  */
 
-import { domainRegistry } from '../domainRegistry';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -110,17 +109,7 @@ export const repairInit = async () => {
 };
 
 // Register the domain with the unified registry
-domainRegistry.registerDomain({
-  name: DOMAIN_NAME,
-  displayName: 'Repair & Debugging',
-  description: 'Error fixing, code repair, debugging strategies, and self-healing operations',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
+
 
 // Auto-initialize when imported
 void repairInit();

@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import meta from "./documentation_meta.json"
+import meta from "./documentation_seeds/documentation_meta.json"
 import { DOCUMENTATION_DOMAIN } from "./documentation_constants"
 
 export const getDomainMeta = () => ({ ...meta, name: DOCUMENTATION_DOMAIN })

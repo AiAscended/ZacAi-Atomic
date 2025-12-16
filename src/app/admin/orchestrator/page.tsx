@@ -12,7 +12,7 @@ import { Slider } from "@/components/ui/slider"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import type { HCOModeSettings } from "@/ai/shared/types/adminSettings"
-import { Loader2, MicVocal, ShieldCheck, Sparkles, Waveform, Zap } from "lucide-react"
+import { AudioWaveform, Loader2, MicVocal, ShieldCheck, Sparkles, Zap } from "lucide-react"
 
 const DEFAULT_FORM: HCOModeSettings = {
   enabled: false,
@@ -36,6 +36,35 @@ const DEFAULT_FORM: HCOModeSettings = {
   },
 }
 
+const mergeHybridMode = (payload?: Partial<HCOModeSettings>): HCOModeSettings => {
+  const incoming = payload ?? {}
+  const triggerWords = Array.isArray(incoming.triggerWords) && incoming.triggerWords.length > 0
+    ? Array.from(new Set(incoming.triggerWords.map((word) => word.trim().toLowerCase()).filter(Boolean))).slice(0, 10)
+    : DEFAULT_FORM.triggerWords
+
+  return {
+    ...DEFAULT_FORM,
+    ...incoming,
+    triggerWords,
+    speech: {
+      ...DEFAULT_FORM.speech,
+      ...(incoming.speech ?? {}),
+      availableVoices:
+        incoming.speech?.availableVoices && incoming.speech.availableVoices.length > 0
+          ? incoming.speech.availableVoices
+          : DEFAULT_FORM.speech.availableVoices,
+      preferredLanguages:
+        incoming.speech?.preferredLanguages && incoming.speech.preferredLanguages.length > 0
+          ? incoming.speech.preferredLanguages
+          : DEFAULT_FORM.speech.preferredLanguages,
+    },
+    auditLogging: {
+      ...DEFAULT_FORM.auditLogging,
+      ...(incoming.auditLogging ?? {}),
+    },
+  }
+}
+
 export default function OrchestratorSettingsPage() {
   const [form, setForm] = useState<HCOModeSettings>(DEFAULT_FORM)
   const [loading, setLoading] = useState(true)
@@ -50,7 +79,7 @@ export default function OrchestratorSettingsPage() {
         const res = await fetch("/api/admin/settings/orchestrator")
         const json = await res.json()
         if (json.success && json.data?.hybridMode) {
-          setForm(json.data.hybridMode as HCOModeSettings)
+          setForm(mergeHybridMode(json.data.hybridMode))
         }
       } catch (error) {
         console.error("[HCO Admin] Failed to load settings", error)
@@ -89,7 +118,7 @@ export default function OrchestratorSettingsPage() {
       if (!json.success) {
         throw new Error(json.error || "Save failed")
       }
-      setForm(json.data.hybridMode)
+      setForm(mergeHybridMode(json.data.hybridMode))
       toast({ title: "Hybrid Orchestrator updated", description: "Settings saved successfully" })
     } catch (error) {
       console.error("[HCO Admin] Save failed", error)
@@ -373,7 +402,7 @@ export default function OrchestratorSettingsPage() {
               </div>
 
               <div className="rounded-lg border p-4 bg-muted/50 flex items-start gap-3">
-                <Waveform className="h-5 w-5 text-indigo-500 mt-1" />
+                <AudioWaveform className="h-5 w-5 text-indigo-500 mt-1" />
                 <p className="text-sm text-muted-foreground">
                   Speech payloads stream through the local STT/TTS inference engines by default. When `REDact audio` is
                   enabled only transcripts + hashed metadata persist to Supabase, keeping memory bounds to the last ten

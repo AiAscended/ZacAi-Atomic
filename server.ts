@@ -1,13 +1,12 @@
 /**
- * File: src/lib/server/websocketServer.ts
- * Purpose: Initialize WebSocket server for dev console terminal
- * Note: This needs to be called from the Next.js custom server
+ * Entry point for the custom Next.js + WebSocket server used by the admin dev console.
+ * Keeps everything in one place so `npm run dev` just works inside the Codespace/container.
  */
 
 import { createServer } from 'http';
-import { parse } from 'url';
+import { parse, pathToFileURL } from 'url';
 import next from 'next';
-import { terminalManager } from '@/lib/terminalManager';
+import { terminalManager } from './src/lib/terminalManager';
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = 'localhost';
@@ -38,7 +37,7 @@ export async function startServer() {
   });
 
   // Graceful shutdown
-  process.on('SIGTERM', () => {
+  process.once('SIGTERM', () => {
     console.log('SIGTERM signal received: closing HTTP server');
     terminalManager.cleanup();
     server.close(() => {
@@ -46,7 +45,7 @@ export async function startServer() {
     });
   });
 
-  process.on('SIGINT', () => {
+  process.once('SIGINT', () => {
     console.log('SIGINT signal received: closing HTTP server');
     terminalManager.cleanup();
     server.close(() => {
@@ -56,8 +55,12 @@ export async function startServer() {
   });
 }
 
-// Start server if this file is run directly
-if (require.main === module) {
+// Start server if this module is executed directly (not imported)
+const invokedFromCLI = process.argv[1]
+  ? pathToFileURL(process.argv[1]).href === import.meta.url
+  : false;
+
+if (invokedFromCLI) {
   startServer().catch((err) => {
     console.error('Error starting server:', err);
     process.exit(1);

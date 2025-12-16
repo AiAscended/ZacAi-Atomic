@@ -76,16 +76,40 @@ export class AIOrchestrator {
     this.thinkingTracker.addStep("domain_query", "Executing domain queries")
     const domainResults = await this.domainQueryExecutor.queryDomains(subtasks)
 
+    const domainOutputs = Object.entries(domainResults).map(([domain, value]) => {
+      const normalizedResult =
+        typeof value === "string"
+          ? value
+          : typeof value?.response === "string"
+            ? value.response
+            : JSON.stringify(value ?? {})
+
+      return {
+        domain,
+        result: normalizedResult,
+      }
+    })
+
     // 4) Synthesize multi-domain results into response
     this.thinkingTracker.addStep("response_synth", "Synthesizing AI response")
-    const response = this.responseSynthesizer.synthesize(domainResults)
+    const response = this.responseSynthesizer.synthesize({
+      llmOutput: processedInput,
+      domainOutputs,
+      originalPrompt: prompt,
+    })
 
     // 5) Log interaction for analytics and debugging
     this.interactionLogger.log(sessionId, prompt, response)
 
     // Attach thinking steps to response metadata for frontend UI
+    const resolvedDomains =
+      response.metadata?.combinedDomains?.length > 0
+        ? response.metadata.combinedDomains
+        : domainOutputs.map((output) => output.domain)
+
     return {
       ...response,
+      domains: resolvedDomains,
       metadata: {
         ...response.metadata,
         thinkingSteps: this.thinkingTracker.getSteps(),

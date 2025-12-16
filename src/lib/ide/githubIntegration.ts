@@ -84,22 +84,26 @@ class GitHubIntegration {
     });
 
     if (!Array.isArray(data)) {
-      // Single file
+      const fileContent =
+        'content' in data && typeof data.content === 'string'
+          ? atob(data.content)
+          : '';
+
       return [
         {
-          path: data.path,
-          content: data.content ? atob(data.content) : '',
-          sha: data.sha,
-          type: data.type === 'dir' ? 'dir' : 'file',
+          path: data.path ?? '',
+          content: fileContent,
+          sha: data.sha ?? '',
+          type: 'file',
         },
       ];
     }
 
     // Directory listing
     return data.map((item) => ({
-      path: item.path,
+      path: item.path ?? '',
       content: '',
-      sha: item.sha,
+      sha: item.sha ?? '',
       type: item.type === 'dir' ? 'dir' : 'file',
     }));
   }
@@ -123,7 +127,7 @@ class GitHubIntegration {
       throw new Error('Path is a directory, not a file');
     }
 
-    if (!data.content) {
+    if (!('content' in data) || typeof data.content !== 'string') {
       throw new Error('File has no content');
     }
 
@@ -310,7 +314,7 @@ class GitHubIntegration {
       id: repo.id,
       name: repo.name,
       fullName: repo.full_name,
-      owner: repo.owner.login,
+      owner: repo.owner?.login ?? 'unknown',
       description: repo.description,
       language: repo.language,
       stars: repo.stargazers_count,

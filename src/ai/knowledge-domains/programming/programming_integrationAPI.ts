@@ -8,7 +8,6 @@
 
 import path from 'path'
 
-import { domainRegistry } from '../domainRegistry'
 import { PROGRAMMING_DOMAIN } from "./programming_constants"
 import { loadProgrammingSeedVocabulary } from "./programming_vocabularyManager"
 import { programmingRunInference } from "./programming_inferenceController"
@@ -20,17 +19,6 @@ const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DO
 export const programmingInit = async () => {
   await loadProgrammingSeedVocabulary()
 
-  domainRegistry.registerDomain({
-  name: PROGRAMMING_DOMAIN,
-  displayName: 'Programming',
-  description: 'General programming concepts, patterns, and paradigms',
-  atomicLevel: 'organ',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
 }
 
 void programmingInit()

@@ -40,7 +40,7 @@
       "@/styles/*": ["./src/styles/*"],
       "@/ai/*": ["./src/ai/*"],
       "@/app/*": ["./src/app/*"],
-      "@hco/*": ["./zacai-hco/src/*"]
+      "@hco/*": ["./src/ai/hco/src/*"]
     },
     
     /* Next.js specific */

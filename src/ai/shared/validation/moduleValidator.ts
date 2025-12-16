@@ -12,7 +12,7 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import type { ModelManifest } from "../../models/modelRegistry";
-import type { DomainManifest } from "../../knowledge-domains/domainScanner";
+import type { DomainManifest } from "../../knowledge-domains";
 
 // ============================================================================
 // Types
@@ -198,6 +198,11 @@ export class ModelValidator {
 // ============================================================================
 
 export class DomainValidator {
+  private static resolveEntry(domainPath: string, entry?: string | null): string | null {
+    if (!entry) return null;
+    return path.join(domainPath, entry);
+  }
+
   /**
    * Validate domain structure
    */
@@ -241,10 +246,10 @@ export class DomainValidator {
       score -= 5;
     }
     
-    // Check seed vocab
-    if (manifest.paths.seedVocabPath) {
+    const seedEntry = DomainValidator.resolveEntry(domainPath, manifest.entries.seeds ?? manifest.entries.baseTokens);
+    if (seedEntry) {
       try {
-        const vocabPath = path.join(domainPath, manifest.paths.seedVocabPath);
+        const vocabPath = seedEntry;
         const content = await fs.readFile(vocabPath, "utf8");
         const vocab = JSON.parse(content);
         
@@ -269,9 +274,10 @@ export class DomainValidator {
     }
     
     // Check integration API
-    if (manifest.paths.integrationAPIPath) {
+    const integrationEntry = DomainValidator.resolveEntry(domainPath, manifest.entries.integrationAPI);
+    if (integrationEntry) {
       try {
-        const apiPath = path.join(domainPath, manifest.paths.integrationAPIPath);
+        const apiPath = integrationEntry;
         const content = await fs.readFile(apiPath, "utf8");
         
         // Check for required exports
@@ -315,9 +321,10 @@ export class DomainValidator {
     const checks: HealthCheckResult["checks"] = [];
     
     // Check inference controller
-    if (manifest.paths.inferenceControllerPath) {
+    const inferenceEntry = DomainValidator.resolveEntry(domainPath, manifest.entries.inferenceController);
+    if (inferenceEntry) {
       try {
-        const controllerPath = path.join(domainPath, manifest.paths.inferenceControllerPath);
+        const controllerPath = inferenceEntry;
         await fs.access(controllerPath);
         checks.push({ name: "Inference controller", passed: true });
       } catch {
@@ -328,9 +335,10 @@ export class DomainValidator {
     }
     
     // Check integration API
-    if (manifest.paths.integrationAPIPath) {
+    const integrationEntry = DomainValidator.resolveEntry(domainPath, manifest.entries.integrationAPI);
+    if (integrationEntry) {
       try {
-        const apiPath = path.join(domainPath, manifest.paths.integrationAPIPath);
+        const apiPath = integrationEntry;
         await fs.access(apiPath);
         checks.push({ name: "Integration API", passed: true });
       } catch {
@@ -341,9 +349,10 @@ export class DomainValidator {
     }
     
     // Check seed vocab
-    if (manifest.paths.seedVocabPath) {
+    const seedEntry = DomainValidator.resolveEntry(domainPath, manifest.entries.seeds ?? manifest.entries.baseTokens);
+    if (seedEntry) {
       try {
-        const vocabPath = path.join(domainPath, manifest.paths.seedVocabPath);
+        const vocabPath = seedEntry;
         const stats = await fs.stat(vocabPath);
         checks.push({ 
           name: "Seed vocabulary", 

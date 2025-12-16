@@ -5,7 +5,7 @@
 
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import type { LLMModelConfig } from '../llm-config/llm-modelConfig';
+import type { LLMModelConfig } from '../unified-transformer-llm_config/llm-modelConfig';
 
 export interface ModelWeights {
   // Embedding weights

@@ -52,7 +52,7 @@ const nextConfig = {
       '@/styles': '/workspaces/ZacAi-Atomic/src/styles',
       '@/ai': '/workspaces/ZacAi-Atomic/src/ai',
       '@/app': '/workspaces/ZacAi-Atomic/src/app',
-      '@hco': '/workspaces/ZacAi-Atomic/zacai-hco/src',
+      '@hco': '/workspaces/ZacAi-Atomic/src/ai/hco/src',
     };
     
     // For server-side (API routes), handle Node.js modules properly

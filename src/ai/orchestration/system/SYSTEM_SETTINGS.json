@@ -1,0 +1,38 @@
+{
+  "maintenanceMode": true,
+  "categories": {
+    "model": {
+      "defaultEnabled": false,
+      "overrides": {}
+    },
+    "domain": {
+      "defaultEnabled": false,
+      "overrides": {}
+    },
+    "tool": {
+      "defaultEnabled": false,
+      "overrides": {}
+    },
+    "agent": {
+      "defaultEnabled": false,
+      "overrides": {}
+    },
+    "utility": {
+      "defaultEnabled": false,
+      "overrides": {}
+    },
+    "pipeline": {
+      "defaultEnabled": false,
+      "overrides": {}
+    },
+    "hco": {
+      "defaultEnabled": false,
+      "overrides": {}
+    },
+    "cell": {
+      "defaultEnabled": false,
+      "overrides": {}
+    }
+  },
+  "allowlist": {}
+}

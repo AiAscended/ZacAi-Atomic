@@ -29,7 +29,7 @@ import { hcoOrchestrator } from "@hco/mainOrchestrator"
 import type { HCOState } from "@hco/shared/types"
 
 // Import domain registry for knowledge domain access
-import { domainRegistry } from "../knowledge-domains/domainRegistry"
+import { getEnabledDomains } from "../knowledge-domains"
 
 // Import LLM inference engine
 import { LLMInferenceEngine } from "../models/unified-transformer-llm/unified-transformer-llm_inference/llm-inferenceEngine"
@@ -171,10 +171,8 @@ export class MainOrchestrator {
 
       // Step 2: Load knowledge domains (real-time from unified registry)
       this.thinkingTracker.addStep("init_domains", "Loading knowledge domains")
-      // Wait briefly for async domain registrations to complete
-      await new Promise(resolve => setTimeout(resolve, 500))
-      const allDomains = domainRegistry.getAllDomains()
-      this.availableDomains = allDomains.map(d => d.name)
+      const domainManifests = await getEnabledDomains()
+      this.availableDomains = domainManifests.map((manifest) => manifest.id)
       logger.info(`Loaded ${this.availableDomains.length} knowledge domains`, {
         domains: this.availableDomains,
       })
@@ -567,19 +565,15 @@ export class MainOrchestrator {
 
     for (const domainName of domains) {
       try {
-        const domain = domainRegistry.getDomain(domainName)
-        if (domain && domain.enabled) {
-          // Use new domain-specific inference
-          const domainResults = await this.domainQueryExecutor.queryDomainsByName([domainName], query)
-          
-          // Lowered threshold from 0.3 to 0.01 for testing - accept all responses
-          if (domainResults.length > 0 && domainResults[0].confidence > 0.01) {
-            results.push({ 
-              domain: domainName, 
-              result: domainResults[0].response || 'No result',
-              confidence: domainResults[0].confidence,
-            })
-          }
+        const domainResults = await this.domainQueryExecutor.queryDomainsByName([domainName], query)
+        
+        // Lowered threshold from 0.3 to 0.01 for testing - accept all responses
+        if (domainResults.length > 0 && domainResults[0].confidence > 0.01) {
+          results.push({ 
+            domain: domainName, 
+            result: domainResults[0].response || 'No result',
+            confidence: domainResults[0].confidence,
+          })
         }
       } catch (error) {
         logger.info(`Domain query failed: ${domainName}`, { error })

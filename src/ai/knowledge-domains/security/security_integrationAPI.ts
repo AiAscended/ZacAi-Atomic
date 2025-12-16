@@ -8,7 +8,6 @@
 
 import path from 'path'
 
-import { domainRegistry } from '../domainRegistry'
 import { SECURITY_DOMAIN } from "./security_constants"
 import { loadSecuritySeedVocabulary } from "./security_vocabularyManager"
 import { securityRunInference } from "./security_inferenceController"
@@ -20,17 +19,6 @@ const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DO
 export const securityInit = async () => {
   await loadSecuritySeedVocabulary()
 
-  domainRegistry.registerDomain({
-  name: SECURITY_DOMAIN,
-  displayName: 'Security',
-  description: 'Security analysis, vulnerability detection, and secure coding',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
 }
 
 void securityInit()

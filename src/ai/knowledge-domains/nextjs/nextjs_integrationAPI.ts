@@ -8,7 +8,6 @@
 
 import path from 'path'
 
-import { domainRegistry } from '../domainRegistry'
 import { NEXTJS_DOMAIN } from "./nextjs_constants"
 import { loadNextjsSeedVocabulary } from "./nextjs_vocabularyManager"
 import { nextjsRunInference } from "./nextjs_inferenceController"
@@ -20,17 +19,6 @@ const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DO
 export const nextjsInit = async () => {
   await loadNextjsSeedVocabulary()
 
-  domainRegistry.registerDomain({
-  name: NEXTJS_DOMAIN,
-  displayName: 'Next.js',
-  description: 'Next.js framework, server-side rendering, and app router',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
 }
 
 void nextjsInit()

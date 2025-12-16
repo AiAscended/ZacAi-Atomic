@@ -2,7 +2,7 @@ import { z } from "zod"
 import { ARISTOTLE_FIGURE_ONE_MOODS, PROPOSITIONAL_RULES, TEMPERATURES } from "../config/hcoConstants"
 import type { Hypothesis, Validation } from "../shared/types"
 
-const ValidationSchema = z
+const ValidationSchema: z.ZodType<Validation[]> = z
   .array(
     z.object({
       valid: z.boolean(),
