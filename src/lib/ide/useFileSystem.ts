@@ -184,6 +184,7 @@ export function useFileSystem() {
   }, [loadFileTree]);
 
   return {
+    fs: vfs,
     fileTree,
     loading,
     error,

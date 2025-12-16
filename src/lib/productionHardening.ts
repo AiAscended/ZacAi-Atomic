@@ -11,7 +11,17 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { headers } from 'next/headers';
+import fs from 'fs';
+import path from 'path';
+
+type HandlerContext = Record<string, unknown>;
+
+interface ChatInputPayload {
+  message?: string;
+  sessionId?: string;
+  model?: string;
+  [key: string]: unknown;
+}
 
 // ============================================================================
 // Rate Limiting (In-Memory Token Bucket)
@@ -111,10 +121,10 @@ export function addSecurityHeaders(response: NextResponse): NextResponse {
 export interface ValidationError {
   field: string;
   message: string;
-  value?: any;
+  value?: unknown;
 }
 
-export function validateChatInput(input: any): { valid: boolean; errors: ValidationError[] } {
+export function validateChatInput(input: ChatInputPayload): { valid: boolean; errors: ValidationError[] } {
   const errors: ValidationError[] = [];
   
   // Check message exists
@@ -161,23 +171,26 @@ export function sanitizeHtml(input: string): string {
     .replace(/\//g, '&#x2F;');
 }
 
-export function sanitizeInput(input: any): any {
+export function sanitizeInput<T>(input: T): T {
   if (typeof input === 'string') {
-    return sanitizeHtml(input);
+    return sanitizeHtml(input) as T;
   }
-  
+
   if (Array.isArray(input)) {
-    return input.map(sanitizeInput);
+    return input.map((value) => sanitizeInput(value)) as unknown as T;
   }
-  
+
   if (typeof input === 'object' && input !== null) {
-    const sanitized: any = {};
-    for (const [key, value] of Object.entries(input)) {
-      sanitized[key] = sanitizeInput(value);
-    }
-    return sanitized;
+    const sanitizedEntries = Object.entries(input as Record<string, unknown>).reduce<Record<string, unknown>>(
+      (acc, [key, value]) => {
+        acc[key] = sanitizeInput(value);
+        return acc;
+      },
+      {},
+    );
+    return sanitizedEntries as T;
   }
-  
+
   return input;
 }
 
@@ -214,8 +227,6 @@ export function captureError(error: Error, context: ErrorContext): void {
   
   // Write to error log file
   try {
-    const fs = require('fs');
-    const path = require('path');
     const logPath = path.join(process.cwd(), 'data', 'error.log');
     const logEntry = JSON.stringify({
       timestamp: context.timestamp,
@@ -255,8 +266,12 @@ export function getClientIp(request: NextRequest): string {
     return realIp;
   }
   
-  // Fallback to connection IP
-  return request.ip || 'unknown';
+  const cfIp = request.headers.get('cf-connecting-ip');
+  if (cfIp) {
+    return cfIp;
+  }
+
+  return 'unknown';
 }
 
 // ============================================================================
@@ -272,10 +287,10 @@ export interface MiddlewareConfig {
 }
 
 export function withHardening(
-  handler: (req: NextRequest, context: any) => Promise<NextResponse>,
+  handler: (req: NextRequest, context: HandlerContext) => Promise<NextResponse>,
   config: MiddlewareConfig = {}
 ) {
-  return async (req: NextRequest, context: any) => {
+  return async (req: NextRequest, context: HandlerContext) => {
     const requestId = generateRequestId();
     const clientIp = getClientIp(req);
     const startTime = Date.now();
@@ -320,7 +335,8 @@ export function withHardening(
               { status: 400 }
             );
           }
-        } catch (e) {
+        } catch (error) {
+          console.warn('[Hardening] Failed to parse JSON body', error);
           return NextResponse.json(
             { error: 'Invalid JSON payload' },
             { status: 400 }
@@ -395,13 +411,12 @@ export async function getHealthStatus(): Promise<HealthStatus> {
   
   // Check storage (file system)
   try {
-    const fs = require('fs');
-    const path = require('path');
     const testPath = path.join(process.cwd(), 'data', '.health-check');
     fs.writeFileSync(testPath, 'OK', 'utf-8');
     fs.unlinkSync(testPath);
     checks.storage = 'pass';
-  } catch (e) {
+  } catch (error) {
+    console.error('[Hardening] Storage health check failed', error);
     checks.storage = 'fail';
     overallStatus = 'degraded';
   }
@@ -410,7 +425,8 @@ export async function getHealthStatus(): Promise<HealthStatus> {
   try {
     // Verify key modules can be imported
     checks.ai = 'pass';
-  } catch (e) {
+  } catch (error) {
+    console.error('[Hardening] AI subsystem health check failed', error);
     checks.ai = 'fail';
     overallStatus = 'unhealthy';
   }

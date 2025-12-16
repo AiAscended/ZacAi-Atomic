@@ -8,7 +8,6 @@
 
 import path from 'path'
 
-import { domainRegistry } from '../domainRegistry'
 import { VERSION_CONTROL_DOMAIN } from "./version_control_constants"
 import { loadVersionControlSeedVocabulary } from "./version_control_vocabularyManager"
 import { versionControlRunInference } from "./version_control_inferenceController"
@@ -20,17 +19,6 @@ const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DO
 export const versionControlInit = async () => {
   await loadVersionControlSeedVocabulary()
 
-  domainRegistry.registerDomain({
-  name: VERSION_CONTROL_DOMAIN,
-  displayName: 'Version Control',
-  description: 'Git, version control workflows, and collaboration',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
 }
 
 void versionControlInit()

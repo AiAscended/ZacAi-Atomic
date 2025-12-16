@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
-import "@/ai/knowledge-domains/registerAllDomains"
 import { promptHandler } from "@/ai/orchestration/promptHandler"
-import { domainRegistry } from "@/ai/knowledge-domains/domainRegistry"
+import { getDomainRegistry, loadAllDomains } from "@/ai/knowledge-domains"
 
 // Session storage
 const sessions = new Map<string, { history: Array<{ role: string; content: string }> }>()
@@ -14,19 +13,21 @@ function generateSessionId(): string {
 let domainsReady = false
 async function ensureDomainsReady() {
   if (domainsReady) return
-  
-  // Wait for domains to register (max 2 seconds)
-  for (let i = 0; i < 20; i++) {
-    const domains = domainRegistry.getAllDomains()
-    if (domains.length > 0) {
-      console.log(`[v0] ✅ ${domains.length} domains ready`)
+
+  // Poll the unified system registry (max ~1 second)
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const snapshot = await getDomainRegistry(attempt > 0)
+    const enabledCount = snapshot.enabledModules.length
+    if (enabledCount > 0) {
+      await loadAllDomains()
+      console.log(`[v0] ✅ ${enabledCount} domains ready (system registry)`)
       domainsReady = true
       return
     }
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 200))
   }
-  
-  console.warn('[v0] ⚠️ Timeout waiting for domains to register')
+
+  console.warn("[v0] ⚠️ Timeout waiting for domains to register via system registry")
 }
 
 export async function POST(request: Request) {
@@ -65,9 +66,11 @@ export async function POST(request: Request) {
 
       console.log("[v0] Initialized session:", newSessionId, "Total sessions:", sessions.size)
 
+      const snapshot = await getDomainRegistry()
+
       return NextResponse.json({
         sessionId: newSessionId,
-        domainCount: 16,
+        domainCount: snapshot.enabledModules.length,
         status: "ready",
       })
     }

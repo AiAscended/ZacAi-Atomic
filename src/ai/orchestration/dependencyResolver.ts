@@ -3,15 +3,36 @@
  * Purpose: Lightweight dependency resolver that ensures declared dependencies are available.
  */
 
-import { listModules } from './moduleRegistry';
+import { getSystemRegistry } from "./system";
 
-export const resolveDependencies = (names: string[]): { missing: string[]; resolved: string[] } => {
-  const available = new Set(listModules().map((m) => m.name));
+export const resolveDependencies = async (
+  names: string[]
+): Promise<{ missing: string[]; resolved: string[] }> => {
+  const registry = await getSystemRegistry();
+  const available = collectModuleNames(registry);
   const resolved: string[] = [];
   const missing: string[] = [];
-  for (const n of names) {
-    if (available.has(n)) resolved.push(n);
-    else missing.push(n);
+
+  for (const name of names) {
+    if (available.has(name)) {
+      resolved.push(name);
+    } else {
+      missing.push(name);
+    }
   }
+
   return { missing, resolved };
+};
+
+const collectModuleNames = (registry: Awaited<ReturnType<typeof getSystemRegistry>>): Set<string> => {
+  const names = new Set<string>();
+
+  for (const categoryGroup of Object.values(registry.modules)) {
+    for (const manifest of Object.values(categoryGroup)) {
+      names.add(manifest.name);
+      names.add(manifest.id);
+    }
+  }
+
+  return names;
 };

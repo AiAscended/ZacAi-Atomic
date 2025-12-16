@@ -19,7 +19,19 @@ interface FileSystemDB extends DBSchema {
   };
 }
 
-class VirtualFileSystem {
+export interface FileSystemEntryMetadata {
+  size: number;
+  modified: number;
+}
+
+export interface FileSystemEntry {
+  name: string;
+  path: string;
+  type: 'file' | 'directory';
+  metadata?: FileSystemEntryMetadata;
+}
+
+export class VirtualFileSystem {
   private db: IDBPDatabase<FileSystemDB> | null = null;
   private dbName = 'zacai-ide-fs';
   private dbVersion = 1;
@@ -199,6 +211,14 @@ Happy coding!`,
     return this.db!.get('files', path);
   }
 
+  async read(path: string): Promise<string> {
+    const file = await this.readFile(path);
+    if (!file) {
+      throw new Error(`File not found: ${path}`);
+    }
+    return file.content;
+  }
+
   async writeFile(path: string, content: string): Promise<void> {
     await this.init();
     const existing = await this.readFile(path);
@@ -215,6 +235,10 @@ Happy coding!`,
     };
 
     await this.db!.put('files', file);
+  }
+
+  async write(path: string, content: string): Promise<void> {
+    await this.writeFile(path, content);
   }
 
   async createFile(path: string, content: string = ''): Promise<void> {
@@ -255,6 +279,10 @@ Happy coding!`,
     await this.db!.add('files', directory);
   }
 
+  async mkdir(path: string): Promise<void> {
+    await this.createDirectory(path);
+  }
+
   async deleteFile(path: string): Promise<void> {
     await this.init();
     const file = await this.readFile(path);
@@ -269,6 +297,15 @@ Happy coding!`,
     }
 
     await this.db!.delete('files', path);
+  }
+
+  async delete(path: string): Promise<void> {
+    await this.deleteFile(path);
+  }
+
+  async exists(path: string): Promise<boolean> {
+    const file = await this.readFile(path);
+    return Boolean(file);
   }
 
   async renameFile(oldPath: string, newPath: string): Promise<void> {
@@ -302,6 +339,19 @@ Happy coding!`,
     return allFiles;
   }
 
+  async list(path: string): Promise<FileSystemEntry[]> {
+    const entries = await this.listDirectory(path);
+    return entries.map((entry) => ({
+      name: entry.path.split('/').filter(Boolean).pop() || '/',
+      path: entry.path,
+      type: entry.type,
+      metadata: {
+        size: entry.size,
+        modified: entry.updatedAt,
+      },
+    }));
+  }
+
   async getDirectoryTree(rootPath: string = '/'): Promise<IDEFile[]> {
     await this.init();
     const allFiles = await this.db!.getAll('files');
@@ -329,6 +379,10 @@ Happy coding!`,
     await this.init();
     await this.db!.clear('files');
     await this.initializeSampleStructure();
+  }
+
+  async search(query: string): Promise<IDEFile[]> {
+    return this.searchFiles(query);
   }
 
   private getLanguageFromPath(path: string): string {

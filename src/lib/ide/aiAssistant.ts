@@ -79,8 +79,11 @@ export class AIAssistant {
       }
 
       const data = await response.json();
+      if (!data.sessionId || typeof data.sessionId !== 'string') {
+        throw new Error('AI session ID missing in response');
+      }
       this.sessionId = data.sessionId;
-      return this.sessionId;
+      return data.sessionId;
     } catch (error) {
       console.error('AI initialization error:', error);
       throw error;

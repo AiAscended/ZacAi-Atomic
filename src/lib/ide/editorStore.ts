@@ -11,42 +11,41 @@ export interface EditorTab {
   cursorPosition?: { line: number; column: number };
 }
 
-interface EditorState {
-  tabs: EditorTab[];
-  activeTabId: string | null;
-  
-  // Actions
+export interface EditorState {
+  openFiles: EditorTab[];
+  activeFileId: string | null;
+
   openFile: (path: string, title: string, content: string, language: string) => void;
-  closeTab: (tabId: string) => void;
-  closeAllTabs: () => void;
-  closeOtherTabs: (tabId: string) => void;
-  setActiveTab: (tabId: string) => void;
-  updateTabContent: (tabId: string, content: string) => void;
-  markTabDirty: (tabId: string, isDirty: boolean) => void;
-  updateCursorPosition: (tabId: string, line: number, column: number) => void;
-  getTab: (tabId: string) => EditorTab | undefined;
-  getActiveTab: () => EditorTab | undefined;
+  closeFile: (fileId: string) => void;
+  closeAllFiles: () => void;
+  closeOtherFiles: (fileId: string) => void;
+  setActiveFile: (fileId: string | null) => void;
+  updateFileContent: (fileId: string, content: string) => void;
+  markFileDirty: (fileId: string, isDirty: boolean) => void;
+  updateCursorPosition: (fileId: string, line: number, column: number) => void;
+  getFileById: (fileId: string | null | undefined) => EditorTab | undefined;
+  getActiveFile: () => EditorTab | undefined;
   hasUnsavedChanges: () => boolean;
 }
 
 export const useEditorStore = create<EditorState>()(
   persist(
     (set, get) => ({
-      tabs: [],
-      activeTabId: null,
+      openFiles: [],
+      activeFileId: null,
 
       openFile: (path, title, content, language) => {
         const state = get();
         
         // Check if file is already open
-        const existingTab = state.tabs.find((tab) => tab.path === path);
-        if (existingTab) {
-          set({ activeTabId: existingTab.id });
+        const existingFile = state.openFiles.find((file) => file.path === path);
+        if (existingFile) {
+          set({ activeFileId: existingFile.id });
           return;
         }
 
-        // Create new tab
-        const newTab: EditorTab = {
+        // Create new tab entry
+        const newFile: EditorTab = {
           id: `tab-${Date.now()}-${Math.random()}`,
           path,
           title,
@@ -56,98 +55,98 @@ export const useEditorStore = create<EditorState>()(
         };
 
         set({
-          tabs: [...state.tabs, newTab],
-          activeTabId: newTab.id,
+          openFiles: [...state.openFiles, newFile],
+          activeFileId: newFile.id,
         });
       },
 
-      closeTab: (tabId) => {
+      closeFile: (fileId) => {
         const state = get();
-        const tabIndex = state.tabs.findIndex((tab) => tab.id === tabId);
-        const newTabs = state.tabs.filter((tab) => tab.id !== tabId);
+        const fileIndex = state.openFiles.findIndex((file) => file.id === fileId);
+        const updatedFiles = state.openFiles.filter((file) => file.id !== fileId);
 
-        let newActiveTabId = state.activeTabId;
-        if (state.activeTabId === tabId && newTabs.length > 0) {
-          // Set active tab to the next tab, or previous if closing the last tab
-          const newActiveIndex = Math.min(tabIndex, newTabs.length - 1);
-          newActiveTabId = newTabs[newActiveIndex].id;
-        } else if (newTabs.length === 0) {
-          newActiveTabId = null;
+        let nextActiveId = state.activeFileId;
+        if (state.activeFileId === fileId && updatedFiles.length > 0) {
+          const nextIndex = Math.min(fileIndex, updatedFiles.length - 1);
+          nextActiveId = updatedFiles[nextIndex].id;
+        } else if (updatedFiles.length === 0) {
+          nextActiveId = null;
         }
 
         set({
-          tabs: newTabs,
-          activeTabId: newActiveTabId,
+          openFiles: updatedFiles,
+          activeFileId: nextActiveId,
         });
       },
 
-      closeAllTabs: () => {
-        set({ tabs: [], activeTabId: null });
+      closeAllFiles: () => {
+        set({ openFiles: [], activeFileId: null });
       },
 
-      closeOtherTabs: (tabId) => {
+      closeOtherFiles: (fileId) => {
         const state = get();
-        const tab = state.tabs.find((t) => t.id === tabId);
-        if (tab) {
+        const target = state.openFiles.find((file) => file.id === fileId);
+        if (target) {
           set({
-            tabs: [tab],
-            activeTabId: tab.id,
+            openFiles: [target],
+            activeFileId: target.id,
           });
         }
       },
 
-      setActiveTab: (tabId) => {
-        set({ activeTabId: tabId });
+      setActiveFile: (fileId) => {
+        set({ activeFileId: fileId });
       },
 
-      updateTabContent: (tabId, content) => {
+      updateFileContent: (fileId, content) => {
         set((state) => ({
-          tabs: state.tabs.map((tab) =>
-            tab.id === tabId ? { ...tab, content, isDirty: true } : tab
+          openFiles: state.openFiles.map((file) =>
+            file.id === fileId ? { ...file, content, isDirty: true } : file
           ),
         }));
       },
 
-      markTabDirty: (tabId, isDirty) => {
+      markFileDirty: (fileId, isDirty) => {
         set((state) => ({
-          tabs: state.tabs.map((tab) =>
-            tab.id === tabId ? { ...tab, isDirty } : tab
+          openFiles: state.openFiles.map((file) =>
+            file.id === fileId ? { ...file, isDirty } : file
           ),
         }));
       },
 
-      updateCursorPosition: (tabId, line, column) => {
+      updateCursorPosition: (fileId, line, column) => {
         set((state) => ({
-          tabs: state.tabs.map((tab) =>
-            tab.id === tabId
-              ? { ...tab, cursorPosition: { line, column } }
-              : tab
+          openFiles: state.openFiles.map((file) =>
+            file.id === fileId
+              ? { ...file, cursorPosition: { line, column } }
+              : file
           ),
         }));
       },
 
-      getTab: (tabId) => {
-        return get().tabs.find((tab) => tab.id === tabId);
+      getFileById: (fileId) => {
+        if (!fileId) return undefined;
+        return get().openFiles.find((file) => file.id === fileId);
       },
 
-      getActiveTab: () => {
+      getActiveFile: () => {
         const state = get();
-        if (!state.activeTabId) return undefined;
-        return state.tabs.find((tab) => tab.id === state.activeTabId);
+        if (!state.activeFileId) return undefined;
+        return state.openFiles.find((file) => file.id === state.activeFileId);
       },
 
       hasUnsavedChanges: () => {
-        return get().tabs.some((tab) => tab.isDirty);
+        return get().openFiles.some((file) => file.isDirty);
       },
     }),
     {
       name: 'zacai-editor-store',
       partialize: (state) => ({
-        tabs: state.tabs.map(tab => ({
-          ...tab,
-          content: '', // Don't persist content to avoid localStorage quota
+        openFiles: state.openFiles.map((file) => ({
+          ...file,
+          content: '',
         })),
-        activeTabId: state.activeTabId,
+        activeFileId: state.activeFileId,
       }),
     }
   )

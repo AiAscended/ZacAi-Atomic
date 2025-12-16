@@ -8,7 +8,6 @@
 
 import path from 'path'
 
-import { domainRegistry } from '../domainRegistry'
 import { DATA_STRUCTURES_DOMAIN } from "./data_structures_constants"
 import { loadDataStructuresSeedVocabulary } from "./data_structures_vocabularyManager"
 import { dataStructuresRunInference } from "./data_structures_inferenceController"
@@ -20,17 +19,6 @@ const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DO
 export const dataStructuresInit = async () => {
   await loadDataStructuresSeedVocabulary()
 
-  domainRegistry.registerDomain({
-  name: DATA_STRUCTURES_DOMAIN,
-  displayName: 'Data Structures',
-  description: 'Data structure design, implementation, and usage patterns',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
 }
 
 void dataStructuresInit()

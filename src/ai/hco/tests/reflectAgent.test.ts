@@ -9,10 +9,8 @@ describe("ReflectAgent", () => {
     const tools = {
       calculator: {} as Toolset["calculator"],
       urlLookup: {} as Toolset["urlLookup"],
-      domainRegistry: {
-        getAllDomains: () => [],
-      } as Toolset["domainRegistry"],
-    }
+      getDomains: async () => [],
+    } satisfies Toolset
 
     const state: HCOState = {
       input: "Customers request trustworthy orchestration",

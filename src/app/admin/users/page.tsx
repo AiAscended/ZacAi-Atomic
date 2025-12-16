@@ -6,7 +6,7 @@
  * Supports admin and system roles for self-awareness features
  */
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -61,12 +61,8 @@ export default function UsersPage() {
   })
   const { toast } = useToast()
 
-  // Load users
-  useEffect(() => {
-    loadUsers()
-  }, [])
-
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
+    setLoading(true)
     try {
       const response = await fetch("/api/admin/settings/users")
       const result = await response.json()
@@ -80,6 +76,7 @@ export default function UsersPage() {
         })
       }
     } catch (error) {
+      console.error("[Admin Users] Failed to load users", error)
       toast({
         title: "Error",
         description: "Failed to connect to API",
@@ -88,7 +85,12 @@ export default function UsersPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
+
+  // Load users
+  useEffect(() => {
+    void loadUsers()
+  }, [loadUsers])
 
   const handleAddUser = async () => {
     if (!formData.name || !formData.email) {
@@ -115,7 +117,7 @@ export default function UsersPage() {
         })
         setIsAddModalOpen(false)
         setFormData({ name: "", email: "", role: "user" })
-        loadUsers()
+        await loadUsers()
       } else {
         toast({
           title: "Error",
@@ -124,6 +126,7 @@ export default function UsersPage() {
         })
       }
     } catch (error) {
+      console.error("[Admin Users] Failed to create user", error)
       toast({
         title: "Error",
         description: "Failed to create user",
@@ -154,7 +157,7 @@ export default function UsersPage() {
         })
         setIsEditModalOpen(false)
         setCurrentUser(null)
-        loadUsers()
+        await loadUsers()
       } else {
         toast({
           title: "Error",
@@ -163,6 +166,7 @@ export default function UsersPage() {
         })
       }
     } catch (error) {
+      console.error("[Admin Users] Failed to update user", error)
       toast({
         title: "Error",
         description: "Failed to update user",
@@ -187,7 +191,7 @@ export default function UsersPage() {
         })
         setIsDeleteModalOpen(false)
         setCurrentUser(null)
-        loadUsers()
+        await loadUsers()
       } else {
         toast({
           title: "Error",
@@ -196,6 +200,7 @@ export default function UsersPage() {
         })
       }
     } catch (error) {
+      console.error("[Admin Users] Failed to delete user", error)
       toast({
         title: "Error",
         description: "Failed to delete user",
@@ -316,7 +321,7 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle>Add New User</DialogTitle>
             <DialogDescription>
-              Create a new user account. Use role "system" for AI self-awareness.
+              Create a new user account. Use role &quot;system&quot; for AI self-awareness.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -343,7 +348,9 @@ export default function UsersPage() {
               <Label htmlFor="add-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: any) => setFormData({ ...formData, role: value })}
+                onValueChange={(value: User["role"]) =>
+                  setFormData({ ...formData, role: value })
+                }
               >
                 <SelectTrigger id="add-role">
                   <SelectValue />
@@ -400,7 +407,9 @@ export default function UsersPage() {
               <Label htmlFor="edit-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: any) => setFormData({ ...formData, role: value })}
+                onValueChange={(value: User["role"]) =>
+                  setFormData({ ...formData, role: value })
+                }
               >
                 <SelectTrigger id="edit-role">
                   <SelectValue />
@@ -432,7 +441,7 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle>Delete User</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete user "{currentUser?.name}"? This action cannot be undone.
+              Are you sure you want to delete user &quot;{currentUser?.name}&quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

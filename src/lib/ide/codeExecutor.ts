@@ -180,10 +180,10 @@ export class CodeExecutor {
       Number,
       Boolean,
       Promise,
-      setTimeout: (fn: Function, ms: number) => {
+      setTimeout: (fn: (...args: unknown[]) => unknown, ms: number) => {
         return setTimeout(fn, Math.min(ms, 5000)); // Max 5s delay
       },
-      setInterval: (fn: Function, ms: number) => {
+      setInterval: (fn: (...args: unknown[]) => unknown, ms: number) => {
         return setInterval(fn, Math.max(ms, 100)); // Min 100ms interval
       },
       clearTimeout,

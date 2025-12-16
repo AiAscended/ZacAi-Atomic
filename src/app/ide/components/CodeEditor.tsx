@@ -12,16 +12,16 @@ import { cn } from '@/lib/utils';
 export function CodeEditor() {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof monaco | null>(null);
-  const { 
-    openFiles, 
-    activeFileId, 
-    closeFile, 
-    setActiveFile, 
+  const {
+    openFiles,
+    activeFileId,
+    closeFile,
+    setActiveFile,
     updateFileContent,
-    saveFile,
-    getFileById 
+    markFileDirty,
+    getFileById,
   } = useEditorStore();
-  const { fs } = useFileSystem();
+  const { writeFile } = useFileSystem();
   const [theme, setTheme] = useState<'vs-dark' | 'light'>('vs-dark');
 
   const activeFile = getFileById(activeFileId);
@@ -92,6 +92,13 @@ export function CodeEditor() {
     languages.forEach((lang) => {
       monacoInstance.languages.registerCompletionItemProvider(lang, {
         provideCompletionItems: (model, position) => {
+          const word = model.getWordUntilPosition(position);
+          const range = new monacoInstance.Range(
+            position.lineNumber,
+            word.startColumn,
+            position.lineNumber,
+            word.endColumn
+          );
           const suggestions = [
             {
               label: 'log',
@@ -99,6 +106,7 @@ export function CodeEditor() {
               insertText: "console.log('${1}');",
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Console log',
+              range,
             },
             {
               label: 'func',
@@ -106,6 +114,7 @@ export function CodeEditor() {
               insertText: 'function ${1:name}(${2:params}) {\n\t${3}\n}',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Function declaration',
+              range,
             },
             {
               label: 'arrow',
@@ -113,6 +122,7 @@ export function CodeEditor() {
               insertText: 'const ${1:name} = (${2:params}) => {\n\t${3}\n};',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Arrow function',
+              range,
             },
             {
               label: 'async',
@@ -120,6 +130,7 @@ export function CodeEditor() {
               insertText: 'async function ${1:name}(${2:params}) {\n\t${3}\n}',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Async function',
+              range,
             },
             {
               label: 'try',
@@ -127,6 +138,7 @@ export function CodeEditor() {
               insertText: 'try {\n\t${1}\n} catch (error) {\n\t${2:console.error(error);}\n}',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Try-catch block',
+              range,
             },
           ];
           
@@ -174,8 +186,12 @@ export function CodeEditor() {
   };
 
   const handleSave = async () => {
-    if (activeFileId && fs) {
-      await saveFile(activeFileId, fs);
+    if (!activeFile) return;
+    try {
+      await writeFile(activeFile.path, activeFile.content);
+      markFileDirty(activeFile.id, false);
+    } catch (error) {
+      console.error('Failed to save file', error);
     }
   };
 

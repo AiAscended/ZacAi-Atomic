@@ -17,8 +17,12 @@ export class CodeAgent {
     const { state, tools } = ctx
     const hypothesis = state.hypotheses[0]
     const validations = state.validations
-    const availableDomains = tools.domainRegistry.getAllDomains()
-    const domainSummary = availableDomains.slice(0, 3).map((domain) => domain.displayName).join(", ") || "core orchestrator"
+    const availableDomains = await tools.getDomains()
+    const domainSummary =
+      availableDomains
+        .slice(0, 3)
+        .map((domain) => domain.name ?? domain.id)
+        .join(", ") || "core orchestrator"
 
     const action = hypothesis ? `Prototype to validate: ${hypothesis.text}` : "Prototype reference scenario"
     const codeBody = this.composeBody(state.input, domainSummary, validations)

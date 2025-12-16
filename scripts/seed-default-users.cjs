@@ -7,13 +7,13 @@
 const fs = require('fs');
 const path = require('path');
 
-const SETTINGS_DIR = path.join(process.cwd(), 'data', 'settings');
+const SETTINGS_DIR = path.join(process.cwd(), 'src', 'ai', 'data', 'settings');
 const USERS_FILE = path.join(SETTINGS_DIR, 'users.json');
 
 // Ensure directory exists
 if (!fs.existsSync(SETTINGS_DIR)) {
   fs.mkdirSync(SETTINGS_DIR, { recursive: true });
-  console.log('✅ Created data/settings directory');
+  console.log('✅ Created src/ai/data/settings directory');
 }
 
 // Default users

@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest"
 import { LogicAgent } from "../src/agents/LogicAgent"
+import type { Hypothesis } from "../src/shared/types"
 
 describe("LogicAgent", () => {
   it("derives syllogistic and propositional validations", async () => {
     const agent = new LogicAgent()
-    const hypotheses = [
+    const hypotheses: Hypothesis[] = [
       { text: "All strategists are systems thinkers therefore we trust escalations", prior: 0.7, type: "intuitive" },
       { text: "If guardrails tighten then risk exposure contracts", prior: 0.6, type: "wild" },
     ]

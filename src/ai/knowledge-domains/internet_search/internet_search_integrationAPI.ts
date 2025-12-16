@@ -1,6 +1,5 @@
 import path from 'path'
 
-import { domainRegistry } from '../domainRegistry'
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
 
 const DOMAIN_NAME = 'internet_search';
@@ -26,17 +25,6 @@ import { internetSearchRunInference } from "./internet_search_inferenceControlle
 export const internetSearchInit = async () => {
   await loadInternetSearchSeedVocabulary()
 
-  domainRegistry.registerDomain({
-  name: INTERNET_SEARCH_DOMAIN,
-  displayName: 'Internet Search',
-  description: 'Web search capabilities, information retrieval, and research',
-  atomicLevel: 'organ',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
 }
 
 void internetSearchInit()
