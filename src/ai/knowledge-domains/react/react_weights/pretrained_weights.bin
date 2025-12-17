@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "domain": "react",
-  "createdAt": "2025-11-05T05:15:19.713Z",
+  "createdAt": "2025-11-05T05:48:42.481Z",
   "architecture": {
     "embeddingDim": 128,
     "hiddenDim": 64,
