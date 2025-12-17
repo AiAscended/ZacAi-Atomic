@@ -4,7 +4,5 @@
 
 export const NEURO_VERSION = "1.0.0";
 
-export const constants = { NEURO_VERSION }
-
-const constants = { NEURO_VERSION }; 
+const constants = { NEURO_VERSION }; // Removed duplicate export default
 export default constants;

@@ -63,23 +63,10 @@ const stopWords = [
 ];
 
 export const generalRunInference = async (input: string, _context?: unknown) => {
-  const contextTokens = (_context && typeof _context === 'object' && 'tokens' in _context) 
-    ? (_context as { tokens: string[] }).tokens 
-    : undefined;
-  const contextEmbeddings = (_context && typeof _context === 'object' && 'embeddings' in _context) 
-    ? (_context as { embeddings: any[] }).embeddings 
-    : undefined;
-  const contextInferenceResults = (_context && typeof _context === 'object' && 'inferenceResults' in _context) 
-    ? (_context as { inferenceResults: any }).inferenceResults 
-    : undefined;
-  const contextSentiment = (_context && typeof _context === 'object' && 'sentiment' in _context) 
-    ? (_context as { sentiment: any }).sentiment 
-    : undefined;
-    
-  const tokens = contextTokens || []
-  const embeddings = contextEmbeddings || []
-  const inferenceResults = contextInferenceResults
-  const sentiment = contextSentiment
+  const tokens = (_context as any)?.tokens || []
+  const embeddings = (_context as any)?.embeddings || []
+  const inferenceResults = (_context as any)?.inferenceResults
+  const sentiment = (_context as any)?.sentiment
   // TODO: Use userProfile for personalized responses
   // const userProfile = _context.userProfile || {}
 

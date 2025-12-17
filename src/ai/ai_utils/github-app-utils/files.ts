@@ -71,16 +71,7 @@ export async function writeFile(
   const token = await getInstallationAccessToken(installationId);
   const encoded = Buffer.from(content).toString("base64");
 
-  const params: {
-    owner: string;
-    repo: string;
-    path: string;
-    message: string;
-    content: string;
-    branch: string;
-    headers: { authorization: string };
-    sha?: string;
-  } = {
+  const params: Record<string, unknown> = {
     owner,
     repo,
     path,
@@ -93,10 +84,8 @@ export async function writeFile(
     params.sha = sha;
   }
 
-  const response = await request(
-    "PUT /repos/{owner}/{repo}/contents/{path}",
-    params,
-  );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const response = await request("PUT /repos/{owner}/{repo}/contents/{path}", params as any);
   return response.data;
 }
 
@@ -130,7 +119,8 @@ export async function getFileSha(
 
     return response.data.sha;
   } catch (error: unknown) {
-    if (typeof error === 'object' && error !== null && 'status' in error && (error as { status: number }).status === 404) {
+    // Type guard for error with status property
+    if (error && typeof error === 'object' && 'status' in error && (error as { status: number }).status === 404) {
       return null;
     }
     throw error;

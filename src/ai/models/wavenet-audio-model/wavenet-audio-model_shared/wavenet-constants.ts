@@ -4,8 +4,6 @@
 
 export const WAVENET_VERSION = "1.0.0";
 
-export const wavenetConstants = { WAVENET_VERSION }
-
-const wavenetConstants = { WAVENET_VERSION }; 
+const wavenetConstants = { WAVENET_VERSION }; // Removed duplicate export default
 
 export default wavenetConstants;

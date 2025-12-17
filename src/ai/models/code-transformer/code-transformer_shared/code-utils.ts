@@ -4,7 +4,7 @@
 
 import type { ModelPayload } from '../../shared/modelTypes';
 
-const codeBundle = { codeUtility }; 
+const codeBundle = { codeUtility }; // Removed duplicate export default
 
 	const result = {
 		...payload,
