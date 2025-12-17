@@ -16,7 +16,7 @@ type SeedWeightMap = {
 }
 
 export const getVersionControlEmbedding = (token: string): number[] => {
-  const weights = (pretrained as SeedWeightMap).seedWeights ?? {}
+  const weights = pretrained.weights as Record<string, number[]>
   if (weights[token]) return weights[token]
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
 }
