@@ -191,9 +191,8 @@ export default function SystemPage() {
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="location">Location & Timezone</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="theme">Theme</TabsTrigger>
+          <TabsTrigger value="rag">RAG Settings</TabsTrigger>
           <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
         </TabsList>
 
