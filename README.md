@@ -1,243 +1,389 @@
-# ZacAi-Atomic
-Full Modularity of evey single Ai Model function required! 
+# ZacAi-Hybrid-LLM v0.0.2
 
-Here is a complete, production-ready **TypeScript hybrid modular AI system MVP project folder and file tree**, fully covering all atomic modules required for orchestration, inference, training, UI, config, monitoring, and integration — ready to deploy and test on GitHub Codespaces:
+**Advanced Hybrid AI System with Knowledge Domains, Memory Management, and Learning Capabilities**
 
-\`\`\`
-/ai-hybrid-mvp
-│
-├── /src                                # Source code root
-│   ├── /ai                            # All AI-specific atomic modules and logic
-│   │   ├── /input_processing
-│   │   │   ├── characterTokenizer.ts
-│   │   │   ├── wordTokenizer.ts
-│   │   │   ├── sentenceBoundaryDetector.ts
-│   │   │   ├── languageDetector.ts
-│   │   │   ├── textNormalizer.ts
-│   │   │   ├── noiseFilter.ts
-│   │   │   ├── audioVoiceActivityDetector.ts
-│   │   │   ├── imageColorSpaceConverter.ts
-│   │   │   ├── imageResizer.ts
-│   │   │   ├── audioFeatureExtractor.ts
-│   │   │   ├── videoFrameExtractor.ts
-│   │   │   └── multimodalInputSynchronizer.ts
-│   │   │
-│   │   ├── /embedding
-│   │   │   ├── staticEmbeddingsLoader.ts
-│   │   │   ├── contextualEmbeddingsGenerator.ts
-│   │   │   ├── embeddingNormalizer.ts
-│   │   │   ├── embeddingQuantizer.ts
-│   │   │   ├── positionalEncoding.ts
-│   │   │   └── crossModalityEmbeddingMapper.ts
-│   │   │
-│   │   ├── /core_reasoning
-│   │   │   ├── transformerAttentionHead.ts
-│   │   │   ├── feedforwardNetworkLayer.ts
-│   │   │   ├── dropoutLayer.ts
-│   │   │   ├── layerNormalization.ts
-│   │   │   ├── activationFunctions.ts
-│   │   │   ├── recurrentCell.ts
-│   │   │   ├── graphNeuralNetwork.ts
-│   │   │   ├── symbolicLogicParser.ts
-│   │   │   ├── constraintSolver.ts
-│   │   │   ├── probabilisticReasoning.ts
-│   │   │   ├── differentiableMemory.ts
-│   │   │   ├── sparseActivationController.ts
-│   │   │   └── explainabilityGenerator.ts
-│   │   │
-│   │   ├── /inference
-│   │   │   ├── batchAssembler.ts
-│   │   │   ├── sequencePaddingManager.ts
-│   │   │   ├── attentionMaskGenerator.ts
-│   │   │   ├── cacheManager.ts
-│   │   │   ├── precisionSwitcher.ts
-│   │   │   ├── latencyOptimizer.ts
-│   │   │   ├── resourceAllocator.ts
-│   │   │   ├── modelSharder.ts
-│   │   │   └── earlyExitController.ts
-│   │   │
-│   │   ├── /context_management
-│   │   │   ├── sessionManager.ts
-│   │   │   ├── contextWindowManager.ts
-│   │   │   ├── intentClassifier.ts
-│   │   │   ├── slotFiller.ts
-│   │   │   ├── dialogueFlowController.ts
-│   │   │   ├── userProfileHandler.ts
-│   │   │   ├── sentimentEmotionDetector.ts
-│   │   │   ├── anaphoraResolver.ts
-│   │   │   └── fallbackRecoveryHandler.ts
-│   │   │
-│   │   ├── /knowledge_retrieval
-│   │   │   ├── localKBLoader.ts
-│   │   │   ├── webSearchAPIConnector.ts
-│   │   │   ├── documentRetrieverRanker.ts
-│   │   │   ├── factVerifier.ts
-│   │   │   ├── ontologyManager.ts
-│   │   │   ├── knowledgebaseSynchronizer.ts
-│   │   │   ├── queryRewriter.ts
-│   │   │   ├── apiAuthenticator.ts
-│   │   │   └── documentCache.ts
-│   │   │
-│   │   ├── /data_pipeline
-│   │   │   ├── rawDataIngestor.ts
-│   │   │   ├── dataCleaner.ts
-│   │   │   ├── schemaValidator.ts
-│   │   │   ├── featureEngineer.ts
-│   │   │   ├── dataAugmentation.ts
-│   │   │   ├── syntheticDataGenerator.ts
-│   │   │   ├── dataAnonymizer.ts
-│   │   │   ├── dataLakeManager.ts
-│   │   │   ├── featureStoreAPI.ts
-│   │   │   ├── datasetVersionController.ts
-│   │   │   ├── anomalyDetector.ts
-│   │   │   └── realTimeStreamProcessor.ts
-│   │   │
-│   │   ├── /training
-│   │   │   ├── trainingLoopController.ts
-│   │   │   ├── lossCalculator.ts
-│   │   │   ├── optimizer.ts
-│   │   │   ├── gradientClipper.ts
-│   │   │   ├── learningRateScheduler.ts
-│   │   │   ├── distributedTrainer.ts
-│   │   │   ├── fineTuningManager.ts
-│   │   │   ├── biasDetector.ts
-│   │   │   ├── curriculumLearningController.ts
-│   │   │   ├── lifelongLearningModule.ts
-│   │   │   ├── hyperparameterTuner.ts
-│   │   │   ├── adversarialTrainer.ts
-│   │   │   ├── checkpointSaver.ts
-│   │   │   └── earlyStopController.ts
-│   │   │
-│   │   ├── /output_generation
-│   │   │   ├── beamSearchSampler.ts
-│   │   │   ├── temperatureController.ts
-│   │   │   ├── responsePostProcessor.ts
-│   │   │   ├── multimodalFormatter.ts
-│   │   │   ├── responseReRanker.ts
-│   │   │   ├── dialogueConsistencyValidator.ts
-│   │   │   ├── translator.ts
-│   │   │   ├── textToSpeechSynthesizer.ts
-│   │   │   ├── imageGenerator.ts
-│   │   │   └── codeFormatter.ts
-│   │   │
-│   │   ├── /external_integration
-│   │   │   ├── apiGateway.ts
-│   │   │   ├── pluginLoader.ts
-│   │   │   ├── webScraper.ts
-│   │   │   ├── apiRateLimiter.ts
-│   │   │   ├── oauthTokenManager.ts
-│   │   │   ├── cloudStorageInterface.ts
-│   │   │   ├── databaseConnector.ts
-│   │   │   └── iotDeviceInterface.ts
-│   │   │
-│   │   ├── /orchestration
-│   │   │   ├── moduleRegistry.ts
-│   │   │   ├── dependencyResolver.ts
-│   │   │   ├── moduleLoaderFactory.ts
-│   │   │   ├── eventBus.ts
-│   │   │   ├── workflowEngine.ts
-│   │   │   ├── schedulerExecutor.ts
-│   │   │   ├── loadBalancer.ts
-│   │   │   ├── resourceManager.ts
-│   │   │   ├── circuitBreaker.ts
-│   │   │   ├── configurationManager.ts
-│   │   │   ├── errorHandler.ts
-│   │   │   ├── metricsCollector.ts
-│   │   │   ├── logger.ts
-│   │   │   ├── securityAccessController.ts
-│   │   │   └── auditTrailGenerator.ts
-│   │   │
-│   │   ├── /monitoring_support
-│   │   │   ├── logger.ts
-│   │   │   ├── metricsCollector.ts
-│   │   │   ├── alertingSystem.ts
-│   │   │   ├── usageAnalyzer.ts
-│   │   │   ├── privacyController.ts
-│   │   │   ├── complianceChecker.ts
-│   │   │   ├── modelDriftDetector.ts
-│   │   │   ├── explainabilityDashboard.ts
-│   │   │   └── userFeedbackHandler.ts
-│   │   │
-│   │   ├── /specialized_modalities
-│   │   │   ├── objectDetection.ts
-│   │   │   ├── imageSegmentation.ts
-│   │   │   ├── speechRecognition.ts
-│   │   │   ├── audioEmotionDetector.ts
-│   │   │   ├── videoCaptioning.ts
-│   │   │   ├── graphNeuralNetwork.ts
-│   │   │   └── crossLingualAlignment.ts
-│   │   │
-│   │   ├── /advanced_meta_modules
-│   │   │   ├── autoMLManager.ts
-│   │   │   ├── selfDebuggingModule.ts
-│   │   │   ├── selfHealingModule.ts
-│   │   │   ├── metaLearningModule.ts
-│   │   │   ├── ethicalComplianceModule.ts
-│   │   │   ├── userCustomizationModule.ts
-│   │   │   ├── explanationMetaModule.ts
-│   │   │   ├── robustnessCertifier.ts
-│   │   │   ├── syntheticDataValidator.ts
-│   │   │   ├── zeroFewShotController.ts
-│   │   │   ├── modelGovernanceModule.ts
-│   │   │   ├── dataProvenanceRecorder.ts
-│   │   │   ├── selfAugmentingDataset.ts
-│   │   │   ├── realtimeFeedbackHandler.ts
-│   │   │   └── latencyProfiler.ts
+---
+
+## 🚀 Overview
+
+ZacAi-Hybrid-LLM v0.0.2 is a comprehensive AI orchestration system built with Next.js 15.5.6 and TypeScript. It combines traditional neural network approaches with knowledge-based reasoning, featuring a unique hybrid architecture that mimics human cognition.
+
+### Key Features
+
+- ✅ **23 Knowledge Domains** - Specialized expertise across algorithms, programming, mathematics, security, and more
+- ✅ **13 AI Models** - Complete neural network implementations including transformers, CNNs, GANs, and more
+- ✅ **220+ Seed Vocabulary Files** - Rich metadata knowledge base with binary indexing for O(1) lookups
+- ✅ **Hybrid Knowledge System** - Combines trained weights (unconscious) with seed lookups (conscious reference)
+- ✅ **Learning & Memory Management** - Real-time vocabulary acquisition with session-based memory
+- ✅ **Date-Stamped Training** - Automated weight versioning with training run timestamps
+- ✅ **GitHub Backup Integration** - Automated backup to multiple repository types
+- ✅ **Complete Separation of Concerns** - Every component fully isolated with proper prefixing
+
+---
+
+## 📊 System Architecture
+
+### Hybrid Knowledge Approach
+
+The system mimics human cognition with two complementary knowledge systems:
+
+1. **Trained Weights** (Unconscious/Fast)
+   - Automatic pattern recognition
+   - Neural network parameters
+   - Fast inference
+
+2. **Seed Lookups** (Conscious/Deliberate)
+   - Explainable references
+   - Rich metadata (60+ fields per entry)
+   - Verifiable knowledge sources
+
+### Component Structure
+
+```
+ZacAi-Hybrid-LLM/
+├── src/ai/
+│   ├── knowledge-domains/     # 23 specialized domains
+│   │   ├── {domain}/
+│   │   │   ├── {domain}_seeds/
+│   │   │   ├── {domain}_weights/
+│   │   │   ├── {domain}_tools/
+│   │   │   ├── {domain}_instructions.yml
+│   │   │   └── url-lookup.json
+│   │   
+│   ├── models/                # 13 AI models
+│   │   ├── {model}/
+│   │   │   ├── {model}_seeds/
+│   │   │   ├── {model}_weights/
+│   │   │   ├── {model}_pretrained_weights/
+│   │   │   ├── {model}_config/
+│   │   │   ├── {model}_data/
+│   │   │   ├── {model}_inference/
+│   │   │   ├── {model}_model/
+│   │   │   ├── {model}_training/
+│   │   │   ├── {model}_instructions.yml
+│   │   │   └── {model}_config.json
 │   │
-│   ├── /ui                             # Frontend UI and admin interface
-│   │   ├── /components
-│   │   │   ├── ChatWindow.tsx
-│   │   │   ├── MessageInput.tsx
-│   │   │   ├── MessageList.tsx
-│   │   │   ├── AdminSettings.tsx
-│   │   │   └── SharedUI.tsx
-│   │   ├── /pages
-│   │   │   ├── index.tsx              # Main chat page
-│   │   │   └── admin.tsx              # Admin dashboard
-│   │   ├── /hooks
-│   │   │   └── useChat.ts
-│   │   └── /styles
-│   │       └── global.css
+│   ├── shared/                # Shared utilities
+│   │   ├── seeds/             # Binary indexing system
+│   │   ├── memory/            # Learning & memory
+│   │   ├── weights/           # Weight management
+│   │   └── vocabulary/        # Shared vocabularies
 │   │
-│   ├── /config                         # Application-wide configs
-│   │   ├── appConfig.ts
-│   │   ├── loggingConfig.ts
-│   │   ├── metricsConfig.ts
-│   │   ├── externalAPIs.ts
-│   │   └── featureFlags.ts
-│   │
-│   ├── /utils                          # Shared helpers and utilities
-│   │   ├── stringUtils.ts
-│   │   ├── dateUtils.ts
-│   │   ├── errorUtils.ts
-│   │   ├── apiHelpers.ts
-│   │   └── arrayUtils.ts
-│
-├── /tests                             # Unit and integration tests mirroring src/
-│
-├── .eslintrc.json                    # ESLint config
-├── .prettierrc                      # Prettier config
-├── tsconfig.json                    # TypeScript project config
-├── package.json                    # NPM config and dependencies
-├── .gitignore                      # Files/patterns to ignore in git
-├── Dockerfile                      # Container build config
-├── docker-compose.yml              # Container orchestration config
-├── README.md                       # Project overview and docs
-\`\`\`
+│   └── orchestration/         # Main orchestrator
+│       └── mainOrchestrator.ts
+```
 
-This tree fully covers every atomic module discussed for the MVP hybrid AI system — from atomic AI modules (tokenizer, embeddings, transformer layers, inference controllers, knowledge retrieval) to orchestration engine and monitoring, all included neatly under `src/ai`. User interface components and admin CMS live in `src/ui`, with configuration and helpers easily locatable.
+---
 
-This structure reflects best TypeScript modular practices, supports advanced AI orchestration, and is ready for full production deployment and GitHub Codespaces development.
+## 🌍 Knowledge Domains (23)
 
-Next, code templates for core modules or orchestration design patterns in TypeScript need to be provided.
+Each domain has specialized knowledge, vocabulary, and reasoning capabilities:
 
-Citations:
-[1] Ultimate Project Setup: Templates & File Structure for Any ... https://www.reddit.com/r/vibecoding/comments/1l2t6jg/ultimate_project_setup_templates_file_structure/
-[2] Migrating from Javascript to Typescript: AI Tooling Assisted ... https://found.com/engineering/migrating-from-javascript-to-typescript
-[3] Building an MVP – Frontend Theme and Backend Architecture https://knowlo.co/blog/day-12-building-an-mvp-basic-frontend-app-and-backend-architecture/
-[4] How to structure solution files and folders to fit best with ... https://stackoverflow.com/questions/7868168/how-to-structure-solution-files-and-folders-to-fit-best-with-mvp-design-pattern
-[5] 1 TypeScript SDK Development: A 5-year-old could follow ... https://dev.to/smy/typescript-sdk-development-a-5-year-old-could-follow-this-step-by-step-part-1-our-first-mvp-1cif
-[6] VectorInstitute/aieng-template-mvp https://github.com/VectorInstitute/aieng-template-mvp
-[7] Vibe Coding SaaS MVPs: The Ultimate Guide https://www.siddharthbharath.com/vibe-coding-saas-mvps-guide/
-[8] How I Structure Projects and Repos for Effective, Safe AI ... https://adityabawankule.io/how-i-structure-projects-and-repos-for-effective-safe-ai-agent-collaboration/
-[9] How to build an AI MVP for under $100 with Next.js ... https://www.linkedin.com/posts/frankhysa_starting-an-ai-project-and-not-sure-what-activity-7373754387917221890-cXcP
+| Domain | Purpose | Seed Files |
+|--------|---------|------------|
+| **algorithms** | Algorithm design and analysis | 5 |
+| **code_review** | Code quality and best practices | 5 |
+| **data_integrity** | Data validation and verification | 4 |
+| **data_structures** | Data organization patterns | 5 |
+| **documentation** | Technical writing | 5 |
+| **english** | Language processing | 5 |
+| **environment** | Environment configuration | 5 |
+| **error_detection** | Bug identification | 5 |
+| **general_knowledge** | Broad knowledge base | 6 |
+| **grammar** | Grammar rules and syntax | 12 |
+| **internet_search** | Web search capabilities | 5 |
+| **mathematics** | Mathematical reasoning | 25 |
+| **nextjs** | Next.js framework | 42 |
+| **observability** | System monitoring | 5 |
+| **programming** | Programming concepts | 16 |
+| **react** | React library | 1 |
+| **repair** | System repair | 5 |
+| **science** | Scientific knowledge | 5 |
+| **security** | Security best practices | 10 |
+| **system** | System operations | 14 |
+| **testing** | Test strategies | 5 |
+| **typescript** | TypeScript language | 5 |
+| **version_control** | Git and versioning | 5 |
+
+---
+
+## 🤖 AI Models (13)
+
+Complete neural network implementations with training pipelines:
+
+1. **code-transformer** - Code generation and transformation
+2. **convolutional-neural-network** - Image processing
+3. **diffusion-model** - Generative modeling
+4. **generative-adversarial-network** - Adversarial learning
+5. **graph-neural-network** - Graph-based reasoning
+6. **multi-modal-fusion** - Cross-modal understanding
+7. **neuro-symbolic-reasoning** - Symbolic + neural hybrid
+8. **recurrent-neural-network** - Sequential data processing
+9. **speech-to-text** - Audio transcription
+10. **text-to-speech** - Speech synthesis
+11. **unified-transformer-llm** - Main language model
+12. **vision-transformer** - Vision understanding
+13. **wavenet-audio-model** - Audio generation
+
+---
+
+## 📚 Key Systems
+
+### 1. Binary Indexing System
+
+Fast O(1) seed lookups with 4-byte indices:
+- Format: `[domain_id(1), file_id(1), entry_id(2)]`
+- Capacity: 4.2 billion entries (255 domains × 255 files × 65,535 entries)
+- Hash-based lookups for instant access
+
+### 2. Learning & Memory Management
+
+Real-time knowledge acquisition:
+- **Session Management** - Unique session IDs with chat history
+- **Vocabulary Learning** - Automatic capture of unknown words
+- **Date-Stamped Storage** - All learned data timestamped (DD-MM-YY format)
+- **Domain-Specific Learning** - Knowledge organized by domain/model
+
+### 3. Weight Management
+
+Comprehensive weight versioning:
+- **Unified Manifests** – Every model and domain writes to `weights-manifest.json`, recording bootstrapped, pretrained, trained, and checkpoint artifacts with provenance so the orchestrator always selects the best available snapshot.
+- **Pretrained Weights** - Basic task-specific functionality
+- **Trained Weights** - Date-stamped training runs (e.g., `_trained_weights_02-11-25.json`)
+- **Weight History** - Complete training lineage
+- **Automatic Loading** - Smart weight discovery and loading
+
+Use the migration script to register legacy weight files into their manifest:
+
+```bash
+npx tsx scripts/migrate-weight-manifests.ts
+```
+
+### 4. GitHub Backup Integration
+
+Automated backup to multiple repositories:
+- **backup** - Daily automated backups
+- **data_library** - Learned vocabulary and training data
+- **stable** - Stable releases
+- **enhanced** - Enhanced versions with new features
+- **experimental** - Experimental branches
+
+---
+
+## 🔧 Installation
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+- Git
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/AiAscended/ZacAi-Hybrid-LLM-v0.0.2.git
+cd ZacAi-Hybrid-LLM-v0.0.2
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+### Environment Variables
+
+Create a `.env.local` file:
+
+```env
+# GitHub Integration (optional)
+GITHUB_TOKEN=your_github_personal_access_token
+GITHUB_BACKUP_ENABLED=true
+
+# AI Configuration
+AI_INFERENCE_ENDPOINT=http://localhost:3000/api/inference
+SEED_REGISTRY_PRELOAD=true
+```
+
+---
+
+## 📖 Usage
+
+### Basic Inference
+
+```typescript
+import { mainOrchestrator } from '@/ai/orchestration/mainOrchestrator';
+
+const result = await mainOrchestrator.processPrompt(
+  "Explain how binary search works",
+  { sessionId: "user-session-123" }
+);
+
+console.log(result.response);
+```
+
+### Seed Lookup
+
+```typescript
+import { lookupSeed, searchSeeds } from '@/ai/shared/seeds/seedLookup';
+
+// Direct lookup
+const concept = lookupSeed('async', 'programming');
+
+// Search across domains
+const results = searchSeeds('neural network', { limit: 10 });
+```
+
+### Learning New Concepts
+
+```typescript
+import { learningMemoryManager } from '@/ai/shared/learningMemoryManager';
+
+// Learn from URL lookup
+await learningMemoryManager.learnFromUrlLookup({
+  term: 'quantum computing',
+  definition: 'Computing using quantum mechanical phenomena',
+  source: 'https://example.com/quantum',
+  domain: 'science'
+});
+
+// Get session history
+const history = learningMemoryManager.getSessionHistory(sessionId);
+```
+
+---
+
+## 🎯 Architecture Highlights
+
+### Complete Separation of Concerns
+
+Every component is fully isolated:
+- All folders prefixed with parent name
+- All files prefixed with component name
+- No cross-domain dependencies (except through orchestrator)
+- Clear module boundaries
+
+### Naming Convention
+
+- **Domains:** `{domain}_seeds/`, `{domain}_weights/`, `{domain}_tools/`
+- **Models:** `{model}_config/`, `{model}_data/`, `{model}_inference/`
+- **Files:** `{component}_{description}_{date}.json`
+
+### Weight Versioning
+
+Training runs automatically create date-stamped weight files:
+```
+mathematics_trained_weights_02-11-25.json
+mathematics_trained_weights_15-12-25.json
+mathematics_trained_weights_03-01-26.json
+```
+
+---
+
+## 📊 Statistics
+
+| Metric | Count |
+|--------|-------|
+| Knowledge Domains | 23 |
+| AI Models | 13 |
+| Seed Vocabulary Files | 220+ |
+| Total Files Created | 277+ |
+| Cleanup Operations | 262 |
+| Legacy Folders Removed | 51 |
+| Folders Renamed | 110 |
+
+---
+
+## 🚀 What's New in v0.0.2
+
+### Major Features
+- ✅ Complete structural reorganization with proper prefixing
+- ✅ Learning and memory management system
+- ✅ Date-stamped weight versioning
+- ✅ GitHub backup integration
+- ✅ Binary indexing for seed lookups
+- ✅ Session-based memory with chat history
+- ✅ Real-time vocabulary acquisition
+- ✅ Automated cleanup and organization scripts
+
+### System Improvements
+- 🔧 Zero legacy folders remaining
+- 🔧 100% consistent naming conventions
+- 🔧 Complete separation of concerns
+- 🔧 Proper TypeScript types throughout
+- 🔧 Comprehensive error handling
+- 🔧 Detailed logging and monitoring
+
+---
+
+## 📝 Documentation
+
+- **[System Complete](./docs/SYSTEM_COMPLETE.md)** - Full completion report
+- **[Cleanup Complete](./docs/CLEANUP_COMPLETE.md)** - Cleanup and organization
+- **[Seed System Architecture](./docs/SEED_SYSTEM_ARCHITECTURE.md)** - Binary indexing design
+- **[Quick Start](./docs/QUICKSTART.md)** - Getting started guide
+
+---
+
+## 🔮 Roadmap
+
+### v0.0.3 (Planned)
+- [ ] Real-time training pipeline
+- [ ] Advanced weight pruning
+- [ ] Multi-GPU support
+- [ ] Enhanced session management
+- [ ] Web UI for system monitoring
+
+### v0.1.0 (Future)
+- [ ] Plugin system for custom domains
+- [ ] Cloud deployment support
+- [ ] API rate limiting
+- [ ] Advanced caching strategies
+- [ ] Performance optimization
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our contributing guidelines before submitting PRs.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- Next.js team for the amazing framework
+- OpenAI for inspiration on hybrid AI systems
+- The broader AI/ML community for research and tools
+
+---
+
+## 📞 Contact
+
+- **Author:** AiAscended
+- **Repository:** [ZacAi-Hybrid-LLM-v0.0.2](https://github.com/AiAscended/ZacAi-Hybrid-LLM-v0.0.2)
+- **Issues:** [GitHub Issues](https://github.com/AiAscended/ZacAi-Hybrid-LLM-v0.0.2/issues)
+
+---
+
+## ⭐ Star History
+
+If you find this project useful, please consider giving it a star!
+
+---
+
+**Built with ❤️ by AiAscended | Version 0.0.2 | Last Updated: November 2, 2025**

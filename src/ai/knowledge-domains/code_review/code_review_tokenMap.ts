@@ -35,4 +35,11 @@ export const getCodeReviewTokenById = (id: number): string | undefined => {
 
 export const codeReviewTokenCount = () => codeReviewTokenMap.size
 
-export default { codeReviewTokenMap, getCodeReviewTokenId, getCodeReviewTokenById, codeReviewTokenCount }
+const codeReviewTokenExports = {
+  codeReviewTokenMap,
+  getCodeReviewTokenId,
+  getCodeReviewTokenById,
+  codeReviewTokenCount,
+}
+
+export default codeReviewTokenExports

@@ -9,7 +9,6 @@
 import { parseNextjsInput } from "./nextjs_parser"
 import { analyzeNextjsSemantics } from "./nextjs_semanticAnalyzer"
 import { performSemanticInference, searchCodeExamples } from "@/ai/shared/inference/semanticInferenceHelper"
-import { NEXTJS_DOMAIN } from "./nextjs_constants"
 
 export interface NextjsInferenceResult {
   response: string
@@ -26,23 +25,28 @@ export interface NextjsInferenceResult {
   }
 }
 
-export async function nextjsRunInference(input: string, context?: any): Promise<NextjsInferenceResult | null> {
-  console.log(`[NextJS] Running REAL AI inference with seed data for: "${input.substring(0, 50)}..."`);
+export type NextjsInferenceContext = Record<string, unknown>
+
+export async function nextjsRunInference(
+  input: string,
+  context?: NextjsInferenceContext,
+): Promise<NextjsInferenceResult | null> {
+  console.log(`[NextJS] Running REAL AI inference with seed data for: "${input.substring(0, 50)}..."`)
   
   try {
     // Use semantic inference helper to query seed registry
-    const semanticResult = await performSemanticInference(input, 'nextjs', context);
+    const semanticResult = await performSemanticInference(input, "nextjs", context)
     
     // Also run traditional parser and semantic analyzer for metadata
-    const parseResult = parseNextjsInput(input);
-    const semanticAnalysis = analyzeNextjsSemantics(input);
+    const parseResult = parseNextjsInput(input)
+    const semanticAnalysis = analyzeNextjsSemantics(input)
     
     // Search for code examples if query mentions code/example
-    let codeExamples = semanticResult.codeExamples;
-    if (!codeExamples && (input.toLowerCase().includes('example') || input.toLowerCase().includes('code'))) {
-      const examples = await searchCodeExamples(semanticResult.concepts, 'nextjs');
+    let codeExamples = semanticResult.codeExamples
+    if (!codeExamples && (input.toLowerCase().includes("example") || input.toLowerCase().includes("code"))) {
+      const examples = await searchCodeExamples(semanticResult.concepts, "nextjs")
       if (examples.length > 0) {
-        codeExamples = examples.map(ex => `\`\`\`${ex.language || 'typescript'}\n${ex.code}\n\`\`\``);
+        codeExamples = examples.map((ex) => `\`\`\`${ex.language || "typescript"}\n${ex.code}\n\`\`\``)
       }
     }
 
@@ -58,7 +62,7 @@ export async function nextjsRunInference(input: string, context?: any): Promise<
         routerType: parseResult.metadata.routerType,
         inferenceMethod: semanticResult.metadata.inferenceMethod,
         matchedSeeds: semanticResult.metadata.matchedSeeds,
-      },
+      }
     }
   } catch (error) {
     console.error("[Next.js Domain] Inference error:", error)
@@ -67,5 +71,3 @@ export async function nextjsRunInference(input: string, context?: any): Promise<
 }
 
 // All hardcoded response functions removed - now using REAL AI with seed registry
-
-export default nextjsRunInference;

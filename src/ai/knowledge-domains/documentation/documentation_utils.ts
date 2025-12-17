@@ -9,7 +9,8 @@
 export const safeParseJSON = <T = unknown>(s: string, fallback: T): T => {
   try {
     return JSON.parse(s) as T
-  } catch (e) {
+  } catch (error) {
+    console.warn("Failed to parse documentation JSON", { error })
     return fallback
   }
 }

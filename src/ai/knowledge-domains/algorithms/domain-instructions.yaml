@@ -1,0 +1,184 @@
+# Algorithms Domain Instructions
+# Purpose: Provide rigorous algorithm design, optimization, and verification guidance
+
+domain:
+  id: algorithms
+  name: Algorithms
+  version: "1.2.0"
+  description: "Covers algorithm analysis, derivation, optimization, and correctness proofs"
+
+role:
+  primary: "Specialized knowledge inference for algorithms"
+  scope: "Design new procedures, adapt existing ones, and reason about complexity"
+  orchestration_behavior: "Automatically joins plans when problem-solving or optimization intents are detected"
+
+capabilities:
+  - "Translate requirements into algorithm families"
+  - "Produce pseudocode and reference implementations"
+  - "Perform asymptotic and empirical complexity analysis"
+  - "Highlight stability, determinism, and numerical characteristics"
+  - "Cross-check constraints with other domains (data_structures, systems)"
+
+seeds:
+  location: "./algorithms_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./algorithms_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./algorithms_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  runtime_profiler:
+    enabled: true
+    capabilities:
+      - "Benchmark pseudocode steps"
+      - "Contrast theoretical vs observed costs"
+  proof_assistant:
+    enabled: true
+    capabilities:
+      - "Outline invariants"
+      - "Generate loop variant checks"
+  reduction_mapper:
+    enabled: true
+    capabilities:
+      - "Map problems to known NP classes"
+      - "Suggest approximation strategies"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "CLRS Online"
+        url: "https://mitpress.mit.edu/9780262046305/introduction-to-algorithms"
+        use_for: ["core algorithms"]
+      - name: "CP-Algorithms"
+        url: "https://cp-algorithms.com"
+        use_for: ["competitive programming"]
+      - name: "Stanford CS97SI"
+        url: "https://web.stanford.edu/class/cs97si"
+        use_for: ["graph algorithms", "math-heavy"]
+      - name: "SIGACT"
+        url: "https://sigact.org"
+        use_for: ["research updates"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "CLRS Online"
+      url: "https://mitpress.mit.edu/9780262046305/introduction-to-algorithms"
+      use_for: ["reference"]
+    - name: "CP-Algorithms"
+      url: "https://cp-algorithms.com"
+      use_for: ["implementation"]
+    - name: "SIGACT"
+      url: "https://sigact.org"
+      use_for: ["research"]
+  reference_triggers:
+    - "Security or correctness claims"
+    - "Approximation ratio justification"
+    - "Novel reduction explanation"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.85
+    max_tokens: 800
+    temperature: 0.38
+    top_p: 0.9
+    require_correctness_section: true
+  input_processing:
+    - "Categorize problem (graph, DP, streaming, etc.)"
+    - "Capture constraints (time, memory, determinism, precision)"
+    - "Identify optimization target"
+  reasoning_steps:
+    - "Select candidate paradigms"
+    - "Outline pseudocode"
+    - "Run runtime_profiler estimates"
+    - "Validate with proof_assistant"
+  output_formatting:
+    - "Provide structured sections: Overview, Approach, Complexity, Proof Sketch"
+    - "Embed pseudocode fenced blocks"
+  validation:
+    - "Check invariants satisfied"
+    - "Ensure complexity claims align with calculations"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.0005
+  batch_size: 48
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Seeds/nuggets from reference textbooks"
+    - "Competitive programming editorials"
+    - "Internal benchmark corpora"
+  focus_areas:
+    - "Proof articulation"
+    - "Edge-case detection"
+    - "Numerical stability"
+  evaluation_metrics:
+    - "Correctness verification rate"
+    - "Runtime estimate accuracy"
+    - "Admin satisfaction score"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize requirements and constraints"
+    - "Map inputs to canonical notation"
+  processing:
+    - "Generate candidate algorithms"
+    - "Simulate or estimate performance"
+  postprocessing:
+    - "Summarize trade-offs"
+    - "Suggest tests to validate implementation"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Ambiguous constraints"
+      action: "Request precision (n limits, real-time needs, etc.)"
+    - error: "Proof failure"
+      action: "Flag via admin console and downgrade confidence"
+    - error: "Tool timeout"
+      action: "Fallback to textual reasoning path"
+  recovery_strategies:
+    - "Escalate to system domain if orchestration conflict"
+    - "Log to admin for manual follow-up"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.runtime_profiler.enabled"
+    - "tools.proof_assistant.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/algorithms"
+    profiler_toggle: "tools.runtime_profiler.enabled"
+    proof_toggle: "tools.proof_assistant.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"

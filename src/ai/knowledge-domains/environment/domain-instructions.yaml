@@ -1,0 +1,185 @@
+# Environment Domain Instructions
+# Purpose: Manage environment configuration, provisioning, and drift detection across dev/stage/prod
+
+domain:
+  id: environment
+  name: Environment
+  version: "1.2.0"
+  description: "Covers infrastructure definitions, secrets scopes, and runtime configuration"
+
+role:
+  primary: "Specialized knowledge inference for environment management"
+  scope: "Provision, audit, and remediate environment discrepancies"
+  orchestration_behavior: "Activates when deployment targets or config files are touched"
+
+capabilities:
+  - "Compare environment manifests"
+  - "Recommend infra changes respecting guardrails"
+  - "Detect secret scope violations"
+  - "Coordinate with security and observability domains"
+  - "Integrate with admin-managed environment matrices"
+
+seeds:
+  location: "./environment_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./environment_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./environment_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  env_diff_analyzer:
+    enabled: true
+    capabilities:
+      - "Generate diffs between env manifests"
+      - "Highlight drift"
+  secrets_scope_validator:
+    enabled: true
+    capabilities:
+      - "Check secret access policies"
+      - "Audit rotation schedules"
+  provisioning_planner:
+    enabled: true
+    capabilities:
+      - "Estimate deployment impact"
+      - "Suggest IaC updates"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Terraform Docs"
+        url: "https://developer.hashicorp.com/terraform/docs"
+        use_for: ["iac patterns"]
+      - name: "AWS Well-Architected"
+        url: "https://aws.amazon.com/architecture/well-architected"
+        use_for: ["cloud best practices"]
+      - name: "Kubernetes Docs"
+        url: "https://kubernetes.io/docs/home"
+        use_for: ["cluster configs"]
+      - name: "HashiCorp Vault"
+        url: "https://developer.hashicorp.com/vault/docs"
+        use_for: ["secrets"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Terraform Docs"
+      url: "https://developer.hashicorp.com/terraform/docs"
+      use_for: ["iac"]
+    - name: "AWS Well-Architected"
+      url: "https://aws.amazon.com/architecture/well-architected"
+      use_for: ["architecture"]
+    - name: "Kubernetes Docs"
+      url: "https://kubernetes.io/docs/home"
+      use_for: ["k8s"]
+  reference_triggers:
+    - "Infra compliance claims"
+    - "Secret rotation procedures"
+    - "Deployment risk assessments"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.81
+    max_tokens: 680
+    temperature: 0.42
+    top_p: 0.9
+    require_env_matrix: true
+  input_processing:
+    - "Capture target environment(s)"
+    - "Identify IaC sources and owners"
+    - "Gather compliance profiles"
+  reasoning_steps:
+    - "Run env_diff_analyzer"
+    - "Assess impact and risk"
+    - "Coordinate with provisioning_planner"
+  output_formatting:
+    - "Summaries include Diff, Risk, Remediation"
+    - "Provide change plan with rollback notes"
+  validation:
+    - "Ensure suggested changes align with admin guardrails"
+    - "Verify secret handling policy"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.00058
+  batch_size: 34
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "IaC repo snapshots"
+    - "Change management tickets"
+    - "Compliance audit logs"
+  focus_areas:
+    - "Drift detection accuracy"
+    - "Secrets policy enforcement"
+    - "Cloud provider best practices"
+  evaluation_metrics:
+    - "False positive rate"
+    - "Remediation speed"
+    - "Admin satisfaction"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Sync manifests across environments"
+    - "Map services to owners"
+  processing:
+    - "Run diffs"
+    - "Simulate provisioning impact"
+  postprocessing:
+    - "Update admin environment matrix"
+    - "Trigger change request templates"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Missing manifest"
+      action: "Request IaC repo link or admin export"
+    - error: "Secrets scope mismatch"
+      action: "Escalate to security domain"
+    - error: "Provisioning planner unavailable"
+      action: "Switch to manual checklist"
+  recovery_strategies:
+    - "Escalate to system domain when orchestration conflicts"
+    - "Log incident for compliance review"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.env_diff_analyzer.enabled"
+    - "tools.secrets_scope_validator.enabled"
+    - "tools.provisioning_planner.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/environment"
+    diff_toggle: "tools.env_diff_analyzer.enabled"
+    secrets_toggle: "tools.secrets_scope_validator.enabled"
+    provisioning_toggle: "tools.provisioning_planner.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"

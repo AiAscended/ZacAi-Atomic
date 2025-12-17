@@ -63,7 +63,6 @@ export default function EnhancedHomePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(true);
   const [aiReady, setAiReady] = useState(false);
   const [systemStatus, setSystemStatus] = useState('Initializing AI system...');
   const [sessionId, setSessionId] = useState('');
@@ -94,7 +93,6 @@ export default function EnhancedHomePage() {
   useEffect(() => {
     async function initializeSession() {
       setSystemStatus('Connecting to AI system...');
-      setIsInitializing(true);
       try {
         const res = await fetch('/api/chat', {
           method: 'POST',
@@ -108,8 +106,6 @@ export default function EnhancedHomePage() {
         setSystemStatus('AI system ready');
       } catch {
         setSystemStatus('Failed to initialize AI system');
-      } finally {
-        setIsInitializing(false);
       }
     }
     initializeSession();
@@ -134,8 +130,9 @@ export default function EnhancedHomePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: 'chat',
           sessionId,
-          prompt: finalPrompt,
+          message: finalPrompt,
         }),
       });
 

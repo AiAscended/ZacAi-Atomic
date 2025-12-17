@@ -2,10 +2,18 @@
  * Code-transformer - Layer Implementations
  */
 
+import type { ModelPayload } from '../../shared/modelTypes';
+
 export class CODELayer {
-  forward(input: any): any {
-    return input;
+  constructor(private readonly identifier: string) {}
+
+  forward(input: ModelPayload): ModelPayload {
+    return {
+      ...input,
+      lastLayer: this.identifier,
+    };
   }
 }
 
-export default CODELayer;
+export const defaultCodeLayer = new CODELayer('code-layer-1');
+

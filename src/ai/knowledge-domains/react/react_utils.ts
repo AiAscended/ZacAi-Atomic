@@ -8,12 +8,18 @@
 
 import { REACT_CONCEPTS, REACT_PATTERNS } from "./react_constants"
 
-export function isReactConcept(term: string): boolean {
-  return REACT_CONCEPTS.includes(term as any)
+type ReactConcept = (typeof REACT_CONCEPTS)[number]
+type ReactPattern = (typeof REACT_PATTERNS)[number]
+
+const CONCEPT_SET = new Set<string>(REACT_CONCEPTS)
+const PATTERN_SET = new Set<string>(REACT_PATTERNS)
+
+export function isReactConcept(term: string): term is ReactConcept {
+  return CONCEPT_SET.has(term)
 }
 
-export function isReactPattern(term: string): boolean {
-  return REACT_PATTERNS.includes(term as any)
+export function isReactPattern(term: string): term is ReactPattern {
+  return PATTERN_SET.has(term)
 }
 
 export function extractReactTerms(text: string): string[] {

@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,11 +52,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/admin/settings/system');
@@ -68,12 +64,17 @@ export default function SettingsPage() {
         setSettings(getDefaultSettings());
       }
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('Failed to load settings:', message);
       setSettings(getDefaultSettings());
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
 
   const getDefaultSettings = (): SystemSettings => ({
     general: {
@@ -125,9 +126,11 @@ export default function SettingsPage() {
         throw new Error('Failed to save settings');
       }
     } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('Failed to save settings:', message);
       toast({
         title: 'Error',
-        description: 'Failed to save settings. Please try again.',
+        description: `Failed to save settings. ${message}`,
         variant: 'destructive',
       });
     } finally {
@@ -135,7 +138,11 @@ export default function SettingsPage() {
     }
   };
 
-  const updateSetting = (category: keyof SystemSettings, key: string, value: any) => {
+  const updateSetting = <T extends keyof SystemSettings, K extends keyof SystemSettings[T]>(
+    category: T,
+    key: K,
+    value: SystemSettings[T][K]
+  ) => {
     if (!settings) return;
     setSettings({
       ...settings,

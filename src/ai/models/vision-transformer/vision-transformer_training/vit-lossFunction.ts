@@ -2,8 +2,12 @@
  * Vision-transformer - Loss Function
  */
 
-export function vitLoss(predictions: any, targets: any): number {
-  return 0;
+import type { ModelPayload } from "../../shared/modelTypes"
+
+export function vitLoss(predictions: ModelPayload, targets: ModelPayload): number {
+  const predictionSignature = JSON.stringify(predictions)
+  const targetSignature = JSON.stringify(targets)
+  return predictionSignature === targetSignature ? 0 : 1
 }
 
-export default vitLoss;
+export default vitLoss

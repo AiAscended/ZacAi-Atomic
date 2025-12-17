@@ -7,14 +7,21 @@
  */
 
 import pretrained from "./environment_weights/environment_pretrained_weights.json"
+import seedVocabulary from "./environment_seeds/environment_seedVocabulary.json"
 import { ENVIRONMENT_DOMAIN } from "./environment_constants"
-
-const EMBEDDING_DIM = 128
+import {
+  buildSeedWeightMap,
+  deterministicVector,
+  normalizeSeedTokens,
+  resolveEmbeddingDimension,
+} from "../utils/embeddingUtils"
+import { updateFile } from "../dataRegistry"
+const EMBEDDING_DIM = resolveEmbeddingDimension(pretrained, 128)
+const SEED_TOKENS = normalizeSeedTokens(seedVocabulary)
+const SEED_WEIGHTS = buildSeedWeightMap(pretrained, SEED_TOKENS, EMBEDDING_DIM)
 
 export const getEnvironmentEmbedding = (token: string): number[] => {
-  const weights = (pretrained as { seedWeights?: Record<string, number[]> }).seedWeights ?? {}
-  if (weights[token]) return weights[token]
-  return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
+  return SEED_WEIGHTS[token] ?? deterministicVector(token, EMBEDDING_DIM)
 }
 
 export const getEnvironmentEmbeddingForTokens = (tokens: string[]) => tokens.map(getEnvironmentEmbedding)
@@ -25,7 +32,6 @@ export const persistEnvironmentWeights = (weights: Record<string, number[]>) => 
     null,
     2,
   )
-  const { updateFile } = require("../../orchestration/fileWatcher")
   updateFile(ENVIRONMENT_DOMAIN, "src/ai/knowledge-domains/environment/environment_weights/environment_pretrained_weights.json", content)
   return {
     success: true,
@@ -33,4 +39,10 @@ export const persistEnvironmentWeights = (weights: Record<string, number[]>) => 
   }
 }
 
-export default { getEnvironmentEmbedding, getEnvironmentEmbeddingForTokens, persistEnvironmentWeights }
+const environmentEmbeddingExports = {
+  getEnvironmentEmbedding,
+  getEnvironmentEmbeddingForTokens,
+  persistEnvironmentWeights,
+}
+
+export default environmentEmbeddingExports

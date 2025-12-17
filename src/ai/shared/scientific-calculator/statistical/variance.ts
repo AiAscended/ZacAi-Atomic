@@ -16,17 +16,19 @@ import { mean } from "./mean"
  * @throws Error if array is empty
  * @example variance(2, 4, 4, 4, 5, 5, 7, 9) // returns 4
  */
+type VarianceArgs = [boolean, ...number[]] | number[]
+
 export function variance(...numbers: number[]): number
 export function variance(sample: boolean, ...numbers: number[]): number
-export function variance(...args: any[]): number {
+export function variance(...args: VarianceArgs): number {
   let sample = false
   let numbers: number[]
 
   if (typeof args[0] === "boolean") {
     sample = args[0]
-    numbers = args.slice(1)
+    numbers = args.slice(1) as number[]
   } else {
-    numbers = args
+    numbers = args as number[]
   }
 
   if (numbers.length === 0) {

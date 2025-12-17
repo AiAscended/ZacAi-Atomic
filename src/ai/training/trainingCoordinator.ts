@@ -5,7 +5,9 @@
  */
 
 import { LearningMetricsTracker } from '../monitoring/learningMetricsTracker';
-import { LLMWeightsManager } from '../models/unified-transformer-llm/unified-transformer-llm_weights/unified-transformer-llm-weightsManager';
+import { LLMWeightsManager, type ModelWeights } from '../models/unified-transformer-llm/unified-transformer-llm_weights/unified-transformer-llm-weightsManager';
+import { buildDefaultLlmConfig } from '../models/unified-transformer-llm/unified-transformer-llm_config/buildDefaultLlmConfig';
+import { vocabularyManager } from '../shared/vocabulary/vocabularyManager';
 import type { InferenceMetrics } from '../monitoring/learningMetricsTracker';
 
 export interface TrainingConfig {
@@ -96,14 +98,18 @@ export class TrainingCoordinator {
       console.log(`   ✅ Prepared ${trainingData.length} training examples`);
       
       // Step 3: Load current weights (or initialize if none exist)
-      try {
-        await this.weightsManager.loadLatestCheckpoint() || 
-        await this.weightsManager.loadWeights();
-        // In real implementation, would use loaded weights for training
-        console.log('   ✅ Loaded existing weights');
-      } catch (error) {
-        console.log('   ℹ️  No existing weights found, would initialize new weights');
-        // In real implementation, would initialize weights here
+      const preferredWeights = await this.weightsManager.loadBestAvailableWeights();
+      let workingWeights: ModelWeights;
+      if (preferredWeights) {
+        workingWeights = JSON.parse(JSON.stringify(preferredWeights.weights)) as ModelWeights;
+        console.log('   ✅ Loaded existing weights', {
+          artifactType: preferredWeights.artifact?.type ?? 'legacy',
+          artifactFile: preferredWeights.artifact?.file,
+        });
+      } else {
+        const fallbackConfig = buildDefaultLlmConfig(vocabularyManager.getEffectiveVocabSize());
+        workingWeights = this.weightsManager.initializeWeights(fallbackConfig);
+        console.log('   ℹ️  Initialized new weights for training (no persisted weights found)');
       }
       
       // Step 4: Simulate training (placeholder for actual training loop)
@@ -111,6 +117,7 @@ export class TrainingCoordinator {
       
       // Step 5: Mark metrics as learned
       if (result.success) {
+        await this.persistTrainedWeights(workingWeights, result, metrics);
         const timestamps = metrics.map(m => m.timestamp);
         await this.metricsTracker.markAsLearned(timestamps);
         console.log(`   ✅ Marked ${timestamps.length} samples as learned`);
@@ -180,6 +187,33 @@ export class TrainingCoordinator {
       epochsCompleted: config.epochs,
       weightsUpdated: false, // Would be true with real training
     };
+  }
+
+  private async persistTrainedWeights(
+    weights: ModelWeights,
+    result: TrainingResult,
+    metrics: InferenceMetrics[]
+  ): Promise<void> {
+    try {
+      weights.metadata.trainedSteps = (weights.metadata.trainedSteps || 0) + result.samplesUsed;
+      weights.metadata.trainedEpochs = (weights.metadata.trainedEpochs || 0) + result.epochsCompleted;
+      weights.metadata.timestamp = new Date().toISOString();
+      const filename = `trained_weights_${Date.now()}.json`;
+      await this.weightsManager.saveWeights(weights, filename, {
+        type: 'trained',
+        source: 'training-coordinator',
+        trainingRunId: filename,
+        metrics: {
+          samples: result.samplesUsed,
+          finalLoss: result.finalLoss ?? 0,
+        },
+        notes: `Auto-generated from ${metrics.length} samples`,
+        setActive: true,
+      });
+      console.log(`   💾 Saved trained weights snapshot: ${filename}`);
+    } catch (error) {
+      console.log('   ⚠️ Failed to persist trained weights', error);
+    }
   }
   
   /**

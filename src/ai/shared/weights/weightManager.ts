@@ -9,6 +9,13 @@
 import fs from 'fs';
 import path from 'path';
 
+type JsonRecord = Record<string, unknown>;
+
+type PerformanceMetrics = Record<string, number> & {
+  accuracy: number;
+  f1_score: number;
+};
+
 export interface WeightMetadata {
   version: string;
   type: 'pretrained' | 'trained';
@@ -18,15 +25,11 @@ export interface WeightMetadata {
   date_stamp?: string;
   training_run?: number;
   description: string;
-  architecture: Record<string, any>;
-  weights: Record<string, any>;
+  architecture: JsonRecord;
+  weights: JsonRecord;
   capabilities: string[];
-  performance: {
-    accuracy: number;
-    f1_score: number;
-    [key: string]: any;
-  };
-  metadata: Record<string, any>;
+  performance: PerformanceMetrics;
+  metadata: JsonRecord;
 }
 
 export interface WeightEntry {
@@ -194,9 +197,9 @@ class WeightManagerSystem {
       let pretrainedMetadata: WeightMetadata | undefined;
       try {
         const content = fs.readFileSync(pretrainedPath, 'utf-8');
-        pretrainedMetadata = JSON.parse(content);
+        pretrainedMetadata = JSON.parse(content) as WeightMetadata;
       } catch (error) {
-        console.warn(`⚠️  Could not parse pretrained weights for ${component}`);
+        console.warn(`⚠️  Could not parse pretrained weights for ${component}:`, error);
       }
 
       // Load trained metadata
@@ -204,9 +207,9 @@ class WeightManagerSystem {
       for (const trainedPath of trainedFiles) {
         try {
           const content = fs.readFileSync(trainedPath, 'utf-8');
-          trainedMetadata.push(JSON.parse(content));
+          trainedMetadata.push(JSON.parse(content) as WeightMetadata);
         } catch (error) {
-          console.warn(`⚠️  Could not parse trained weights: ${trainedPath}`);
+          console.warn(`⚠️  Could not parse trained weights: ${trainedPath}`, error);
         }
       }
 
@@ -272,7 +275,7 @@ class WeightManagerSystem {
 
       if (!metadata) {
         const content = fs.readFileSync(weightsPath, 'utf-8');
-        metadata = JSON.parse(content);
+        metadata = JSON.parse(content) as WeightMetadata;
       }
 
       entry.loaded = true;
@@ -327,7 +330,7 @@ class WeightManagerSystem {
       usingTrainedWeights: 0
     };
 
-    for (const [key, entry] of this.weightRegistry) {
+    for (const entry of this.weightRegistry.values()) {
       if (entry.type === 'domain') stats.domains++;
       if (entry.type === 'model') stats.models++;
       if (entry.trainedPaths.length > 0) stats.componentsWithTrainedWeights++;

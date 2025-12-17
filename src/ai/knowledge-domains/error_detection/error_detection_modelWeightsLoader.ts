@@ -1,20 +1,25 @@
-/**
- * File: src/ai/data/error_detection/error_detection_modelWeightsLoader.ts
- * Purpose: Load training weights for error detection domain
- * Depends on: ../storageAdapter.ts
- * Depended on by: error_detection_trainingController.ts
- * Creator: Vercel v0 Coding Assistant
- */
-
 import { storageAdapter } from "../storageAdapter"
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-export const errorDetectionLoadWeights = async (
-  path = "/src/ai/knowledge-domains/error_detection/error_detection_weights/error_detection_trainingWeights.bin",
-) => {
+const errorDetectionWeightsManager = createDomainWeightsManager({
+  domainName: "error_detection",
+})
+
+export const errorDetectionLoadWeights = async (): Promise<ArrayBuffer | null> => {
   try {
-    const raw = await storageAdapter.readFile(path)
-    return raw
-  } catch (e) {
+    const filename = await errorDetectionWeightsManager.resolveActiveWeightFile()
+    const fullPath = `${errorDetectionWeightsManager.storageBasePath}/${filename}`
+    return await storageAdapter.readBinaryFile(fullPath)
+  } catch (error) {
+    console.error("[error-detection][weights] Failed to load weights", { error })
     return null
   }
+}
+
+export const primeErrorDetectionWeights = async (): Promise<string | null> => {
+  return errorDetectionWeightsManager.prime()
+}
+
+export const getErrorDetectionActiveWeightArtifact = () => {
+  return errorDetectionWeightsManager.getActiveWeightArtifact()
 }

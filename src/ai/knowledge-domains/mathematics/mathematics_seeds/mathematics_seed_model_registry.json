@@ -13,7 +13,34 @@
       "location": "s3://models/ultimateai-v5.pt",
       "status": "production",
       "created_by": "AI Team"
+    },
+    {
+      "model_id": "symbolic-math-v3",
+      "name": "SymbolicReasoner-v3",
+      "type": "symbolic",
+      "version": "3.1.0",
+      "trained_on": "2025-05-12",
+      "metrics": {
+        "proof_success_rate": 0.87,
+        "algebra_accuracy": 0.94
+      },
+      "location": "s3://models/symbolic-math-v3.onnx",
+      "status": "canary",
+      "created_by": "MathOps"
+    },
+    {
+      "model_id": "probability-net-v2",
+      "name": "ProbabilisticEstimator-v2",
+      "type": "bayesian",
+      "version": "2.4.3",
+      "trained_on": "2025-08-21",
+      "metrics": {
+        "log_likelihood": -0.42,
+        "forecast_rmse": 0.08
+      },
+      "location": "s3://models/probability-net-v2.safetensors",
+      "status": "production",
+      "created_by": "ForecastingGuild"
     }
-    // ...more models
   ]
 }

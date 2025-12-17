@@ -40,9 +40,15 @@ export const persistCodeReviewWeights = (weights: Record<string, number[]>) => {
     )
     updateFile(CODE_REVIEW_DOMAIN, "src/ai/knowledge-domains/code_review/code_review_weights/code_review_pretrained_weights.json", content)
     return true
-  } catch (e) {
+  } catch (error) {
+    console.warn("Failed to persist code review weights", error)
     return false
   }
 }
+const codeReviewEmbeddingExports = {
+  getCodeReviewEmbedding,
+  getCodeReviewEmbeddingForTokens,
+  persistCodeReviewWeights,
+}
 
-export default { getCodeReviewEmbedding, getCodeReviewEmbeddingForTokens, persistCodeReviewWeights }
+export default codeReviewEmbeddingExports

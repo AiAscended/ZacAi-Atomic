@@ -13,7 +13,8 @@ export const loadCodeReviewLearnedData = async (path = "/src/ai/knowledge-domain
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
     return safeParseJSON(raw, { notes: [], concepts: {} })
-  } catch (e) {
+  } catch (error) {
+    console.warn("Failed to load code review learned data", { path, error })
     return { notes: [], concepts: {} }
   }
 }
@@ -25,7 +26,8 @@ export const saveCodeReviewLearnedData = async (
   try {
     await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
     return true
-  } catch (e) {
+  } catch (error) {
+    console.warn("Failed to save code review learned data", { path, error })
     return false
   }
 }

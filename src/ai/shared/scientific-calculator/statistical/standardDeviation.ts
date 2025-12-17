@@ -16,17 +16,19 @@ import { mean } from "./mean"
  * @throws Error if array is empty or has only one element for sample calculation
  * @example stdDev(2, 4, 4, 4, 5, 5, 7, 9) // returns 2
  */
+type StdDevArgs = [boolean, ...number[]] | number[]
+
 export function stdDev(...numbers: number[]): number
 export function stdDev(sample: boolean, ...numbers: number[]): number
-export function stdDev(...args: any[]): number {
+export function stdDev(...args: StdDevArgs): number {
   let sample = false
   let numbers: number[]
 
   if (typeof args[0] === "boolean") {
     sample = args[0]
-    numbers = args.slice(1)
+    numbers = args.slice(1) as number[]
   } else {
-    numbers = args
+    numbers = args as number[]
   }
 
   if (numbers.length === 0) {

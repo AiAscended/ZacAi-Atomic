@@ -28,6 +28,22 @@ export interface BackupConfig {
   excludePatterns: string[];
 }
 
+interface RepositoryStats {
+  name: string;
+  type: GitHubRepository['type'];
+  enabled: boolean;
+  lastBackup?: string;
+  autoBackup?: boolean;
+  schedule?: GitHubRepository['backupSchedule'];
+}
+
+interface BackupStatistics {
+  totalRepositories: number;
+  enabledRepositories: number;
+  autoBackupEnabled: boolean;
+  repositories: RepositoryStats[];
+}
+
 export class GitHubBackupManager {
   private configPath: string;
   private config: BackupConfig | null = null;
@@ -356,7 +372,7 @@ export class GitHubBackupManager {
         }
       }
       await fs.rmdir(dir);
-    } catch (error) {
+    } catch {
       // Ignore errors
     }
   }
@@ -364,21 +380,31 @@ export class GitHubBackupManager {
   /**
    * Get backup statistics
    */
-  async getStatistics(): Promise<any> {
+  async getStatistics(): Promise<BackupStatistics> {
     if (!this.config) await this.initialize();
 
+    const config = this.config;
+    if (!config) {
+      return {
+        totalRepositories: 0,
+        enabledRepositories: 0,
+        autoBackupEnabled: false,
+        repositories: [],
+      };
+    }
+
     return {
-      totalRepositories: this.config?.repositories.length || 0,
-      enabledRepositories: this.config?.repositories.filter(r => r.enabled).length || 0,
-      autoBackupEnabled: this.config?.autoBackupEnabled || false,
-      repositories: this.config?.repositories.map(r => ({
+      totalRepositories: config.repositories.length,
+      enabledRepositories: config.repositories.filter(r => r.enabled).length,
+      autoBackupEnabled: config.autoBackupEnabled,
+      repositories: config.repositories.map(r => ({
         name: r.name,
         type: r.type,
         enabled: r.enabled,
         lastBackup: r.lastBackup,
         autoBackup: r.autoBackup,
-        schedule: r.backupSchedule
-      }))
+        schedule: r.backupSchedule,
+      })),
     };
   }
 }

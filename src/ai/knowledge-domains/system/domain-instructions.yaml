@@ -1,0 +1,214 @@
+# System Domain Instructions
+# Purpose: Provide governance for platform, infrastructure, and orchestration metadata
+
+domain:
+  id: system
+  name: "System Operations"
+  version: "1.1.0"
+  description: "Handles platform health, orchestration controls, and infrastructure guardrails"
+
+role:
+  primary: "Specialized knowledge inference for system-level operations"
+  scope: "Observability, orchestration, security, and runtime configuration"
+  orchestration_behavior: "Always-on plug-in that enables the main orchestrator to function with zero or many domains"
+
+capabilities:
+  - "Interpret system health metrics and alerts"
+  - "Provide operational runbooks and remediation steps"
+  - "Reference system seeds for topology and dependency graphs"
+  - "Sync URL lookup sources for vendor documentation"
+  - "Coordinate hot-swapping of domains/models without system downtime"
+
+principles:
+  - name: "Reliability"
+    rule: "Prefer graceful degradation paths and redundant routing"
+    priority: 1
+  - name: "Security"
+    rule: "Harden every operational action; log and audit"
+    priority: 2
+  - name: "Observability"
+    rule: "Surface traceability for every domain/model invocation"
+    priority: 3
+  - name: "Modularity"
+    rule: "Treat every domain/model as a plugin that can be enabled/disabled at runtime"
+    priority: 4
+
+foundational_concepts:
+  operating_systems:
+    - "Linux service management (systemd, journald)"
+    - "Process lifecycle and resource quotas"
+    - "Filesystem layouts for seeds, weights, and logs"
+  networking:
+    - "Service endpoints and health probes"
+    - "Rate limiting and throttling"
+    - "Secure transport (TLS, mTLS, VPN tunnels)"
+  orchestration:
+    - "Domain/model registration and deregistration"
+    - "Hot-swap workflows"
+    - "Fallback routing across modules"
+  observability:
+    - "Metrics, logs, traces correlation"
+    - "Alert thresholds"
+    - "Audit trail requirements"
+
+seeds:
+  location: "./system_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./system_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./system_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+tools:
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Linux Man Pages"
+        url: "https://man7.org/linux/man-pages/"
+        use_for: ["system calls", "daemon management"]
+      - name: "Kubernetes Docs"
+        url: "https://kubernetes.io/docs"
+        use_for: ["orchestration", "deployments"]
+      - name: "Prometheus Docs"
+        url: "https://prometheus.io/docs"
+        use_for: ["metrics", "alerting"]
+    usage_guidelines:
+      - "Verify operational commands"
+      - "Confirm configuration flags"
+      - "Look up vendor-specific behaviors"
+  telemetry_inspector:
+    enabled: true
+    capabilities:
+      - "Aggregate metrics, logs, traces"
+      - "Detect anomalies"
+      - "Correlate incidents with deployments"
+  command_simulator:
+    enabled: true
+    capabilities:
+      - "Dry-run orchestrator commands"
+      - "Validate hot-swap plans"
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Linux Man Pages"
+      url: "https://man7.org/linux/man-pages/"
+      use_for: ["system calls", "process management"]
+    - name: "Kubernetes Docs"
+      url: "https://kubernetes.io/docs"
+      use_for: ["orchestration", "controllers"]
+    - name: "Prometheus Docs"
+      url: "https://prometheus.io/docs"
+      use_for: ["metrics", "alerting"]
+  reference_triggers:
+    - "New service integration requested"
+    - "Operational flag unknown"
+    - "Need to confirm API or CLI syntax"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.75
+    max_tokens: 600
+    temperature: 0.45
+    top_p: 0.85
+    allow_system_commands: false
+  input_processing:
+    - "Parse operational context (incident, deploy, query)"
+    - "Identify referenced domains/models"
+    - "Gather current system metrics"
+  reasoning_steps:
+    - "Determine if action requires orchestrator hooks"
+    - "Check dependencies and health status"
+    - "Plan safe rollout or rollback"
+  output_formatting:
+    - "Provide ordered steps with owners"
+    - "List required tools or commands"
+    - "Surface confidence and risk"
+  validation:
+    - "Verify domain/model availability"
+    - "Ensure commands are idempotent"
+    - "Confirm audit trail logging"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.001
+  batch_size: 32
+  update_frequency: "daily"
+  optimizer: "adam"
+  data_sources:
+    - "Incident postmortems"
+    - "Runbooks"
+    - "Deployment change logs"
+    - "Telemetry baselines"
+  focus_areas:
+    - "Faster anomaly detection"
+    - "Improved routing heuristics"
+    - "Stronger security posture"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize metric names"
+    - "Fetch current domain registry"
+    - "Load admin overrides"
+  processing:
+    - "Evaluate routing graph"
+    - "Simulate proposed changes"
+    - "Score impact"
+  postprocessing:
+    - "Emit audit logs"
+    - "Update cache"
+    - "Notify monitoring"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Domain offline"
+      action: "Trigger fallback route, mark domain for recovery"
+    - error: "Weight mismatch"
+      action: "Reload weights from canonical path"
+    - error: "Seed corruption"
+      action: "Restore from backup and alert admin"
+  recovery_strategies:
+    - "Engage telemetry_inspector"
+    - "Consult runbook via url_lookup"
+    - "Switch to degraded mode"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "principles"
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/system"
+    url_sources: "tools.url_lookup.sources"
+    lookup_config: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seed_directory: "seeds.location"
+    weight_directory: "weights.location"
+    telemetry_rules: "tools.telemetry_inspector.capabilities"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"
+      - "tools.url_lookup.sources"
+

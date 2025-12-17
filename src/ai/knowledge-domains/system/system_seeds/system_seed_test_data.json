@@ -5,7 +5,18 @@
       "name": "Test User",
       "role": "role-user",
       "email": "testuser@example.com"
+    },
+    {
+      "user_id": "test-ops",
+      "name": "Observability Bot",
+      "role": "role-admin",
+      "email": "ops-bot@example.com"
+    },
+    {
+      "user_id": "test-analyst",
+      "name": "Forecast Analyst",
+      "role": "role-user",
+      "email": "analyst@example.com"
     }
-    // Add more test users or data as needed
   ]
 }

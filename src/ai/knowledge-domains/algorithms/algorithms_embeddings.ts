@@ -7,14 +7,22 @@
  */
 
 import pretrained from "./algorithms_weights/algorithms_pretrained_weights.json"
+import seedVocabulary from "./algorithms_seeds/algorithms_seedVocabulary.json"
 import { ALGORITHMS_DOMAIN } from "./algorithms_constants"
+import {
+  buildSeedWeightMap,
+  deterministicVector,
+  normalizeSeedTokens,
+  resolveEmbeddingDimension,
+} from "../utils/embeddingUtils"
+import { updateFile } from "../dataRegistry"
 
-const EMBEDDING_DIM = 128
+const EMBEDDING_DIM = resolveEmbeddingDimension(pretrained, 128)
+const SEED_TOKENS = normalizeSeedTokens(seedVocabulary)
+const SEED_WEIGHTS = buildSeedWeightMap(pretrained, SEED_TOKENS, EMBEDDING_DIM)
 
 export const getAlgorithmsEmbedding = (token: string): number[] => {
-  const weights = (pretrained as { seedWeights?: Record<string, number[]> }).seedWeights ?? {}
-  if (weights[token]) return weights[token]
-  return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
+  return SEED_WEIGHTS[token] ?? deterministicVector(token, EMBEDDING_DIM)
 }
 
 export const getAlgorithmsEmbeddingForTokens = (tokens: string[]) => tokens.map(getAlgorithmsEmbedding)
@@ -25,7 +33,6 @@ export const persistAlgorithmsWeights = (weights: Record<string, number[]>) => {
     null,
     2,
   )
-  const { updateFile } = require("../../orchestration/fileWatcher")
   updateFile(ALGORITHMS_DOMAIN, "src/ai/knowledge-domains/algorithms/algorithms_weights/algorithms_pretrained_weights.json", content)
   return {
     success: true,
@@ -33,4 +40,10 @@ export const persistAlgorithmsWeights = (weights: Record<string, number[]>) => {
   }
 }
 
-export default { getAlgorithmsEmbedding, getAlgorithmsEmbeddingForTokens, persistAlgorithmsWeights }
+const algorithmsEmbeddingExports = {
+  getAlgorithmsEmbedding,
+  getAlgorithmsEmbeddingForTokens,
+  persistAlgorithmsWeights,
+}
+
+export default algorithmsEmbeddingExports

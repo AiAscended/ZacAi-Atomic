@@ -28,9 +28,11 @@ export const getDataStructuresTokenById = (id: number): string | undefined => {
   return undefined
 }
 export const dataStructuresTokenCount = () => dataStructuresTokenMap.size
-export default {
+const dataStructuresTokenExports = {
   dataStructuresTokenMap,
   getDataStructuresTokenId,
   getDataStructuresTokenById,
   dataStructuresTokenCount,
 }
+
+export default dataStructuresTokenExports

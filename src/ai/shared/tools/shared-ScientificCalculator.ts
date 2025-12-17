@@ -177,7 +177,17 @@ export class ScientificCalculator {
    * Normalize mathematical expression for evaluation
    */
   private static normalizeExpression(expr: string): string {
-    return expr.trim().replace(/\s+/g, "").replace(/×/g, "*").replace(/÷/g, "/").replace(/\^/g, "**")
+    return expr
+      .trim()
+      .replace(/,/g, "")
+      .replace(/=/g, "")
+      .replace(/\?/g, "")
+      .replace(/\s+/g, "")
+      .replace(/×/g, "*")
+      .replace(/·/g, "*")
+      .replace(/÷/g, "/")
+      .replace(/[–−]/g, "-")
+      .replace(/\^/g, "**")
   }
 
   /**
@@ -235,7 +245,7 @@ export class ScientificCalculator {
    */
   private static safeEval(expr: string): number {
     // Validate expression contains only safe characters
-    if (!/^[\d+\-*/.()e\s]+$/.test(expr)) {
+    if (!/^[\d+\-*/.%()e\s]+$/.test(expr)) {
       throw new Error("Invalid characters in expression")
     }
 

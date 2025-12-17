@@ -1,0 +1,186 @@
+# Repair Domain Instructions
+# Purpose: Deliver automated remediation plans, patches, and safe rollback guidance
+
+domain:
+  id: repair
+  name: Repair
+  version: "1.2.0"
+  description: "Focuses on applying fixes, generating patches, and coordinating mitigations across services"
+
+role:
+  primary: "Specialized knowledge inference for repair"
+  scope: "Diagnose issues, synthesize remediation steps, and validate fixes"
+  orchestration_behavior: "Activated when incidents, failing tests, or regression flags require fixes"
+
+capabilities:
+  - "Generate minimal diffs that resolve defects"
+  - "Recommend rollback vs forward-fix strategies"
+  - "Simulate impact using seeds and weights"
+  - "Coordinate with testing and deployment domains"
+  - "Track post-fix validation requirements"
+
+seeds:
+  location: "./repair_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./repair_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./repair_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  patch_synthesizer:
+    enabled: true
+    capabilities:
+      - "Propose textual diffs"
+      - "Annotate reasoning per hunk"
+  regression_validator:
+    enabled: true
+    capabilities:
+      - "Map fixes to relevant tests"
+      - "Run heuristic impact scoring"
+  rollback_planner:
+    enabled: true
+    capabilities:
+      - "Assemble rollback steps"
+      - "Surface dependency blockers"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "GitHub Engineering"
+        url: "https://github.blog/category/engineering"
+        use_for: ["incident stories"]
+      - name: "Google SRE"
+        url: "https://sre.google"
+        use_for: ["remediation patterns"]
+      - name: "AWS Post-Incident Guides"
+        url: "https://aws.amazon.com/blogs/architecture/tag/post-incident"
+        use_for: ["cloud remediation"]
+      - name: "Mozilla Bugzilla"
+        url: "https://bugzilla.mozilla.org"
+        use_for: ["patch precedents"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Google SRE"
+      url: "https://sre.google"
+      use_for: ["incident remediation"]
+    - name: "GitHub Engineering"
+      url: "https://github.blog/category/engineering"
+      use_for: ["lessons learned"]
+    - name: "AWS Post-Incident Guides"
+      url: "https://aws.amazon.com/blogs/architecture/tag/post-incident"
+      use_for: ["cloud guidance"]
+  reference_triggers:
+    - "Critical incidents"
+    - "Rollback planning"
+    - "Need authoritative repair patterns"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.85
+    max_tokens: 750
+    temperature: 0.37
+    top_p: 0.88
+    require_patch_block: true
+  input_processing:
+    - "Capture incident or diff context"
+    - "Identify affected components"
+    - "Pull severity + SLA from admin config"
+  reasoning_steps:
+    - "Outline hypotheses"
+    - "Select repair strategy"
+    - "Use patch_synthesizer/regression_validator"
+    - "Verify rollback coverage"
+  output_formatting:
+    - "Provide sections: Summary, Patch/Steps, Validation, Risks"
+    - "Embed diffs in fenced code blocks"
+  validation:
+    - "Ensure diff applies cleanly (syntactic check)"
+    - "Map each risk to mitigation"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.0005
+  batch_size: 46
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Seeded remediation playbooks"
+    - "CI failure archives"
+    - "Postmortem libraries"
+  focus_areas:
+    - "Minimal viable fix generation"
+    - "Regression avoidance"
+    - "Admin override responsiveness"
+  evaluation_metrics:
+    - "Fix acceptance rate"
+    - "Regression reoccurrence"
+    - "Admin satisfaction"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize incident description"
+    - "Fetch related test results"
+  processing:
+    - "Generate candidate patch"
+    - "Validate against regression_validator"
+  postprocessing:
+    - "Produce rollout + rollback checklist"
+    - "Notify admin dashboards"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Patch conflicts"
+      action: "Regenerate with additional context or request latest base"
+    - error: "Insufficient telemetry"
+      action: "Request logs/metrics via observability domain"
+    - error: "Tool timeout"
+      action: "Fallback to manual reasoning"
+  recovery_strategies:
+    - "Escalate to system domain for orchestrator conflicts"
+    - "Escalate to security if vulnerability related"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.patch_synthesizer.enabled"
+    - "tools.regression_validator.enabled"
+    - "tools.rollback_planner.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/repair"
+    patch_tool_toggle: "tools.patch_synthesizer.enabled"
+    regression_tool_toggle: "tools.regression_validator.enabled"
+    rollback_tool_toggle: "tools.rollback_planner.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"

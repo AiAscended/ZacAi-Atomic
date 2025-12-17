@@ -7,7 +7,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { logEvent } from '@/lib/systemActivityLogger.cjs';
+import systemActivityLogger from '@/lib/systemActivityLogger.cjs';
+
+const { logEvent } = systemActivityLogger;
 
 // Base path for file operations (project root)
 const BASE_PATH = process.env.ZACAI_CODE_ROOT || process.cwd();
@@ -24,7 +26,7 @@ function validatePath(requestedPath: string): string {
   return resolved;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     // TODO: Add proper auth check
     // const session = await getServerSession();
@@ -65,7 +67,7 @@ export async function GET(request: NextRequest) {
             size: itemStats.size,
             modified: itemStats.mtime.toISOString(),
           };
-        } catch (error) {
+        } catch {
           // Skip items we can't access
           return null;
         }
@@ -90,12 +92,11 @@ export async function GET(request: NextRequest) {
       items: validItems,
     });
   } catch (error) {
-    console.error('[dev-console] Error listing files:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[dev-console] Error listing files:', message);
     
     return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : 'Failed to list files',
-      },
+      { error: message },
       { status: 500 }
     );
   }

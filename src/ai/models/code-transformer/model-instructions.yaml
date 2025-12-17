@@ -1,0 +1,233 @@
+# Code Transformer Model Instructions
+# Purpose: Generate and refactor source code with semantic awareness, AST alignment, and safety guardrails
+
+model:
+  id: "code_transformer"
+  name: "Code Transformer"
+  version: "1.2.0"
+  description: "Encoder-decoder transformer tuned for code synthesis, refactoring, and lint-aware completions"
+  modality: "code"
+  architecture:
+    type: "encoder-decoder"
+    parameters: "~350M"
+    context_length: 4096
+    positional_encoding: "rotary"
+  deployment:
+    runtime: "worker-thread"
+    container_image: "registry.internal.models/code-transformer:1.2.0"
+    supports_hot_swap: true
+
+role:
+  primary: "Neural code generation and transformation"
+  scope: "Translate specs, diffs, or natural-language requirements into compilable code"
+  orchestration_behavior: "Invoked when orchestration detects code edits, refactors, or scaffolding tasks"
+
+capabilities:
+  - "Generate idiomatic TypeScript/JavaScript, with fallbacks for Python and Go"
+  - "Apply targeted refactors with patch reasoning"
+  - "Enforce lint/style rules pulled from admin-managed configs"
+  - "Annotate reasoning steps for auditing"
+  - "Coordinate with testing domain to propose coverage updates"
+
+principles:
+  - name: "Deterministic Builds"
+    rule: "Prefer patterns that keep build outputs reproducible and avoid nondeterministic APIs"
+    priority: P1
+  - name: "Secure Defaults"
+    rule: "Flag insecure code paths and recommend hardened alternatives"
+    priority: P1
+  - name: "Minimal Diff"
+    rule: "Produce smallest safe patch unless admin overrides for rewrites"
+    priority: P2
+
+seeds:
+  location: "./code-transformer_seeds/"
+  auto_load: true
+  format: "json"
+  tokens_file: "code-transformer_seed_tokens.json"
+  cache: "warm"
+
+weights:
+  location: "./code-transformer_weights/"
+  auto_load: true
+  format: "binary"
+  current: "./code-transformer_weights/code-transformer_current_weights.bin"
+  pretrained: "./code-transformer_pretrained_weights/code-transformer_pretrained_embeddings.bin"
+  fallback: "./code-transformer_pretrained_weights/code-transformer_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  ast_analyzer:
+    enabled: true
+    description: "Builds abstract syntax trees and aligns edits with node boundaries"
+    capabilities:
+      - "Detect syntax errors before emission"
+      - "Highlight unsafe mutations"
+  static_lint_bridge:
+    enabled: true
+    description: "Bridges ESLint/TSLint configs from admin panel"
+    capabilities:
+      - "Apply lint fixes"
+      - "Explain rule violations"
+  patch_verifier:
+    enabled: true
+    description: "Simulates patch application via git"
+    capabilities:
+      - "Detect merge conflicts"
+      - "Ensure formatting remains consistent"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "TypeScript Handbook"
+        url: "https://www.typescriptlang.org/docs/handbook/intro.html"
+        use_for: ["language semantics"]
+      - name: "MDN Web Docs"
+        url: "https://developer.mozilla.org"
+        use_for: ["web APIs"]
+      - name: "Go Docs"
+        url: "https://go.dev/doc/"
+        use_for: ["golang"]
+      - name: "Rust Book"
+        url: "https://doc.rust-lang.org/book/"
+        use_for: ["rust references"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "TypeScript Handbook"
+      url: "https://www.typescriptlang.org/docs/handbook/intro.html"
+      use_for: ["ts semantics"]
+    - name: "MDN Web Docs"
+      url: "https://developer.mozilla.org"
+      use_for: ["js/web"]
+    - name: "Go Docs"
+      url: "https://go.dev/doc/"
+      use_for: ["golang"]
+  reference_triggers:
+    - "New or deprecated language features"
+    - "Security-sensitive API usage"
+    - "Cross-language translation requests"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.86
+    max_tokens: 768
+    temperature: 0.32
+    top_p: 0.9
+    top_k: 40
+    nucleus_sampling: true
+  input_processing:
+    - "Detect language + framework"
+    - "Ingest lint/style settings"
+    - "Run ast_analyzer on context"
+  reasoning_steps:
+    - "Summarize intent"
+    - "Plan edits"
+    - "Generate draft"
+    - "Validate via patch_verifier"
+    - "Annotate reasoning"
+  output_formatting:
+    - "Emit diff blocks with file headers"
+    - "Include rationale for each change"
+  validation:
+    - "Ensure generated code compiles syntactically"
+    - "Cross-check with lint rules"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adamw"
+  learning_rate: 0.00045
+  batch_size: 48
+  update_frequency: "nightly"
+  epochs: 6
+  data_sources:
+    - "code-transformer_training/curated_patches.jsonl"
+    - "code-transformer_data/review_feedback.parquet"
+    - "Shared refactoring corpus"
+  focus_areas:
+    - "Security hardening patterns"
+    - "Diff minimization"
+    - "Language expansion support"
+  evaluation_metrics:
+    - "Lint-clean output rate"
+    - "Regression introduction rate"
+    - "Admin-rated usefulness"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize indentation + line endings"
+    - "Extract dependency graph"
+    - "Fetch admin-provided constraints"
+  processing:
+    - "Plan transformation graph"
+    - "Generate tokens with context window awareness"
+    - "Apply ast-level corrections"
+  postprocessing:
+    - "Format code via prettier"
+    - "Run static_lint_bridge"
+    - "Publish diff + summary"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Compilation failure"
+      action: "Re-run generation with stricter temperature and surface diagnostics"
+    - error: "Patch conflict"
+      action: "Invoke patch_verifier conflict mode and request updated base"
+    - error: "Tool outage"
+      action: "Fallback to textual reasoning and alert admin"
+  recovery_strategies:
+    - "Escalate to system domain when orchestrator constraints violated"
+    - "Defer to programming domain for ambiguous logic requirements"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.ast_analyzer.enabled"
+    - "tools.static_lint_bridge.enabled"
+    - "tools.patch_verifier.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/code-transformer"
+    ast_tool_toggle: "tools.ast_analyzer.enabled"
+    lint_bridge_toggle: "tools.static_lint_bridge.enabled"
+    patch_verifier_toggle: "tools.patch_verifier.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "Diff Acceptance"
+      target: ">=90%"
+    - name: "Security Regression"
+      target: "<1%"
+    - name: "Lint Cleanliness"
+      target: ">=98%"
+metadata:
+  owners:
+    - "ai-platform@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/code-transformer"

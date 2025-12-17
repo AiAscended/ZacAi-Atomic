@@ -9,25 +9,37 @@
 import { safeParseJSON } from "./error_detection_utils"
 import { storageAdapter } from "../storageAdapter"
 
+export type ErrorDetectionLearnedData = {
+  notes: string[]
+  concepts: Record<string, unknown>
+}
+
+const DEFAULT_LEARNED_DATA_PATH =
+  "/src/ai/knowledge-domains/error_detection/error_detection_learned/error_detection_learnedData.json"
+
+const createDefaultLearnedData = (): ErrorDetectionLearnedData => ({ notes: [], concepts: {} })
+
 export const loadErrorDetectionLearnedData = async (
-  path = "/src/ai/knowledge-domains/error_detection/error_detection_learned/error_detection_learnedData.json",
-) => {
+  path = DEFAULT_LEARNED_DATA_PATH,
+): Promise<ErrorDetectionLearnedData> => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { notes: [], concepts: {} })
-  } catch (e) {
-    return { notes: [], concepts: {} }
+    return safeParseJSON<ErrorDetectionLearnedData>(raw, createDefaultLearnedData())
+  } catch (error) {
+    console.error("[error-detection][learned-data] Failed to load learned data", { path, error })
+    return createDefaultLearnedData()
   }
 }
 
 export const saveErrorDetectionLearnedData = async (
-  data: unknown,
-  path = "/src/ai/knowledge-domains/error_detection/error_detection_learned/error_detection_learnedData.json",
-) => {
+  data: ErrorDetectionLearnedData,
+  path = DEFAULT_LEARNED_DATA_PATH,
+): Promise<boolean> => {
   try {
     await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
     return true
-  } catch (e) {
+  } catch (error) {
+    console.error("[error-detection][learned-data] Failed to persist learned data", { path, error })
     return false
   }
 }

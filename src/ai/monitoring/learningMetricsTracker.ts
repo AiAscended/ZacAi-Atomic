@@ -8,6 +8,9 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export interface InferenceMetrics {
   // Input
   prompt: string;
@@ -56,8 +59,6 @@ export interface LearningData {
   };
 }
 
-const moduleDir = path.dirname(fileURLToPath(import.meta.url));
-
 export class LearningMetricsTracker {
   private dataDir: string;
   private metricsFile: string;
@@ -65,7 +66,7 @@ export class LearningMetricsTracker {
   private maxCacheSize: number = 1000;
   
   constructor(dataDir?: string) {
-    this.dataDir = dataDir || path.join(moduleDir, '../../../data/learning');
+    this.dataDir = dataDir || path.join(__dirname, '../../../data/learning');
     this.metricsFile = path.join(this.dataDir, 'learnt.json');
   }
   
@@ -128,7 +129,7 @@ export class LearningMetricsTracker {
     try {
       const data = await fs.readFile(this.metricsFile, 'utf-8');
       return JSON.parse(data) as LearningData;
-    } catch (error) {
+    } catch {
       // File doesn't exist or is invalid, return empty data
       return {
         metrics: [],

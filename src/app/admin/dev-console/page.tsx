@@ -11,7 +11,6 @@ import { useState } from 'react';
 import { AlertTriangle, Code2, Github, Terminal } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { SystemAwarenessPanel } from '@/components/admin/dev-console/SystemAwarenessPanel';
 
 // Dynamic imports for client-only components to avoid SSR issues
 const AdminFileTree = dynamic(() => import('@/components/admin/dev-console/AdminFileTree').then(mod => ({ default: mod.AdminFileTree })), {
@@ -103,11 +102,10 @@ export default function DevConsolePage() {
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Admin-Only Access</AlertTitle>
             <AlertDescription>
-              System-level access. Changes here directly affect ZacAi&rsquo;s own codebase.
+              System-level access. Changes here directly affect ZacAi&apos;s own codebase.
               All actions are logged and audited.
             </AlertDescription>
           </Alert>
-          <SystemAwarenessPanel />
         </div>
       </div>
 

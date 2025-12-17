@@ -1,0 +1,233 @@
+# Text-to-Speech Model Instructions
+# Purpose: Convert natural language text into expressive, latency-aware audio waveforms
+
+model:
+  id: "text_to_speech"
+  name: "Text-to-Speech"
+  version: "1.2.0"
+  description: "Neural TTS stack combining linguistic front-end, acoustic model, and neural vocoder"
+  modality: "audio"
+  architecture:
+    type: "seq2seq + vocoder"
+    acoustic_model: "transformer-TTS"
+    vocoder: "HiFi-GAN v2"
+    sampling_rate_hz: 22050
+  deployment:
+    runtime: "CUDA"
+    container_image: "registry.internal.models/text-to-speech:1.2.0"
+    supports_streaming: true
+
+role:
+  primary: "Context-aware text-to-speech synthesis"
+  scope: "Generate speech in multiple locales with controllable prosody and safety filters"
+  orchestration_behavior: "Attached when orchestrator routes narration, accessibility, or audio preview tasks"
+
+capabilities:
+  - "Synthesize speech for en-US, en-GB, es-ES, and fr-FR voices"
+  - "Control speaking rate, pitch, and emotion via tags"
+  - "Auto-pronounce acronyms, code tokens, and numbers"
+  - "Insert SSML cues for pauses and emphasis"
+  - "Enforce policy filters for sensitive text"
+
+principles:
+  - name: "Clarity First"
+    rule: "Prioritize intelligibility over stylistic flourishes when constraints conflict"
+    priority: P1
+  - name: "Safety Guardrails"
+    rule: "Reject or sanitize disallowed content before synthesis"
+    priority: P1
+  - name: "Low Latency"
+    rule: "Favor chunked streaming responses for long passages"
+    priority: P2
+
+seeds:
+  location: "./text-to-speech_seeds/"
+  auto_load: true
+  format: "json"
+  tokens_file: "text-to-speech_seed_tokens.json"
+  lexicon_file: "lexicon.csv"
+  cache: "warm"
+
+weights:
+  location: "./text-to-speech_weights/"
+  auto_load: true
+  format: "binary"
+  current: "./text-to-speech_weights/text-to-speech_current_weights.bin"
+  pretrained: "./text-to-speech_pretrained_weights/text-to-speech_pretrained_embeddings.bin"
+  fallback: "./text-to-speech_pretrained_weights/text-to-speech_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  pronunciation_engine:
+    enabled: true
+    description: "Builds phoneme graphs from IPA dictionaries"
+    capabilities:
+      - "Resolve ambiguous tokens"
+      - "Respect locale-specific stress"
+  ssml_validator:
+    enabled: true
+    description: "Validates SSML tags prior to synthesis"
+    capabilities:
+      - "Auto-close tags"
+      - "Strip unsupported attributes"
+  content_filter:
+    enabled: true
+    description: "Applies policy guardrails pre/post synthesis"
+    capabilities:
+      - "Detect disallowed phrases"
+      - "Mask PII before audio generation"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "SSML Specification"
+        url: "https://www.w3.org/TR/speech-synthesis/"
+        use_for: ["markup"]
+      - name: "CMU Pronouncing Dictionary"
+        url: "http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/"
+        use_for: ["phonemes"]
+      - name: "HiFi-GAN Paper"
+        url: "https://arxiv.org/abs/2010.05646"
+        use_for: ["vocoder"]
+      - name: "Voice Accessibility Guidelines"
+        url: "https://www.w3.org/WAI/media/av/"
+        use_for: ["accessibility"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "SSML Specification"
+      url: "https://www.w3.org/TR/speech-synthesis/"
+      use_for: ["ssml"]
+    - name: "CMU Pronouncing Dictionary"
+      url: "http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/"
+      use_for: ["phonetics"]
+    - name: "HiFi-GAN Paper"
+      url: "https://arxiv.org/abs/2010.05646"
+      use_for: ["vocoder tuning"]
+  reference_triggers:
+    - "New locale onboarding"
+    - "Prosody rule disputes"
+    - "Vocoder stability investigations"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.82
+    max_tokens: 512
+    max_audio_seconds: 120
+    temperature: 0.6
+    top_p: 0.92
+    enable_streaming: true
+  input_processing:
+    - "Normalize text (unicode NFC, punctuation)"
+    - "Detect locale + voice"
+    - "Insert SSML based on markup or heuristics"
+    - "Run content_filter pre-check"
+  reasoning_steps:
+    - "Generate phoneme sequence via pronunciation_engine"
+    - "Produce mel-spectrogram"
+    - "Vocode into waveform"
+    - "Apply post-filtering"
+  output_formatting:
+    - "Return base64 PCM chunks plus metadata (locale, duration, sample rate)"
+    - "Attach SSML used"
+  validation:
+    - "Check loudness within [-23, -16] LUFS"
+    - "Ensure duration constraint"
+    - "Run post content_filter"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adamw"
+  learning_rate: 0.0003
+  batch_size: 64
+  update_frequency: "every-8-hours"
+  epochs: 12
+  data_sources:
+    - "text-to-speech_training/corpus_manifest.json"
+    - "text-to-speech_data/voice_feedback.parquet"
+    - "Accessibility QA transcripts"
+  focus_areas:
+    - "Prosody consistency"
+    - "Locale pronunciation accuracy"
+    - "Latency reduction"
+  evaluation_metrics:
+    - "MOS (mean opinion score)"
+    - "Word error rate vs transcripts"
+    - "Content policy violation rate"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Clean text + detect markup"
+    - "Align lexicon entries"
+  processing:
+    - "Generate phonemes"
+    - "Run acoustic + vocoder stages"
+  postprocessing:
+    - "Normalize loudness"
+    - "Segment audio for streaming"
+    - "Attach metadata + transcripts"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Unsupported locale"
+      action: "Fallback to english voice and notify admin"
+    - error: "Vocoder instability"
+      action: "Reduce temperature, re-render, and log incident"
+    - error: "Policy violation"
+      action: "Block output, return sanitized message"
+  recovery_strategies:
+    - "Escalate to security for policy disputes"
+    - "Escalate to observability for systemic latency spikes"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.pronunciation_engine.enabled"
+    - "tools.ssml_validator.enabled"
+    - "tools.content_filter.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/text-to-speech"
+    pronunciation_toggle: "tools.pronunciation_engine.enabled"
+    ssml_toggle: "tools.ssml_validator.enabled"
+    filter_toggle: "tools.content_filter.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "MOS"
+      target: ">=4.2"
+    - name: "Latency p95"
+      target: "<1200ms for 3s text"
+    - name: "Policy Violations"
+      target: "<0.1%"
+metadata:
+  owners:
+    - "audio-platform@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/text-to-speech"

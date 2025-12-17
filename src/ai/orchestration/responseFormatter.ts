@@ -43,77 +43,73 @@ export interface FormattedResponse {
  * Returns structured, ready-for-UI rendering response object.
  * @param rawResponse - raw AI-generated text including code blocks
  */
-export function formatResponse(rawResponse: string): FormattedResponse {
+export async function formatResponse(rawResponse: string): Promise<FormattedResponse> {
   const codeBlocks: CodeBlock[] = []
   const textBlocks: TextBlock[] = []
   const languages = new Set<string>()
+  const orderedSegments: OrderedSegment[] = []
 
-  const codeBlockRegex = /``````/g
-  let match,
-    lastIndex = 0,
-    blockId = 0
+  const codeBlockRegex = /```([^\n]*)?\n([\s\S]*?)```/g
+  let match: RegExpExecArray | null
+  let lastIndex = 0
+  let textBlockCount = 0
+  let codeBlockCount = 0
+
+  const appendTextBlock = (segment: string) => {
+    const processed = buildTextBlock(segment)
+    if (!processed) {
+      return
+    }
+
+    const block: TextBlock = {
+      id: `text-${textBlockCount++}`,
+      ...processed,
+    }
+
+    textBlocks.push(block)
+    orderedSegments.push({ kind: "text", content: block.content })
+  }
 
   while ((match = codeBlockRegex.exec(rawResponse)) !== null) {
     if (match.index > lastIndex) {
-      const textContent = rawResponse.substring(lastIndex, match.index).trim()
-      if (textContent) {
-        const cleaned = cleanText(textContent)
-        const summarized = summarizeText(cleaned)
-        if (summarized) {
-          textBlocks.push({
-            id: `text-${blockId}`,
-            content: summarized,
-            type: "paragraph",
-          })
-        }
-      }
+      appendTextBlock(rawResponse.substring(lastIndex, match.index))
     }
 
-    const language = match[1] || detectLanguage(match[2])
-    const code = match[2].trim()
-    const formattedCode = formatCode(code, { language })
+    const detectedLanguage = match[1]?.trim()
+    const codeBody = match[2] ?? ""
+    const language = detectedLanguage || detectLanguage(codeBody)
+    const normalizedLanguage = normalizeLanguage(language)
+    const formattedCode = await formatCode(codeBody.trimEnd(), { language: normalizedLanguage })
 
-    languages.add(language)
-    codeBlocks.push({
-      id: `code-${blockId}`,
-      language,
+    languages.add(normalizedLanguage)
+    const codeBlock: CodeBlock = {
+      id: `code-${codeBlockCount++}`,
+      language: normalizedLanguage,
       code: formattedCode,
-    })
+    }
 
-    lastIndex = match.index + match[0].length
-    blockId++
+    codeBlocks.push(codeBlock)
+    orderedSegments.push({ kind: "code", language: normalizedLanguage, code: formattedCode })
+    lastIndex = codeBlockRegex.lastIndex
   }
 
   if (lastIndex < rawResponse.length) {
-    const textContent = rawResponse.substring(lastIndex).trim()
-    if (textContent) {
-      const cleaned = cleanText(textContent)
-      const summarized = summarizeText(cleaned)
-      if (summarized) {
-        textBlocks.push({
-          id: `text-${blockId}`,
-          content: summarized,
-          type: "paragraph",
-        })
-      }
-    }
+    appendTextBlock(rawResponse.substring(lastIndex))
   }
 
   if (codeBlocks.length === 0 && textBlocks.length === 0) {
-    const cleaned = cleanText(rawResponse.trim())
-    const summarized = summarizeText(cleaned)
-    textBlocks.push({
-      id: "text-0",
-      content: summarized || cleaned,
-      type: "paragraph",
-    })
+    appendTextBlock(rawResponse)
   }
 
-  const combinedText =
-    textBlocks.map((tb) => tb.content).join("\n\n") +
-    (codeBlocks.length > 0
-      ? "\n\n" + codeBlocks.map((cb) => `\`\`\`${cb.language}\n${cb.code}\n\`\`\``).join("\n\n")
-      : "")
+  const combinedText = orderedSegments
+    .map((segment) =>
+      segment.kind === "text"
+        ? segment.content
+        : `\`\`\`${segment.language}\n${segment.code}\n\`\`\``,
+    )
+    .filter(Boolean)
+    .join("\n\n")
+    .trim()
 
   return {
     text: combinedText,
@@ -125,4 +121,91 @@ export function formatResponse(rawResponse: string): FormattedResponse {
       hasFormatting: codeBlocks.length > 0,
     },
   }
+}
+
+function normalizeLanguage(language?: string): string {
+  if (!language) return "javascript"
+  const normalized = language.toLowerCase()
+  if (["ts", "tsx", "typescript"].includes(normalized)) return "typescript"
+  if (["js", "jsx", "javascript"].includes(normalized)) return "javascript"
+  return normalized
+}
+
+type OrderedSegment =
+  | { kind: "text"; content: string }
+  | { kind: "code"; language: string; code: string }
+
+function buildTextBlock(content: string): Pick<TextBlock, "content" | "type"> | null {
+  const trimmed = content.trim()
+  if (!trimmed) {
+    return null
+  }
+
+  const inferredType = inferTextBlockType(trimmed)
+
+  if (inferredType === "list") {
+    const normalizedList = normalizeListContent(trimmed)
+    return normalizedList
+      ? {
+          content: normalizedList,
+          type: "list",
+        }
+      : null
+  }
+
+  const cleaned = inferredType === "heading" ? cleanText(trimmed.replace(/^#+\s*/, "")) : cleanText(trimmed)
+  const condensed = summarizeIfNeeded(cleaned)
+
+  if (!condensed) {
+    return null
+  }
+
+  return {
+    content: condensed,
+    type: inferredType,
+  }
+}
+
+function inferTextBlockType(content: string): TextBlock["type"] {
+  const trimmed = content.trim()
+  if (/^#{1,6}\s+/.test(trimmed)) {
+    return "heading"
+  }
+
+  const lines = trimmed.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
+  const hasMultipleLines = lines.length > 1
+  const looksLikeList =
+    hasMultipleLines &&
+    lines.every((line) => /^[-*+]\s+/.test(line) || /^\d+[\.)]\s+/.test(line))
+
+  if (looksLikeList) {
+    return "list"
+  }
+
+  return "paragraph"
+}
+
+function normalizeListContent(content: string): string {
+  const lines = content
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+
+  if (!lines.length) {
+    return ""
+  }
+
+  const normalized = lines
+    .map((line) => line.replace(/^([-*+]\s+|\d+[\.)]\s+)/, ""))
+    .map((line) => cleanText(line))
+    .filter(Boolean)
+
+  return normalized.map((line) => `- ${line}`).join("\n")
+}
+
+function summarizeIfNeeded(text: string, threshold = 4000): string {
+  if (text.length <= threshold) {
+    return text
+  }
+  return summarizeText(text, threshold)
 }

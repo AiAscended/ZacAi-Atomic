@@ -1,18 +1,41 @@
-import TOKENS from './general_knowledge_tokens';
+import TOKENS from "./general_knowledge_tokens"
 
-const tokenToId = new Map<string, number>();
-const idToToken = new Map<number, string>();
+const RESERVED_TOKENS = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"] as const
 
-// 0-based token ids
-TOKENS.forEach((t, i) => {
-  tokenToId.set(t, i);
-  idToToken.set(i, t);
-});
+export const buildGeneralTokenMap = () => {
+  const tokenToId = new Map<string, number>()
+  RESERVED_TOKENS.forEach((token, index) => tokenToId.set(token, index))
+  let nextId = RESERVED_TOKENS.length
 
-export const getGeneralTokenId = (token: string): number | undefined => tokenToId.get(token);
-export const getGeneralTokenById = (id: number): string | undefined => idToToken.get(id);
-export const generalTokenCount = () => tokenToId.size;
+  for (const token of TOKENS) {
+    if (!tokenToId.has(token)) {
+      tokenToId.set(token, nextId++)
+    }
+  }
 
-export const generalTokenMap = tokenToId;
+  return tokenToId
+}
 
-export default { getGeneralTokenId, getGeneralTokenById, generalTokenCount, generalTokenMap };
+export const generalTokenMap = buildGeneralTokenMap()
+
+export const getGeneralTokenId = (token: string): number => {
+  return generalTokenMap.get(token) ?? generalTokenMap.get("[UNK]")!
+}
+
+export const getGeneralTokenById = (id: number): string | undefined => {
+  for (const [token, idx] of generalTokenMap.entries()) {
+    if (idx === id) return token
+  }
+  return undefined
+}
+
+export const generalTokenCount = () => generalTokenMap.size
+
+const generalTokenMapExports = {
+  generalTokenMap,
+  getGeneralTokenId,
+  getGeneralTokenById,
+  generalTokenCount,
+}
+
+export default generalTokenMapExports

@@ -2,8 +2,12 @@
  * Diffusion-model - Loss Function
  */
 
-export function diffusionLoss(predictions: any, targets: any): number {
-  return 0;
+import type { ModelPayload } from "../../shared/modelTypes"
+
+export function diffusionLoss(predictions: ModelPayload, targets: ModelPayload): number {
+  const predictionSignature = JSON.stringify(predictions)
+  const targetSignature = JSON.stringify(targets)
+  return predictionSignature === targetSignature ? 0 : 1
 }
 
-export default diffusionLoss;
+export default diffusionLoss

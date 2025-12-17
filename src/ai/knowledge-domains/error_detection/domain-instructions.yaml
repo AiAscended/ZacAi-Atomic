@@ -1,0 +1,186 @@
+# Error Detection Domain Instructions
+# Purpose: Detect, classify, and remediate runtime, compile-time, and logical errors
+
+domain:
+  id: error_detection
+  name: Error Detection
+  version: "1.2.0"
+  description: "Monitors stack traces, telemetry, and signals to surface defects early"
+
+role:
+  primary: "Specialized knowledge inference for error detection"
+  scope: "Analyze errors, reproduce scenarios, and recommend fixes"
+  orchestration_behavior: "Plug-in triggered by exception traces, lint failures, or anomaly alerts"
+
+capabilities:
+  - "Parse logs and map to known signatures"
+  - "Correlate alerts with recent deployments"
+  - "Propose debug experiments"
+  - "Escalate critical issues to proper domains"
+  - "Sync admin-configured severity rules"
+
+seeds:
+  location: "./error_detection_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./error_detection_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./error_detection_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  stacktrace_parser:
+    enabled: true
+    capabilities:
+      - "Normalize stack frames"
+      - "Rank probable root causes"
+  anomaly_detector:
+    enabled: true
+    capabilities:
+      - "Detect metric deviations"
+      - "Group correlated alerts"
+  reproduction_planner:
+    enabled: true
+    capabilities:
+      - "Outline repro steps"
+      - "Suggest automation hooks"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Mozilla Developer Network"
+        url: "https://developer.mozilla.org"
+        use_for: ["web errors"]
+      - name: "Stack Overflow"
+        url: "https://stackoverflow.com"
+        use_for: ["community fixes"]
+      - name: "Microsoft Learn Debugging"
+        url: "https://learn.microsoft.com/visualstudio/debugger"
+        use_for: ["debug tooling"]
+      - name: "Kubernetes Troubleshooting"
+        url: "https://kubernetes.io/docs/tasks/debug"
+        use_for: ["cluster errors"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Stack Overflow"
+      url: "https://stackoverflow.com"
+      use_for: ["error lookup"]
+    - name: "Mozilla Developer Network"
+      url: "https://developer.mozilla.org"
+      use_for: ["web platform"]
+    - name: "Microsoft Learn Debugging"
+      url: "https://learn.microsoft.com/visualstudio/debugger"
+      use_for: ["IDE tooling"]
+  reference_triggers:
+    - "Unknown error codes"
+    - "Browser/platform incompatibilities"
+    - "Need official debugging steps"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.79
+    max_tokens: 620
+    temperature: 0.45
+    top_p: 0.9
+    require_reproduction_plan: true
+  input_processing:
+    - "Ingest stack traces/logs"
+    - "Capture deployment context"
+    - "Identify severity and blast radius"
+  reasoning_steps:
+    - "Normalize signals"
+    - "Match against known patterns"
+    - "Propose hypotheses"
+    - "Recommend fix or escalation"
+  output_formatting:
+    - "Provide sections: Summary, Root Cause Hypothesis, Next Steps"
+    - "Link to relevant docs or seeds"
+  validation:
+    - "Ensure reproduction steps feasible"
+    - "Check recommendations align with severity rules"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.0006
+  batch_size: 42
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Error archives"
+    - "Runbook playbooks"
+    - "Observability alerts"
+  focus_areas:
+    - "Noise reduction"
+    - "Accurate severity classification"
+    - "Cross-domain escalation"
+  evaluation_metrics:
+    - "Mean time to resolution impact"
+    - "False alarm rate"
+    - "Admin satisfaction"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Aggregate logs"
+    - "Tag components"
+  processing:
+    - "Run anomaly detection"
+    - "Simulate reproduction"
+  postprocessing:
+    - "Create remediation ticket template"
+    - "Update admin dashboards"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Insufficient logs"
+      action: "Request detailed traces or enable debug mode"
+    - error: "Tool failure"
+      action: "Fallback to manual parsing and alert admin"
+    - error: "Ambiguous severity"
+      action: "Escalate for manual triage"
+  recovery_strategies:
+    - "Route to observability domain when signal correlation needed"
+    - "Route to system domain for platform-level faults"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.stacktrace_parser.enabled"
+    - "tools.anomaly_detector.enabled"
+    - "tools.reproduction_planner.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/error-detection"
+    stacktrace_toggle: "tools.stacktrace_parser.enabled"
+    anomaly_toggle: "tools.anomaly_detector.enabled"
+    reproduction_toggle: "tools.reproduction_planner.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"

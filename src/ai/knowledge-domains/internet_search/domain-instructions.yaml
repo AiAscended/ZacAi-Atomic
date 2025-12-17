@@ -1,0 +1,190 @@
+# Internet Search Domain Instructions
+# Purpose: Live knowledge acquisition and citation-safe responses using web sources
+
+domain:
+  id: internet_search
+  name: "Internet Search"
+  version: "1.1.0"
+  description: "Executes real-time searches, validates sources, and returns cited answers"
+
+role:
+  primary: "Specialized knowledge inference for internet search"
+  scope: "Query planning, web retrieval, citation enforcement"
+  orchestration_behavior: "Acts as a plug-in data provider; can run independently or alongside other domains"
+
+capabilities:
+  - "Craft precise multi-keyword queries"
+  - "Invoke approved search providers via shared connectors"
+  - "Validate freshness and credibility of results"
+  - "Enforce citation output with real URLs"
+  - "Synchronize URL source lists with admin-managed settings"
+
+seeds:
+  location: "./internet_search_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "on-demand"
+
+weights:
+  location: "./internet_search_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./internet_search_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  realtime_search_gateway:
+    enabled: true
+    providers:
+      - name: "Bing Web Search"
+        endpoint: "https://api.bing.microsoft.com/v7.0/search"
+      - name: "Google Programmable Search"
+        endpoint: "https://www.googleapis.com/customsearch/v1"
+    usage_guidelines:
+      - "Always include locale + recency filters when available"
+      - "Respect provider rate limits and retry policies"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Google Search Central"
+        url: "https://developers.google.com/search"
+        use_for: ["search operators", "ranking guidance"]
+      - name: "Bing Web Search Docs"
+        url: "https://learn.microsoft.com/bing/search-apis/bing-web-search"
+        use_for: ["API usage", "filters"]
+      - name: "Common Crawl"
+        url: "https://commoncrawl.org"
+        use_for: ["open data references"]
+  web_scraper:
+    enabled: true
+    capabilities:
+      - "Fetch HTML snapshots"
+      - "Extract OpenGraph/JSON-LD metadata"
+      - "Normalize text for downstream summarization"
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Google Search Central"
+      url: "https://developers.google.com/search"
+      use_for: ["operators", "guidelines"]
+    - name: "Bing Web Search"
+      url: "https://learn.microsoft.com/bing/search-apis"
+      use_for: ["API docs", "filters"]
+    - name: "Web Almanac"
+      url: "https://almanac.httparchive.org"
+      use_for: ["web statistics"]
+  reference_triggers:
+    - "Unknown search operator"
+    - "Need to confirm provider quota"
+    - "User requests compliance guidance"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.7
+    max_tokens: 600
+    temperature: 0.4
+    top_p: 0.85
+    max_queries: 3
+  input_processing:
+    - "Determine search intent (navigational, informational, transactional)"
+    - "Extract mandatory keywords, optional keywords, and filters"
+    - "Check if cached results satisfy freshness requirements"
+  reasoning_steps:
+    - "Draft query variations"
+    - "Execute against realtime_search_gateway"
+    - "Rank results by freshness and authority"
+    - "Cross-check facts with at least two sources when possible"
+  output_formatting:
+    - "Include citation list with title + URL"
+    - "Mark timestamps for time-sensitive info"
+    - "Summaries must mention data staleness if older than 30 days"
+  validation:
+    - "Reject sources failing HTTPS or with low trust rating"
+    - "Ensure citations align with stated facts"
+    - "Redact PII when scraping user-provided URLs"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.0009
+  batch_size: 48
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Search query logs (anonymized)"
+    - "Click-through performance metrics"
+    - "Public SERP datasets"
+    - "Admin-curated high quality answers"
+  focus_areas:
+    - "Better deduplication across sources"
+    - "Query expansion heuristics"
+    - "Freshness detection"
+  evaluation_metrics:
+    - "Citation accuracy"
+    - "Latency"
+    - "Source diversity"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize user query"
+    - "Check admin overrides for blocked domains"
+    - "Load per-provider auth tokens"
+  processing:
+    - "Run search queries sequentially or in parallel"
+    - "Enrich results with metadata (publish date, author)"
+    - "Score credibility"
+  postprocessing:
+    - "Generate summarized answer"
+    - "Attach citations"
+    - "Cache result with TTL from admin config"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Provider rate limit"
+      action: "Apply exponential backoff and switch provider"
+    - error: "No results"
+      action: "Relax filters or request clarification"
+    - error: "Blocked domain"
+      action: "Respect admin block list and log event"
+  recovery_strategies:
+    - "Fallback to cached answer"
+    - "Route to general_knowledge domain"
+    - "Alert admin if providers down > 5 minutes"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.realtime_search_gateway.providers"
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/internet-search"
+    search_providers: "tools.realtime_search_gateway.providers"
+    url_sources: "tools.url_lookup.sources"
+    primary_lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    cache_ttl: "pipeline.postprocessing"
+    seed_directory: "seeds.location"
+    weight_directory: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"
+      - "tools.url_lookup.sources"

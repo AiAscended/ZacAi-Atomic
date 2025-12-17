@@ -1,27 +1,78 @@
 /**
- * File: src/ai/data/typescript/typescript_inferenceController.ts
+ * File: src/ai/knowledge-domains/typescript/typescript_inferenceController.ts
  * Purpose: Controls inference operations for TypeScript domain using pretrained weights and token analysis
- * Depends on: src/ai/data/typescript/typescript_tokenizer.ts, src/ai/data/typescript/typescript_semanticAnalyzer.ts
- * Depended on by: src/ai/data/typescript/typescript_integrationAPI.ts
+ * Depends on: src/ai/knowledge-domains/typescript/typescript_tokenizer.ts, src/ai/knowledge-domains/typescript/typescript_semanticAnalyzer.ts
+ * Depended on by: src/ai/knowledge-domains/typescript/typescript_integrationAPI.ts
  * Creator: Vercel v0 Coding Assistant
  */
 
 import { typescriptTokenizer } from "./typescript_tokenizer"
-import { typescriptSemanticAnalyzer } from "./typescript_semanticAnalyzer"
-import pretrainedWeights from "./weights/typescript_pretrained_weights.json"
+import {
+  typescriptSemanticAnalyzer,
+  type TypescriptSemanticAnalysis,
+} from "./typescript_semanticAnalyzer"
+import pretrainedWeights from "./typescript_weights/typescript_pretrained_weights.json"
+import seeds from "./typescript_seeds/typescript_seeds.json"
+import {
+  normalizeThresholds,
+  normalizeVocabularyWeights,
+  type ThresholdLike,
+} from "../utils/embeddingUtils"
+import { TYPESCRIPT_DOMAIN } from "./typescript_constants"
 
 interface InferenceContext {
-  tokens: string[]
-  inferenceResults?: any
-  sentiment?: any
-  slots?: any
-  userProfile?: any
-  dialogueState?: any
+  tokens?: string[]
 }
+
+type CodeContext =
+  | "ai_function"
+  | "entry_point"
+  | "blockchain"
+  | "ai"
+  | "error_handling"
+  | "algorithm"
+  | "web"
+  | "general"
+
+interface TypescriptSeedConfig {
+  vocabulary?: string[] | Record<string, number>
+  thresholds?: ThresholdLike
+}
+
+interface TypescriptPretrainedConfig {
+  thresholds?: ThresholdLike
+}
+
+interface TypescriptInferenceMetadata {
+  tokensUsed: number
+  semanticAnalysis: TypescriptSemanticAnalysis
+  codeContext: CodeContext
+  pretrainedConfidence: number
+  suggestions: string[]
+}
+
+interface TypescriptInferenceError {
+  code: "LOW_CONFIDENCE"
+  message: string
+}
+
+export interface TypescriptInferenceResponse {
+  response: string | null
+  confidence: number
+  domain: string
+  sources: string[]
+  metadata?: TypescriptInferenceMetadata
+  error?: TypescriptInferenceError
+}
+
+const seedConfig = seeds as TypescriptSeedConfig
+const pretrainedConfig = pretrainedWeights as TypescriptPretrainedConfig
+
+const VOCABULARY = normalizeVocabularyWeights(seedConfig.vocabulary, 0.75)
+const THRESHOLDS = normalizeThresholds(pretrainedConfig.thresholds, seedConfig.thresholds)
 
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
-  const vocabulary = pretrainedWeights.vocabulary as Record<string, number>
 
   let tokenScore = 0
   let matchCount = 0
@@ -29,8 +80,8 @@ function calculateConfidence(tokens: string[], input: string): number {
   // Calculate token-based confidence using pretrained vocabulary
   for (const token of tokens) {
     const lowerToken = token.toLowerCase()
-    if (vocabulary[lowerToken]) {
-      tokenScore += vocabulary[lowerToken]
+    if (VOCABULARY[lowerToken]) {
+      tokenScore += VOCABULARY[lowerToken]
       matchCount++
     }
   }
@@ -58,8 +109,7 @@ function calculateConfidence(tokens: string[], input: string): number {
   semanticScore = Math.min(semanticScore / 2, 1.0)
 
   // Combine scores using weights from pretrained config
-  const thresholds = pretrainedWeights.thresholds
-  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
+  const finalConfidence = avgTokenScore * THRESHOLDS.tokenMatchWeight + semanticScore * THRESHOLDS.semanticWeight
 
   if (lowerInput.match(/\b(code|example|file|entry|main|index)\b/)) {
     return Math.min(finalConfidence + 0.2, 1.0)
@@ -68,7 +118,7 @@ function calculateConfidence(tokens: string[], input: string): number {
   return Math.min(finalConfidence, 1.0)
 }
 
-function detectCodeContext(tokens: string[], input: string): string {
+function detectCodeContext(tokens: string[], input: string): CodeContext {
   const lowerInput = input.toLowerCase()
   const lowerTokens = tokens.map((t) => t.toLowerCase())
 
@@ -113,7 +163,7 @@ function detectCodeContext(tokens: string[], input: string): string {
   return "general"
 }
 
-function generateCodeExample(context: string): string {
+function generateCodeExample(context: CodeContext): string {
   switch (context) {
     case "ai_function":
       return `\`\`\`typescript
@@ -748,21 +798,25 @@ console.log(user);
   }
 }
 
-export async function typescriptRunInference(input: string, context?: InferenceContext): Promise<any> {
-  const tokens = context?.tokens || typescriptTokenizer(input)
+export async function typescriptRunInference(
+  input: string,
+  context?: InferenceContext,
+): Promise<TypescriptInferenceResponse> {
+  const tokens = context?.tokens ?? typescriptTokenizer(input)
   const semantics = typescriptSemanticAnalyzer(input)
 
   const confidence = calculateConfidence(tokens, input)
+  const minConfidence = THRESHOLDS.minConfidence ?? 0.05
 
-  if (confidence < 0.05) {
+  if (confidence < minConfidence) {
     return {
       response: null,
       confidence: 0,
-      domain: "typescript",
+      domain: TYPESCRIPT_DOMAIN,
       sources: [],
       error: {
         code: "LOW_CONFIDENCE",
-        message: `Query confidence (${confidence.toFixed(2)}) below threshold (0.05)`,
+        message: `Query confidence (${confidence.toFixed(2)}) below threshold (${minConfidence.toFixed(2)})`,
       },
     }
   }
@@ -794,20 +848,20 @@ This demonstrates TypeScript's type system${codeContext !== "general" ? ` for ${
 
   return {
     response: responseText,
-    confidence: confidence,
-    domain: "typescript",
+    confidence,
+    domain: TYPESCRIPT_DOMAIN,
     sources: ["TypeScript Domain Inference (Pretrained Weights)"],
     metadata: {
       tokensUsed: tokens.length,
       semanticAnalysis: semantics,
-      codeContext: codeContext,
+      codeContext,
       pretrainedConfidence: confidence,
       suggestions: generateTypescriptSuggestions(semantics),
     },
   }
 }
 
-function generateTypescriptSuggestions(semantics: Record<string, any>): string[] {
+function generateTypescriptSuggestions(semantics: TypescriptSemanticAnalysis): string[] {
   const suggestions: string[] = []
 
   if (!semantics.hasTypeAnnotations) {
@@ -822,3 +876,5 @@ function generateTypescriptSuggestions(semantics: Record<string, any>): string[]
 
   return suggestions
 }
+
+export default typescriptRunInference;

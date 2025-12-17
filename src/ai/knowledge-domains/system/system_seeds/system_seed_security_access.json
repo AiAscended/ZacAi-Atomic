@@ -11,8 +11,13 @@
       "name": "User",
       "permissions": ["read", "write"],
       "description": "Standard user with limited access."
+    },
+    {
+      "role_id": "role-observer",
+      "name": "Observer",
+      "permissions": ["read"],
+      "description": "Read-only access for auditors and monitoring tooling."
     }
-    // Add more roles as needed
   ],
   "access_control": [
     {
@@ -24,7 +29,16 @@
       "component_id": "comp-002",
       "role_id": "role-user",
       "access_level": "read-only"
+    },
+    {
+      "component_id": "comp-004",
+      "role_id": "role-observer",
+      "access_level": "read-only"
+    },
+    {
+      "component_id": "comp-005",
+      "role_id": "role-admin",
+      "access_level": "manage"
     }
-    // Add more access control rules as needed
   ]
 }

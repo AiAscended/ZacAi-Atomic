@@ -1,0 +1,185 @@
+# Code Review Domain Instructions
+# Purpose: Deliver high-signal code review feedback with actionable guidance
+
+domain:
+  id: code_review
+  name: Code Review
+  version: "1.2.0"
+  description: "Analyzes diffs, design changes, and patterns to surface issues early"
+
+role:
+  primary: "Specialized knowledge inference for code review"
+  scope: "Provide structured review comments, highlight quality risks, and suggest improvements"
+  orchestration_behavior: "Attaches when pull requests, patches, or diff contexts are provided"
+
+capabilities:
+  - "Summarize intent and context"
+  - "Detect correctness issues, edge cases, and regressions"
+  - "Check adherence to style and architecture guidelines"
+  - "Prioritize findings by severity"
+  - "Sync review templates with admin configuration"
+
+seeds:
+  location: "./code_review_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./code_review_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./code_review_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  diff_analyzer:
+    enabled: true
+    capabilities:
+      - "Parse diff chunks"
+      - "Detect risky patterns"
+  risk_classifier:
+    enabled: true
+    capabilities:
+      - "Score findings"
+      - "Suggest reviewer assignments"
+  test_gap_checker:
+    enabled: true
+    capabilities:
+      - "Correlate changed files with tests"
+      - "Flag missing coverage"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "GitHub Engineering Blog"
+        url: "https://github.blog/category/engineering"
+        use_for: ["best practices"]
+      - name: "Google Engineering Practices"
+        url: "https://google.github.io/eng-practices"
+        use_for: ["review guidelines"]
+      - name: "Martin Fowler Refactoring"
+        url: "https://martinfowler.com/books/refactoring.html"
+        use_for: ["refactoring"]
+      - name: "OWASP ASVS"
+        url: "https://owasp.org/www-project-application-security-verification-standard"
+        use_for: ["security"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Google Engineering Practices"
+      url: "https://google.github.io/eng-practices"
+      use_for: ["review"]
+    - name: "GitHub Engineering Blog"
+      url: "https://github.blog/category/engineering"
+      use_for: ["lessons"]
+    - name: "OWASP ASVS"
+      url: "https://owasp.org/www-project-application-security-verification-standard"
+      use_for: ["security"]
+  reference_triggers:
+    - "Security or compliance concerns"
+    - "Architecture deviation"
+    - "Request for authoritative review patterns"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.84
+    max_tokens: 780
+    temperature: 0.38
+    top_p: 0.88
+    require_findings_table: true
+  input_processing:
+    - "Ingest diff + metadata (author, files, tests)"
+    - "Identify languages and frameworks"
+    - "Check admin-defined guardrails"
+  reasoning_steps:
+    - "Run diff_analyzer"
+    - "Classify findings"
+    - "Recommend fixes/tests"
+  output_formatting:
+    - "Structured findings (Severity, File, Line, Detail, Action)"
+    - "Include summary + confidence"
+  validation:
+    - "Ensure each finding has actionable recommendation"
+    - "Avoid false positives by cross-checking with seeds"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.00052
+  batch_size: 44
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Historic review comments"
+    - "Post-mortems"
+    - "Test coverage reports"
+  focus_areas:
+    - "Signal-to-noise ratio"
+    - "Security review alignment"
+    - "Admin template adherence"
+  evaluation_metrics:
+    - "False positive/negative rate"
+    - "Reviewer satisfaction"
+    - "Time-to-merge impact"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize diff context"
+    - "Map module ownership"
+  processing:
+    - "Run risk_classifier"
+    - "Detect missing tests"
+  postprocessing:
+    - "Generate review summary"
+    - "Attach recommended checklist"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Missing diff context"
+      action: "Request patch or repository link"
+    - error: "Tool timeout"
+      action: "Fallback to textual review and flag admin"
+    - error: "Conflicting guidelines"
+      action: "Defer to admin-configured priority"
+  recovery_strategies:
+    - "Escalate to system domain if orchestrator conflict"
+    - "Route security concerns to security domain"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.diff_analyzer.enabled"
+    - "tools.risk_classifier.enabled"
+    - "tools.test_gap_checker.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/code-review"
+    diff_toggle: "tools.diff_analyzer.enabled"
+    risk_toggle: "tools.risk_classifier.enabled"
+    test_toggle: "tools.test_gap_checker.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"

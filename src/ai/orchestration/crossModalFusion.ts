@@ -71,7 +71,7 @@ export class CrossModalFusion {
     modalityData: ModalityData[],
     strategy: "early" | "late" | "hybrid" | "attention" = "hybrid"
   ): FusedOutput {
-    logger.info("CrossModalFusion", "Fusing modalities", {
+    logger.info("CrossModalFusion: Fusing modalities", {
       modalityCount: modalityData.length,
       modalities: modalityData.map((d) => d.modality),
       strategy,
@@ -91,7 +91,7 @@ export class CrossModalFusion {
     // Apply fusion
     const fused = strategyFn(modalityData)
 
-    logger.info("CrossModalFusion", "Fusion complete", {
+    logger.info("CrossModalFusion: Fusion complete", {
       modalitiesUsed: fused.metadata.modalitiesUsed.length,
       confidence: fused.metadata.confidence,
     })
@@ -199,7 +199,7 @@ export class CrossModalFusion {
     // Apply attention to combine modalities
     const unified = this.applyAttention(data, attentionMatrix)
 
-    const modalityWeights = this.extractModalityWeights(attentionMatrix)
+    const modalityWeights = this.extractModalityWeights(data, attentionMatrix)
 
     const fusedContent = this.generateAttentionBasedDescription(data, modalityWeights)
 
@@ -351,9 +351,30 @@ export class CrossModalFusion {
   /**
    * Extract modality weights from attention matrix
    */
-  private extractModalityWeights(attention: number[][]): Map<string, number> {
-    // Simplified: average attention scores
+  private extractModalityWeights(
+    data: ModalityData[],
+    attention: number[][]
+  ): Map<string, number> {
     const weights = new Map<string, number>()
+    if (data.length === 0) {
+      return weights
+    }
+
+    const distribution = this.getAttentionDistribution(attention)
+
+    if (distribution.length === 0) {
+      const uniformWeight = 1 / data.length
+      for (const modalityData of data) {
+        weights.set(modalityData.modality, uniformWeight)
+      }
+      return weights
+    }
+
+    const count = Math.min(data.length, distribution.length)
+    for (let i = 0; i < count; i++) {
+      weights.set(data[i].modality, distribution[i])
+    }
+
     return weights
   }
 
@@ -364,7 +385,21 @@ export class CrossModalFusion {
     data: ModalityData[],
     weights: Map<string, number>
   ): string {
-    return this.generateFusedDescription(data)
+    if (weights.size === 0) {
+      return this.generateFusedDescription(data)
+    }
+
+    const ranked = [...weights.entries()].sort(([, a], [, b]) => b - a)
+    const descriptions = ranked.map(([modality, weight]) => {
+      const modalityData = data.find((d) => d.modality === modality)
+      const summary = typeof modalityData?.content === "string"
+        ? modalityData.content
+        : JSON.stringify(modalityData?.content ?? {})
+      const confidence = modalityData?.metadata.confidence ?? 0
+      return `[${modality} ${(weight * 100).toFixed(1)}% | confidence ${confidence.toFixed(2)}] ${summary}`
+    })
+
+    return descriptions.join("\n")
   }
 
   /**
@@ -395,7 +430,36 @@ export class CrossModalFusion {
    * Calculate attention-based confidence
    */
   private calculateAttentionConfidence(data: ModalityData[], attention: number[][]): number {
-    return this.calculateAverageConfidence(data)
+    if (data.length === 0) {
+      return 0
+    }
+
+    const distribution = this.getAttentionDistribution(attention)
+    if (distribution.length === 0) {
+      return this.calculateAverageConfidence(data)
+    }
+
+    let confidence = 0
+    const count = Math.min(data.length, distribution.length)
+    for (let i = 0; i < count; i++) {
+      confidence += data[i].metadata.confidence * distribution[i]
+    }
+    return confidence
+  }
+
+  private getAttentionDistribution(attention: number[][]): number[] {
+    if (attention.length === 0) {
+      return []
+    }
+
+    const rowSums = attention.map((row) => row.reduce((acc, value) => acc + value, 0))
+    const total = rowSums.reduce((acc, value) => acc + value, 0)
+
+    if (total === 0) {
+      return []
+    }
+
+    return rowSums.map((sum) => sum / total)
   }
 
   /**

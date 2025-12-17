@@ -38,9 +38,15 @@ export const persistEnglishWeights = (weights: Record<string, number[]>) => {
     );
     updateFile(ENGLISH_DOMAIN, 'src/ai/knowledge-domains/english/english_weights/english_pretrained_weights.json', content);
     return true;
-  } catch (e) {
+  } catch (error) {
+    console.warn('Failed to persist English weights', error);
     return false;
   }
 };
+const englishEmbeddingExports = {
+  getEnglishEmbedding,
+  getEnglishEmbeddingForTokens,
+  persistEnglishWeights,
+};
 
-export default { getEnglishEmbedding, getEnglishEmbeddingForTokens, persistEnglishWeights };
+export default englishEmbeddingExports;

@@ -14,6 +14,15 @@ interface GitHubFile {
   type: 'file' | 'dir';
 }
 
+type RepoContentItem = {
+  path: string;
+  sha: string;
+  type: 'file' | 'dir' | 'symlink' | 'submodule';
+  content?: string | null;
+};
+
+type RepoContentResponse = RepoContentItem | RepoContentItem[];
+
 class GitHubIntegration {
   private octokit: Octokit | null = null;
   private currentRepo: GitHubRepo | null = null;
@@ -83,27 +92,25 @@ class GitHubIntegration {
       ref,
     });
 
-    if (!Array.isArray(data)) {
-      const fileContent =
-        'content' in data && typeof data.content === 'string'
-          ? atob(data.content)
-          : '';
+    const contentData = data as RepoContentResponse;
 
+    if (!Array.isArray(contentData)) {
+      // Single file
       return [
         {
-          path: data.path ?? '',
-          content: fileContent,
-          sha: data.sha ?? '',
-          type: 'file',
+          path: contentData.path,
+          content: typeof contentData.content === 'string' ? atob(contentData.content) : '',
+          sha: contentData.sha,
+          type: contentData.type === 'dir' ? 'dir' : 'file',
         },
       ];
     }
 
     // Directory listing
-    return data.map((item) => ({
-      path: item.path ?? '',
+    return contentData.map((item) => ({
+      path: item.path,
       content: '',
-      sha: item.sha ?? '',
+      sha: item.sha,
       type: item.type === 'dir' ? 'dir' : 'file',
     }));
   }
@@ -123,15 +130,17 @@ class GitHubIntegration {
       ref,
     });
 
-    if (Array.isArray(data)) {
+    const contentData = data as RepoContentResponse;
+
+    if (Array.isArray(contentData)) {
       throw new Error('Path is a directory, not a file');
     }
 
-    if (!('content' in data) || typeof data.content !== 'string') {
+    if (typeof contentData.content !== 'string') {
       throw new Error('File has no content');
     }
 
-    return atob(data.content);
+    return atob(contentData.content);
   }
 
   async cloneRepositoryToVFS(owner: string, repo: string, branch: string = 'main') {

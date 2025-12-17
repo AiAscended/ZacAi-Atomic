@@ -6,21 +6,31 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import path from 'path'
+import path from "path"
 
+import { domainRegistry } from "../domainRegistry"
 import { PROGRAMMING_DOMAIN } from "./programming_constants"
 import { loadProgrammingSeedVocabulary } from "./programming_vocabularyManager"
-import { programmingRunInference } from "./programming_inferenceController"
-import { programmingRunTrainingEpoch } from "./programming_trainingController"
 
-const DOMAIN_NAME = 'programming';
-const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+const DOMAIN_NAME = "programming"
+const DOMAIN_DIR = path.join(process.cwd(), "src", "ai", "knowledge-domains", DOMAIN_NAME)
 
-export const programmingInit = async () => {
+const resolveDomainPath = (...segments: string[]): string => path.join(DOMAIN_DIR, ...segments)
+
+export const programmingInit = async (): Promise<void> => {
   await loadProgrammingSeedVocabulary()
 
+  domainRegistry.registerDomain({
+    name: PROGRAMMING_DOMAIN,
+    displayName: "Programming",
+    description: "General programming concepts, patterns, and paradigms",
+    atomicLevel: "organ",
+    modules: [],
+    seedDataPath: resolveDomainPath(`${DOMAIN_NAME}_seeds`),
+    learnedDataPath: resolveDomainPath(`${DOMAIN_NAME}_learned`),
+    weightsPath: resolveDomainPath(`${DOMAIN_NAME}_weights`),
+    enabled: true,
+  })
 }
 
 void programmingInit()
-
-export default programmingInit

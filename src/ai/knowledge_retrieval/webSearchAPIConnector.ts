@@ -21,7 +21,7 @@ export interface WebResult {
  * 3. Parse and return results
  */
 export const webSearch = async (query: string, limit = 5): Promise<WebResult[]> => {
-  console.log("[v0] webSearch called with query:", query)
+  console.log("[v0] webSearch called with query:", query, "limit:", limit)
 
   // For now, return empty array so domains can handle the fallback
   // In production, this would make real API calls to Google/Bing/DuckDuckGo

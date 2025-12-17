@@ -155,7 +155,7 @@ export class ModelSelector {
   public select(criteria: ModelSelectionCriteria): SelectedModel[] {
     const selectedModels: SelectedModel[] = []
 
-    logger.info("ModelSelector", "Selecting models", { criteria })
+    logger.info("ModelSelector: Selecting models", { criteria })
 
     // If preferred models specified, prioritize them
     if (criteria.preferredModels && criteria.preferredModels.length > 0) {
@@ -203,7 +203,7 @@ export class ModelSelector {
       return b.confidence - a.confidence
     })
 
-    logger.info("ModelSelector", "Models selected", {
+    logger.info("ModelSelector: Models selected", {
       count: uniqueModels.length,
       models: uniqueModels.map((m) => m.name),
     })
@@ -223,8 +223,8 @@ export class ModelSelector {
     // Always include LLM for text
     models.push({
       name: "unified-transformer-llm",
-      confidence: 0.95,
-      reason: "Primary text model",
+      confidence: taskType === "generation" ? 0.97 : 0.95,
+      reason: taskType === "generation" ? "Creative text generation" : "Primary text model",
     })
 
     // Code-related keywords
@@ -237,11 +237,19 @@ export class ModelSelector {
     }
 
     // Logical reasoning keywords
-    if (this.hasReasoningKeywords(keywords)) {
+    if (this.hasReasoningKeywords(keywords) || taskType === "reasoning") {
       models.push({
         name: "neuro-symbolic-reasoning",
-        confidence: 0.85,
+        confidence: taskType === "reasoning" ? 0.9 : 0.85,
         reason: "Logical reasoning required",
+      })
+    }
+
+    if (taskType === "classification") {
+      models.push({
+        name: "graph-neural-network",
+        confidence: 0.8,
+        reason: "Classification emphasis",
       })
     }
 
@@ -252,16 +260,26 @@ export class ModelSelector {
    * Select models for code processing
    */
   private selectForCode(keywords: string[]): SelectedModel[] {
+    const languageHint = keywords.find((keyword) =>
+      /(typescript|javascript|python|java|rust)/i.test(keyword)
+    )
+
+    const testingFocus = keywords.some((keyword) => /test|jest|mocha|qa/i.test(keyword))
+
     return [
       {
         name: "code-transformer",
-        confidence: 0.98,
-        reason: "Code processing task",
+        confidence: languageHint ? 0.99 : 0.95,
+        reason: languageHint
+          ? `Focused on ${languageHint} implementation details`
+          : "Code processing task",
       },
       {
         name: "unified-transformer-llm",
-        confidence: 0.85,
-        reason: "Supporting natural language",
+        confidence: testingFocus ? 0.88 : 0.85,
+        reason: testingFocus
+          ? "Testing context detected"
+          : "Supporting natural language",
       },
     ]
   }
@@ -335,7 +353,7 @@ export class ModelSelector {
    * Select models for multi-modal processing
    */
   private selectForMultiModal(criteria: ModelSelectionCriteria): SelectedModel[] {
-    return [
+    const selections: SelectedModel[] = [
       {
         name: "multi-modal-fusion",
         confidence: 0.98,
@@ -343,15 +361,29 @@ export class ModelSelector {
       },
       {
         name: "unified-transformer-llm",
-        confidence: 0.9,
+        confidence: criteria.taskType === "reasoning" ? 0.92 : 0.9,
         reason: "Text component",
       },
       {
         name: "vision-transformer",
-        confidence: 0.85,
+        confidence: criteria.taskType === "generation" ? 0.87 : 0.85,
         reason: "Visual component",
       },
     ]
+
+    const hasAudioKeywords = criteria.keywords.some((keyword) =>
+      /(audio|speech|voice)/i.test(keyword)
+    )
+
+    if (hasAudioKeywords) {
+      selections.push({
+        name: "speech-to-text",
+        confidence: 0.82,
+        reason: "Audio component",
+      })
+    }
+
+    return selections
   }
 
   /**

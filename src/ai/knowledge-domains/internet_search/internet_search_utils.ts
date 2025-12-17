@@ -1,7 +1,7 @@
 export const safeParseJSON = <T = unknown>(s: string, fallback: T): T => {
   try {
     return JSON.parse(s) as T;
-  } catch (e) {
+  } catch {
     return fallback;
   }
 };

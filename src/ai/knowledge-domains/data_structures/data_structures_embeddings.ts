@@ -7,19 +7,25 @@
  */
 
 import pretrained from "./data_structures_weights/data_structures_pretrained_weights.json"
+import seedVocabulary from "./data_structures_seeds/data_structures_seedVocabulary.json"
 import { DATA_STRUCTURES_DOMAIN } from "./data_structures_constants"
-
-const EMBEDDING_DIM = 128
+import {
+  buildSeedWeightMap,
+  deterministicVector,
+  normalizeSeedTokens,
+  resolveEmbeddingDimension,
+} from "../utils/embeddingUtils"
+import { updateFile } from "../dataRegistry"
+const EMBEDDING_DIM = resolveEmbeddingDimension(pretrained, 128)
+const SEED_TOKENS = normalizeSeedTokens(seedVocabulary)
+const SEED_WEIGHTS = buildSeedWeightMap(pretrained, SEED_TOKENS, EMBEDDING_DIM)
 
 /**
  * Get embedding vector for a token
  * Returns: 128-dimensional vector or random fallback
  */
 export const getDataStructuresEmbedding = (token: string): number[] => {
-  const weights = (pretrained as { seedWeights?: Record<string, number[]> }).seedWeights ?? {}
-  if (weights[token]) return weights[token]
-  // Fallback: random embedding
-  return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
+  return SEED_WEIGHTS[token] ?? deterministicVector(token, EMBEDDING_DIM)
 }
 
 export const getDataStructuresEmbeddingForTokens = (tokens: string[]) => tokens.map(getDataStructuresEmbedding)
@@ -31,7 +37,6 @@ export const persistDataStructuresWeights = (weights: Record<string, number[]>) 
     2,
   )
   // In production, write to file system
-  const { updateFile } = require("../../orchestration/fileWatcher")
   updateFile(DATA_STRUCTURES_DOMAIN, "src/ai/knowledge-domains/data_structures/data_structures_weights/data_structures_pretrained_weights.json", content)
   return {
     success: true,
@@ -39,4 +44,10 @@ export const persistDataStructuresWeights = (weights: Record<string, number[]>) 
   }
 }
 
-export default { getDataStructuresEmbedding, getDataStructuresEmbeddingForTokens, persistDataStructuresWeights }
+const dataStructuresEmbeddingExports = {
+  getDataStructuresEmbedding,
+  getDataStructuresEmbeddingForTokens,
+  persistDataStructuresWeights,
+}
+
+export default dataStructuresEmbeddingExports

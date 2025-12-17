@@ -12,19 +12,29 @@ interface RequestLog {
   status: number
 }
 
+interface RequestLogContext {
+  method: string
+  path: string
+  startedAt: number
+}
+
 export class RequestLogger {
   private logs: RequestLog[] = []
 
-  logRequestStart(method: string, path: string): number {
-    return Date.now()
-  }
-
-  logRequestEnd(startTime: number, method: string, path: string, status: number) {
-    const duration = Date.now() - startTime
-    this.logs.push({
-      timestamp: Date.now(),
+  logRequestStart(method: string, path: string): RequestLogContext {
+    return {
       method,
       path,
+      startedAt: Date.now(),
+    }
+  }
+
+  logRequestEnd(context: RequestLogContext, status: number) {
+    const duration = Date.now() - context.startedAt
+    this.logs.push({
+      timestamp: Date.now(),
+      method: context.method,
+      path: context.path,
       durationMs: duration,
       status,
     })

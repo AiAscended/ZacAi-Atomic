@@ -1,11 +1,23 @@
 import { storageAdapter } from "../storageAdapter"
 import { safeParseJSON } from "./general_knowledge_utils"
 
-export const loadGeneralSeedVocabulary = async (path = "/src/ai/knowledge-domains/general_knowledge/general_knowledge_seeds/general_knowledge_seedVocabulary.json") => {
+export type GeneralSeedVocabulary = {
+  terms: string[]
+}
+
+const DEFAULT_SEED_VOCAB_PATH =
+  "/src/ai/knowledge-domains/general_knowledge/general_knowledge_seeds/general_knowledge_seedVocabulary.json"
+
+const createDefaultSeedVocabulary = (): GeneralSeedVocabulary => ({ terms: [] })
+
+export const loadGeneralSeedVocabulary = async (
+  path = DEFAULT_SEED_VOCAB_PATH,
+): Promise<GeneralSeedVocabulary> => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { terms: [] }) as { terms: string[] }
-  } catch (e) {
-    return { terms: [] }
+    return safeParseJSON<GeneralSeedVocabulary>(raw, createDefaultSeedVocabulary())
+  } catch (error) {
+    console.error("[general-knowledge][seed-vocabulary] Failed to load seed vocabulary", { path, error })
+    return createDefaultSeedVocabulary()
   }
 }

@@ -40,7 +40,7 @@ export class CodeExecutor {
       `;
 
       // Execute with timeout
-      const result = await this.executeWithTimeout(wrappedCode, sandbox, timeout);
+      await this.executeWithTimeout(wrappedCode, sandbox, timeout);
       
       const executionTime = performance.now() - startTime;
 
@@ -148,21 +148,21 @@ export class CodeExecutor {
   private createSandbox(logs: ExecutionResult['logs']) {
     return {
       console: {
-        log: (...args: any[]) => {
+        log: (...args: unknown[]) => {
           logs.push({
             type: 'log',
             message: args.map((arg) => this.formatValue(arg)).join(' '),
             timestamp: Date.now(),
           });
         },
-        warn: (...args: any[]) => {
+        warn: (...args: unknown[]) => {
           logs.push({
             type: 'warn',
             message: args.map((arg) => this.formatValue(arg)).join(' '),
             timestamp: Date.now(),
           });
         },
-        error: (...args: any[]) => {
+        error: (...args: unknown[]) => {
           logs.push({
             type: 'error',
             message: args.map((arg) => this.formatValue(arg)).join(' '),
@@ -196,9 +196,9 @@ export class CodeExecutor {
    */
   private async executeWithTimeout(
     code: string,
-    sandbox: any,
+    sandbox: Record<string, unknown>,
     timeout: number
-  ): Promise<any> {
+  ): Promise<unknown> {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         reject(new Error(`Execution timeout after ${timeout}ms`));
@@ -210,7 +210,7 @@ export class CodeExecutor {
         const values = keys.map((key) => sandbox[key]);
         
         // Use Function constructor for safer execution
-        const fn = new Function(...keys, code);
+        const fn = new Function(...keys, code) as (...args: unknown[]) => unknown;
         const result = fn(...values);
 
         // Handle promise results
@@ -238,7 +238,7 @@ export class CodeExecutor {
   /**
    * Format value for console output
    */
-  private formatValue(value: any): string {
+  private formatValue(value: unknown): string {
     if (value === null) return 'null';
     if (value === undefined) return 'undefined';
     if (typeof value === 'string') return value;

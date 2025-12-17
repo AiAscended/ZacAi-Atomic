@@ -1,18 +1,21 @@
-/**
- * File: src/ai/data/environment/environment_modelWeightsLoader.ts
- * Purpose: Load training weights for environment domain
- * Depends on: storageAdapter.ts
- * Depended on by: environment_trainingController.ts
- * Creator: Vercel v0 Coding Assistant
- */
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-import { storageAdapter } from "../storageAdapter"
+const environmentWeightsManager = createDomainWeightsManager({
+  domainName: "environment",
+})
 
-export const environmentLoadWeights = async (path = "/src/ai/knowledge-domains/environment/environment_weights/environment_trainingWeights.bin") => {
-  try {
-    const buffer = await storageAdapter.readFile(path)
-    return { success: true, weights: buffer }
-  } catch {
+export const environmentLoadWeights = async () => {
+  const weights = await environmentWeightsManager.loadWeights()
+  if (!weights) {
     return { success: false, weights: null }
   }
+  return { success: true, weights }
+}
+
+export const primeEnvironmentWeights = async (): Promise<string | null> => {
+  return environmentWeightsManager.prime()
+}
+
+export const getEnvironmentActiveWeightArtifact = () => {
+  return environmentWeightsManager.getActiveWeightArtifact()
 }

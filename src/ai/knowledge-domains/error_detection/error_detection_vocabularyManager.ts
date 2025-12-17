@@ -9,13 +9,23 @@
 import { safeParseJSON } from "./error_detection_utils"
 import { storageAdapter } from "../storageAdapter"
 
+export type ErrorDetectionSeedVocabulary = {
+  errorTypes: string[]
+}
+
+const DEFAULT_SEED_VOCAB_PATH =
+  "/src/ai/knowledge-domains/error_detection/error_detection_seeds/error_detection_seedVocabulary.json"
+
+const createDefaultSeedVocabulary = (): ErrorDetectionSeedVocabulary => ({ errorTypes: [] })
+
 export const loadErrorDetectionSeedVocabulary = async (
-  path = "/src/ai/knowledge-domains/error_detection/error_detection_seeds/error_detection_seedVocabulary.json",
-) => {
+  path = DEFAULT_SEED_VOCAB_PATH,
+): Promise<ErrorDetectionSeedVocabulary> => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { errorTypes: [] }) as { errorTypes: string[] }
-  } catch (e) {
-    return { errorTypes: [] }
+    return safeParseJSON<ErrorDetectionSeedVocabulary>(raw, createDefaultSeedVocabulary())
+  } catch (error) {
+    console.error("[error-detection][seed-vocabulary] Failed to load seed vocabulary", { path, error })
+    return createDefaultSeedVocabulary()
   }
 }

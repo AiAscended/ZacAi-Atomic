@@ -1,7 +1,10 @@
 import { PROGRAMMING_CONCEPTS } from "./programming_constants"
 
-export function isProgrammingConcept(term: string): boolean {
-  return PROGRAMMING_CONCEPTS.includes(term as any)
+type ProgrammingConcept = (typeof PROGRAMMING_CONCEPTS)[number]
+const CONCEPT_SET = new Set<string>(PROGRAMMING_CONCEPTS)
+
+export function isProgrammingConcept(term: string): term is ProgrammingConcept {
+  return CONCEPT_SET.has(term)
 }
 
 export function extractProgrammingTerms(text: string): string[] {
