@@ -31,7 +31,8 @@
     "recovery:consolidate": "tsx scripts/consolidate-files.ts",
     "recovery:compare": "tsx scripts/generate-comparison-reports.ts",
     "recovery:strategy": "tsx scripts/generate-recovery-strategy.ts",
-    "recovery:full": "tsx scripts/run-full-recovery.ts"
+    "recovery:full": "tsx scripts/run-full-recovery.ts",
+    "heart:self-test": "tsx scripts/heart-self-test.ts"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.8.0-rc.2",

@@ -30,7 +30,7 @@
 
 ### 1. AI Orchestration Layer ✅ **EXCELLENT**
 
-**File**: `src/ai/orchestration/mainOrchestrator.ts` (838 lines)
+**File**: `src/ai/orchestration/main-orchestrator.ts` (838 lines)
 
 **Architecture Quality**: 9/10
 

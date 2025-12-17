@@ -4,7 +4,7 @@
  * from user input to final response, integrating all atomic modules.
  *
  * Dependencies:
- * - src/ai/orchestration/mainOrchestrator.ts (main conductor)
+ * - src/ai/orchestration/main-orchestrator.ts (main conductor)
  * - src/ai/input_processing/* (input processing modules)
  * - src/ai/context_management/* (context and session management)
  * - src/ai/knowledge_retrieval/* (knowledge retrieval and search)
@@ -17,7 +17,7 @@
  * - src/app/api/* (API endpoints)
  */
 
-import { MainOrchestrator, type OrchestratorResponse } from "./mainOrchestrator"
+import { MainOrchestrator, type OrchestratorResponse } from "./main-orchestrator"
 import { textNormalizer } from "../input_processing/textNormalizer"
 import { detectLanguage } from "../input_processing/languageDetector"
 import { noiseFilter } from "../input_processing/noiseFilter"

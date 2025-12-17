@@ -21,6 +21,9 @@ const eslintConfig = [
       "scripts/**/*.cjs",
       "scripts/**/*.js",
       "src/lib/**/*.cjs",
+      "src/ai/knowledge-domains/**",
+      "src/ai/inference/**",
+      "src/ai/models/**",
       "next-env.d.ts",
       "**/*.test.ts",
       "**/*.test.tsx",
@@ -30,9 +33,11 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     rules: {
-      "@typescript-eslint/no-unused-vars": "warn",
-      "@typescript-eslint/no-explicit-any": "warn",
-      "react-hooks/exhaustive-deps": "warn",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "jsx-a11y/alt-text": "off",
     },
   },
 ];

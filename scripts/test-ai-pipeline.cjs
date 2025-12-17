@@ -317,7 +317,7 @@ class AIPipelineTest {
     this.header('TEST 5: Main Orchestrator Flow');
 
     const fs = require('fs').promises;
-    const orchestratorPath = path.join(__dirname, '../src/ai/orchestration/mainOrchestrator.ts');
+    const orchestratorPath = path.join(__dirname, '../src/ai/orchestration/main-orchestrator.ts');
 
     try {
       const content = await fs.readFile(orchestratorPath, 'utf8');
@@ -370,7 +370,7 @@ class AIPipelineTest {
     this.header('TEST 6: Intelligent Fallback System');
 
     const fs = require('fs').promises;
-    const orchestratorPath = path.join(__dirname, '../src/ai/orchestration/mainOrchestrator.ts');
+    const orchestratorPath = path.join(__dirname, '../src/ai/orchestration/main-orchestrator.ts');
 
     try {
       const content = await fs.readFile(orchestratorPath, 'utf8');

@@ -199,7 +199,7 @@ Features:
 8. `docs/ADMIN_FEATURES_COMPLETE.md` (this file)
 
 ### Modified Files (1):
-1. `src/ai/orchestration/mainOrchestrator.ts`
+1. `src/ai/orchestration/main-orchestrator.ts`
    - Added enhancedMetricsCollector import
    - Added recordInference calls (lines 440-450, 470-475)
 

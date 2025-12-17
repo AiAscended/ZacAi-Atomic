@@ -24,7 +24,7 @@ ZacAi-Hybrid-LLM v0.0.5 is a comprehensive AI orchestration system built with Ne
 
 ### Hybrid Cognitive Orchestrator (HCO)
 
-The new [zacai-hco](zacai-hco/README.md) module houses the 7-agent Piaget/Vygotsky reasoning pipeline, Supabase-backed memory store, and deployment assets (Vercel + GPU workers). Phase 1 scaffolding is available now; future phases will wire the orchestrator into the main `src/ai/orchestration/mainOrchestrator.ts`, enable STT/TTS loops, and expose admin toggles for critical reasoning mode.
+The new [zacai-hco](zacai-hco/README.md) module houses the 7-agent Piaget/Vygotsky reasoning pipeline, Supabase-backed memory store, and deployment assets (Vercel + GPU workers). Phase 1 scaffolding is available now; future phases will wire the orchestrator into the main `src/ai/orchestration/main-orchestrator.ts`, enable STT/TTS loops, and expose admin toggles for critical reasoning mode.
 
 #### Phase 3 Enterprise Updates (Current)
 

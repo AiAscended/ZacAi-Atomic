@@ -173,7 +173,7 @@ export async function POST(request: Request) {
 
 ### 3. Main Orchestrator (Conductor)
 
-**File:** `src/ai/orchestration/mainOrchestrator.ts`
+**File:** `src/ai/orchestration/main-orchestrator.ts`
 - **Role:** Central coordination hub
 - **Function:** Orchestrate entire AI pipeline
 - **Key Actions:**
@@ -256,7 +256,7 @@ class PromptProcessor {
 
 ### 5. Domain Routing
 
-**File:** `src/ai/orchestration/mainOrchestrator.ts` (method)
+**File:** `src/ai/orchestration/main-orchestrator.ts` (method)
 - **Role:** Identify relevant knowledge domains
 - **Function:** Keyword matching and context analysis
 - **Logic:**
@@ -620,7 +620,7 @@ interface OrchestratorResponse {
 |-----------|-----------|
 | Chat UI | `src/app/page.tsx` |
 | API Gateway | `src/app/api/chat/route.ts` |
-| Main Orchestrator | `src/ai/orchestration/mainOrchestrator.ts` |
+| Main Orchestrator | `src/ai/orchestration/main-orchestrator.ts` |
 | Prompt Processor | `src/ai/input_processing/promptProcessor.ts` |
 | Domain Registry | `src/ai/knowledge-domains/domainRegistry.ts` |
 | LLM Engine | `src/ai/models/unified-transformer-llm/llm-inference/llm-inferenceEngine.ts` |

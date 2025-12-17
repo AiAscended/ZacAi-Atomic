@@ -5,7 +5,7 @@
  * Supports intelligent model selection for optimal performance and accuracy.
  * 
  * Integration:
- * - Called by: mainOrchestrator.ts
+ * - Called by: main-orchestrator.ts
  * - Uses: Intent classification, keyword analysis, model registry
  * - Returns: List of model names to invoke for inference
  */

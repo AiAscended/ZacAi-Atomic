@@ -109,7 +109,7 @@ preprocessInput(text: string) {
 ---
 
 ### Layer 4: Main Orchestrator
-**File**: `src/ai/orchestration/mainOrchestrator.ts`
+**File**: `src/ai/orchestration/main-orchestrator.ts`
 
 The **central hub** coordinating the entire AI pipeline.
 

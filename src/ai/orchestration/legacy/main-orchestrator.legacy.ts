@@ -1,5 +1,5 @@
 /**
- * File: src/ai/orchestration/mainOrchestrator.ts
+ * File: src/ai/orchestration/main-orchestrator.ts
  * 
  * Main AI Orchestration System for ZacAi-Atomic
  * 
@@ -27,6 +27,17 @@ import { formatResponse } from "./responseFormatter"
 import * as logger from "./logger"
 import { hcoOrchestrator } from "@hco/mainOrchestrator"
 import type { HCOState } from "@hco/shared/types"
+import { bootHeart, registerHeartCore, systemModel, HEART_DOC_PATH, markHeartOrganStatus } from "../core"
+import type {
+  ComponentHealthStatus,
+  HeartPlanStepId,
+  HealthSignal,
+  PlanEdge,
+  PlanGraph,
+  PlanStep,
+  PlanStepStatus,
+  SystemGoal,
+} from "../types"
 
 // Import domain registry for knowledge domain access
 import { getEnabledDomains } from "../knowledge-domains"
@@ -88,10 +99,59 @@ export class MainOrchestrator {
   private responseSynthesizer: ResponseSynthesizer
   private llmInferenceEngine: LLMInferenceEngine | null = null
   private learningMetricsTracker: LearningMetricsTracker
+  private heartBooted = false
+  private readonly heartPlanVersion = "1.0.0"
+  private readonly heartPlanSteps: HeartPlanStepId[] = [
+    "input-processing",
+    "domain-routing",
+    "domain-inference",
+    "llm-inference",
+    "response-synthesis",
+  ]
+  private readonly heartGoalId = "goal-heart-main-orchestrator"
+  private heartPlanGraph: PlanGraph | null = null
+  private readonly heartPlanDescriptors: Record<HeartPlanStepId, {
+    label: string
+    description: string
+    executor: PlanStep["executor"]
+    targetComponent: string
+  }> = {
+    "input-processing": {
+      label: "Normalize Prompt",
+      description: "Clean user input, detect fast-paths, and decompose tasks",
+      executor: "internal",
+      targetComponent: "main-orchestrator",
+    },
+    "domain-routing": {
+      label: "Select Domains",
+      description: "Match normalized prompt to plug-and-play domain registry",
+      executor: "domain",
+      targetComponent: "knowledge-domain-registry",
+    },
+    "domain-inference": {
+      label: "Run Domain Engines",
+      description: "Query enabled knowledge domains registered in the Heart system model",
+      executor: "domain",
+      targetComponent: "knowledge-domain-registry",
+    },
+    "llm-inference": {
+      label: "Unified Transformer",
+      description: "Execute unified LLM against enriched prompt",
+      executor: "model",
+      targetComponent: "llm-unified-transformer",
+    },
+    "response-synthesis": {
+      label: "Synthesize Response",
+      description: "Fuse domain and LLM outputs into final blocks",
+      executor: "internal",
+      targetComponent: "main-orchestrator",
+    },
+  }
   
   private initialized: boolean = false
   private availableDomains: string[] = []
   private availableModels: string[] = []
+  private healthSignals: HealthSignal[] = []
   
   // Runtime configuration from settings store
   private config: OrchestratorSettings | null = null
@@ -102,6 +162,264 @@ export class MainOrchestrator {
     this.domainQueryExecutor = new DomainQueryExecutor()
     this.responseSynthesizer = new ResponseSynthesizer()
     this.learningMetricsTracker = new LearningMetricsTracker()
+  }
+
+  private async ensureHeartReady(): Promise<void> {
+    if (this.heartBooted) {
+      return
+    }
+
+    registerHeartCore()
+    this.ensureHeartPlanRegistered()
+    const report = await bootHeart()
+    if (report.blocked) {
+      throw new Error("Heart boot sequence blocked; resolve critical boot checks before proceeding")
+    }
+    this.heartBooted = true
+    systemModel.updateContext({
+      maintenanceMode: true,
+      offlineMode: true,
+      availableDomains: [],
+      availableTools: [],
+      environment: "maintenance",
+      metadata: {
+        documentation: HEART_DOC_PATH,
+      },
+    })
+    this.recordComponentSignal("heart-core", "healthy", "Heart boot completed")
+  }
+
+  private recordComponentSignal(
+    componentId: string,
+    status: ComponentHealthStatus,
+    message: string,
+    metadata?: Record<string, unknown>
+  ): void {
+    const signal: HealthSignal = {
+      componentId,
+      status,
+      message,
+      metadata,
+      timestamp: new Date().toISOString(),
+    }
+    this.healthSignals.push(signal)
+    systemModel.recordHealthSignal(signal)
+  }
+
+  private ensureHeartPlanRegistered(): void {
+    const now = new Date().toISOString()
+    const existingPlan = systemModel.getPlan(this.heartGoalId)
+    if (existingPlan) {
+      this.heartPlanGraph = existingPlan
+      return
+    }
+
+    const goalExists = systemModel.listGoals().some(goal => goal.id === this.heartGoalId)
+    if (!goalExists) {
+      const goal: SystemGoal = {
+        id: this.heartGoalId,
+        type: "stability",
+        objective: "Keep orchestrator pipeline aligned with Heart plan backbone",
+        constraints: [
+          {
+            id: "heart-doc-alignment",
+            description: "Heart orchestration must remain compliant with ZacAi Heart Core README",
+            type: "compliance",
+            value: HEART_DOC_PATH,
+          },
+        ],
+        success: [
+          {
+            id: "plan-synchronized",
+            description: "All Heart steps reach a terminal status per request cycle",
+            metric: "heart.plan.steps.completed",
+            threshold: this.heartPlanSteps.length,
+          },
+        ],
+        priority: 2,
+        createdBy: "main-orchestrator",
+        createdAt: now,
+        context: { planVersion: this.heartPlanVersion },
+      }
+      systemModel.createGoal(goal)
+    }
+
+    const steps: Record<string, PlanStep> = {}
+    const edges: PlanEdge[] = []
+    let previousStep: HeartPlanStepId | null = null
+
+    for (const stepId of this.heartPlanSteps) {
+      const descriptor = this.heartPlanDescriptors[stepId]
+      steps[stepId] = {
+        id: stepId,
+        goalId: this.heartGoalId,
+        label: descriptor.label,
+        description: descriptor.description,
+        status: previousStep ? "pending" : "ready",
+        dependencies: previousStep ? [previousStep] : [],
+        executor: descriptor.executor,
+        targetComponent: descriptor.targetComponent,
+        createdAt: now,
+        updatedAt: now,
+      }
+
+      if (previousStep) {
+        edges.push({ from: previousStep, to: stepId, type: "sequential" })
+      }
+
+      previousStep = stepId
+    }
+
+    const plan: PlanGraph = {
+      goalId: this.heartGoalId,
+      steps,
+      edges,
+      version: this.heartPlanVersion,
+      createdAt: now,
+    }
+
+    this.heartPlanGraph = plan
+    systemModel.registerPlan(plan)
+  }
+
+  private resetHeartPlanExecution(): void {
+    if (!this.heartPlanGraph) {
+      return
+    }
+    const now = new Date().toISOString()
+    const steps = Object.fromEntries(
+      Object.entries(this.heartPlanGraph.steps).map(([id, step]) => [
+        id,
+        {
+          ...step,
+          status: step.dependencies.length === 0 ? "ready" : "pending",
+          updatedAt: now,
+          parameters: undefined,
+        },
+      ])
+    ) as Record<string, PlanStep>
+
+    this.heartPlanGraph = {
+      ...this.heartPlanGraph,
+      steps,
+    }
+    systemModel.registerPlan(this.heartPlanGraph)
+  }
+
+  private markPlanStep(
+    stepId: HeartPlanStepId,
+    status: PlanStepStatus,
+    parameters?: Record<string, unknown>
+  ): void {
+    if (!this.heartPlanGraph) {
+      return
+    }
+    const step = this.heartPlanGraph.steps[stepId]
+    if (!step) {
+      return
+    }
+
+    const updatedStep: PlanStep = {
+      ...step,
+      status,
+      updatedAt: new Date().toISOString(),
+      parameters: parameters
+        ? { ...(step.parameters ?? {}), ...parameters }
+        : step.parameters,
+    }
+
+    this.heartPlanGraph = {
+      ...this.heartPlanGraph,
+      steps: {
+        ...this.heartPlanGraph.steps,
+        [stepId]: updatedStep,
+      },
+    }
+
+    systemModel.registerPlan(this.heartPlanGraph)
+  }
+
+  private skipPlanSteps(stepIds: HeartPlanStepId[], metadata?: Record<string, unknown>): void {
+    for (const stepId of stepIds) {
+      this.markPlanStep(stepId, "skipped", metadata)
+    }
+  }
+
+  private reportHeartOrganBaseline(): void {
+    const recordedAt = new Date().toISOString()
+    const baselines: Array<{
+      id: string
+      status: ComponentHealthStatus
+      summary: string
+      metadata?: Record<string, unknown>
+    }> = [
+      {
+        id: "input-processing",
+        status: "healthy",
+        summary: "Prompt processor + decomposition pipeline online",
+      },
+      {
+        id: "orchestration-goal-interpreter",
+        status: "healthy",
+        summary: "Goal interpreter bound to Heart plan",
+      },
+      {
+        id: "orchestration-planner",
+        status: "degraded",
+        summary: "Hierarchical planner pending refactor",
+        metadata: { actionRequired: "upgrade-planner" },
+      },
+      {
+        id: "orchestration-executor",
+        status: "healthy",
+        summary: "Domain + LLM pipeline executing",
+      },
+      {
+        id: "orchestration-policy",
+        status: "degraded",
+        summary: "Policy engine not fully enforced",
+        metadata: { actionRequired: "wire-policy-engine" },
+      },
+      {
+        id: "response-synthesizer",
+        status: "healthy",
+        summary: "Response synthesizer active",
+      },
+      {
+        id: "offline-simulator",
+        status: "healthy",
+        summary: "Math + CLI fallback ready",
+      },
+      {
+        id: "monitoring-center",
+        status: "healthy",
+        summary: "Enhanced metrics + learning trackers online",
+      },
+      {
+        id: "self-heal-engine",
+        status: "healthy",
+        summary: "Self-heal loop running from boot",
+      },
+      {
+        id: "state-manager",
+        status: "degraded",
+        summary: "Persistent orchestrator state pending integration",
+        metadata: { actionRequired: "state-sync" },
+      },
+      {
+        id: "tools-registry",
+        status: "degraded",
+        summary: "Tool registry limited during maintenance",
+        metadata: { actionRequired: "register-core-tools" },
+      },
+    ]
+
+    baselines.forEach(baseline =>
+      markHeartOrganStatus(baseline.id, baseline.status, baseline.summary, {
+        recordedAt,
+        ...(baseline.metadata ?? {}),
+      })
+    )
   }
 
   /**
@@ -131,6 +449,7 @@ export class MainOrchestrator {
     const startTime = Date.now()
 
     try {
+      await this.ensureHeartReady()
       // Step 0: Load runtime configuration
       this.thinkingTracker.addStep("load_config", "Loading orchestrator configuration")
       this.config = await settingsStore.getOrchestrator()
@@ -168,6 +487,20 @@ export class MainOrchestrator {
       this.llmInferenceEngine = new LLMInferenceEngine(llmConfig)
       this.availableModels.push("unified-transformer-llm")
       logger.info("LLM initialized", {})
+      systemModel.registerComponent({
+        id: "llm-unified-transformer",
+        name: "Unified Transformer LLM",
+        kind: "model",
+        version: "0.0.1",
+        dependencies: [{ id: "heart-core", contract: "core-services" }],
+        capabilities: ["text-generation", "system-reasoning"],
+        metadata: { vocabSize: actualVocabSize, config: llmConfig },
+      })
+      systemModel.markComponentStatus("llm-unified-transformer", "healthy", "Unified LLM initialized")
+      this.recordComponentSignal("llm-unified-transformer", "healthy", "LLM ready", { vocabSize: actualVocabSize })
+      markHeartOrganStatus("inference-engine", "healthy", "Unified Transformer online", {
+        vocabSize: actualVocabSize,
+      })
 
       // Step 2: Load knowledge domains (real-time from unified registry)
       this.thinkingTracker.addStep("init_domains", "Loading knowledge domains")
@@ -176,11 +509,45 @@ export class MainOrchestrator {
       logger.info(`Loaded ${this.availableDomains.length} knowledge domains`, {
         domains: this.availableDomains,
       })
+      systemModel.registerComponent({
+        id: "knowledge-domain-registry",
+        name: "Knowledge Domain Registry",
+        kind: "domain",
+        capabilities: this.availableDomains,
+        metadata: { enabled: this.availableDomains.length },
+      })
+      systemModel.markComponentStatus(
+        "knowledge-domain-registry",
+        this.availableDomains.length > 0 ? "healthy" : "degraded",
+        `${this.availableDomains.length} domains available`
+      )
+      this.recordComponentSignal(
+        "knowledge-domain-registry",
+        this.availableDomains.length > 0 ? "healthy" : "degraded",
+        "Domain registry refreshed",
+        { total: this.availableDomains.length }
+      )
 
       // Step 3: Initialize other models (CNN, RNN, etc.) - placeholder for future
       this.thinkingTracker.addStep("init_models", "Initializing specialized AI models")
       // TODO: Initialize CNN, RNN, ViT, GAN, etc. when needed
+
+      const currentContext = systemModel.getContext()
+      systemModel.updateContext({
+        maintenanceMode: false,
+        offlineMode: false,
+        availableDomains: this.availableDomains,
+        availableTools: this.availableModels,
+        environment: "development",
+        metadata: {
+          ...(currentContext.metadata ?? {}),
+          documentation: HEART_DOC_PATH,
+          lastInitializedAt: new Date().toISOString(),
+        },
+      })
       
+      this.reportHeartOrganBaseline()
+      this.resetHeartPlanExecution()
       this.initialized = true
       const initTime = Date.now() - startTime
       
@@ -212,6 +579,8 @@ export class MainOrchestrator {
       await this.initialize()
     }
 
+    this.resetHeartPlanExecution()
+
     const processingStartTime = Date.now()
     const metadata = context || {}
     this.thinkingTracker.reset()
@@ -234,6 +603,10 @@ export class MainOrchestrator {
         try {
           const result = ScientificCalculator.evaluate(prompt.trim())
           if (!isNaN(result.value)) {
+            this.skipPlanSteps(this.heartPlanSteps, {
+              reason: "math-fast-path",
+              sessionId,
+            })
             const processingTime = Date.now() - processingStartTime
             logger.info("Quick mathematical calculation completed", { result: result.value })
             
@@ -261,6 +634,10 @@ export class MainOrchestrator {
       // STEP 1: INPUT PROCESSING
       // ============================================
       this.thinkingTracker.addStep("input_processing", "Processing and cleaning user input")
+      this.markPlanStep("input-processing", "running", {
+        sessionId,
+        promptLength: prompt.length,
+      })
       
       const cleanedPrompt = this.promptProcessor.process(prompt)
       const subtasks = await this.promptProcessor.decomposeSubtasks(cleanedPrompt)
@@ -269,8 +646,16 @@ export class MainOrchestrator {
         subtasks: subtasks.length,
         cleanedLength: cleanedPrompt.length,
       })
+      this.markPlanStep("input-processing", "completed", {
+        subtasks: subtasks.length,
+        cleanedLength: cleanedPrompt.length,
+      })
 
       if (this.shouldUseHybridMode(cleanedPrompt, metadata)) {
+        this.skipPlanSteps(
+          this.heartPlanSteps.filter(step => step !== "input-processing"),
+          { reason: "hybrid-orchestrator" }
+        )
         return await this.processViaHybridOrchestrator(cleanedPrompt, sessionId, metadata, processingStartTime)
       }
 
@@ -280,6 +665,9 @@ export class MainOrchestrator {
       this.thinkingTracker.addStep("domain_routing", "Identifying relevant knowledge domains")
       
       let relevantDomains = this.identifyRelevantDomains(cleanedPrompt, subtasks)
+      this.markPlanStep("domain-routing", "running", {
+        candidateDomains: relevantDomains.length,
+      })
       
       // Fallback to general_knowledge domain if no matches (for testing)
       if (relevantDomains.length === 0) {
@@ -296,11 +684,17 @@ export class MainOrchestrator {
         totalFound: relevantDomains.length,
         maxAllowed: maxDomains,
       })
+      this.markPlanStep("domain-routing", "completed", {
+        selectedDomains: limitedDomains,
+      })
 
       // ============================================
       // STEP 3: KNOWLEDGE DOMAIN INFERENCE
       // ============================================
       this.thinkingTracker.addStep("domain_inference", "Querying knowledge domain engines")
+      this.markPlanStep("domain-inference", "running", {
+        parallelMode: enableParallel,
+      })
       
       // Use parallel inference if enabled in config
       const enableParallel = this.config?.enableParallelInference ?? true
@@ -312,12 +706,19 @@ export class MainOrchestrator {
         domainsQueried: domainResults.length,
         parallelMode: enableParallel,
       })
+      this.markPlanStep("domain-inference", "completed", {
+        domainsQueried: domainResults.length,
+      })
 
       // ============================================
       // STEP 4: LLM INFERENCE (Primary Generation)
       // ============================================
       this.thinkingTracker.addStep("llm_inference", "Generating response with LLM")
+      this.markPlanStep("llm-inference", "running", {
+        engineAvailable: Boolean(this.llmInferenceEngine),
+      })
       
+      let enrichedPrompt = cleanedPrompt
       let llmResponse = ""
       let llmSuccess = false
       let llmError: Error | null = null
@@ -327,7 +728,7 @@ export class MainOrchestrator {
         // RE-ENABLED: LLM dimension mismatch fixed - now using actual vocab size
         if (this.llmInferenceEngine) {
           // Construct enriched prompt with domain knowledge
-          const enrichedPrompt = this.buildEnrichedPrompt(cleanedPrompt, domainResults)
+          enrichedPrompt = this.buildEnrichedPrompt(cleanedPrompt, domainResults)
           console.log("[MainOrchestrator] Attempting LLM generation...")
           llmResponse = await this.llmInferenceEngine.generate(enrichedPrompt, 100)
           
@@ -345,6 +746,14 @@ export class MainOrchestrator {
         llmError = error as Error
         console.error("[MainOrchestrator] LLM generation failed:", error)
       }
+
+      this.markPlanStep(
+        "llm-inference",
+        llmSuccess ? "completed" : "failed",
+        llmSuccess
+          ? { responsePreview: llmResponse.substring(0, 80) }
+          : { error: llmError?.message ?? "Unknown error" }
+      )
       
       // ============================================
       // INTELLIGENT FALLBACK HIERARCHY
@@ -381,6 +790,10 @@ export class MainOrchestrator {
       // ============================================
       console.log("[MainOrchestrator] Starting step 5: Response Synthesis")
       this.thinkingTracker.addStep("synthesis", "Synthesizing multi-source response")
+      this.markPlanStep("response-synthesis", "running", {
+        domainOutputs: domainResults.length,
+        llmSuccess,
+      })
       
       let synthesizedResponse
       try {
@@ -390,6 +803,9 @@ export class MainOrchestrator {
           originalPrompt: prompt,
         })
         console.log("[MainOrchestrator] Synthesis completed, text length:", synthesizedResponse.text.length)
+        this.markPlanStep("response-synthesis", "completed", {
+          textLength: synthesizedResponse.text.length,
+        })
       } catch (synthError) {
         console.error("[MainOrchestrator] Synthesis error:", synthError)
         synthesizedResponse = {
@@ -398,6 +814,9 @@ export class MainOrchestrator {
           sources: [],
           metadata: { combinedDomains: [], responseLength: 0 }
         }
+        this.markPlanStep("response-synthesis", "failed", {
+          error: synthError instanceof Error ? synthError.message : String(synthError),
+        })
       }
       
       // ============================================
@@ -480,6 +899,9 @@ export class MainOrchestrator {
       }
     } catch (error) {
       logger.info("Error in prompt processing", { error })
+      this.markPlanStep("response-synthesis", "failed", {
+        error: error instanceof Error ? error.message : String(error),
+      })
       
       // Record failed inference metrics
       enhancedMetricsCollector.recordInference({

@@ -62,7 +62,7 @@ src/ai/
     ## Entry Point Flow
 
     ```typescript
-    // src/ai/orchestration/mainOrchestrator.ts (simplified)
+    // src/ai/orchestration/main-orchestrator.ts (simplified)
     import { systemModel, selfHeal } from '../core';
     import { processInput } from '../input-processing/input-processing';
     import { runInference } from '../inference-engine/inference-engine';
@@ -280,7 +280,7 @@ src/ai/
 
                            ---
 
-                           ok but we have each of them in its parent folder as we have other companion fikes that accompany these for added functionality. ie src/ai/orchestration/mainOrchestrator.ts is ours and src/ai/inference-engine/inference-engine.ts etc etc
+                           ok but we have each of them in its parent folder as we have other companion fikes that accompany these for added functionality. ie src/ai/orchestration/main-orchestrator.ts is ours and src/ai/inference-engine/inference-engine.ts etc etc
 
                            `src/ai/` stays as your Heart root with existing parent folders intact—`orchestration/`, `inference-engine/`, etc.—each holding their main `.ts` file plus companion files for added functionality, without flattening or disrupting current structure.
 
@@ -329,7 +329,7 @@ src/ai/
 
                                ## Entry point and standalone guarantees
 
-                               `src/ai/orchestration/mainOrchestrator.ts` orchestrates everything:
+                               `src/ai/orchestration/main-orchestrator.ts` orchestrates everything:
 
                                ```typescript
                                // Pseudocode pattern
@@ -596,7 +596,7 @@ src/ai/
                                                                                                                            - `memory.ts`: SQLite/JSON persistence with WAL mode
 
                                                                                                                            ## 🎯 PHASE 4: ORCHESTRATION INTEGRATION (Glue Everything)
-                                                                                                                           **UPDATE `src/ai/orchestration/mainOrchestrator.ts`** (enhance existing):
+                                                                                                                           **UPDATE `src/ai/orchestration/main-orchestrator.ts`** (enhance existing):
                                                                                                                            ```
                                                                                                                            export async function heartCycle(input: string, isOffline = false): Promise<string> {
                                                                                                                              // EXACT flow: selfHeal.monitor() → processInput → plan → execute → synthesize
