@@ -185,7 +185,7 @@ export async function programmingRunInference(
       semanticAnalysis.intent === "implement"
 
     // Find relevant code example based on keywords
-    if (wantsExample) {
+    if (requestsExample) {
       for (const [key, example] of Object.entries(CODE_EXAMPLES)) {
         if (lowerInput.includes(key)) {
           codeExample = example

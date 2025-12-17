@@ -20,7 +20,7 @@ type SeedWeightMap = {
  * Returns: 128-dimensional vector or random fallback
  */
 export const getDataStructuresEmbedding = (token: string): number[] => {
-  const weights = (pretrained as SeedWeightMap).seedWeights ?? {}
+  const weights = pretrained.weights as Record<string, number[]>
   if (weights[token]) return weights[token]
   // Fallback: random embedding
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
