@@ -8,7 +8,6 @@
 
 import path from 'path'
 
-import { domainRegistry } from '../domainRegistry'
 import { ALGORITHMS_DOMAIN } from "./algorithms_constants"
 import { loadAlgorithmsSeedVocabulary } from "./algorithms_vocabularyManager"
 import { algorithmsRunInference } from "./algorithms_inferenceController"
@@ -20,17 +19,6 @@ const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DO
 export const algorithmsInit = async () => {
   await loadAlgorithmsSeedVocabulary()
 
-  domainRegistry.registerDomain({
-  name: ALGORITHMS_DOMAIN,
-  displayName: 'Algorithms',
-  description: 'Algorithm design, complexity analysis, and optimization',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
 }
 
 void algorithmsInit()

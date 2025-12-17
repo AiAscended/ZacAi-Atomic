@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { logger } from "./logger"
+import { logger } from "../orchestration/logger"
 
 export interface Metric {
   name: string
@@ -60,7 +60,7 @@ class MetricsCollector {
       this.metrics.shift()
     }
 
-    logger.debug("MetricsCollector", `Recorded metric: ${name} = ${value}`, tags)
+    logger.debug("MetricsCollector recorded metric", { name, value, tags })
   }
 
   /**

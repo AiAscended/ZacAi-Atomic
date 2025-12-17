@@ -5,7 +5,6 @@
  * Provides insights into system behavior and performance.
  */
 
-import { domainRegistry } from '../domainRegistry';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -108,17 +107,7 @@ export const observabilityInit = async () => {
   // Register domain files for tracking;
 
   // Register the domain with the registry
-  domainRegistry.registerDomain({
-  name: DOMAIN_NAME,
-  displayName: 'Observability',
-  description: 'Observability domain capabilities',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
+
 };
 
 // Auto-initialize when imported

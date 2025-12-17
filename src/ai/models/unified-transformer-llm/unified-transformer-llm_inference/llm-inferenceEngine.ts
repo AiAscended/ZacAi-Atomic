@@ -46,7 +46,7 @@ export class LLMInferenceEngine {
     topP: number = 0.9
   ): Promise<string> {
     // Encode prompt to token IDs
-    let tokenIds = this.tokenizer.encode(prompt);
+    const tokenIds = this.tokenizer.encode(prompt);
     const eosTokenId = 2; // End of sequence token
     const maxLength = tokenIds.length + maxTokens;
     

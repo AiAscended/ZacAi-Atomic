@@ -10,7 +10,7 @@
  * - Hot-reload support
  */
 
-import { getDomainRegistry, type DomainManifest } from "../knowledge-domains/domainScanner";
+import { getDomainRegistry, type DomainManifest } from "../knowledge-domains";
 import { getModelRegistry, type ModelManifest } from "./modelRegistry";
 
 // ============================================================================
@@ -180,7 +180,7 @@ export class ModelLoader {
   async loadAllDomains(): Promise<void> {
     const registry = await getDomainRegistry();
     
-    for (const domainId of registry.enabledDomains) {
+    for (const domainId of registry.enabledModules) {
       try {
         await this.loadDomain(domainId);
       } catch (error) {
@@ -199,7 +199,7 @@ export class ModelLoader {
     }
     
     const registry = await getDomainRegistry();
-    const manifest = registry.domains[domainId];
+    const manifest = registry.modules[domainId];
     
     if (!manifest) {
       throw new Error(`Domain not found: ${domainId}`);
@@ -240,9 +240,10 @@ export class ModelLoader {
     
     try {
       // Attempt to dynamically import integration API
-      if (manifest.paths.integrationAPIPath) {
+      const integrationEntry = manifest.entries.integrationAPI;
+      if (integrationEntry) {
         const apiModule = await import(
-          `../knowledge-domains/${domainId}/${manifest.paths.integrationAPIPath}`
+          `../knowledge-domains/${domainId}/${integrationEntry}`
         );
         loaded.instance = apiModule.default || apiModule;
       }
