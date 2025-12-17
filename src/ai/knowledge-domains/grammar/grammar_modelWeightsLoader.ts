@@ -1,25 +1,20 @@
-import { storageAdapter } from "../storageAdapter"
-import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
+/**
+ * File: src/ai/data/grammar/grammar_modelWeightsLoader.ts
+ * Purpose: Load training weights for grammar domain
+ * Depends on: None
+ * Depended on by: grammar_trainingController.ts
+ * Creator: Vercel v0 Coding Assistant
+ */
 
-const grammarWeightsManager = createDomainWeightsManager({
-  domainName: "grammar",
-})
+import { storageAdapter } from "../storageAdapter";
 
-export const grammarLoadWeights = async (): Promise<ArrayBuffer | null> => {
+export const grammarLoadWeights = async (
+  path = "/src/ai/knowledge-domains/grammar/grammar_weights/grammar_trainingWeights.bin",
+) => {
   try {
-    const filename = await grammarWeightsManager.resolveActiveWeightFile()
-    const fullPath = `${grammarWeightsManager.storageBasePath}/${filename}`
-    return await storageAdapter.readBinaryFile(fullPath)
-  } catch (error) {
-    console.error("[grammar][weights] Failed to load weights", { error })
-    return null
+    const raw = await storageAdapter.readFile(path);
+    return raw;
+  } catch (e) {
+    return null;
   }
-}
-
-export const primeGrammarWeights = async (): Promise<string | null> => {
-  return grammarWeightsManager.prime()
-}
-
-export const getGrammarActiveWeightArtifact = () => {
-  return grammarWeightsManager.getActiveWeightArtifact()
-}
+};

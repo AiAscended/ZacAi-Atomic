@@ -50,6 +50,6 @@ export const ERROR_DETECTION_CORE_TOKENS = [
   "TOKEN_13",
   "TOKEN_14",
   "TOKEN_15",
-]
+];
 
-export default ERROR_DETECTION_CORE_TOKENS
+export default ERROR_DETECTION_CORE_TOKENS;

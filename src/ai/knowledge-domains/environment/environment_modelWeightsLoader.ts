@@ -1,21 +1,14 @@
 import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-const environmentWeightsManager = createDomainWeightsManager({
-  domainName: "environment",
-})
+import { storageAdapter } from "../storageAdapter";
 
-export const environmentLoadWeights = async () => {
-  const weights = await environmentWeightsManager.loadWeights()
-  if (!weights) {
-    return { success: false, weights: null }
+export const environmentLoadWeights = async (
+  path = "/src/ai/knowledge-domains/environment/environment_weights/environment_trainingWeights.bin",
+) => {
+  try {
+    const buffer = await storageAdapter.readFile(path);
+    return { success: true, weights: buffer };
+  } catch {
+    return { success: false, weights: null };
   }
-  return { success: true, weights }
-}
-
-export const primeEnvironmentWeights = async (): Promise<string | null> => {
-  return environmentWeightsManager.prime()
-}
-
-export const getEnvironmentActiveWeightArtifact = () => {
-  return environmentWeightsManager.getActiveWeightArtifact()
-}
+};

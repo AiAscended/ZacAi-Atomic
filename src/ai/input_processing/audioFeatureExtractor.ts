@@ -4,7 +4,10 @@
  * Dependencies: none
  */
 
-export const extractSimpleFeatures = (samples: Float32Array, sampleRate = 16000): number[] => {
+export const extractSimpleFeatures = (
+  samples: Float32Array,
+  sampleRate = 16000,
+): number[] => {
   // Very small placeholder: compute RMS per 20ms frame
   const frameSize = Math.floor(sampleRate * 0.02);
   const feats: number[] = [];

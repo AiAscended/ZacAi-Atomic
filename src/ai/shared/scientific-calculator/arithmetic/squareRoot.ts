@@ -15,9 +15,9 @@
  */
 export function sqrt(n: number): number {
   if (n < 0) {
-    throw new Error("Square root of negative number is not real")
+    throw new Error("Square root of negative number is not real");
   }
-  return Math.sqrt(n)
+  return Math.sqrt(n);
 }
 
 /**
@@ -28,13 +28,13 @@ export function sqrt(n: number): number {
  */
 export function sqrtNewton(n: number, precision = 0.0001): number {
   if (n < 0) {
-    throw new Error("Square root of negative number is not real")
+    throw new Error("Square root of negative number is not real");
   }
-  if (n === 0) return 0
+  if (n === 0) return 0;
 
-  let guess = n / 2
+  let guess = n / 2;
   while (Math.abs(guess * guess - n) > precision) {
-    guess = (guess + n / guess) / 2
+    guess = (guess + n / guess) / 2;
   }
-  return guess
+  return guess;
 }

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useEffect, useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface TrainingStatus {
   isTraining: boolean;
@@ -18,7 +18,7 @@ interface TrainingStatus {
 
 interface TrainingHistoryItem {
   id: string;
-  status: 'completed' | 'failed' | 'running';
+  status: "completed" | "failed" | "running";
   timestamp: string;
   mode: string;
   duration: number;
@@ -39,9 +39,9 @@ export default function TrainingDashboard() {
   const fetchData = async () => {
     try {
       const [statusRes, historyRes, settingsRes] = await Promise.all([
-        fetch('/api/admin/training?view=status'),
-        fetch('/api/admin/training?view=history'),
-        fetch('/api/admin/training?view=settings'),
+        fetch("/api/admin/training?view=status"),
+        fetch("/api/admin/training?view=history"),
+        fetch("/api/admin/training?view=settings"),
       ]);
 
       const statusData: TrainingResponse<TrainingStatus> = await statusRes.json();
@@ -52,7 +52,7 @@ export default function TrainingDashboard() {
       if (historyData.success) setHistory(historyData.data);
       if (settingsData.success) setSettings(settingsData.data);
     } catch (error) {
-      console.error('Failed to fetch training data:', error);
+      console.error("Failed to fetch training data:", error);
     } finally {
       setLoading(false);
     }
@@ -67,10 +67,10 @@ export default function TrainingDashboard() {
   const triggerTraining = async (mode: string) => {
     setTriggering(true);
     try {
-      const res = await fetch('/api/admin/training', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'trigger', params: { mode } }),
+      const res = await fetch("/api/admin/training", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "trigger", params: { mode } }),
       });
 
       const data: TrainingResponse<TrainingStatus> = await res.json();
@@ -81,8 +81,8 @@ export default function TrainingDashboard() {
         alert(`Failed to start training: ${data.error}`);
       }
     } catch (error) {
-      console.error('Training trigger failed:', error);
-      alert('Failed to trigger training');
+      console.error("Training trigger failed:", error);
+      alert("Failed to trigger training");
     } finally {
       setTriggering(false);
     }
@@ -90,20 +90,20 @@ export default function TrainingDashboard() {
 
   const stopTraining = async () => {
     try {
-      const res = await fetch('/api/admin/training', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'stop' }),
+      const res = await fetch("/api/admin/training", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "stop" }),
       });
 
       const data: TrainingResponse<TrainingStatus> = await res.json();
       if (data.success) {
         await fetchData();
-        alert('Training stopped successfully!');
+        alert("Training stopped successfully!");
       }
     } catch (error) {
-      console.error('Stop training failed:', error);
-      alert('Failed to stop training');
+      console.error("Stop training failed:", error);
+      alert("Failed to stop training");
     }
   };
 
@@ -111,21 +111,21 @@ export default function TrainingDashboard() {
     if (!settings) return;
 
     try {
-      const res = await fetch('/api/admin/training', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/admin/training", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ settings }),
       });
 
       const data: TrainingResponse<TrainingSettings> = await res.json();
       if (data.success) {
-        alert('Settings updated successfully!');
+        alert("Settings updated successfully!");
       } else {
         alert(`Failed to update settings: ${data.error}`);
       }
     } catch (error) {
-      console.error('Update settings failed:', error);
-      alert('Failed to update settings');
+      console.error("Update settings failed:", error);
+      alert("Failed to update settings");
     }
   };
 
@@ -149,18 +149,34 @@ export default function TrainingDashboard() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Current Status</CardTitle>
-              <Badge className={status.isTraining ? 'bg-blue-500' : 'bg-gray-500'}>
-                {status.isTraining ? 'TRAINING' : 'IDLE'}
+              <Badge
+                className={status.isTraining ? "bg-blue-500" : "bg-gray-500"}
+              >
+                {status.isTraining ? "TRAINING" : "IDLE"}
               </Badge>
             </div>
           </CardHeader>
           <CardContent>
             {status.isTraining && status.currentTraining ? (
               <div className="space-y-2">
-                <p><span className="font-semibold">Mode:</span> {status.currentTraining.mode}</p>
-                <p><span className="font-semibold">Started:</span> {new Date(status.currentTraining.timestamp).toLocaleString()}</p>
-                <p><span className="font-semibold">Duration:</span> {(status.currentTraining.duration / 1000).toFixed(1)}s</p>
-                <Button onClick={stopTraining} variant="destructive" size="sm" className="mt-2">
+                <p>
+                  <span className="font-semibold">Mode:</span>{" "}
+                  {status.currentTraining.mode}
+                </p>
+                <p>
+                  <span className="font-semibold">Started:</span>{" "}
+                  {new Date(status.currentTraining.timestamp).toLocaleString()}
+                </p>
+                <p>
+                  <span className="font-semibold">Duration:</span>{" "}
+                  {(status.currentTraining.duration / 1000).toFixed(1)}s
+                </p>
+                <Button
+                  onClick={stopTraining}
+                  variant="destructive"
+                  size="sm"
+                  className="mt-2"
+                >
                   Stop Training
                 </Button>
               </div>
@@ -177,16 +193,31 @@ export default function TrainingDashboard() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button onClick={() => triggerTraining('full')} disabled={triggering || status?.isTraining}>
+            <Button
+              onClick={() => triggerTraining("full")}
+              disabled={triggering || status?.isTraining}
+            >
               Full Training
             </Button>
-            <Button onClick={() => triggerTraining('vocabulary')} disabled={triggering || status?.isTraining} variant="outline">
+            <Button
+              onClick={() => triggerTraining("vocabulary")}
+              disabled={triggering || status?.isTraining}
+              variant="outline"
+            >
               Vocabulary Only
             </Button>
-            <Button onClick={() => triggerTraining('seeds')} disabled={triggering || status?.isTraining} variant="outline">
+            <Button
+              onClick={() => triggerTraining("seeds")}
+              disabled={triggering || status?.isTraining}
+              variant="outline"
+            >
               Seeds Only
             </Button>
-            <Button onClick={() => triggerTraining('weights')} disabled={triggering || status?.isTraining} variant="outline">
+            <Button
+              onClick={() => triggerTraining("weights")}
+              disabled={triggering || status?.isTraining}
+              variant="outline"
+            >
               Weights Only
             </Button>
           </div>
@@ -202,11 +233,28 @@ export default function TrainingDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="schedule">Cron Schedule</Label>
-                <Input id="schedule" value={settings.schedule} onChange={(e) => setSettings({ ...settings, schedule: e.target.value })} />
+                <Input
+                  id="schedule"
+                  value={settings.schedule}
+                  onChange={(e) =>
+                    setSettings({ ...settings, schedule: e.target.value })
+                  }
+                />
               </div>
               <div>
                 <Label htmlFor="confidence">Confidence Threshold</Label>
-                <Input id="confidence" type="number" step="0.1" value={settings.confidenceThreshold} onChange={(e) => setSettings({ ...settings, confidenceThreshold: parseFloat(e.target.value) })} />
+                <Input
+                  id="confidence"
+                  type="number"
+                  step="0.1"
+                  value={settings.confidenceThreshold}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      confidenceThreshold: parseFloat(e.target.value),
+                    })
+                  }
+                />
               </div>
             </div>
             <Button onClick={updateSettings}>Save Settings</Button>
@@ -220,19 +268,36 @@ export default function TrainingDashboard() {
         </CardHeader>
         <CardContent>
           {history.length === 0 ? (
-            <p className="text-sm text-gray-500">No training history available</p>
+            <p className="text-sm text-gray-500">
+              No training history available
+            </p>
           ) : (
             <div className="space-y-4">
               {history.slice(0, 10).map((item) => (
                 <div key={item.id} className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <Badge className={item.status === 'completed' ? 'bg-green-500' : item.status === 'failed' ? 'bg-red-500' : 'bg-blue-500'}>
+                    <Badge
+                      className={
+                        item.status === "completed"
+                          ? "bg-green-500"
+                          : item.status === "failed"
+                            ? "bg-red-500"
+                            : "bg-blue-500"
+                      }
+                    >
                       {item.status}
                     </Badge>
-                    <span className="text-sm text-gray-500">{new Date(item.timestamp).toLocaleString()}</span>
+                    <span className="text-sm text-gray-500">
+                      {new Date(item.timestamp).toLocaleString()}
+                    </span>
                   </div>
-                  <p><span className="font-semibold">Mode:</span> {item.mode}</p>
-                  <p><span className="font-semibold">Duration:</span> {(item.duration / 1000).toFixed(1)}s</p>
+                  <p>
+                    <span className="font-semibold">Mode:</span> {item.mode}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Duration:</span>{" "}
+                    {(item.duration / 1000).toFixed(1)}s
+                  </p>
                 </div>
               ))}
             </div>

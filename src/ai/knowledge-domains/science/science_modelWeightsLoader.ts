@@ -1,17 +1,14 @@
 import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-const scienceWeightsManager = createDomainWeightsManager({
-  domainName: "science",
-})
+import { storageAdapter } from "../storageAdapter";
 
-export const scienceLoadWeights = async (): Promise<string | null> => {
-  return scienceWeightsManager.loadWeights()
-}
-
-export const primeScienceWeights = async (): Promise<string | null> => {
-  return scienceWeightsManager.prime()
-}
-
-export const getScienceActiveWeightArtifact = () => {
-  return scienceWeightsManager.getActiveWeightArtifact()
-}
+export const scienceLoadWeights = async (
+  path = "/src/ai/knowledge-domains/science/science_weights/science_trainingWeights.bin",
+) => {
+  try {
+    const raw = await storageAdapter.readFile(path);
+    return raw;
+  } catch (e) {
+    return null;
+  }
+};

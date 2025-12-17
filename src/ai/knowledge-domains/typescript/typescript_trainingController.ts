@@ -9,42 +9,31 @@
 import {
   loadTypescriptLearnedData,
   saveTypescriptLearnedData,
-  type TypescriptLearnedData,
-} from "./typescript_learnedDataManager"
-
-type TrainingSample = {
-  input?: string
-  output?: string
-  [key: string]: unknown
-}
-
-type LearnedData = {
-  interactions?: Array<{ input: string; output: string; timestamp: number }>
-  [key: string]: unknown
-}
+} from "./typescript_learnedDataManager";
 
 export async function typescriptRunTrainingEpoch(
-  samples: TrainingSample[],
+  samples: any[],
 ): Promise<{ loss: number; accuracy: number }> {
-  const learned = (await loadTypescriptLearnedData()) as LearnedData
+  const learned = await loadTypescriptLearnedData();
 
   for (const sample of samples) {
-    if (typeof sample.input === "string" && typeof sample.output === "string") {
-      const interactions = Array.isArray(learned.interactions) ? learned.interactions : []
+    if (sample.input && sample.output) {
+      // Add interactions array if it doesn't exist
+      const interactions = (learned as any).interactions || [];
       interactions.push({
         input: sample.input,
         output: sample.output,
         timestamp: Date.now(),
-      })
-      learned.interactions = interactions
+      });
+      (learned as any).interactions = interactions;
     }
     addInteraction(learned, sample)
   }
 
-  await saveTypescriptLearnedData(learned)
+  await saveTypescriptLearnedData(learned);
 
   return {
     loss: 0.1,
     accuracy: 0.9,
-  }
+  };
 }

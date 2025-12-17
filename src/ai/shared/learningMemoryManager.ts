@@ -9,8 +9,8 @@
  * - Domain-specific learned data storage
  */
 
-import { promises as fs } from 'fs';
-import * as path from 'path';
+import { promises as fs } from "fs";
+import * as path from "path";
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 type MetadataRecord = Record<string, JsonValue>;
@@ -47,7 +47,7 @@ export interface SessionMemory {
 }
 
 export interface ConversationTurn {
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   timestamp: string;
   domains?: string[];
@@ -86,10 +86,11 @@ export class LearningMemoryManager {
   private archiveAfterDays: number = 21;
 
   constructor(basePath?: string) {
-    this.basePath = basePath || path.join(__dirname, '../../../data/learning-memory');
-    this.sessionsPath = path.join(this.basePath, 'sessions');
-    this.learnedPath = path.join(this.basePath, 'learned');
-    this.archivePath = path.join(this.basePath, 'archive');
+    this.basePath =
+      basePath || path.join(__dirname, "../../../data/learning-memory");
+    this.sessionsPath = path.join(this.basePath, "sessions");
+    this.learnedPath = path.join(this.basePath, "learned");
+    this.archivePath = path.join(this.basePath, "archive");
   }
 
   /**
@@ -102,19 +103,40 @@ export class LearningMemoryManager {
 
     // Create domain-specific learned folders
     const domains = [
-      'algorithms', 'code_review', 'data_integrity', 'data_structures',
-      'documentation', 'english', 'environment', 'error_detection',
-      'general_knowledge', 'grammar', 'internet_search', 'mathematics',
-      'nextjs', 'observability', 'programming', 'react', 'repair',
-      'science', 'security', 'system', 'testing', 'typescript', 'version_control'
+      "algorithms",
+      "code_review",
+      "data_integrity",
+      "data_structures",
+      "documentation",
+      "english",
+      "environment",
+      "error_detection",
+      "general_knowledge",
+      "grammar",
+      "internet_search",
+      "mathematics",
+      "nextjs",
+      "observability",
+      "programming",
+      "react",
+      "repair",
+      "science",
+      "security",
+      "system",
+      "testing",
+      "typescript",
+      "version_control",
     ];
 
     for (const domain of domains) {
       const domainPath = path.join(this.learnedPath, domain);
       await fs.mkdir(domainPath, { recursive: true });
-      
+
       // Create initial learned file if it doesn't exist
-      const learnedFile = path.join(domainPath, `${domain}_learned_${this.getDateStamp()}.json`);
+      const learnedFile = path.join(
+        domainPath,
+        `${domain}_learned_${this.getDateStamp()}.json`,
+      );
       try {
         await fs.access(learnedFile);
       } catch {
@@ -125,14 +147,14 @@ export class LearningMemoryManager {
           version: 1,
           statistics: {
             totalConcepts: 0,
-            avgConfidence: 0
-          }
+            avgConfidence: 0,
+          },
         };
         await fs.writeFile(learnedFile, JSON.stringify(initialData, null, 2));
       }
     }
 
-    console.log('✅ Learning & Memory System initialized');
+    console.log("✅ Learning & Memory System initialized");
   }
 
   // ============================================================================
@@ -142,7 +164,10 @@ export class LearningMemoryManager {
   /**
    * Create or retrieve a session
    */
-  async getOrCreateSession(sessionId: string, userId?: string): Promise<SessionMemory> {
+  async getOrCreateSession(
+    sessionId: string,
+    userId?: string,
+  ): Promise<SessionMemory> {
     // Check in-memory cache
     if (this.activeSessions.has(sessionId)) {
       const session = this.activeSessions.get(sessionId)!;
@@ -151,9 +176,12 @@ export class LearningMemoryManager {
     }
 
     // Try to load from disk
-    const sessionFile = path.join(this.sessionsPath, `session_${sessionId}.json`);
+    const sessionFile = path.join(
+      this.sessionsPath,
+      `session_${sessionId}.json`,
+    );
     try {
-      const data = await fs.readFile(sessionFile, 'utf-8');
+      const data = await fs.readFile(sessionFile, "utf-8");
       const session: SessionMemory = JSON.parse(data);
       session.lastActive = new Date().toISOString();
       this.activeSessions.set(sessionId, session);
@@ -167,7 +195,7 @@ export class LearningMemoryManager {
         learnedConcepts: [],
         createdAt: new Date().toISOString(),
         lastActive: new Date().toISOString(),
-        metadata: {}
+        metadata: {},
       };
       this.activeSessions.set(sessionId, session);
       await this.saveSession(session);
@@ -180,19 +208,19 @@ export class LearningMemoryManager {
    */
   async addConversationTurn(
     sessionId: string,
-    role: 'user' | 'assistant' | 'system',
+    role: "user" | "assistant" | "system",
     content: string,
     domains?: string[],
-    concepts?: string[]
+    concepts?: string[],
   ): Promise<void> {
     const session = await this.getOrCreateSession(sessionId);
-    
+
     const turn: ConversationTurn = {
       role,
       content,
       timestamp: new Date().toISOString(),
       domains,
-      concepts
+      concepts,
     };
 
     session.conversationHistory.push(turn);
@@ -206,13 +234,18 @@ export class LearningMemoryManager {
    */
   async updateSessionMetadata(
     sessionId: string,
-    updates: Partial<Pick<SessionMemory, 'userName' | 'userPreferences' | 'metadata'>>
+    updates: Partial<
+      Pick<SessionMemory, "userName" | "userPreferences" | "metadata">
+    >,
   ): Promise<void> {
     const session = await this.getOrCreateSession(sessionId);
-    
+
     if (updates.userName) session.userName = updates.userName;
     if (updates.userPreferences) {
-      session.userPreferences = { ...session.userPreferences, ...updates.userPreferences };
+      session.userPreferences = {
+        ...session.userPreferences,
+        ...updates.userPreferences,
+      };
     }
     if (updates.metadata) {
       session.metadata = { ...session.metadata, ...updates.metadata };
@@ -224,7 +257,10 @@ export class LearningMemoryManager {
   /**
    * Get session context (recent conversation history)
    */
-  async getSessionContext(sessionId: string, lastNTurns: number = 10): Promise<ConversationTurn[]> {
+  async getSessionContext(
+    sessionId: string,
+    lastNTurns: number = 10,
+  ): Promise<ConversationTurn[]> {
     const session = await this.getOrCreateSession(sessionId);
     return session.conversationHistory.slice(-lastNTurns);
   }
@@ -233,7 +269,10 @@ export class LearningMemoryManager {
    * Save session to disk
    */
   private async saveSession(session: SessionMemory): Promise<void> {
-    const sessionFile = path.join(this.sessionsPath, `session_${session.sessionId}.json`);
+    const sessionFile = path.join(
+      this.sessionsPath,
+      `session_${session.sessionId}.json`,
+    );
     await fs.writeFile(sessionFile, JSON.stringify(session, null, 2));
   }
 
@@ -255,10 +294,10 @@ export class LearningMemoryManager {
       relatedTerms?: string[];
       context?: string;
       confidence?: number;
-    }
+    },
   ): Promise<LearnedConcept> {
     const now = new Date().toISOString();
-    
+
     const concept: LearnedConcept = {
       term,
       definition,
@@ -271,7 +310,7 @@ export class LearningMemoryManager {
       lastAccessed: now,
       accessCount: 1,
       sessionId,
-      context: options?.context
+      context: options?.context,
     };
 
     // Save to domain-specific learned file
@@ -283,22 +322,28 @@ export class LearningMemoryManager {
     await this.saveSession(session);
 
     console.log(`✅ Learned new concept: "${term}" in ${domain} domain`);
-    
+
     return concept;
   }
 
   /**
    * Save concept to domain-specific learned file
    */
-  private async saveToDomainLearned(domain: string, concept: LearnedConcept): Promise<void> {
+  private async saveToDomainLearned(
+    domain: string,
+    concept: LearnedConcept,
+  ): Promise<void> {
     const domainPath = path.join(this.learnedPath, domain);
     const dateStamp = this.getDateStamp();
-    const learnedFile = path.join(domainPath, `${domain}_learned_${dateStamp}.json`);
+    const learnedFile = path.join(
+      domainPath,
+      `${domain}_learned_${dateStamp}.json`,
+    );
 
     let domainData: DomainLearned;
 
     try {
-      const data = await fs.readFile(learnedFile, 'utf-8');
+      const data = await fs.readFile(learnedFile, "utf-8");
       domainData = JSON.parse(data);
     } catch {
       // Create new file
@@ -309,20 +354,23 @@ export class LearningMemoryManager {
         version: 1,
         statistics: {
           totalConcepts: 0,
-          avgConfidence: 0
-        }
+          avgConfidence: 0,
+        },
       };
     }
 
     // Check if concept already exists
-    const existingIndex = domainData.concepts.findIndex(c => c.term === concept.term);
+    const existingIndex = domainData.concepts.findIndex(
+      (c) => c.term === concept.term,
+    );
     if (existingIndex >= 0) {
       // Update existing
       domainData.concepts[existingIndex].accessCount++;
-      domainData.concepts[existingIndex].lastAccessed = new Date().toISOString();
+      domainData.concepts[existingIndex].lastAccessed =
+        new Date().toISOString();
       domainData.concepts[existingIndex].confidence = Math.min(
         1.0,
-        domainData.concepts[existingIndex].confidence + 0.05
+        domainData.concepts[existingIndex].confidence + 0.05,
       );
     } else {
       // Add new
@@ -332,8 +380,9 @@ export class LearningMemoryManager {
     // Update statistics
     domainData.lastUpdated = new Date().toISOString();
     domainData.statistics.totalConcepts = domainData.concepts.length;
-    domainData.statistics.avgConfidence = 
-      domainData.concepts.reduce((sum, c) => sum + c.confidence, 0) / domainData.concepts.length;
+    domainData.statistics.avgConfidence =
+      domainData.concepts.reduce((sum, c) => sum + c.confidence, 0) /
+      domainData.concepts.length;
 
     await fs.writeFile(learnedFile, JSON.stringify(domainData, null, 2));
   }
@@ -341,13 +390,18 @@ export class LearningMemoryManager {
   /**
    * Retrieve learned concept
    */
-  async getConcept(term: string, domain: string): Promise<LearnedConcept | null> {
+  async getConcept(
+    term: string,
+    domain: string,
+  ): Promise<LearnedConcept | null> {
     const domainPath = path.join(this.learnedPath, domain);
-    
+
     // Find the latest learned file for this domain
     const files = await fs.readdir(domainPath);
-    const learnedFiles = files.filter(f => f.startsWith(`${domain}_learned_`) && f.endsWith('.json'));
-    
+    const learnedFiles = files.filter(
+      (f) => f.startsWith(`${domain}_learned_`) && f.endsWith(".json"),
+    );
+
     if (learnedFiles.length === 0) return null;
 
     // Sort by date (newest first)
@@ -356,10 +410,12 @@ export class LearningMemoryManager {
     // Search through files
     for (const file of learnedFiles) {
       const filePath = path.join(domainPath, file);
-      const data = await fs.readFile(filePath, 'utf-8');
+      const data = await fs.readFile(filePath, "utf-8");
       const domainData: DomainLearned = JSON.parse(data);
-      
-      const concept = domainData.concepts.find(c => c.term.toLowerCase() === term.toLowerCase());
+
+      const concept = domainData.concepts.find(
+        (c) => c.term.toLowerCase() === term.toLowerCase(),
+      );
       if (concept) {
         // Update access stats
         concept.accessCount++;
@@ -375,23 +431,29 @@ export class LearningMemoryManager {
   /**
    * Search for concepts across domains
    */
-  async searchConcepts(query: string, domains?: string[]): Promise<LearnedConcept[]> {
+  async searchConcepts(
+    query: string,
+    domains?: string[],
+  ): Promise<LearnedConcept[]> {
     const results: LearnedConcept[] = [];
-    const searchDomains = domains || await this.getAllDomains();
+    const searchDomains = domains || (await this.getAllDomains());
 
     for (const domain of searchDomains) {
       const domainPath = path.join(this.learnedPath, domain);
       try {
         const files = await fs.readdir(domainPath);
-        const learnedFiles = files.filter(f => f.startsWith(`${domain}_learned_`));
+        const learnedFiles = files.filter((f) =>
+          f.startsWith(`${domain}_learned_`),
+        );
 
         for (const file of learnedFiles) {
-          const data = await fs.readFile(path.join(domainPath, file), 'utf-8');
+          const data = await fs.readFile(path.join(domainPath, file), "utf-8");
           const domainData: DomainLearned = JSON.parse(data);
-          
-          const matches = domainData.concepts.filter(c =>
-            c.term.toLowerCase().includes(query.toLowerCase()) ||
-            c.definition.toLowerCase().includes(query.toLowerCase())
+
+          const matches = domainData.concepts.filter(
+            (c) =>
+              c.term.toLowerCase().includes(query.toLowerCase()) ||
+              c.definition.toLowerCase().includes(query.toLowerCase()),
           );
 
           results.push(...matches);
@@ -421,9 +483,13 @@ export class LearningMemoryManager {
     for (const file of sessionFiles) {
       const filePath = path.join(this.sessionsPath, file);
       const stats = await fs.stat(filePath);
-      
+
       if (stats.mtime < cutoffDate) {
-        await this.archiveFile(filePath, 'session', `Inactive for ${this.archiveAfterDays} days`);
+        await this.archiveFile(
+          filePath,
+          "session",
+          `Inactive for ${this.archiveAfterDays} days`,
+        );
       }
     }
 
@@ -432,7 +498,9 @@ export class LearningMemoryManager {
     for (const domain of domains) {
       const domainPath = path.join(this.learnedPath, domain);
       const files = await fs.readdir(domainPath);
-      const learnedFiles = files.filter(f => f.startsWith(`${domain}_learned_`));
+      const learnedFiles = files.filter((f) =>
+        f.startsWith(`${domain}_learned_`),
+      );
 
       // Keep the latest 3 files, archive the rest
       if (learnedFiles.length > 3) {
@@ -441,7 +509,11 @@ export class LearningMemoryManager {
 
         for (const file of toArchive) {
           const filePath = path.join(domainPath, file);
-          await this.archiveFile(filePath, 'learned', 'Old learned data superseded by newer files');
+          await this.archiveFile(
+            filePath,
+            "learned",
+            "Old learned data superseded by newer files",
+          );
         }
       }
     }
@@ -452,7 +524,11 @@ export class LearningMemoryManager {
   /**
    * Archive a file
    */
-  private async archiveFile(filePath: string, type: string, reason: string): Promise<void> {
+  private async archiveFile(
+    filePath: string,
+    type: string,
+    reason: string,
+  ): Promise<void> {
     const fileName = path.basename(filePath);
     const archiveSubDir = path.join(this.archivePath, type);
     await fs.mkdir(archiveSubDir, { recursive: true });
@@ -465,14 +541,14 @@ export class LearningMemoryManager {
       originalPath: filePath,
       archivedAt: new Date().toISOString(),
       reason,
-      metadata: {}
+      metadata: {},
     };
 
-    const indexFile = path.join(archiveSubDir, 'archive_index.json');
+    const indexFile = path.join(archiveSubDir, "archive_index.json");
     let index: ArchiveEntry[] = [];
-    
+
     try {
-      const data = await fs.readFile(indexFile, 'utf-8');
+      const data = await fs.readFile(indexFile, "utf-8");
       index = JSON.parse(data);
     } catch {
       // New index
@@ -491,8 +567,8 @@ export class LearningMemoryManager {
    */
   private getDateStamp(): string {
     const now = new Date();
-    const dd = String(now.getDate()).padStart(2, '0');
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, "0");
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
     const yy = String(now.getFullYear()).slice(-2);
     return `${dd}-${mm}-${yy}`;
   }
@@ -502,8 +578,10 @@ export class LearningMemoryManager {
    */
   private async getAllDomains(): Promise<string[]> {
     try {
-      const entries = await fs.readdir(this.learnedPath, { withFileTypes: true });
-      return entries.filter(e => e.isDirectory()).map(e => e.name);
+      const entries = await fs.readdir(this.learnedPath, {
+        withFileTypes: true,
+      });
+      return entries.filter((e) => e.isDirectory()).map((e) => e.name);
     } catch {
       return [];
     }
@@ -517,8 +595,8 @@ export class LearningMemoryManager {
       activeSessions: this.activeSessions.size,
       totalSessionFiles: 0,
       totalLearnedConcepts: 0,
-      conceptsByDomain: {},
-      archivedFiles: 0
+      conceptsByDomain: {} as Record<string, number>,
+      archivedFiles: 0,
     };
 
     // Count session files
@@ -533,15 +611,17 @@ export class LearningMemoryManager {
       const domainPath = path.join(this.learnedPath, domain);
       try {
         const files = await fs.readdir(domainPath);
-        const learnedFiles = files.filter(f => f.startsWith(`${domain}_learned_`));
-        
+        const learnedFiles = files.filter((f) =>
+          f.startsWith(`${domain}_learned_`),
+        );
+
         let domainTotal = 0;
         for (const file of learnedFiles) {
-          const data = await fs.readFile(path.join(domainPath, file), 'utf-8');
+          const data = await fs.readFile(path.join(domainPath, file), "utf-8");
           const domainData: DomainLearned = JSON.parse(data);
           domainTotal += domainData.concepts.length;
         }
-        
+
         stats.conceptsByDomain[domain] = domainTotal;
         stats.totalLearnedConcepts += domainTotal;
       } catch {}

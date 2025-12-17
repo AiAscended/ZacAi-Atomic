@@ -12,7 +12,7 @@
  */
 export const normalizeText = (text: string): string => {
   return text.trim().replace(/\s+/g, " ").toLowerCase();
-}
+};
 
 /**
  * Detect data structure patterns in code
@@ -29,24 +29,24 @@ export const detectDataStructurePatterns = (code: string) => {
     stack: /Stack|\.push|\.pop/gi,
     queue: /Queue|\.enqueue|\.dequeue/gi,
     heap: /Heap|PriorityQueue/gi,
-  }
+  };
 
-  const detected: string[] = []
+  const detected: string[] = [];
   for (const [structure, pattern] of Object.entries(patterns)) {
     if (pattern.test(code)) {
-      detected.push(structure)
+      detected.push(structure);
     }
   }
-  return detected
-}
+  return detected;
+};
 
 /**
  * Safe JSON parsing with fallback
  */
 export const safeParseJSON = (text: string, fallback: unknown = {}) => {
   try {
-    return JSON.parse(text)
+    return JSON.parse(text);
   } catch {
-    return fallback
+    return fallback;
   }
-}
+};

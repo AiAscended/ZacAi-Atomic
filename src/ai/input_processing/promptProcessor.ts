@@ -14,12 +14,12 @@
  */
 
 // Import utilities for text processing
-import { cleanText } from "../shared/tools/textFormatting/textFormatter"
+import { cleanText } from "../shared/tools/textFormatting/textFormatter";
 
 // Define interface for processed prompt output
 export interface ProcessedPrompt {
-  cleanedText: string
-  tokens: number[]
+  cleanedText: string;
+  tokens: number[];
 }
 
 // Class implements the processing logic
@@ -31,10 +31,10 @@ export class PromptProcessor {
    */
   process(prompt: string): string {
     if (!prompt || typeof prompt !== "string") {
-      throw new Error("Invalid prompt input")
+      throw new Error("Invalid prompt input");
     }
-    const cleaned = cleanText(prompt)
-    return cleaned
+    const cleaned = cleanText(prompt);
+    return cleaned;
   }
 
   /**
@@ -45,7 +45,7 @@ export class PromptProcessor {
    */
   async decomposeSubtasks(prompt: string): Promise<string[]> {
     // Example implementation: split by sentences or custom NLP
-    const subtasks = prompt.split(/[.!?]\s/).filter((x) => x.length > 0)
-    return subtasks
+    const subtasks = prompt.split(/[.!?]\s/).filter((x) => x.length > 0);
+    return subtasks;
   }
 }

@@ -1,29 +1,34 @@
 /**
  * File: src/ai/models/index.ts
  * Purpose: Convenience API for model registry and loading
- * 
+ *
  * Usage in orchestrator:
  * import { loadAllModels, getReadyModels, getModel } from "@/ai/models";
  */
 
 import { modelScannerConfig } from "./config";
 import { getRegistry, scanAndUpdate } from "../shared/registry/moduleRegistry";
-import { 
-  getLoader, 
-  loadAllModules, 
-  loadModule, 
+import {
+  getLoader,
+  loadAllModules,
+  loadModule,
   getLoadedModule,
   getAllLoadedModules,
-  getReadyModules 
+  getReadyModules,
 } from "../shared/registry/moduleLoader";
-import type { ModuleRegistry, ModuleManifest } from "../shared/registry/moduleRegistry";
+import type {
+  ModuleRegistry,
+  ModuleManifest,
+} from "../shared/registry/moduleRegistry";
 import type { LoadedModule } from "../shared/registry/moduleLoader";
 
 // ============================================================================
 // Registry APIs
 // ============================================================================
 
-export async function getModelRegistry(forceRefresh = false): Promise<ModuleRegistry> {
+export async function getModelRegistry(
+  forceRefresh = false,
+): Promise<ModuleRegistry> {
   return await getRegistry(modelScannerConfig, forceRefresh);
 }
 
@@ -33,18 +38,24 @@ export async function scanModels(): Promise<ModuleRegistry> {
 
 export async function getEnabledModels(): Promise<ModuleManifest[]> {
   const registry = await getModelRegistry();
-  return registry.enabledModules.map(id => registry.modules[id]).filter(Boolean);
+  return registry.enabledModules
+    .map((id) => registry.modules[id])
+    .filter(Boolean);
 }
 
-export async function getModel(modelId: string): Promise<ModuleManifest | null> {
+export async function getModel(
+  modelId: string,
+): Promise<ModuleManifest | null> {
   const registry = await getModelRegistry();
   return registry.modules[modelId] || null;
 }
 
-export async function getModelsByType(modelType: string): Promise<ModuleManifest[]> {
+export async function getModelsByType(
+  modelType: string,
+): Promise<ModuleManifest[]> {
   const registry = await getModelRegistry();
   const ids = registry.byType?.[modelType] || [];
-  return ids.map(id => registry.modules[id]).filter(Boolean);
+  return ids.map((id) => registry.modules[id]).filter(Boolean);
 }
 
 export async function isModelEnabled(modelId: string): Promise<boolean> {
@@ -90,5 +101,8 @@ export function getModelLoaderStats() {
 // Type Exports
 // ============================================================================
 
-export type { ModuleManifest as ModelManifest, ModuleRegistry as ModelRegistry };
+export type {
+  ModuleManifest as ModelManifest,
+  ModuleRegistry as ModelRegistry,
+};
 export type { LoadedModule as LoadedModel };

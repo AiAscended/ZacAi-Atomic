@@ -6,16 +6,16 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { safeParseJSON } from "./data_structures_utils"
-import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./data_structures_utils";
+import { storageAdapter } from "../storageAdapter";
 
 export const loadDataStructuresSeedVocabulary = async (
   path = "/src/ai/knowledge-domains/data_structures/data_structures_seeds/data_structures_seedVocabulary.json",
 ) => {
   try {
-    const content = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(content, { vocab: [] })
+    const content = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(content, { vocab: [] });
   } catch {
-    return { vocab: [] }
+    return { vocab: [] };
   }
-}
+};

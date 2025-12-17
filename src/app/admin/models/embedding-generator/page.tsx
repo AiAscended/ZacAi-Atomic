@@ -3,13 +3,13 @@
  * Generates vector embeddings for semantic search
  */
 
-"use client"
+"use client";
 
-import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage"
+import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage";
 
 export default function EmbeddingGeneratorPage() {
   return (
-    <ModelSettingsPage 
+    <ModelSettingsPage
       modelName="embedding-generator"
       modelTitle="Embedding Generator"
       modelDescription="Generates high-quality vector embeddings for semantic search and similarity"
@@ -19,8 +19,8 @@ export default function EmbeddingGeneratorPage() {
         normalize: true,
         poolingStrategy: "mean",
         batchSize: 32,
-        maxSequenceLength: 512
+        maxSequenceLength: 512,
       }}
     />
-  )
+  );
 }

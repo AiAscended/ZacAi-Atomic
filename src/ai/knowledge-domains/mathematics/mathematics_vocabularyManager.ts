@@ -1,5 +1,5 @@
-import { storageAdapter } from "../storageAdapter"
-import { safeParseJSON } from "./mathematics_utils"
+import { storageAdapter } from "../storageAdapter";
+import { safeParseJSON } from "./mathematics_utils";
 
 export type MathematicsSeedVocabulary = {
   terms: string[]
@@ -14,10 +14,9 @@ export const loadMathematicsSeedVocabulary = async (
   path = DEFAULT_SEED_VOCAB_PATH,
 ): Promise<MathematicsSeedVocabulary> => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON<MathematicsSeedVocabulary>(raw, createDefaultSeedVocabulary())
-  } catch (error) {
-    console.error("[mathematics][seed-vocabulary] Failed to load seed vocabulary", { path, error })
-    return createDefaultSeedVocabulary()
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { terms: [] }) as { terms: string[] };
+  } catch (e) {
+    return { terms: [] };
   }
-}
+};

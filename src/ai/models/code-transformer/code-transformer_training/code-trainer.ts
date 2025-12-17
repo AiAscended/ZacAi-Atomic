@@ -5,8 +5,8 @@
 import type { TrainingBatch } from '../../shared/modelTypes';
 
 export class CODETrainer {
-  train(data: unknown): void {
-    console.log('Training code-transformer...');
+  train(data: any): void {
+    console.log("Training code-transformer...");
   }
 }
 

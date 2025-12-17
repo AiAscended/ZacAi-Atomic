@@ -6,16 +6,25 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import fs from "fs/promises"
-import path from "path"
+import path from "path";
 
-import { domainRegistry, type ModuleMetadata } from "../domainRegistry"
-import { SECURITY_DOMAIN } from "./security_constants"
-import { loadSecuritySeedVocabulary } from "./security_vocabularyManager"
+import { domainRegistry } from "../domainRegistry";
+import { SECURITY_DOMAIN } from "./security_constants";
+import { loadSecuritySeedVocabulary } from "./security_vocabularyManager";
+import { securityRunInference } from "./security_inferenceController";
+import { securityRunTrainingEpoch } from "./security_trainingController";
 
-const DOMAIN_DIR = path.join(process.cwd(), "src", "ai", "knowledge-domains", SECURITY_DOMAIN)
+const DOMAIN_NAME = "security";
+const DOMAIN_DIR = path.join(
+  process.cwd(),
+  "src",
+  "ai",
+  "knowledge-domains",
+  DOMAIN_NAME,
+);
 
-type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue }
+export const securityInit = async () => {
+  await loadSecuritySeedVocabulary();
 
 export interface SecuritySeedEntry {
   name: string
@@ -131,35 +140,15 @@ const registerSecurityDomain = () => {
   domainRegistry.registerDomain({
     name: SECURITY_DOMAIN,
     displayName: "Security",
-    description: "Security analysis, vulnerability detection, and secure coding guidance",
-    atomicLevel: "organ",
-    modules: SECURITY_MODULES,
-    seedDataPath: path.join(DOMAIN_DIR, `${SECURITY_DOMAIN}_seeds`),
-    learnedDataPath: path.join(DOMAIN_DIR, `${SECURITY_DOMAIN}_learned`),
-    weightsPath: path.join(DOMAIN_DIR, `${SECURITY_DOMAIN}_weights`),
+    description:
+      "Security analysis, vulnerability detection, and secure coding",
+    atomicLevel: "molecule",
+    modules: [],
+    seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+    learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+    weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
     enabled: true,
-  })
-}
+  });
+};
 
-export const securityInit = async (): Promise<void> => {
-  registerSecurityDomain()
-
-  try {
-    const [seedEntries, vocabulary] = await Promise.all([
-      loadSecuritySeedData(),
-      loadSecuritySeedVocabulary(),
-    ])
-
-    if (!seedEntries.length) {
-      console.warn("[Security] No seed data detected. Domain capabilities may be limited.")
-    }
-
-    console.log(
-      `[Security] Vocabulary contains ${vocabulary.vulnerabilities.length} baseline vulnerabilities.`
-    )
-  } catch (error) {
-    console.error("[Security] Initialization error:", error)
-  }
-}
-
-void securityInit()
+void securityInit();

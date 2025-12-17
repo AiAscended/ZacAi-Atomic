@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 /**
  * File: src/app/client-layout.tsx
@@ -6,45 +6,23 @@
  * Handles theme state management, persistence, and application of styles.
  */
 
-import type React from "react"
-import { useState, useEffect, createContext, useContext } from "react"
-import { Geist, Geist_Mono } from "next/font/google"
-import { NavigationWrapper } from "@/components/navigation/NavigationWrapper"
-import { Analytics } from "@vercel/analytics/next"
-import ThemeToggle from "@/components/ui/ThemeToggle"
+import { ReactNode, useState, useEffect } from "react";
+import { ThemeProvider } from "@/components/theme-provider";
+import { NavigationWrapper } from "@/components/navigation/NavigationWrapper";
 
-const geist = Geist({ subsets: ["latin"] })
-const geistMono = Geist_Mono({ subsets: ["latin"] })
+interface ClientLayoutProps {
+  children: ReactNode;
+}
 
-type Theme = "light" | "dark"
-
-const ThemeContext = createContext<{ theme: Theme; toggleTheme: () => void }>({
-  theme: "light",
-  toggleTheme: () => {},
-})
-
-export const useTheme = () => useContext(ThemeContext)
-
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light")
-
-  const toggleTheme = () =>
-    setTheme((prev) => {
-      const next = prev === "light" ? "dark" : "light"
-      localStorage.setItem("theme", next)
-      return next
-    })
+export default function ClientLayout({ children }: ClientLayoutProps) {
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
-    const saved = localStorage.getItem("theme") as Theme | null
-    if (saved) {
-      setTheme(saved)
-    } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-      setTheme(prefersDark ? "dark" : "light")
-      localStorage.setItem("prefers-color-scheme", prefersDark ? "dark" : "light")
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "light" || savedTheme === "dark") {
+      setTheme(savedTheme);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     const root = window.document.documentElement
@@ -53,15 +31,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, [theme])
 
   return (
-    <html lang="en" className={geist.className}>
-      <body className={`font-sans antialiased ${theme}`}>
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
-          <NavigationWrapper />
-          <ThemeToggle />
-          {children}
-          <Analytics />
-        </ThemeContext.Provider>
-      </body>
-    </html>
-  )
+    <ThemeProvider attribute="class" defaultTheme={theme}>
+      <NavigationWrapper>{children}</NavigationWrapper>
+    </ThemeProvider>
+  );
 }

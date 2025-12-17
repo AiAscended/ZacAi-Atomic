@@ -19,16 +19,17 @@ export class LLMPositionalEncoding {
    */
   private generateEncodings(): number[][] {
     const encodings: number[][] = [];
-    
+
     for (let pos = 0; pos < this.maxSeqLength; pos++) {
       const encoding: number[] = [];
       for (let i = 0; i < this.embeddingDim; i++) {
-        const angle = pos / Math.pow(10000, (2 * Math.floor(i / 2)) / this.embeddingDim);
+        const angle =
+          pos / Math.pow(10000, (2 * Math.floor(i / 2)) / this.embeddingDim);
         encoding.push(i % 2 === 0 ? Math.sin(angle) : Math.cos(angle));
       }
       encodings.push(encoding);
     }
-    
+
     return encodings;
   }
 
@@ -37,7 +38,9 @@ export class LLMPositionalEncoding {
    */
   forward(embeddings: number[][]): number[][] {
     if (embeddings.length > this.maxSeqLength) {
-      throw new Error(`Sequence length ${embeddings.length} exceeds maximum ${this.maxSeqLength}`);
+      throw new Error(
+        `Sequence length ${embeddings.length} exceeds maximum ${this.maxSeqLength}`,
+      );
     }
 
     return embeddings.map((embedding, pos) => {

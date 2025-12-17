@@ -4,9 +4,13 @@
  * Dependencies: probabilisticReasoning
  */
 
-import { bayesUpdate } from './probabilisticReasoning';
+import { bayesUpdate } from "./probabilisticReasoning";
 
-export const generateSimpleExplanation = (fact: string, prior: number, lr: number): string => {
+export const generateSimpleExplanation = (
+  fact: string,
+  prior: number,
+  lr: number,
+): string => {
   const posterior = bayesUpdate(prior, lr);
   return `Based on evidence '${fact}', probability updated from ${prior.toFixed(2)} to ${posterior.toFixed(2)}.`;
 };

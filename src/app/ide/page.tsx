@@ -5,87 +5,9 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { IDELayout } from './components/IDELayout';
-import { MonacoEditor, EditorFile } from './components/MonacoEditor';
-import { FileExplorer, FileNode } from './components/FileExplorer';
-import { Preview } from './components/Preview';
-import { TerminalWrapper } from './components/TerminalWrapper';
-import { AIChatPanel } from './components/AIChatPanel';
-import { useVirtualFileSystem } from '@/hooks/useVirtualFileSystem';
-
-// Sample files (fallback)
-const sampleFiles: FileNode[] = [
-  {
-    id: '1',
-    name: 'src',
-    type: 'directory',
-    path: '/src',
-    children: [
-      {
-        id: '2',
-        name: 'index.tsx',
-        type: 'file',
-        path: '/src/index.tsx',
-      },
-      {
-        id: '3',
-        name: 'App.tsx',
-        type: 'file',
-        path: '/src/App.tsx',
-      },
-      {
-        id: '4',
-        name: 'styles.css',
-        type: 'file',
-        path: '/src/styles.css',
-      },
-    ],
-  },
-  {
-    id: '5',
-    name: 'package.json',
-    type: 'file',
-    path: '/package.json',
-  },
-  {
-    id: '6',
-    name: 'README.md',
-    type: 'file',
-    path: '/README.md',
-  },
-];
-
-const sampleEditorFiles: EditorFile[] = [
-  {
-    id: '2',
-    name: 'index.tsx',
-    path: '/src/index.tsx',
-    language: 'typescript',
-    content: `import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import './styles.css';
-
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);`,
-  },
-  {
-    id: '3',
-    name: 'App.tsx',
-    path: '/src/App.tsx',
-    language: 'typescript',
-    content: `import React, { useState } from 'react';
-
-function App() {
-  const [count, setCount] = useState(0);
+import { Suspense } from "react";
+import { IDELayout } from "./components/IDELayout";
+import { IDELoadingState } from "./components/IDELoadingState";
 
   return (
     <div className="App">

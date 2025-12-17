@@ -3,8 +3,8 @@
  * Manages training loop, batching, and backpropagation
  */
 
-import { LLMModelConfig } from '../unified-transformer-llm_config/llm-modelConfig';
-import { batchCrossEntropyLoss } from './llm-lossFunction';
+import { LLMModelConfig } from "../unified-transformer-llm_config/llm-modelConfig";
+import { batchCrossEntropyLoss } from "./llm-lossFunction";
 
 export interface TrainingConfig {
   batchSize: number;
@@ -31,7 +31,9 @@ export class LLMTrainer {
    */
   private getLearningRate(): number {
     if (this.currentStep < this.config.warmupSteps) {
-      return this.config.learningRate * (this.currentStep / this.config.warmupSteps);
+      return (
+        this.config.learningRate * (this.currentStep / this.config.warmupSteps)
+      );
     }
     return this.config.learningRate;
   }
@@ -39,22 +41,21 @@ export class LLMTrainer {
   /**
    * Train for one step
    */
-  trainStep(
-    batchLogits: Float32Array[],
-    batchTargets: number[]
-  ): number {
+  trainStep(batchLogits: Float32Array[], batchTargets: number[]): number {
     const loss = batchCrossEntropyLoss(batchLogits, batchTargets);
     this.losses.push(loss);
-    
+
     // Placeholder: Backpropagation would happen here
     const lr = this.getLearningRate();
-    
+
     this.currentStep++;
-    
+
     if (this.currentStep % this.config.logInterval === 0) {
-      console.log(`Step ${this.currentStep}: Loss = ${loss.toFixed(4)}, LR = ${lr.toFixed(6)}`);
+      console.log(
+        `Step ${this.currentStep}: Loss = ${loss.toFixed(4)}, LR = ${lr.toFixed(6)}`,
+      );
     }
-    
+
     return loss;
   }
 
@@ -63,13 +64,13 @@ export class LLMTrainer {
    */
   train(numEpochs: number): void {
     console.log(`Starting training for ${numEpochs} epochs...`);
-    
+
     for (let epoch = 0; epoch < numEpochs; epoch++) {
       console.log(`Epoch ${epoch + 1}/${numEpochs}`);
-      
+
       // Placeholder: Actual training loop would iterate over dataset
       if (this.currentStep >= this.config.maxSteps) {
-        console.log('Max steps reached');
+        console.log("Max steps reached");
         break;
       }
     }

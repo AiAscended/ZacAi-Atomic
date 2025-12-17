@@ -5,11 +5,22 @@
  * data ingestion pipelines can query them for canonical sources.
  */
 
-type SourceRecord = { domain: string; name: string; url: string; description?: string; searchPath?: string };
+type SourceRecord = {
+  domain: string;
+  name: string;
+  url: string;
+  description?: string;
+  searchPath?: string;
+};
 
 const sources: SourceRecord[] = [];
 
-export const registerSource = (domain: string, name: string, url: string, description?: string) => {
+export const registerSource = (
+  domain: string,
+  name: string,
+  url: string,
+  description?: string,
+) => {
   sources.push({ domain, name, url, description });
 };
 

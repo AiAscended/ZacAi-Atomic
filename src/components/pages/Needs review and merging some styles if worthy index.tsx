@@ -1,4 +1,4 @@
-import { ChatInterface } from '@components/ChatInterface';
+import { ChatInterface } from "@components/ChatInterface";
 
 export const renderChatPage = (container: HTMLElement): void => {
   container.innerHTML = `
@@ -13,5 +13,5 @@ export const renderChatPage = (container: HTMLElement): void => {
     </div>
   `;
 
-  new ChatInterface('chat-interface');
+  new ChatInterface("chat-interface");
 };

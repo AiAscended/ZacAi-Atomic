@@ -30,10 +30,15 @@ const SYNTAX_MESSAGES: Record<string, { message: string; severity: ErrorDetectio
 const LONG_LINE_THRESHOLD = 140
 
 export class ErrorDetectionAnalyzer {
-  analyze(code: string): ErrorDetectionAnalysis {
-    const sanitized = normalizeText(code)
-    const errors = this.detectStructuralIssues(code)
-    const suggestions = this.buildSuggestions(code, sanitized)
+  analyze(_code: string): {
+    errors: Array<{
+      line: number;
+      message: string;
+      severity: "error" | "warning";
+    }>;
+    suggestions: string[];
+  } {
+    // Placeholder implementation
     return {
       errors,
       suggestions,

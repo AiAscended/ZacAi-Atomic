@@ -9,8 +9,12 @@ export function IDELoadingState() {
           <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
           <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
         </div>
-        <h2 className="text-xl font-semibold text-white">Loading ZacAi IDE...</h2>
-        <p className="text-sm text-gray-400">Initializing workspace environment</p>
+        <h2 className="text-xl font-semibold text-white">
+          Loading ZacAi IDE...
+        </h2>
+        <p className="text-sm text-gray-400">
+          Initializing workspace environment
+        </p>
       </div>
     </div>
   );

@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { mean } from "./mean"
+import { mean } from "./mean";
 
 /**
  * Calculates standard deviation of numbers
@@ -16,31 +16,33 @@ import { mean } from "./mean"
  * @throws Error if array is empty or has only one element for sample calculation
  * @example stdDev(2, 4, 4, 4, 5, 5, 7, 9) // returns 2
  */
-type StdDevArgs = [boolean, ...number[]] | number[]
-
-export function stdDev(...numbers: number[]): number
-export function stdDev(sample: boolean, ...numbers: number[]): number
+export function stdDev(...numbers: number[]): number;
+export function stdDev(sample: boolean, ...numbers: number[]): number;
 export function stdDev(...args: (number | boolean)[]): number {
-  let sample = false
-  let numbers: number[]
+  let sample = false;
+  let numbers: number[];
 
   if (typeof args[0] === "boolean") {
-    sample = args[0]
-    numbers = args.slice(1) as number[]
+    sample = args[0];
+    numbers = args.slice(1) as number[];
   } else {
-    numbers = args as number[]
+    numbers = args as number[];
   }
 
   if (numbers.length === 0) {
-    throw new Error("Cannot calculate standard deviation of empty array")
+    throw new Error("Cannot calculate standard deviation of empty array");
   }
   if (sample && numbers.length === 1) {
-    throw new Error("Cannot calculate sample standard deviation with only one value")
+    throw new Error(
+      "Cannot calculate sample standard deviation with only one value",
+    );
   }
 
-  const avg = mean(...numbers)
-  const squaredDiffs = numbers.map((num) => Math.pow(num - avg, 2))
-  const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / (sample ? numbers.length - 1 : numbers.length)
+  const avg = mean(...numbers);
+  const squaredDiffs = numbers.map((num) => Math.pow(num - avg, 2));
+  const variance =
+    squaredDiffs.reduce((sum, diff) => sum + diff, 0) /
+    (sample ? numbers.length - 1 : numbers.length);
 
-  return Math.sqrt(variance)
+  return Math.sqrt(variance);
 }

@@ -1,4 +1,4 @@
-import { scienceTokenizer } from "./science_tokenizer"
+import { scienceTokenizer } from "./science_tokenizer";
 /**
  * File: src/ai/data/science/science_semanticAnalyzer.ts
  * Purpose: Science semantic analyzer for concepts and relationships
@@ -7,20 +7,22 @@ import { scienceTokenizer } from "./science_tokenizer"
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { scienceParser } from "./science_parser"
+import { scienceParser } from "./science_parser";
 
 /**
  * Analyze scientific content for concepts, formulas, and domain classification
  */
 export const scienceSemanticAnalyzer = (text: string) => {
-  const { tokens } = scienceTokenizer(text)
-  const parsed = scienceParser(text)
+  const { tokens } = scienceTokenizer(text);
+  const parsed = scienceParser(text);
 
   // Extract scientific concepts from tokens
-  const concepts = tokens.filter((t) => ["FORCE", "ENERGY", "MASS", "ATOM", "MOLECULE", "CELL", "DNA"].includes(t))
+  const concepts = tokens.filter((t) =>
+    ["FORCE", "ENERGY", "MASS", "ATOM", "MOLECULE", "CELL", "DNA"].includes(t),
+  );
 
   // Count scientific terminology
-  const scientificTermCount = concepts.length
+  const scientificTermCount = concepts.length;
 
   return {
     concepts: [...new Set(concepts)],
@@ -31,5 +33,5 @@ export const scienceSemanticAnalyzer = (text: string) => {
     numbers: parsed.numbers,
     units: parsed.units,
     complexity: parsed.complexity,
-  }
-}
+  };
+};

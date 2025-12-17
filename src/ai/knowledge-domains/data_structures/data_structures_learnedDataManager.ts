@@ -6,28 +6,28 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { safeParseJSON } from "./data_structures_utils"
-import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./data_structures_utils";
+import { storageAdapter } from "../storageAdapter";
 
 export const loadDataStructuresLearnedData = async (
   path = "/src/ai/knowledge-domains/data_structures/data_structures_learned/data_structures_learnedData.json",
 ) => {
   try {
-    const content = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(content, { notes: [], concepts: {} })
+    const content = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(content, { notes: [], concepts: {} });
   } catch {
-    return { notes: [], concepts: {} }
+    return { notes: [], concepts: {} };
   }
-}
+};
 
 export const saveDataStructuresLearnedData = async (
   data: unknown,
   path = "/src/ai/knowledge-domains/data_structures/data_structures_learned/data_structures_learnedData.json",
 ) => {
   try {
-    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
-    return { success: true }
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2));
+    return { success: true };
   } catch (err) {
-    return { success: false, error: String(err) }
+    return { success: false, error: String(err) };
   }
-}
+};

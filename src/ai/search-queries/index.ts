@@ -6,6 +6,6 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-export { parseQuery, type ParsedQuery } from "./queryParser"
-export { expandQuery } from "./queryExpander"
-export { rankResults, type SearchResult } from "./queryRanker"
+export { parseQuery, type ParsedQuery } from "./queryParser";
+export { expandQuery } from "./queryExpander";
+export { rankResults, type SearchResult } from "./queryRanker";

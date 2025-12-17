@@ -5,8 +5,8 @@
 import type { TrainingBatch } from '../../shared/modelTypes';
 
 export class GANTrainer {
-  train(data: unknown): void {
-    console.log('Training generative-adversarial-network...');
+  train(data: any): void {
+    console.log("Training generative-adversarial-network...");
   }
 }
 

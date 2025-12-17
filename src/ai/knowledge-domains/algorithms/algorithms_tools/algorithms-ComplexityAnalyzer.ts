@@ -30,9 +30,9 @@ export class AlgorithmsComplexityAnalyzer {
     }
 
     return {
-      timeComplexity: 'O(n)',
-      spaceComplexity: 'O(1)',
-      confidence: 0.3,
+      timeComplexity: "O(n)",
+      spaceComplexity: "O(1)",
+      confidence: 0.5,
     };
   }
 }

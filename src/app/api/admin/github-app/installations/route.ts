@@ -1,7 +1,7 @@
 /**
  * File: src/app/api/admin/github-app/installations/route.ts
  * Purpose: List GitHub App installations
- * 
+ *
  * GET - Retrieve all installations for the GitHub App
  */
 
@@ -16,15 +16,18 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     // Get JWT token from internal endpoint
-    const jwtResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/admin/github-app/jwt`, {
-      method: "POST",
-    });
+    const jwtResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/admin/github-app/jwt`,
+      {
+        method: "POST",
+      },
+    );
 
     if (!jwtResponse.ok) {
       const error = await jwtResponse.json();
       return NextResponse.json(
         { error: error.error || "Failed to generate JWT" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -44,7 +47,7 @@ export async function GET() {
       console.error("GitHub API error:", errorText);
       return NextResponse.json(
         { error: "Failed to fetch installations from GitHub" },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -65,7 +68,7 @@ export async function GET() {
     console.error("Failed to get installations:", error);
     return NextResponse.json(
       { error: "Failed to retrieve installations" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,7 +1,7 @@
 /**
  * File: src/app/api/admin/github-app/jwt/route.ts
  * Purpose: Generate GitHub App JWT for authentication
- * 
+ *
  * POST - Create a JWT token signed with the app's private key
  */
 
@@ -21,8 +21,11 @@ export async function POST() {
 
     if (!appId || !privateKey) {
       return NextResponse.json(
-        { error: "GitHub App credentials not configured. Set GITHUB_APP_ID and GITHUB_APP_PRIVATE_KEY environment variables." },
-        { status: 500 }
+        {
+          error:
+            "GitHub App credentials not configured. Set GITHUB_APP_ID and GITHUB_APP_PRIVATE_KEY environment variables.",
+        },
+        { status: 500 },
       );
     }
 
@@ -51,7 +54,7 @@ export async function POST() {
     console.error("Failed to generate JWT:", error);
     return NextResponse.json(
       { error: "Failed to generate JWT token" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

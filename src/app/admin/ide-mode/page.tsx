@@ -6,12 +6,24 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { IDEModeSettings } from "@/ai/shared/types/adminSettings";
 
 export default function IDEModePage() {
@@ -48,14 +60,16 @@ export default function IDEModePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
-      
+
       if (!response.ok) throw new Error("Failed to save settings");
-      
+
       const updated = await response.json();
       setSettings(updated);
       alert("Settings saved successfully!");
     } catch (err) {
-      alert(`Failed to save: ${err instanceof Error ? err.message : "Unknown error"}`);
+      alert(
+        `Failed to save: ${err instanceof Error ? err.message : "Unknown error"}`,
+      );
     } finally {
       setSaving(false);
     }
@@ -88,7 +102,9 @@ export default function IDEModePage() {
             <Switch
               id="ide-enabled"
               checked={settings.enabled}
-              onCheckedChange={(checked) => setSettings({ ...settings, enabled: checked })}
+              onCheckedChange={(checked) =>
+                setSettings({ ...settings, enabled: checked })
+              }
             />
           </div>
         </CardContent>
@@ -110,7 +126,10 @@ export default function IDEModePage() {
               onCheckedChange={(checked) =>
                 setSettings({
                   ...settings,
-                  features: { ...settings.features, enableCodeCompletion: checked },
+                  features: {
+                    ...settings.features,
+                    enableCodeCompletion: checked,
+                  },
                 })
               }
             />
@@ -158,7 +177,10 @@ export default function IDEModePage() {
               onCheckedChange={(checked) =>
                 setSettings({
                   ...settings,
-                  features: { ...settings.features, enableGitIntegration: checked },
+                  features: {
+                    ...settings.features,
+                    enableGitIntegration: checked,
+                  },
                 })
               }
             />

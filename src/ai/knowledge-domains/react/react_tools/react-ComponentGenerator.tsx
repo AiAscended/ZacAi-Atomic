@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 /**
  * File: src/ai/data/react/tools/react-ComponentGenerator.ts
@@ -27,19 +27,28 @@ export function generateReactComponent(
       ? `interface ${componentName}Props {\n${Object.entries(props)
           .map(([key, type]) => `  ${key}: ${type};`)
           .join("\n")}\n}\n\n`
-      : ""
+      : "";
 
-  const propsParam = Object.keys(props).length > 0 ? `{ ${Object.keys(props).join(", ")} }: ${componentName}Props` : ""
+  const propsParam =
+    Object.keys(props).length > 0
+      ? `{ ${Object.keys(props).join(", ")} }: ${componentName}Props`
+      : "";
 
-  const imports = ["import React"]
-  if (hasState) imports.push("useState")
-  if (hasEffect) imports.push("useEffect")
+  const imports = ["import React"];
+  if (hasState) imports.push("useState");
+  if (hasEffect) imports.push("useEffect");
 
   const importStatement =
-    imports.length > 1 ? `import React, { ${imports.slice(1).join(", ")} } from 'react';` : `import React from 'react';`
+    imports.length > 1
+      ? `import React, { ${imports.slice(1).join(", ")} } from 'react';`
+      : `import React from 'react';`;
 
-  const stateCode = hasState ? `\n  const [state, setState] = useState<string>('');` : ""
-  const effectCode = hasEffect ? `\n\n  useEffect(() => {\n    // Effect logic here\n  }, []);` : ""
+  const stateCode = hasState
+    ? `\n  const [state, setState] = useState<string>('');`
+    : "";
+  const effectCode = hasEffect
+    ? `\n\n  useEffect(() => {\n    // Effect logic here\n  }, []);`
+    : "";
 
   return `${importStatement}
 
@@ -53,7 +62,7 @@ ${propsInterface}export const ${componentName} = (${propsParam}) => {${stateCode
 };
 
 export default ${componentName};
-`
+`;
 }
 
 /**
@@ -62,9 +71,12 @@ export default ${componentName};
  * @param returnType - TypeScript return type
  * @returns Generated custom hook code
  */
-export function generateReactHook(hookName: string, returnType = "void"): string {
+export function generateReactHook(
+  hookName: string,
+  returnType = "void",
+): string {
   if (!hookName.startsWith("use")) {
-    hookName = "use" + hookName.charAt(0).toUpperCase() + hookName.slice(1)
+    hookName = "use" + hookName.charAt(0).toUpperCase() + hookName.slice(1);
   }
 
   return `import { useState, useEffect } from 'react';
@@ -80,5 +92,5 @@ export const ${hookName} = (): ${returnType} => {
 };
 
 export default ${hookName};
-`
+`;
 }

@@ -83,6 +83,6 @@ export const CODE_REVIEW_CORE_TOKENS = [
   "TOKEN_18",
   "TOKEN_19",
   "TOKEN_20",
-]
+];
 
-export default CODE_REVIEW_CORE_TOKENS
+export default CODE_REVIEW_CORE_TOKENS;

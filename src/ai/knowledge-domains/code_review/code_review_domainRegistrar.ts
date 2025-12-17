@@ -6,9 +6,9 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import meta from "./code_review_seeds/code_review_meta.json"
-import { CODE_REVIEW_DOMAIN } from "./code_review_constants"
+import meta from "./code_review_seeds/code_review_meta.json";
+import { CODE_REVIEW_DOMAIN } from "./code_review_constants";
 
-export const getDomainMeta = () => ({ ...meta, name: CODE_REVIEW_DOMAIN })
+export const getDomainMeta = () => ({ ...meta, name: CODE_REVIEW_DOMAIN });
 
-export default getDomainMeta
+export default getDomainMeta;

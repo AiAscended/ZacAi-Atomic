@@ -43,7 +43,7 @@ export const DATA_STRUCTURES_CORE_TOKENS = [
   "<SYS_DATA_STRUCTURES>",
   "DATA_STRUCTURES_BASE",
   "DATA_STRUCTURES_SYS_TOKEN",
-]
+];
 
 /**
  * Production-ready data structure token analysis
@@ -52,12 +52,16 @@ export const DATA_STRUCTURES_CORE_TOKENS = [
  */
 export const analyzeDataStructureTokens = (tokens: string[]) => {
   const structures = {
-    arrays: tokens.filter((t) => /array|list|\[\]/.test(t.toLowerCase())).length,
-    trees: tokens.filter((t) => /tree|node|binary|bst/.test(t.toLowerCase())).length,
-    graphs: tokens.filter((t) => /graph|vertex|edge/.test(t.toLowerCase())).length,
-    hashTables: tokens.filter((t) => /hash|map|dict/.test(t.toLowerCase())).length,
-  }
-  return structures
-}
+    arrays: tokens.filter((t) => /array|list|\[\]/.test(t.toLowerCase()))
+      .length,
+    trees: tokens.filter((t) => /tree|node|binary|bst/.test(t.toLowerCase()))
+      .length,
+    graphs: tokens.filter((t) => /graph|vertex|edge/.test(t.toLowerCase()))
+      .length,
+    hashTables: tokens.filter((t) => /hash|map|dict/.test(t.toLowerCase()))
+      .length,
+  };
+  return structures;
+};
 
-export default DATA_STRUCTURES_CORE_TOKENS
+export default DATA_STRUCTURES_CORE_TOKENS;

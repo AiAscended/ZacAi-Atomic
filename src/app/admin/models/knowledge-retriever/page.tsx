@@ -3,13 +3,13 @@
  * RAG system for retrieving relevant knowledge
  */
 
-"use client"
+"use client";
 
-import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage"
+import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage";
 
 export default function KnowledgeRetrieverPage() {
   return (
-    <ModelSettingsPage 
+    <ModelSettingsPage
       modelName="knowledge-retriever"
       modelTitle="Knowledge Retriever"
       modelDescription="RAG system that retrieves relevant knowledge from vector databases"
@@ -18,8 +18,8 @@ export default function KnowledgeRetrieverPage() {
         similarityThreshold: 0.75,
         vectorDimensions: 768,
         embeddingModel: "text-embedding-ada-002",
-        rerankResults: true
+        rerankResults: true,
       }}
     />
-  )
+  );
 }

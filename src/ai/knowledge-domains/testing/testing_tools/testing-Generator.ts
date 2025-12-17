@@ -21,22 +21,18 @@ const frameworkTemplates: Record<string, { describe: string; assertion: string }
 }
 
 export class TestingGenerator {
-  generate(code: string, framework: string = "jest"): GeneratedTestSuite {
-    const template = frameworkTemplates[framework.toLowerCase()] ?? frameworkTemplates.jest
-    const suite = `${template.describe}("Auto-generated tests", () => {
-  it("should execute core logic", () => {
-    const result = /* invoke subject under test */ null
-    ${template.assertion}(result).toBeDefined()
-  })
-})`
-
-    const coverage = code.trim().length ? 0.35 : 0
-
+  generate(
+    _code: string,
+    _framework: string = "jest",
+  ): {
+    tests: string;
+    coverage: number;
+  } {
+    // Placeholder implementation
     return {
-      tests: suite,
-      coverage,
-      framework: framework.toLowerCase(),
-    }
+      tests: "",
+      coverage: 0,
+    };
   }
 }
 

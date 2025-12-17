@@ -99,6 +99,6 @@ export const SCIENCE_CORE_TOKENS = [
   "TOKEN_28",
   "TOKEN_29",
   "TOKEN_30",
-]
+];
 
-export default SCIENCE_CORE_TOKENS
+export default SCIENCE_CORE_TOKENS;

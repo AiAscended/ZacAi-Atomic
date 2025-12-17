@@ -43,15 +43,20 @@ export const VERSION_CONTROL_CORE_TOKENS = [
   "<SYS_VERSION_CONTROL>",
   "VERSION_CONTROL_BASE",
   "VERSION_CONTROL_SYS_TOKEN",
-]
+];
 
 export const analyzeVersionControlTokens = (tokens: string[]) => {
   const operations = {
-    commits: tokens.filter((t) => /commit|push|pull/.test(t.toLowerCase())).length,
-    branching: tokens.filter((t) => /branch|checkout|merge/.test(t.toLowerCase())).length,
-    conflicts: tokens.filter((t) => /conflict|resolve|rebase/.test(t.toLowerCase())).length,
-  }
-  return operations
-}
+    commits: tokens.filter((t) => /commit|push|pull/.test(t.toLowerCase()))
+      .length,
+    branching: tokens.filter((t) =>
+      /branch|checkout|merge/.test(t.toLowerCase()),
+    ).length,
+    conflicts: tokens.filter((t) =>
+      /conflict|resolve|rebase/.test(t.toLowerCase()),
+    ).length,
+  };
+  return operations;
+};
 
-export default VERSION_CONTROL_CORE_TOKENS
+export default VERSION_CONTROL_CORE_TOKENS;

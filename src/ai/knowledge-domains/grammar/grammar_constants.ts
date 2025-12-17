@@ -6,5 +6,6 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-export const GRAMMAR_DOMAIN = "grammar"
-export const GRAMMAR_VOCAB_PATH = "/src/ai/knowledge-domains/grammar/grammar_seeds/grammar_seedVocabulary.json"
+export const GRAMMAR_DOMAIN = "grammar";
+export const GRAMMAR_VOCAB_PATH =
+  "/src/ai/knowledge-domains/grammar/grammar_seeds/grammar_seedVocabulary.json";

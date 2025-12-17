@@ -20,7 +20,8 @@ export class DifferentiableMemory<V> {
     for (let i = 0; i < this.keys.length; i++) {
       const k = this.keys[i];
       let s = 0;
-      for (let j = 0; j < Math.min(k.length, query.length); j++) s += k[j] * query[j];
+      for (let j = 0; j < Math.min(k.length, query.length); j++)
+        s += k[j] * query[j];
       if (i === 0 || s > best) {
         best = s;
         bestIdx = i;

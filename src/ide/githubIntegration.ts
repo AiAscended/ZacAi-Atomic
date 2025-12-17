@@ -1,5 +1,5 @@
-import { Octokit } from '@octokit/rest';
-import { vfs } from './virtualFileSystem';
+import { Octokit } from "@octokit/rest";
+import { vfs } from "./virtualFileSystem";
 
 interface GitHubRepo {
   owner: string;
@@ -11,7 +11,7 @@ interface GitHubFile {
   path: string;
   content: string;
   sha: string;
-  type: 'file' | 'dir' | 'symlink' | 'submodule';
+  type: "file" | "dir" | "symlink" | "submodule";
 }
 
 type RepoContentItem = {
@@ -39,7 +39,7 @@ class GitHubIntegration {
     return this.octokit !== null;
   }
 
-  setCurrentRepo(owner: string, repo: string, branch: string = 'main') {
+  setCurrentRepo(owner: string, repo: string, branch: string = "main") {
     this.currentRepo = { owner, repo, branch };
   }
 
@@ -48,19 +48,19 @@ class GitHubIntegration {
   }
 
   async getUserInfo() {
-    if (!this.octokit) throw new Error('Not authenticated');
+    if (!this.octokit) throw new Error("Not authenticated");
     const { data } = await this.octokit.users.getAuthenticated();
     return data;
   }
 
   async listRepositories(page: number = 1, perPage: number = 30) {
-    if (!this.octokit) throw new Error('Not authenticated');
-    
+    if (!this.octokit) throw new Error("Not authenticated");
+
     const { data } = await this.octokit.repos.listForAuthenticatedUser({
       page,
       per_page: perPage,
-      sort: 'updated',
-      direction: 'desc',
+      sort: "updated",
+      direction: "desc",
     });
 
     return data.map((repo) => ({
@@ -80,10 +80,10 @@ class GitHubIntegration {
   async getRepositoryContents(
     owner: string,
     repo: string,
-    path: string = '',
-    ref?: string
+    path: string = "",
+    ref?: string,
   ): Promise<GitHubFile[]> {
-    if (!this.octokit) throw new Error('Not authenticated');
+    if (!this.octokit) throw new Error("Not authenticated");
 
     const { data } = await this.octokit.repos.getContent({
       owner,
@@ -92,14 +92,14 @@ class GitHubIntegration {
       ref,
     });
 
-    if ('content' in data && !Array.isArray(data)) {
+    if ("content" in data && !Array.isArray(data)) {
       // Single file with content
       return [
         {
           path: data.path,
           content: atob(data.content),
           sha: data.sha,
-          type: 'file',
+          type: "file",
         },
       ];
     }
@@ -108,20 +108,22 @@ class GitHubIntegration {
       // Directory listing
       return data.map((item) => ({
         path: item.path,
-        content: '',
+        content: "",
         sha: item.sha,
         type: item.type,
       }));
     }
 
     if (!Array.isArray(data)) {
-        // Handles cases like submodules or files without content property
-        return [{
-            path: data.path,
-            content: '',
-            sha: data.sha,
-            type: data.type,
-        }];
+      // Handles cases like submodules or files without content property
+      return [
+        {
+          path: data.path,
+          content: "",
+          sha: data.sha,
+          type: data.type,
+        },
+      ];
     }
 
     return [];
@@ -131,9 +133,9 @@ class GitHubIntegration {
     owner: string,
     repo: string,
     path: string,
-    ref?: string
+    ref?: string,
   ): Promise<string> {
-    if (!this.octokit) throw new Error('Not authenticated');
+    if (!this.octokit) throw new Error("Not authenticated");
 
     const { data } = await this.octokit.repos.getContent({
       owner,
@@ -142,15 +144,19 @@ class GitHubIntegration {
       ref,
     });
 
-    if (Array.isArray(data) || !('content' in data)) {
-      throw new Error('Path is a directory or does not have content.');
+    if (Array.isArray(data) || !("content" in data)) {
+      throw new Error("Path is a directory or does not have content.");
     }
 
     return atob(contentData.content);
   }
 
-  async cloneRepositoryToVFS(owner: string, repo: string, branch: string = 'main') {
-    if (!this.octokit) throw new Error('Not authenticated');
+  async cloneRepositoryToVFS(
+    owner: string,
+    repo: string,
+    branch: string = "main",
+  ) {
+    if (!this.octokit) throw new Error("Not authenticated");
 
     this.setCurrentRepo(owner, repo, branch);
 
@@ -159,7 +165,7 @@ class GitHubIntegration {
       owner,
       repo,
       tree_sha: branch,
-      recursive: '1',
+      recursive: "1",
     });
 
     // Clear existing VFS and create root directory
@@ -167,21 +173,26 @@ class GitHubIntegration {
     await vfs.createDirectory(`/${repo}`);
 
     if (!tree.tree) {
-        console.warn('Repository tree is empty.');
-        return `/${repo}`;
+      console.warn("Repository tree is empty.");
+      return `/${repo}`;
     }
 
     // Download and create all files
     for (const item of tree.tree) {
       if (!item.path) continue; // Skip items without a path
 
-      if (item.type === 'tree') {
+      if (item.type === "tree") {
         // Directory
         await vfs.createDirectory(`/${repo}/${item.path}`);
-      } else if (item.type === 'blob') {
+      } else if (item.type === "blob") {
         // File
         try {
-          const content = await this.getFileContent(owner, repo, item.path, branch);
+          const content = await this.getFileContent(
+            owner,
+            repo,
+            item.path,
+            branch,
+          );
           await vfs.createFile(`/${repo}/${item.path}`, content);
         } catch (error) {
           console.error(`Failed to download file: ${item.path}`, error);
@@ -193,8 +204,8 @@ class GitHubIntegration {
   }
 
   async createFile(path: string, content: string, message: string) {
-    if (!this.octokit) throw new Error('Not authenticated');
-    if (!this.currentRepo) throw new Error('No repository selected');
+    if (!this.octokit) throw new Error("Not authenticated");
+    if (!this.currentRepo) throw new Error("No repository selected");
 
     const { owner, repo, branch } = this.currentRepo;
 
@@ -208,9 +219,14 @@ class GitHubIntegration {
     });
   }
 
-  async updateFile(path: string, content: string, message: string, sha: string) {
-    if (!this.octokit) throw new Error('Not authenticated');
-    if (!this.currentRepo) throw new Error('No repository selected');
+  async updateFile(
+    path: string,
+    content: string,
+    message: string,
+    sha: string,
+  ) {
+    if (!this.octokit) throw new Error("Not authenticated");
+    if (!this.currentRepo) throw new Error("No repository selected");
 
     const { owner, repo, branch } = this.currentRepo;
 
@@ -226,8 +242,8 @@ class GitHubIntegration {
   }
 
   async deleteFile(path: string, message: string, sha: string) {
-    if (!this.octokit) throw new Error('Not authenticated');
-    if (!this.currentRepo) throw new Error('No repository selected');
+    if (!this.octokit) throw new Error("Not authenticated");
+    if (!this.currentRepo) throw new Error("No repository selected");
 
     const { owner, repo, branch } = this.currentRepo;
 
@@ -242,7 +258,7 @@ class GitHubIntegration {
   }
 
   async listBranches(owner: string, repo: string) {
-    if (!this.octokit) throw new Error('Not authenticated');
+    if (!this.octokit) throw new Error("Not authenticated");
 
     const { data } = await this.octokit.repos.listBranches({
       owner,
@@ -256,8 +272,13 @@ class GitHubIntegration {
     }));
   }
 
-  async createBranch(owner: string, repo: string, branchName: string, fromBranch: string = 'main') {
-    if (!this.octokit) throw new Error('Not authenticated');
+  async createBranch(
+    owner: string,
+    repo: string,
+    branchName: string,
+    fromBranch: string = "main",
+  ) {
+    if (!this.octokit) throw new Error("Not authenticated");
 
     // Get the SHA of the source branch
     const { data: ref } = await this.octokit.git.getRef({
@@ -275,8 +296,13 @@ class GitHubIntegration {
     });
   }
 
-  async listCommits(owner: string, repo: string, branch?: string, page: number = 1) {
-    if (!this.octokit) throw new Error('Not authenticated');
+  async listCommits(
+    owner: string,
+    repo: string,
+    branch?: string,
+    page: number = 1,
+  ) {
+    if (!this.octokit) throw new Error("Not authenticated");
 
     const { data } = await this.octokit.repos.listCommits({
       owner,
@@ -289,7 +315,7 @@ class GitHubIntegration {
     return data.map((commit) => ({
       sha: commit.sha,
       message: commit.commit.message,
-      author: commit.commit.author?.name ?? 'Unknown',
+      author: commit.commit.author?.name ?? "Unknown",
       date: commit.commit.author?.date,
       url: commit.html_url,
     }));
@@ -301,9 +327,9 @@ class GitHubIntegration {
     title: string,
     head: string,
     base: string,
-    body?: string
+    body?: string,
   ) {
-    if (!this.octokit) throw new Error('Not authenticated');
+    if (!this.octokit) throw new Error("Not authenticated");
 
     const { data } = await this.octokit.pulls.create({
       owner,
@@ -322,21 +348,21 @@ class GitHubIntegration {
   }
 
   async searchRepositories(query: string, page: number = 1) {
-    if (!this.octokit) throw new Error('Not authenticated');
+    if (!this.octokit) throw new Error("Not authenticated");
 
     const { data } = await this.octokit.search.repos({
       q: query,
       page,
       per_page: 20,
-      sort: 'stars',
-      order: 'desc',
+      sort: "stars",
+      order: "desc",
     });
 
     return data.items.map((repo) => ({
       id: repo.id,
       name: repo.name,
       fullName: repo.full_name,
-      owner: repo.owner?.login ?? 'Unknown',
+      owner: repo.owner?.login ?? "Unknown",
       description: repo.description,
       language: repo.language,
       stars: repo.stargazers_count,

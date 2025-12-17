@@ -4,7 +4,7 @@
  * Now uses shared vocabulary manager for consistent tokenization across all models
  */
 
-import { vocabularyManager } from '../../../shared/vocabulary/vocabularyManager';
+import { vocabularyManager } from "../../../shared/vocabulary/vocabularyManager";
 
 export class LLMTokenizer {
   private vocabulary: Map<string, number>;
@@ -13,13 +13,15 @@ export class LLMTokenizer {
 
   constructor(
     vocabulary?: Map<string, number>,
-    specialTokens?: Record<string, string>
+    specialTokens?: Record<string, string>,
   ) {
     // Use shared vocabulary if no custom vocabulary provided
     if (!vocabulary || vocabulary.size === 0) {
       this.vocabulary = vocabularyManager.getVocabulary();
       this.reverseVocabulary = vocabularyManager.getReverseVocabulary();
-      console.log(`[LLMTokenizer] Loaded shared vocabulary with ${this.vocabulary.size} tokens`);
+      console.log(
+        `[LLMTokenizer] Loaded shared vocabulary with ${this.vocabulary.size} tokens`,
+      );
     } else {
       this.vocabulary = vocabulary;
       this.reverseVocabulary = new Map();
@@ -27,12 +29,12 @@ export class LLMTokenizer {
         this.reverseVocabulary.set(id, token);
       });
     }
-    
+
     this.specialTokens = specialTokens || {
-      pad: '<PAD>',
-      bos: '<BOS>',
-      eos: '<EOS>',
-      unk: '<UNK>',
+      pad: "<PAD>",
+      bos: "<BOS>",
+      eos: "<EOS>",
+      unk: "<UNK>",
     };
   }
 
@@ -41,15 +43,22 @@ export class LLMTokenizer {
    */
   encode(text: string): number[] {
     const tokens = this.tokenize(text);
-    return tokens.map(token => this.vocabulary.get(token) ?? this.vocabulary.get(this.specialTokens.unk) ?? 3);
+    return tokens.map(
+      (token) =>
+        this.vocabulary.get(token) ??
+        this.vocabulary.get(this.specialTokens.unk) ??
+        3,
+    );
   }
 
   /**
    * Decode token IDs back into text
    */
   decode(tokenIds: number[]): string {
-    const tokens = tokenIds.map(id => this.reverseVocabulary.get(id) ?? this.specialTokens.unk);
-    return tokens.join(' ');
+    const tokens = tokenIds.map(
+      (id) => this.reverseVocabulary.get(id) ?? this.specialTokens.unk,
+    );
+    return tokens.join(" ");
   }
 
   /**
@@ -57,7 +66,10 @@ export class LLMTokenizer {
    */
   private tokenize(text: string): string[] {
     // Simple whitespace tokenization (placeholder)
-    return text.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+    return text
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((t) => t.length > 0);
   }
 
   /**

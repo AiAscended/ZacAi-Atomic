@@ -6,11 +6,15 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-export const PROGRAMMING_DOMAIN = "programming"
-export const PROGRAMMING_VOCAB_PATH = "/src/ai/knowledge-domains/programming/programming_seeds/programming_seedVocabulary.json"
-export const PROGRAMMING_LEARNED_DATA_PATH = "/src/ai/knowledge-domains/programming/programming_learned/programming_learnedData.json"
-export const PROGRAMMING_WEIGHTS_PATH = "/src/ai/knowledge-domains/programming/programming_weights/programming_pretrained_weights.json"
-export const PROGRAMMING_TRAINING_WEIGHTS_PATH = "/src/ai/knowledge-domains/programming/programming_weights/programming_trainingWeights.bin"
+export const PROGRAMMING_DOMAIN = "programming";
+export const PROGRAMMING_VOCAB_PATH =
+  "/src/ai/knowledge-domains/programming/programming_seeds/programming_seedVocabulary.json";
+export const PROGRAMMING_LEARNED_DATA_PATH =
+  "/src/ai/knowledge-domains/programming/programming_learned/programming_learnedData.json";
+export const PROGRAMMING_WEIGHTS_PATH =
+  "/src/ai/knowledge-domains/programming/programming_weights/programming_pretrained_weights.json";
+export const PROGRAMMING_TRAINING_WEIGHTS_PATH =
+  "/src/ai/knowledge-domains/programming/programming_weights/programming_trainingWeights.bin";
 
 // Programming concepts
 export const PROGRAMMING_CONCEPTS = [
@@ -39,7 +43,7 @@ export const PROGRAMMING_CONCEPTS = [
   "optimization",
   "design-pattern",
   "architecture",
-] as const
+] as const;
 
 export const PROGRAMMING_PARADIGMS = [
   "object-oriented",
@@ -49,7 +53,7 @@ export const PROGRAMMING_PARADIGMS = [
   "imperative",
   "event-driven",
   "reactive",
-] as const
+] as const;
 
 export const PROGRAMMING_LANGUAGES = [
   "javascript",
@@ -65,4 +69,4 @@ export const PROGRAMMING_LANGUAGES = [
   "php",
   "swift",
   "kotlin",
-] as const
+] as const;

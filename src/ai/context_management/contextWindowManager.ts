@@ -28,6 +28,6 @@ export class ContextWindowManager {
   }
 
   private tokenCount() {
-    return this.window.join(' ').split(/\s+/).length;
+    return this.window.join(" ").split(/\s+/).length;
   }
 }

@@ -1,7 +1,7 @@
 /**
  * File: src/ai/models/modelRegistry.ts
  * Purpose: Auto-discover and register AI models dynamically
- * 
+ *
  * Features:
  * - Scans src/ai/models/ for model directories
  * - Validates model structure (seeds, weights, tokenizer, config)
@@ -19,12 +19,20 @@ import * as path from "path";
 
 export interface ModelManifest {
   modelId: string;
-  modelType: "llm" | "cnn" | "rnn" | "transformer" | "gan" | "diffusion" | "multimodal" | "other";
+  modelType:
+    | "llm"
+    | "cnn"
+    | "rnn"
+    | "transformer"
+    | "gan"
+    | "diffusion"
+    | "multimodal"
+    | "other";
   version: string;
   displayName: string;
   description: string;
   enabled: boolean;
-  
+
   // Required structure
   structure: {
     hasSeedsFolder: boolean;
@@ -33,7 +41,7 @@ export interface ModelManifest {
     hasInferenceEngine: boolean;
     hasTrainingPipeline: boolean;
   };
-  
+
   // File paths (relative to model folder)
   paths: {
     seedsPath?: string;
@@ -45,7 +53,7 @@ export interface ModelManifest {
     trainingPipelinePath?: string;
     scriptsPath?: string;
   };
-  
+
   // Metadata
   metadata: {
     tokensCount?: number;
@@ -91,7 +99,7 @@ const REQUIRED_PATTERNS = {
 
 export class ModelScanner {
   private registry: ModelRegistry;
-  
+
   constructor() {
     this.registry = {
       version: "1.0.0",
@@ -101,21 +109,21 @@ export class ModelScanner {
       totalModels: 0,
     };
   }
-  
+
   /**
    * Scan all models in src/ai/models/
    */
   async scanModels(): Promise<ModelRegistry> {
     console.log("🔍 Scanning for AI models...");
-    
+
     try {
       const entries = await fs.readdir(MODELS_DIR, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         if (!entry.isDirectory() || SKIP_FOLDERS.includes(entry.name)) {
           continue;
         }
-        
+
         try {
           const manifest = await this.scanModelDirectory(entry.name);
           if (manifest) {
@@ -128,71 +136,95 @@ export class ModelScanner {
           console.warn(`⚠️  Failed to scan model: ${entry.name}`, error);
         }
       }
-      
+
       this.registry.totalModels = Object.keys(this.registry.models).length;
       this.registry.lastScanned = new Date().toISOString();
-      
+
       console.log(`✅ Found ${this.registry.totalModels} models`);
-      
+
       return this.registry;
     } catch (error) {
       console.error("❌ Failed to scan models directory:", error);
       throw error;
     }
   }
-  
+
   /**
    * Scan individual model directory
    */
-  private async scanModelDirectory(modelFolderName: string): Promise<ModelManifest | null> {
+  private async scanModelDirectory(
+    modelFolderName: string,
+  ): Promise<ModelManifest | null> {
     const modelPath = path.join(MODELS_DIR, modelFolderName);
-    
+
     console.log(`  📦 Scanning: ${modelFolderName}`);
-    
+
     // Read directory contents
     const files = await this.readDirectoryRecursive(modelPath);
-    
+
     // Detect model type from folder name
     const modelType = this.detectModelType(modelFolderName);
-    
+
     // Check structure
     const structure = {
-      hasSeedsFolder: files.some(f => f.includes("seed") || f.includes("vocab")),
-      hasWeightsFolder: files.some(f => f.includes("weight")),
-      hasTokenizerConfig: files.some(f => REQUIRED_PATTERNS.tokenizer.test(f)),
-      hasInferenceEngine: files.some(f => REQUIRED_PATTERNS.inference.test(f)),
-      hasTrainingPipeline: files.some(f => REQUIRED_PATTERNS.training.test(f)),
+      hasSeedsFolder: files.some(
+        (f) => f.includes("seed") || f.includes("vocab"),
+      ),
+      hasWeightsFolder: files.some((f) => f.includes("weight")),
+      hasTokenizerConfig: files.some((f) =>
+        REQUIRED_PATTERNS.tokenizer.test(f),
+      ),
+      hasInferenceEngine: files.some((f) =>
+        REQUIRED_PATTERNS.inference.test(f),
+      ),
+      hasTrainingPipeline: files.some((f) =>
+        REQUIRED_PATTERNS.training.test(f),
+      ),
     };
-    
+
     // Build paths
     const paths: ModelManifest["paths"] = {
-      seedsPath: files.find(f => f.includes("seed") && f.endsWith(".json")),
-      pretrainedWeightsPath: files.find(f => f.includes("pretrained") && f.includes("weight")),
-      finetunedWeightsPath: files.find(f => f.includes("finetuned") && f.includes("weight")),
-      tokenizerConfigPath: files.find(f => REQUIRED_PATTERNS.tokenizer.test(f) && f.endsWith(".json")),
-      baseTokensPath: files.find(f => REQUIRED_PATTERNS.baseTokens.test(f) && f.endsWith(".json")),
-      inferenceEnginePath: files.find(f => REQUIRED_PATTERNS.inference.test(f) && f.endsWith(".ts")),
-      trainingPipelinePath: files.find(f => REQUIRED_PATTERNS.training.test(f) && f.endsWith(".ts")),
-      scriptsPath: files.find(f => f.includes("scripts")),
+      seedsPath: files.find((f) => f.includes("seed") && f.endsWith(".json")),
+      pretrainedWeightsPath: files.find(
+        (f) => f.includes("pretrained") && f.includes("weight"),
+      ),
+      finetunedWeightsPath: files.find(
+        (f) => f.includes("finetuned") && f.includes("weight"),
+      ),
+      tokenizerConfigPath: files.find(
+        (f) => REQUIRED_PATTERNS.tokenizer.test(f) && f.endsWith(".json"),
+      ),
+      baseTokensPath: files.find(
+        (f) => REQUIRED_PATTERNS.baseTokens.test(f) && f.endsWith(".json"),
+      ),
+      inferenceEnginePath: files.find(
+        (f) => REQUIRED_PATTERNS.inference.test(f) && f.endsWith(".ts"),
+      ),
+      trainingPipelinePath: files.find(
+        (f) => REQUIRED_PATTERNS.training.test(f) && f.endsWith(".ts"),
+      ),
+      scriptsPath: files.find((f) => f.includes("scripts")),
     };
-    
+
     // Check for base tokens
     const hasBaseTokens = !!paths.baseTokensPath;
     let baseTokensCount = 0;
-    
+
     if (hasBaseTokens && paths.baseTokensPath) {
       try {
         const baseTokensContent = await fs.readFile(
           path.join(MODELS_DIR, modelFolderName, paths.baseTokensPath),
-          "utf8"
+          "utf8",
         );
         const baseTokens = JSON.parse(baseTokensContent);
-        baseTokensCount = Array.isArray(baseTokens) ? baseTokens.length : Object.keys(baseTokens).length;
+        baseTokensCount = Array.isArray(baseTokens)
+          ? baseTokens.length
+          : Object.keys(baseTokens).length;
       } catch {
         // Ignore parse errors
       }
     }
-    
+
     // Build manifest
     const manifest: ModelManifest = {
       modelId: modelFolderName,
@@ -210,27 +242,32 @@ export class ModelScanner {
         discoveredAt: new Date().toISOString(),
       },
     };
-    
+
     return manifest;
   }
-  
+
   /**
    * Recursively read directory files
    */
-  private async readDirectoryRecursive(dir: string, basePath: string = ""): Promise<string[]> {
+  private async readDirectoryRecursive(
+    dir: string,
+    basePath: string = "",
+  ): Promise<string[]> {
     const files: string[] = [];
-    
+
     try {
       const entries = await fs.readdir(dir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
-        const relativePath = basePath ? `${basePath}/${entry.name}` : entry.name;
-        
+        const relativePath = basePath
+          ? `${basePath}/${entry.name}`
+          : entry.name;
+
         if (entry.isDirectory()) {
           if (!SKIP_FOLDERS.includes(entry.name)) {
             const subFiles = await this.readDirectoryRecursive(
               path.join(dir, entry.name),
-              relativePath
+              relativePath,
             );
             files.push(...subFiles);
           }
@@ -241,23 +278,33 @@ export class ModelScanner {
     } catch (error) {
       console.warn(`[ModelScanner] Unable to read directory ${dir}`, error)
     }
-    
+
     return files;
   }
-  
+
   /**
    * Detect model type from folder name
    */
   private detectModelType(folderName: string): ModelManifest["modelType"] {
     const lower = folderName.toLowerCase();
-    
-    if (lower.includes("llm") || lower.includes("transformer") || lower.includes("gpt") || lower.includes("bert")) {
+
+    if (
+      lower.includes("llm") ||
+      lower.includes("transformer") ||
+      lower.includes("gpt") ||
+      lower.includes("bert")
+    ) {
       return "llm";
     }
     if (lower.includes("cnn") || lower.includes("convolutional")) {
       return "cnn";
     }
-    if (lower.includes("rnn") || lower.includes("recurrent") || lower.includes("lstm") || lower.includes("gru")) {
+    if (
+      lower.includes("rnn") ||
+      lower.includes("recurrent") ||
+      lower.includes("lstm") ||
+      lower.includes("gru")
+    ) {
       return "rnn";
     }
     if (lower.includes("gan") || lower.includes("adversarial")) {
@@ -269,20 +316,20 @@ export class ModelScanner {
     if (lower.includes("multi-modal") || lower.includes("multimodal")) {
       return "multimodal";
     }
-    
+
     return "other";
   }
-  
+
   /**
    * Format display name from folder name
    */
   private formatDisplayName(folderName: string): string {
     return folderName
       .split("-")
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   }
-  
+
   /**
    * Save registry to file
    */
@@ -291,7 +338,7 @@ export class ModelScanner {
       await fs.writeFile(
         REGISTRY_FILE,
         JSON.stringify(this.registry, null, 2),
-        "utf8"
+        "utf8",
       );
       console.log(`💾 Registry saved to ${REGISTRY_FILE}`);
     } catch (error) {
@@ -299,7 +346,7 @@ export class ModelScanner {
       throw error;
     }
   }
-  
+
   /**
    * Load existing registry
    */
@@ -311,7 +358,7 @@ export class ModelScanner {
       return null;
     }
   }
-  
+
   /**
    * Get registry
    */
@@ -340,19 +387,21 @@ let cachedRegistry: ModelRegistry | null = null;
 /**
  * Get model registry (cached)
  */
-export async function getModelRegistry(forceRefresh = false): Promise<ModelRegistry> {
+export async function getModelRegistry(
+  forceRefresh = false,
+): Promise<ModelRegistry> {
   if (cachedRegistry && !forceRefresh) {
     return cachedRegistry;
   }
-  
+
   // Try to load from file first
   const existing = await ModelScanner.loadRegistry();
-  
+
   if (existing && !forceRefresh) {
     cachedRegistry = existing;
     return existing;
   }
-  
+
   // Scan and rebuild
   const registry = await scanAndUpdateRegistry();
   cachedRegistry = registry;
@@ -364,7 +413,9 @@ export async function getModelRegistry(forceRefresh = false): Promise<ModelRegis
  */
 export async function getEnabledModels(): Promise<ModelManifest[]> {
   const registry = await getModelRegistry();
-  return registry.enabledModels.map(id => registry.models[id]).filter(Boolean);
+  return registry.enabledModels
+    .map((id) => registry.models[id])
+    .filter(Boolean);
 }
 
 /**

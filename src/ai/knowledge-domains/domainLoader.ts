@@ -6,23 +6,23 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { domainRegistry, type DomainMetadata } from "./domainRegistry"
-import * as englishAPI from "./english/english_integrationAPI"
-import * as mathematicsAPI from "./mathematics/mathematics_integrationAPI"
-import * as typescriptAPI from "./typescript/typescript_integrationAPI"
-import * as generalAPI from "./general_knowledge/general_knowledge_integrationAPI"
-import * as internetSearchAPI from "./internet_search/internet_search_integrationAPI"
-import * as grammarAPI from "./grammar/grammar_integrationAPI"
-import * as scienceAPI from "./science/science_integrationAPI"
-import * as codeReviewAPI from "./code_review/code_review_integrationAPI"
-import * as errorDetectionAPI from "./error_detection/error_detection_integrationAPI"
-import * as testingAPI from "./testing/testing_integrationAPI"
-import * as documentationAPI from "./documentation/documentation_integrationAPI"
-import * as securityAPI from "./security/security_integrationAPI"
-import * as dataStructuresAPI from "./data_structures/data_structures_integrationAPI"
-import * as algorithmsAPI from "./algorithms/algorithms_integrationAPI"
-import * as versionControlAPI from "./version_control/version_control_integrationAPI"
-import * as environmentAPI from "./environment/environment_integrationAPI"
+import { domainRegistry, type DomainMetadata } from "./domainRegistry";
+import * as englishAPI from "./english/english_integrationAPI";
+import * as mathematicsAPI from "./mathematics/mathematics_integrationAPI";
+import * as typescriptAPI from "./typescript/typescript_integrationAPI";
+import * as generalAPI from "./general_knowledge/general_knowledge_integrationAPI";
+import * as internetSearchAPI from "./internet_search/internet_search_integrationAPI";
+import * as grammarAPI from "./grammar/grammar_integrationAPI";
+import * as scienceAPI from "./science/science_integrationAPI";
+import * as codeReviewAPI from "./code_review/code_review_integrationAPI";
+import * as errorDetectionAPI from "./error_detection/error_detection_integrationAPI";
+import * as testingAPI from "./testing/testing_integrationAPI";
+import * as documentationAPI from "./documentation/documentation_integrationAPI";
+import * as securityAPI from "./security/security_integrationAPI";
+import * as dataStructuresAPI from "./data_structures/data_structures_integrationAPI";
+import * as algorithmsAPI from "./algorithms/algorithms_integrationAPI";
+import * as versionControlAPI from "./version_control/version_control_integrationAPI";
+import * as environmentAPI from "./environment/environment_integrationAPI";
 
 /**
  * Domain configurations with metadata
@@ -138,18 +138,18 @@ const domainConfigs: DomainMetadata[] = [
     enabled: true,
   },
   // ... Continue for all 16 domains
-]
+];
 
 /**
  * Load and register all domains
  */
 export async function loadAllDomains(): Promise<void> {
   for (const config of domainConfigs) {
-    domainRegistry.registerDomain(config)
+    domainRegistry.registerDomain(config);
   }
 
-  console.log(`[DomainLoader] Loaded ${domainConfigs.length} domains`)
-  console.log("[DomainLoader] System stats:", domainRegistry.getStats())
+  console.log(`[DomainLoader] Loaded ${domainConfigs.length} domains`);
+  console.log("[DomainLoader] System stats:", domainRegistry.getStats());
 }
 
 /**
@@ -173,7 +173,7 @@ export function getDomainAPI(name: string): unknown {
     algorithms: algorithmsAPI,
     version_control: versionControlAPI,
     environment: environmentAPI,
-  }
+  };
 
-  return apis[name]
+  return apis[name];
 }

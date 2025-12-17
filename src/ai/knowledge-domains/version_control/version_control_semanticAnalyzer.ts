@@ -6,11 +6,15 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { versionControlParser } from "./version_control_parser"
+import { versionControlParser } from "./version_control_parser";
 
 export const versionControlSemanticAnalyzer = (code: string) => {
-  const tokens: string[] = []
+  const tokens: string[] = [];
   // Placeholder token array
-  const parsed = versionControlParser(code)
-  return { tokens, parsed, semanticScore: tokens.length * 0.1 + parsed.operations.length * 2 }
-}
+  const parsed = versionControlParser(code);
+  return {
+    tokens,
+    parsed,
+    semanticScore: tokens.length * 0.1 + parsed.operations.length * 2,
+  };
+};

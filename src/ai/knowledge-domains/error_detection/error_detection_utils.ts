@@ -8,19 +8,20 @@
 
 export const safeParseJSON = <T = unknown>(s: string, fallback: T): T => {
   try {
-    return JSON.parse(s) as T
-  } catch {
-    return fallback
+    return JSON.parse(s) as T;
+  } catch (e) {
+    return fallback;
   }
-}
+};
 
-export const normalizeText = (t: string) => t.replace(/\s+/g, " ").trim()
+export const normalizeText = (t: string) => t.replace(/\s+/g, " ").trim();
 
 export const detectSyntaxErrors = (code: string): string[] => {
-  const errors: string[] = []
-  const openBrackets = (code.match(/[{[(]/g) || []).length
-  const closeBrackets = (code.match(/[}\])]/g) || []).length
-  if (openBrackets !== closeBrackets) errors.push("UNCLOSED_BRACKET")
-  if (/\bfunction\s+\w+\s*$$[^)]*$$\s*(?!{)/.test(code)) errors.push("MISSING_FUNCTION_BODY")
-  return errors
-}
+  const errors: string[] = [];
+  const openBrackets = (code.match(/[{[(]/g) || []).length;
+  const closeBrackets = (code.match(/[}\])]/g) || []).length;
+  if (openBrackets !== closeBrackets) errors.push("UNCLOSED_BRACKET");
+  if (/\bfunction\s+\w+\s*$$[^)]*$$\s*(?!{)/.test(code))
+    errors.push("MISSING_FUNCTION_BODY");
+  return errors;
+};

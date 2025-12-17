@@ -1,17 +1,14 @@
 import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-const securityWeightsManager = createDomainWeightsManager({
-  domainName: "security",
-})
+import { storageAdapter } from "../storageAdapter";
 
-export const securityLoadWeights = async (): Promise<string | null> => {
-  return securityWeightsManager.loadWeights()
-}
-
-export const primeSecurityWeights = async (): Promise<string | null> => {
-  return securityWeightsManager.prime()
-}
-
-export const getSecurityActiveWeightArtifact = () => {
-  return securityWeightsManager.getActiveWeightArtifact()
-}
+export const securityLoadWeights = async (
+  path = "/src/ai/knowledge-domains/security/security_weights/security_trainingWeights.bin",
+) => {
+  try {
+    const raw = await storageAdapter.readFile(path);
+    return raw;
+  } catch (e) {
+    return null;
+  }
+};

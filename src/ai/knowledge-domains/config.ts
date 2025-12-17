@@ -9,11 +9,23 @@ import type { ScannerConfig } from "../shared/registry/moduleRegistry";
 export const domainScannerConfig: ScannerConfig = {
   scanDir: path.join(process.cwd(), "src", "ai", "knowledge-domains"),
   moduleType: "domain",
-  registryFile: path.join(process.cwd(), "src", "ai", "knowledge-domains", "DOMAIN_REGISTRY.json"),
-  
+  registryFile: path.join(
+    process.cwd(),
+    "src",
+    "ai",
+    "knowledge-domains",
+    "DOMAIN_REGISTRY.json",
+  ),
+
   skipFolders: ["shared", "node_modules", ".git"],
-  skipFiles: ["config.ts", "registry.ts", "domainScanner.ts", "registerAllDomains.ts", "DOMAIN_REGISTRY.json"],
-  
+  skipFiles: [
+    "config.ts",
+    "registry.ts",
+    "domainScanner.ts",
+    "registerAllDomains.ts",
+    "DOMAIN_REGISTRY.json",
+  ],
+
   requiredPatterns: {
     seedData: /seed.*data\.json/i,
     seedVocab: /seed.*vocab\.json/i,

@@ -17,10 +17,10 @@ export const charToIdMap = (input: string): Record<string, number> => {
 };
 
 export const characterTokenizer = (text: string): string[] => {
-  return text.split('');
+  return text.split("");
 };
 
 export const characterIds = (text: string): number[] => {
   const map = charToIdMap(text);
-  return text.split('').map((c) => map[c]);
+  return text.split("").map((c) => map[c]);
 };

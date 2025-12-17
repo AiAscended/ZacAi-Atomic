@@ -14,9 +14,9 @@
  */
 export function multiply(...numbers: number[]): number {
   if (numbers.length === 0) {
-    throw new Error("Multiplication requires at least one number")
+    throw new Error("Multiplication requires at least one number");
   }
-  return numbers.reduce((product, num) => product * num, 1)
+  return numbers.reduce((product, num) => product * num, 1);
 }
 
 /**
@@ -27,6 +27,6 @@ export function multiply(...numbers: number[]): number {
  * @returns Product with specified precision
  */
 export function multiplyPrecise(a: number, b: number, precision = 10): number {
-  const multiplier = Math.pow(10, precision)
-  return Math.round(a * b * multiplier) / multiplier
+  const multiplier = Math.pow(10, precision);
+  return Math.round(a * b * multiplier) / multiplier;
 }

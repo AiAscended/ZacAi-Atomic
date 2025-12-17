@@ -5,13 +5,13 @@
 import type { ModelConfig, ModelPayload } from "../../shared/modelTypes"
 
 export class MULTIMODALModel {
-  private config: unknown;
-  
-  constructor(config: unknown) {
+  private config: any;
+
+  constructor(config: any) {
     this.config = config;
   }
-  
-  forward(input: unknown): unknown {
+
+  forward(input: any): any {
     // Model forward pass implementation
     return input;
   }

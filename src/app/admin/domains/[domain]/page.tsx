@@ -4,32 +4,39 @@
  * Features: Load/save settings, dynamic domain routing, keyword management
  */
 
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { useParams } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
-import { Slider } from "@/components/ui/slider"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Upload, Download, Save, RefreshCw, X, Check, AlertCircle, RotateCcw } from "lucide-react"
-import type { ModuleManifest } from "@/ai/shared/registry/unifiedRegistry"
-import type { AdminConfig } from "@/ai/shared/config/instructionLoader"
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import {
+  Upload,
+  Download,
+  Save,
+  RefreshCw,
+  X,
+  Check,
+  AlertCircle,
+  RotateCcw,
+} from "lucide-react";
 
 interface DomainSettings {
-  enabled: boolean
-  confidenceThreshold: number
-  maxTokens: number
-  temperature: number
-  description: string
-  keywords: string[]
-  priority: number
-  updatedAt: string
+  enabled: boolean;
+  confidenceThreshold: number;
+  maxTokens: number;
+  temperature: number;
+  description: string;
+  keywords: string[];
+  priority: number;
+  updatedAt: string;
 }
 
 interface DomainInstructionsSummary {
@@ -45,15 +52,17 @@ interface DomainMetadataPayload {
 }
 
 export default function DomainSettingsPage() {
-  const params = useParams()
-  const domain = params.domain as string
-  const domainName = domain.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+  const params = useParams();
+  const domain = params.domain as string;
+  const domainName = domain
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
 
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [newKeyword, setNewKeyword] = useState("")
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [newKeyword, setNewKeyword] = useState("");
 
   const [settings, setSettings] = useState<DomainSettings>({
     enabled: true,
@@ -63,77 +72,72 @@ export default function DomainSettingsPage() {
     description: `Configuration for ${domainName} domain`,
     keywords: [domain],
     priority: 5,
-    updatedAt: new Date().toISOString()
-  })
+    updatedAt: new Date().toISOString(),
+  });
 
-  const [seedData, setSeedData] = useState("")
-  const [weightsData, setWeightsData] = useState("")
-  const [metadata, setMetadata] = useState<DomainMetadataPayload | null>(null)
-  const [metadataLoading, setMetadataLoading] = useState(true)
-  const [metadataError, setMetadataError] = useState<string | null>(null)
-  const displayName = metadata?.manifest.displayName ?? domainName
-  const heroDescription = metadata?.manifest.description ?? settings.description
-  const instructions = metadata?.instructions
-  const adminConfig = instructions?.admin_config
-
-  const loadSettings = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await fetch(`/api/admin/settings/domains?name=${domain}`)
-      const result = await response.json()
-      
-      if (result.success) {
-        setSettings(result.data)
-      } else {
-        setError(result.error || 'Failed to load settings')
-      }
-    } catch (err) {
-      setError('Network error loading settings')
-      console.error('[Domain Settings] Load error:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [domain])
+  const [seedData, setSeedData] = useState("");
+  const [weightsData, setWeightsData] = useState("");
 
   useEffect(() => {
-    void loadSettings()
-  }, [loadSettings])
+    loadSettings();
+  }, [domain]);
+
+  const loadSettings = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(
+        `/api/admin/settings/domains?name=${domain}`,
+      );
+      const result = await response.json();
+
+      if (result.success) {
+        setSettings(result.data);
+      } else {
+        setError(result.error || "Failed to load settings");
+      }
+    } catch (err) {
+      setError("Network error loading settings");
+      console.error("[Domain Settings] Load error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const saveSettings = async () => {
     try {
-      setSaving(true)
-      setError(null)
-      setShowSuccess(false)
-      
-      const response = await fetch('/api/admin/settings/domains', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      setSaving(true);
+      setError(null);
+      setShowSuccess(false);
+
+      const response = await fetch("/api/admin/settings/domains", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           domainName: domain,
           settings: {
             ...settings,
-            updatedAt: new Date().toISOString()
-          }
-        })
-      })
-      
-      const result = await response.json()
-      
+            updatedAt: new Date().toISOString(),
+          },
+        }),
+      });
+
+      const result = await response.json();
+
       if (result.success) {
-        setSettings(result.data)
-        setShowSuccess(true)
-        setTimeout(() => setShowSuccess(false), 3000)
+        setSettings(result.data);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
       } else {
-        setError(result.error || 'Failed to save settings')
+        setError(result.error || "Failed to save settings");
       }
     } catch (err) {
-      setError('Network error saving settings')
-      console.error('[Domain Settings] Save error:', err)
+      setError("Network error saving settings");
+      console.error("[Domain Settings] Save error:", err);
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const resetToDefaults = () => {
     setSettings({
@@ -144,26 +148,26 @@ export default function DomainSettingsPage() {
       description: `Configuration for ${domainName} domain`,
       keywords: [domain],
       priority: 5,
-      updatedAt: new Date().toISOString()
-    })
-  }
+      updatedAt: new Date().toISOString(),
+    });
+  };
 
   const addKeyword = () => {
     if (newKeyword.trim() && !settings.keywords.includes(newKeyword.trim())) {
       setSettings({
         ...settings,
-        keywords: [...settings.keywords, newKeyword.trim()]
-      })
-      setNewKeyword('')
+        keywords: [...settings.keywords, newKeyword.trim()],
+      });
+      setNewKeyword("");
     }
-  }
+  };
 
   const removeKeyword = (keyword: string) => {
     setSettings({
       ...settings,
-      keywords: settings.keywords.filter(k => k !== keyword)
-    })
-  }
+      keywords: settings.keywords.filter((k) => k !== keyword),
+    });
+  };
 
   if (loading) {
     return (
@@ -173,7 +177,7 @@ export default function DomainSettingsPage() {
           <p className="text-muted-foreground">Loading domain settings...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -326,28 +330,36 @@ export default function DomainSettingsPage() {
                   Enable or disable this domain
                 </p>
               </div>
-              <Switch 
+              <Switch
                 id="enabled"
                 checked={settings.enabled}
-                onCheckedChange={(checked) => setSettings({ ...settings, enabled: checked })}
+                onCheckedChange={(checked) =>
+                  setSettings({ ...settings, enabled: checked })
+                }
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <Textarea 
-                id="description" 
+              <Textarea
+                id="description"
                 rows={3}
                 value={settings.description}
-                onChange={(e) => setSettings({ ...settings, description: e.target.value })}
+                onChange={(e) =>
+                  setSettings({ ...settings, description: e.target.value })
+                }
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Confidence Threshold: {settings.confidenceThreshold.toFixed(2)}</Label>
+              <Label>
+                Confidence Threshold: {settings.confidenceThreshold.toFixed(2)}
+              </Label>
               <Slider
                 value={[settings.confidenceThreshold]}
-                onValueChange={([value]) => setSettings({ ...settings, confidenceThreshold: value })}
+                onValueChange={([value]) =>
+                  setSettings({ ...settings, confidenceThreshold: value })
+                }
                 min={0}
                 max={1}
                 step={0.01}
@@ -362,7 +374,9 @@ export default function DomainSettingsPage() {
               <Label>Temperature: {settings.temperature.toFixed(2)}</Label>
               <Slider
                 value={[settings.temperature]}
-                onValueChange={([value]) => setSettings({ ...settings, temperature: value })}
+                onValueChange={([value]) =>
+                  setSettings({ ...settings, temperature: value })
+                }
                 min={0}
                 max={2}
                 step={0.1}
@@ -375,11 +389,16 @@ export default function DomainSettingsPage() {
 
             <div className="space-y-2">
               <Label htmlFor="maxTokens">Max Tokens</Label>
-              <Input 
-                id="maxTokens" 
-                type="number" 
+              <Input
+                id="maxTokens"
+                type="number"
                 value={settings.maxTokens}
-                onChange={(e) => setSettings({ ...settings, maxTokens: parseInt(e.target.value) || 2000 })}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    maxTokens: parseInt(e.target.value) || 2000,
+                  })
+                }
               />
               <p className="text-sm text-muted-foreground">
                 Maximum response length (100 - 8000 tokens)
@@ -388,13 +407,18 @@ export default function DomainSettingsPage() {
 
             <div className="space-y-2">
               <Label htmlFor="priority">Priority (1-10)</Label>
-              <Input 
-                id="priority" 
-                type="number" 
+              <Input
+                id="priority"
+                type="number"
                 min="1"
                 max="10"
                 value={settings.priority}
-                onChange={(e) => setSettings({ ...settings, priority: parseInt(e.target.value) || 5 })}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    priority: parseInt(e.target.value) || 5,
+                  })
+                }
               />
               <p className="text-sm text-muted-foreground">
                 Domain priority for routing (1 = lowest, 10 = highest)
@@ -408,20 +432,26 @@ export default function DomainSettingsPage() {
             <h2 className="text-xl font-semibold mb-4">Routing Keywords</h2>
             <div className="space-y-4">
               <div className="flex gap-2">
-                <Input 
-                  placeholder="Add keyword..." 
+                <Input
+                  placeholder="Add keyword..."
                   value={newKeyword}
                   onChange={(e) => setNewKeyword(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
+                  onKeyDown={(e) => e.key === "Enter" && addKeyword()}
                 />
-                <Button onClick={addKeyword} variant="outline">Add</Button>
+                <Button onClick={addKeyword} variant="outline">
+                  Add
+                </Button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {settings.keywords.map((keyword) => (
-                  <Badge key={keyword} variant="secondary" className="px-3 py-1">
+                  <Badge
+                    key={keyword}
+                    variant="secondary"
+                    className="px-3 py-1"
+                  >
                     {keyword}
-                    <X 
-                      className="h-3 w-3 ml-2 cursor-pointer" 
+                    <X
+                      className="h-3 w-3 ml-2 cursor-pointer"
                       onClick={() => removeKeyword(keyword)}
                     />
                   </Badge>
@@ -507,15 +537,16 @@ export default function DomainSettingsPage() {
               <Button>Add URL Reference</Button>
             </div>
             <p className="text-sm text-muted-foreground mt-4">
-              URL references help the AI system learn from authoritative sources for this domain.
+              URL references help the AI system learn from authoritative sources
+              for this domain.
             </p>
           </Card>
         </TabsContent>
       </Tabs>
 
       <div className="flex gap-3">
-        <Button 
-          onClick={saveSettings} 
+        <Button
+          onClick={saveSettings}
           disabled={saving}
           className="flex items-center gap-2"
         >
@@ -531,9 +562,9 @@ export default function DomainSettingsPage() {
             </>
           )}
         </Button>
-        
-        <Button 
-          variant="outline" 
+
+        <Button
+          variant="outline"
           onClick={resetToDefaults}
           className="flex items-center gap-2"
         >
@@ -541,14 +572,11 @@ export default function DomainSettingsPage() {
           Reset to Defaults
         </Button>
 
-        <Button 
-          variant="outline" 
-          className="flex items-center gap-2"
-        >
+        <Button variant="outline" className="flex items-center gap-2">
           <RefreshCw className="h-4 w-4" />
           Retrain Domain
         </Button>
       </div>
     </div>
-  )
+  );
 }

@@ -4,38 +4,59 @@
  * Handles inference for data validation, consistency checks, and quality assurance queries
  */
 
-import fs from 'fs/promises';
-import path from 'path';
+import { DOMAIN_NAME } from "./data_integrity_constants";
 
-const DOMAIN_NAME = 'data_integrity';
-const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
-const SEEDS_DIR = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`);
+export const dataIntegrityRunInference = async (
+  input: string,
+  _context?: any,
+) => {
+  const lowerInput = input.toLowerCase();
 
-/**
- * Load seed data for inference
- */
-async function loadSeedData(): Promise<any[]> {
-  try {
-    const files = await fs.readdir(SEEDS_DIR);
-    const jsonFiles = files.filter(f => f.endsWith('.json'));
-    
-    const allConcepts: any[] = [];
-    for (const file of jsonFiles) {
-      const filePath = path.join(SEEDS_DIR, file);
-      const content = await fs.readFile(filePath, 'utf-8');
-      const data = JSON.parse(content);
-      
-      if (data.concepts && Array.isArray(data.concepts)) {
-        allConcepts.push(...data.concepts);
-      } else if (Array.isArray(data)) {
-        allConcepts.push(...data);
-      }
-    }
-    
-    return allConcepts;
-  } catch (error) {
-    console.error('[DataIntegrity] Error loading seed data:', error);
-    return [];
+  let responseText = "";
+  let confidence = 0.7;
+  const sources: string[] = [];
+
+  // Detect data integrity keywords
+  if (
+    lowerInput.includes("data") ||
+    lowerInput.includes("valid") ||
+    lowerInput.includes("integrity") ||
+    lowerInput.includes("consistency") ||
+    lowerInput.includes("quality") ||
+    lowerInput.includes("corrupt")
+  ) {
+    confidence = 0.85;
+
+    responseText = `I can help with data integrity and validation. Key concepts:
+
+**Data Validation:**
+- Input validation and sanitization
+- Schema validation (JSON Schema, Zod, Yup)
+- Type checking and constraints
+- Format validation (emails, URLs, dates)
+
+**Data Consistency:**
+- Database constraints (primary keys, foreign keys)
+- Transaction management (ACID properties)
+- Data synchronization
+- Conflict resolution
+
+**Data Quality:**
+- Completeness checks
+- Accuracy verification
+- Uniqueness constraints
+- Timeliness validation
+
+What specific data integrity topic would you like to explore?`;
+  } else {
+    responseText = `I'm the Data Integrity domain. I specialize in:
+- Data validation strategies
+- Consistency checking
+- Quality assurance
+- Error detection in data
+- Data cleaning and normalization
+
+How can I help you ensure data integrity?`;
   }
 }
 

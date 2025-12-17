@@ -1,59 +1,78 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Settings, Download, Upload, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useIDESettings } from '@/ide/ideSettings';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState } from "react";
+import { Settings, Download, Upload, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useIDESettings } from "@/lib/ide/ideSettings";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
 interface IDESettingsPanelProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) {
-  const { settings, updateEditorSettings, updateThemeSettings, updateTerminalSettings, 
-          updateAISettings, updateFileSettings, updateGitSettings, updatePreviewSettings,
-          resetSettings, exportSettings, importSettings } = useIDESettings();
+export function IDESettingsPanel({
+  open,
+  onOpenChange,
+}: IDESettingsPanelProps) {
+  const {
+    settings,
+    updateEditorSettings,
+    updateThemeSettings,
+    updateTerminalSettings,
+    updateAISettings,
+    updateFileSettings,
+    updateGitSettings,
+    updatePreviewSettings,
+    resetSettings,
+    exportSettings,
+    importSettings,
+  } = useIDESettings();
   const { toast } = useToast();
-  const [importValue, setImportValue] = useState('');
+  const [importValue, setImportValue] = useState("");
 
   const handleExport = () => {
     const json = exportSettings();
-    const blob = new Blob([json], { type: 'application/json' });
+    const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'zacai-ide-settings.json';
+    a.download = "zacai-ide-settings.json";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
     toast({
-      title: 'Settings Exported',
-      description: 'Your IDE settings have been downloaded',
+      title: "Settings Exported",
+      description: "Your IDE settings have been downloaded",
     });
   };
 
   const handleImport = () => {
     if (!importValue.trim()) {
       toast({
-        title: 'Error',
-        description: 'Please paste settings JSON first',
-        variant: 'destructive',
+        title: "Error",
+        description: "Please paste settings JSON first",
+        variant: "destructive",
       });
       return;
     }
@@ -61,15 +80,15 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
     const success = importSettings(importValue);
     if (success) {
       toast({
-        title: 'Settings Imported',
-        description: 'Your IDE settings have been updated',
+        title: "Settings Imported",
+        description: "Your IDE settings have been updated",
       });
-      setImportValue('');
+      setImportValue("");
     } else {
       toast({
-        title: 'Import Failed',
-        description: 'Invalid settings JSON',
-        variant: 'destructive',
+        title: "Import Failed",
+        description: "Invalid settings JSON",
+        variant: "destructive",
       });
     }
   };
@@ -77,8 +96,8 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
   const handleReset = () => {
     resetSettings();
     toast({
-      title: 'Settings Reset',
-      description: 'All settings have been reset to defaults',
+      title: "Settings Reset",
+      description: "All settings have been reset to defaults",
     });
   };
 
@@ -112,7 +131,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                   id="fontSize"
                   type="number"
                   value={settings.editor.fontSize}
-                  onChange={(e) => updateEditorSettings({ fontSize: parseInt(e.target.value) })}
+                  onChange={(e) =>
+                    updateEditorSettings({ fontSize: parseInt(e.target.value) })
+                  }
                   min={8}
                   max={32}
                 />
@@ -123,7 +144,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                 <Input
                   id="fontFamily"
                   value={settings.editor.fontFamily}
-                  onChange={(e) => updateEditorSettings({ fontFamily: e.target.value })}
+                  onChange={(e) =>
+                    updateEditorSettings({ fontFamily: e.target.value })
+                  }
                 />
               </div>
 
@@ -133,7 +156,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                   id="tabSize"
                   type="number"
                   value={settings.editor.tabSize}
-                  onChange={(e) => updateEditorSettings({ tabSize: parseInt(e.target.value) })}
+                  onChange={(e) =>
+                    updateEditorSettings({ tabSize: parseInt(e.target.value) })
+                  }
                   min={1}
                   max={8}
                 />
@@ -144,7 +169,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                 <Switch
                   id="insertSpaces"
                   checked={settings.editor.insertSpaces}
-                  onCheckedChange={(checked) => updateEditorSettings({ insertSpaces: checked })}
+                  onCheckedChange={(checked) =>
+                    updateEditorSettings({ insertSpaces: checked })
+                  }
                 />
               </div>
 
@@ -152,7 +179,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                 <Label htmlFor="wordWrap">Word Wrap</Label>
                 <Select
                   value={settings.editor.wordWrap}
-                  onValueChange={(value) => updateEditorSettings({ wordWrap: value as 'off' | 'on' | 'bounded' })}
+                  onValueChange={(value: any) =>
+                    updateEditorSettings({ wordWrap: value })
+                  }
                 >
                   <SelectTrigger id="wordWrap">
                     <SelectValue />
@@ -170,7 +199,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                 <Switch
                   id="minimap"
                   checked={settings.editor.minimap}
-                  onCheckedChange={(checked) => updateEditorSettings({ minimap: checked })}
+                  onCheckedChange={(checked) =>
+                    updateEditorSettings({ minimap: checked })
+                  }
                 />
               </div>
 
@@ -179,7 +210,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                 <Switch
                   id="formatOnSave"
                   checked={settings.editor.formatOnSave}
-                  onCheckedChange={(checked) => updateEditorSettings({ formatOnSave: checked })}
+                  onCheckedChange={(checked) =>
+                    updateEditorSettings({ formatOnSave: checked })
+                  }
                 />
               </div>
             </div>
@@ -190,7 +223,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Label htmlFor="editorTheme">Editor Theme</Label>
               <Select
                 value={settings.theme.editorTheme}
-                onValueChange={(value) => updateThemeSettings({ editorTheme: value as 'vs-dark' | 'vs-light' | 'hc-black' })}
+                onValueChange={(value: any) =>
+                  updateThemeSettings({ editorTheme: value })
+                }
               >
                 <SelectTrigger id="editorTheme">
                   <SelectValue />
@@ -207,7 +242,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Label htmlFor="uiTheme">UI Theme</Label>
               <Select
                 value={settings.theme.uiTheme}
-                onValueChange={(value) => updateThemeSettings({ uiTheme: value as 'dark' | 'light' | 'system' })}
+                onValueChange={(value: any) =>
+                  updateThemeSettings({ uiTheme: value })
+                }
               >
                 <SelectTrigger id="uiTheme">
                   <SelectValue />
@@ -228,7 +265,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                 id="terminalFontSize"
                 type="number"
                 value={settings.terminal.fontSize}
-                onChange={(e) => updateTerminalSettings({ fontSize: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  updateTerminalSettings({ fontSize: parseInt(e.target.value) })
+                }
                 min={8}
                 max={32}
               />
@@ -240,7 +279,11 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                 id="terminalScrollback"
                 type="number"
                 value={settings.terminal.scrollback}
-                onChange={(e) => updateTerminalSettings({ scrollback: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  updateTerminalSettings({
+                    scrollback: parseInt(e.target.value),
+                  })
+                }
                 min={100}
                 max={10000}
               />
@@ -251,7 +294,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Switch
                 id="cursorBlink"
                 checked={settings.terminal.cursorBlink}
-                onCheckedChange={(checked) => updateTerminalSettings({ cursorBlink: checked })}
+                onCheckedChange={(checked) =>
+                  updateTerminalSettings({ cursorBlink: checked })
+                }
               />
             </div>
           </TabsContent>
@@ -262,7 +307,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Switch
                 id="aiEnabled"
                 checked={settings.ai.enabled}
-                onCheckedChange={(checked) => updateAISettings({ enabled: checked })}
+                onCheckedChange={(checked) =>
+                  updateAISettings({ enabled: checked })
+                }
               />
             </div>
 
@@ -271,7 +318,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Switch
                 id="autoSuggest"
                 checked={settings.ai.autoSuggest}
-                onCheckedChange={(checked) => updateAISettings({ autoSuggest: checked })}
+                onCheckedChange={(checked) =>
+                  updateAISettings({ autoSuggest: checked })
+                }
                 disabled={!settings.ai.enabled}
               />
             </div>
@@ -282,7 +331,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                 id="contextLines"
                 type="number"
                 value={settings.ai.contextLines}
-                onChange={(e) => updateAISettings({ contextLines: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  updateAISettings({ contextLines: parseInt(e.target.value) })
+                }
                 min={10}
                 max={200}
                 disabled={!settings.ai.enabled}
@@ -297,7 +348,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Switch
                 id="showInlineHints"
                 checked={settings.ai.showInlineHints}
-                onCheckedChange={(checked) => updateAISettings({ showInlineHints: checked })}
+                onCheckedChange={(checked) =>
+                  updateAISettings({ showInlineHints: checked })
+                }
                 disabled={!settings.ai.enabled}
               />
             </div>
@@ -308,7 +361,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Label htmlFor="autoSave">Auto Save</Label>
               <Select
                 value={settings.files.autoSave}
-                onValueChange={(value) => updateFileSettings({ autoSave: value as 'off' | 'afterDelay' | 'onFocusChange' })}
+                onValueChange={(value: any) =>
+                  updateFileSettings({ autoSave: value })
+                }
               >
                 <SelectTrigger id="autoSave">
                   <SelectValue />
@@ -326,7 +381,9 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Switch
                 id="autoRefresh"
                 checked={settings.preview.autoRefresh}
-                onCheckedChange={(checked) => updatePreviewSettings({ autoRefresh: checked })}
+                onCheckedChange={(checked) =>
+                  updatePreviewSettings({ autoRefresh: checked })
+                }
               />
             </div>
 
@@ -335,18 +392,28 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
               <Switch
                 id="gitEnabled"
                 checked={settings.git.enabled}
-                onCheckedChange={(checked) => updateGitSettings({ enabled: checked })}
+                onCheckedChange={(checked) =>
+                  updateGitSettings({ enabled: checked })
+                }
               />
             </div>
 
             <div className="pt-4 space-y-2">
               <Label>Import/Export Settings</Label>
               <div className="flex gap-2">
-                <Button onClick={handleExport} variant="outline" className="flex-1">
+                <Button
+                  onClick={handleExport}
+                  variant="outline"
+                  className="flex-1"
+                >
                   <Download className="h-4 w-4 mr-2" />
                   Export
                 </Button>
-                <Button onClick={handleReset} variant="outline" className="flex-1">
+                <Button
+                  onClick={handleReset}
+                  variant="outline"
+                  className="flex-1"
+                >
                   <RotateCcw className="h-4 w-4 mr-2" />
                   Reset
                 </Button>
@@ -358,7 +425,11 @@ export function IDESettingsPanel({ open, onOpenChange }: IDESettingsPanelProps) 
                   value={importValue}
                   onChange={(e) => setImportValue(e.target.value)}
                 />
-                <Button onClick={handleImport} variant="outline" className="w-full">
+                <Button
+                  onClick={handleImport}
+                  variant="outline"
+                  className="w-full"
+                >
                   <Upload className="h-4 w-4 mr-2" />
                   Import Settings
                 </Button>

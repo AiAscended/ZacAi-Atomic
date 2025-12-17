@@ -6,13 +6,13 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { detectDevOpsPatterns } from "./environment_utils"
+import { detectDevOpsPatterns } from "./environment_utils";
 
 export const environmentParser = (code: string) => {
-  const tools = detectDevOpsPatterns(code)
+  const tools = detectDevOpsPatterns(code);
   return {
     tools,
     complexity: tools.length > 3 ? "high" : tools.length > 1 ? "medium" : "low",
     raw: code,
-  }
-}
+  };
+};

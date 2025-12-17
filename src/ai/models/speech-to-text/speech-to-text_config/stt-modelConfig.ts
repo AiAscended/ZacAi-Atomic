@@ -14,8 +14,8 @@ export interface STTModelConfig {
 }
 
 export const defaultSTTConfig: STTModelConfig = {
-  modelName: 'speech-to-text',
-  version: '1.0.0',
+  modelName: "speech-to-text",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

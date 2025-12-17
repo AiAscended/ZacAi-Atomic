@@ -5,13 +5,17 @@
  * Dependents: retrieval, inference
  */
 
-export const loadStaticEmbeddings = async (source?: string): Promise<Record<string, number[]>> => {
+export const loadStaticEmbeddings = async (
+  _source?: string,
+): Promise<Record<string, number[]>> => {
   // In an MVP we'll return deterministic sample embeddings for tokens
-  const sample = ['hello', 'world', 'zacai', 'atomic'];
-  const seedOffset = source ? source.length % 50 : 0;
+  const sample = ["hello", "world", "zacai", "atomic"];
   const out: Record<string, number[]> = {};
   for (const t of sample) {
-    out[t] = Array.from({ length: 8 }, (_, i) => ((t.charCodeAt(0) + seedOffset + i) % 100) / 100);
+    out[t] = Array.from(
+      { length: 8 },
+      (_, i) => ((t.charCodeAt(0) + i) % 100) / 100,
+    );
   }
   return out;
 };

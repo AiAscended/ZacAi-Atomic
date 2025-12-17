@@ -3,13 +3,13 @@
  * Monitors system metrics and performance
  */
 
-"use client"
+"use client";
 
-import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage"
+import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage";
 
 export default function PerformanceMonitorPage() {
   return (
-    <ModelSettingsPage 
+    <ModelSettingsPage
       modelName="performance-monitor"
       modelTitle="Performance Monitor"
       modelDescription="Monitors system performance, latency, and resource usage"
@@ -19,8 +19,8 @@ export default function PerformanceMonitorPage() {
         alertThreshold: 0.9,
         trackLatency: true,
         trackMemory: true,
-        trackTokenUsage: true
+        trackTokenUsage: true,
       }}
     />
-  )
+  );
 }

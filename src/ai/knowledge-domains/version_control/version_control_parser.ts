@@ -6,13 +6,14 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { detectGitPatterns } from "./version_control_utils"
+import { detectGitPatterns } from "./version_control_utils";
 
 export const versionControlParser = (code: string) => {
-  const operations = detectGitPatterns(code)
+  const operations = detectGitPatterns(code);
   return {
     operations,
-    complexity: operations.length > 3 ? "high" : operations.length > 1 ? "medium" : "low",
+    complexity:
+      operations.length > 3 ? "high" : operations.length > 1 ? "medium" : "low",
     raw: code,
-  }
-}
+  };
+};

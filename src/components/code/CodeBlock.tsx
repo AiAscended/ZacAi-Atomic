@@ -1,31 +1,63 @@
-"use client"
+/**
+ * File: src/components/code/CodeBlock.tsx
+ * Purpose: Displays syntax-highlighted code block with copy-to-clipboard,
+ * optional filename and language labels, and line numbers.
+ *
+ * Depends on:
+ * - prismjs for syntax highlighting
+ * - lucide-react icons for UI controls
+ * - src/components/ui/button.tsx for button styling
+ */
 
-import { useState } from "react"
-import { Check, Copy } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+"use client";
 
-interface CodeBlockProps {
-  code: string
-  language: string
-  filename?: string
-  showLineNumbers?: boolean
-  className?: string
+import React, { useState } from "react";
+import Prism from "prismjs";
+import "prismjs/themes/prism-tomorrow.css";
+import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-typescript";
+import "prismjs/components/prism-python";
+
+import { Button } from "@/components/ui/button";
+import { Check, Copy } from "lucide-react";
+
+export interface CodeBlockProps {
+  code: string;
+  language: string;
+  filename?: string;
+  showLineNumbers?: boolean;
+  className?: string;
 }
 
-export function CodeBlock({ code, language, filename, showLineNumbers = true, className }: CodeBlockProps) {
-  const [copied, setCopied] = useState(false)
+export function CodeBlock({
+  code,
+  language,
+  filename,
+  showLineNumbers = true,
+  className,
+}: CodeBlockProps) {
+  const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(code)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-  const lines = code.split("\n")
+  // Highlight entire code block
+  const highlightedCode = Prism.highlight(
+    code,
+    Prism.languages[language] || Prism.languages.javascript,
+    language,
+  );
+
+  // Split code into lines for line numbers display
+  const lines = code.split("\n");
 
   return (
-    <div className={cn("relative rounded-lg overflow-hidden border border-border", className)}>
+    <div
+      className={`relative rounded-lg border border-slate-700 bg-slate-900 text-slate-50 font-mono text-sm ${className ?? ""}`}
+    >
       {filename && (
         <div className="bg-muted px-4 py-2 border-b border-border flex items-center justify-between">
           <span className="text-sm font-mono text-muted-foreground">{filename}</span>
@@ -33,34 +65,48 @@ export function CodeBlock({ code, language, filename, showLineNumbers = true, cl
         </div>
       )}
 
-      <div className="relative">
-        <Button variant="ghost" size="icon" className="absolute top-2 right-2 z-10" onClick={handleCopy}>
-          {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-        </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleCopy}
+        className="absolute top-2 right-2 z-20"
+        aria-label="Copy code"
+      >
+        {copied ? (
+          <Check className="h-4 w-4 text-green-500" />
+        ) : (
+          <Copy className="h-4 w-4" />
+        )}
+      </Button>
 
-        <pre className="p-4 overflow-x-auto bg-slate-950 text-slate-50">
-          <code className="font-mono text-sm">
-            {showLineNumbers ? (
-              <table className="w-full">
-                <tbody>
-                  {lines.map((line, idx) => (
-                    <tr key={idx}>
-                      <td className="pr-4 text-right text-slate-500 select-none w-8">{idx + 1}</td>
-                      <td className="text-slate-50">
-                        <SyntaxHighlight code={line} language={language} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <SyntaxHighlight code={code} language={language} />
-            )}
-          </code>
-        </pre>
-      </div>
+      <pre className="overflow-x-auto p-4">
+        {showLineNumbers ? (
+          <table className="w-full border-collapse">
+            <tbody>
+              {lines.map((line, idx) => (
+                <tr key={idx} className="align-top">
+                  <td className="pr-2 text-right text-slate-500 select-none tabular-nums w-6">
+                    {idx + 1}
+                  </td>
+                  <td
+                    dangerouslySetInnerHTML={{
+                      __html: Prism.highlight(
+                        line,
+                        Prism.languages[language] || Prism.languages.javascript,
+                        language,
+                      ),
+                    }}
+                  />
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <code dangerouslySetInnerHTML={{ __html: highlightedCode }} />
+        )}
+      </pre>
     </div>
-  )
+  );
 }
 
 function SyntaxHighlight({ code, language }: { code: string; language: string }) {

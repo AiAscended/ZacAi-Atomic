@@ -6,12 +6,27 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerSource } from "../url_lookup"
+import { registerSource } from "../url_lookup";
 
-registerSource("grammar", "Grammarly", "https://www.grammarly.com/blog", "Grammar rules and usage")
-registerSource("grammar", "Purdue OWL", "https://owl.purdue.edu", "Academic writing and grammar")
-registerSource("grammar", "Grammar Book", "https://www.grammarbook.com", "Grammar rules reference")
+registerSource(
+  "grammar",
+  "Grammarly",
+  "https://www.grammarly.com/blog",
+  "Grammar rules and usage",
+);
+registerSource(
+  "grammar",
+  "Purdue OWL",
+  "https://owl.purdue.edu",
+  "Academic writing and grammar",
+);
+registerSource(
+  "grammar",
+  "Grammar Book",
+  "https://www.grammarbook.com",
+  "Grammar rules reference",
+);
 
-export const grammarSources = () => registerSource
+export const grammarSources = () => registerSource;
 
-export default grammarSources
+export default grammarSources;

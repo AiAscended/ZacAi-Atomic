@@ -6,21 +6,22 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { REACT_DOMAIN } from "./react_constants"
+import { REACT_DOMAIN } from "./react_constants";
 
 export interface ReactDomainMetadata {
-  name: string
-  version: string
-  description: string
-  capabilities: string[]
-  keywords: string[]
+  name: string;
+  version: string;
+  description: string;
+  capabilities: string[];
+  keywords: string[];
 }
 
 export function getReactDomainMetadata(): ReactDomainMetadata {
   return {
     name: REACT_DOMAIN,
     version: "1.0.0",
-    description: "React JavaScript library knowledge domain for component-based UI development",
+    description:
+      "React JavaScript library knowledge domain for component-based UI development",
     capabilities: [
       "component_explanation",
       "hooks_usage",
@@ -45,5 +46,5 @@ export function getReactDomainMetadata(): ReactDomainMetadata {
       "virtual-dom",
       "lifecycle",
     ],
-  }
+  };
 }

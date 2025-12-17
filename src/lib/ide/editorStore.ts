@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface EditorTab {
   id: string;
@@ -11,20 +11,26 @@ export interface EditorTab {
   cursorPosition?: { line: number; column: number };
 }
 
-export interface EditorState {
-  openFiles: EditorTab[];
-  activeFileId: string | null;
+interface EditorState {
+  tabs: EditorTab[];
+  activeTabId: string | null;
 
-  openFile: (path: string, title: string, content: string, language: string) => void;
-  closeFile: (fileId: string) => void;
-  closeAllFiles: () => void;
-  closeOtherFiles: (fileId: string) => void;
-  setActiveFile: (fileId: string | null) => void;
-  updateFileContent: (fileId: string, content: string) => void;
-  markFileDirty: (fileId: string, isDirty: boolean) => void;
-  updateCursorPosition: (fileId: string, line: number, column: number) => void;
-  getFileById: (fileId: string | null | undefined) => EditorTab | undefined;
-  getActiveFile: () => EditorTab | undefined;
+  // Actions
+  openFile: (
+    path: string,
+    title: string,
+    content: string,
+    language: string,
+  ) => void;
+  closeTab: (tabId: string) => void;
+  closeAllTabs: () => void;
+  closeOtherTabs: (tabId: string) => void;
+  setActiveTab: (tabId: string) => void;
+  updateTabContent: (tabId: string, content: string) => void;
+  markTabDirty: (tabId: string, isDirty: boolean) => void;
+  updateCursorPosition: (tabId: string, line: number, column: number) => void;
+  getTab: (tabId: string) => EditorTab | undefined;
+  getActiveTab: () => EditorTab | undefined;
   hasUnsavedChanges: () => boolean;
 }
 
@@ -36,7 +42,7 @@ export const useEditorStore = create<EditorState>()(
 
       openFile: (path, title, content, language) => {
         const state = get();
-        
+
         // Check if file is already open
         const existingFile = state.openFiles.find((file) => file.path === path);
         if (existingFile) {
@@ -100,26 +106,26 @@ export const useEditorStore = create<EditorState>()(
 
       updateFileContent: (fileId, content) => {
         set((state) => ({
-          openFiles: state.openFiles.map((file) =>
-            file.id === fileId ? { ...file, content, isDirty: true } : file
+          tabs: state.tabs.map((tab) =>
+            tab.id === tabId ? { ...tab, content, isDirty: true } : tab,
           ),
         }));
       },
 
       markFileDirty: (fileId, isDirty) => {
         set((state) => ({
-          openFiles: state.openFiles.map((file) =>
-            file.id === fileId ? { ...file, isDirty } : file
+          tabs: state.tabs.map((tab) =>
+            tab.id === tabId ? { ...tab, isDirty } : tab,
           ),
         }));
       },
 
       updateCursorPosition: (fileId, line, column) => {
         set((state) => ({
-          openFiles: state.openFiles.map((file) =>
-            file.id === fileId
-              ? { ...file, cursorPosition: { line, column } }
-              : file
+          tabs: state.tabs.map((tab) =>
+            tab.id === tabId
+              ? { ...tab, cursorPosition: { line, column } }
+              : tab,
           ),
         }));
       },
@@ -140,14 +146,14 @@ export const useEditorStore = create<EditorState>()(
       },
     }),
     {
-      name: 'zacai-editor-store',
+      name: "zacai-editor-store",
       partialize: (state) => ({
-        openFiles: state.openFiles.map((file) => ({
-          ...file,
-          content: '',
+        tabs: state.tabs.map((tab) => ({
+          ...tab,
+          content: "", // Don't persist content to avoid localStorage quota
         })),
         activeFileId: state.activeFileId,
       }),
-    }
-  )
+    },
+  ),
 );

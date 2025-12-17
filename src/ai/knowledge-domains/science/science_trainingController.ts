@@ -6,15 +6,20 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { loadScienceLearnedData, saveScienceLearnedData } from "./science_learnedDataManager"
+import {
+  loadScienceLearnedData,
+  saveScienceLearnedData,
+} from "./science_learnedDataManager";
 
-type ScienceLearned = { notes: string[]; concepts: Record<string, unknown> }
+type ScienceLearned = { notes: string[]; concepts: Record<string, unknown> };
 
 export const scienceRunTrainingEpoch = async (opts?: { epochs?: number }) => {
-  const data = (await loadScienceLearnedData()) as ScienceLearned
-  const epoch = opts?.epochs ?? 1
-  data.notes = data.notes || []
-  data.notes.push(`science trained ${epoch} epoch(s) at ${new Date().toISOString()}`)
-  await saveScienceLearnedData(data)
-  return { ok: true, epoch }
-}
+  const data = (await loadScienceLearnedData()) as ScienceLearned;
+  const epoch = opts?.epochs ?? 1;
+  data.notes = data.notes || [];
+  data.notes.push(
+    `science trained ${epoch} epoch(s) at ${new Date().toISOString()}`,
+  );
+  await saveScienceLearnedData(data);
+  return { ok: true, epoch };
+};

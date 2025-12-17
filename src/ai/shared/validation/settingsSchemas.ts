@@ -1,7 +1,7 @@
 /**
  * File: src/ai/shared/validation/settingsSchemas.ts
  * Purpose: Zod validation schemas for admin settings
- * 
+ *
  * Provides runtime validation for all settings types
  */
 
@@ -89,47 +89,35 @@ export const DomainSettingsSchema = z.object({
 // GitHub App Settings Schema
 // ============================================================================
 
-export const GitHubAppSettingsSchema = z
-  .object({
-    appId: z.string(),
-    clientId: z.string(),
-    installations: z.array(
-      z.object({
-        installationId: z.string(),
-        accountLogin: z.string(),
-        accountType: z.enum(["User", "Organization"]),
-        installedAt: z.string(),
-        repositories: z.array(
-          z.object({
-            id: z.number(),
-            name: z.string(),
-            fullName: z.string(),
-            private: z.boolean(),
-            defaultBranch: z.string(),
-          })
-        ),
-        permissions: z.record(z.string(), z.string()),
-      })
-    ),
-    webhookSecret: z.string(),
-    webhookUrl: z.string().url().optional(),
-    enableAutoCommit: z.boolean(),
-    enablePRCreation: z.boolean(),
-    enableIssueSync: z.boolean(),
-    defaultBranch: z.string(),
-    commitMessagePrefix: z.string(),
-  })
-  .refine(
-    (data) => {
-      const hasAppId = data.appId.trim().length > 0;
-      const hasClientId = data.clientId.trim().length > 0;
-      return hasAppId === hasClientId;
-    },
-    {
-      message: 'appId and clientId must both be provided together or left blank',
-      path: ['appId'],
-    }
-  );
+export const GitHubAppSettingsSchema = z.object({
+  appId: z.string().min(1),
+  clientId: z.string().min(1),
+  installations: z.array(
+    z.object({
+      installationId: z.string(),
+      accountLogin: z.string(),
+      accountType: z.enum(["User", "Organization"]),
+      installedAt: z.string(),
+      repositories: z.array(
+        z.object({
+          id: z.number(),
+          name: z.string(),
+          fullName: z.string(),
+          private: z.boolean(),
+          defaultBranch: z.string(),
+        }),
+      ),
+      permissions: z.record(z.string(), z.string()),
+    }),
+  ),
+  webhookSecret: z.string(),
+  webhookUrl: z.string().url().optional(),
+  enableAutoCommit: z.boolean(),
+  enablePRCreation: z.boolean(),
+  enableIssueSync: z.boolean(),
+  defaultBranch: z.string(),
+  commitMessagePrefix: z.string(),
+});
 
 // Public-facing (no secrets)
 export const GitHubAppSettingsPublicSchema = GitHubAppSettingsSchema.omit({
@@ -169,7 +157,15 @@ export const IDEModeSettingsSchema = z.object({
 
 export const ModelSettingsSchema = z.object({
   modelId: z.string().min(1),
-  modelType: z.enum(["llm", "cnn", "rnn", "transformer", "gan", "diffusion", "other"]),
+  modelType: z.enum([
+    "llm",
+    "cnn",
+    "rnn",
+    "transformer",
+    "gan",
+    "diffusion",
+    "other",
+  ]),
   enabled: z.boolean(),
   config: z.object({
     batchSize: z.number().int().positive(),
@@ -249,12 +245,19 @@ export function validateAdminSettings(data: unknown) {
 
 export function redactSecrets<T extends Record<string, unknown>>(obj: T): T {
   const redacted: Record<string, unknown> = {};
-  const secretKeys = ["privateKey", "webhookSecret", "apiKey", "secret", "password", "token"];
+  const secretKeys = [
+    "privateKey",
+    "webhookSecret",
+    "apiKey",
+    "secret",
+    "password",
+    "token",
+  ];
 
   for (const key of Object.keys(obj)) {
-    if (secretKeys.some(sk => key.toLowerCase().includes(sk.toLowerCase()))) {
+    if (secretKeys.some((sk) => key.toLowerCase().includes(sk.toLowerCase()))) {
       redacted[key] = "***REDACTED***";
-    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+    } else if (typeof obj[key] === "object" && obj[key] !== null) {
       redacted[key] = redactSecrets(obj[key] as Record<string, unknown>);
     } else {
       redacted[key] = obj[key];

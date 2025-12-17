@@ -5,8 +5,8 @@
 import type { TrainingBatch } from '../../shared/modelTypes';
 
 export class STTTrainer {
-  train(data: unknown): void {
-    console.log('Training speech-to-text...');
+  train(data: any): void {
+    console.log("Training speech-to-text...");
   }
 }
 

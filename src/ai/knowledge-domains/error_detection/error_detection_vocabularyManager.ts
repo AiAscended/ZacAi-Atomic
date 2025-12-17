@@ -6,8 +6,8 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { safeParseJSON } from "./error_detection_utils"
-import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./error_detection_utils";
+import { storageAdapter } from "../storageAdapter";
 
 export type ErrorDetectionSeedVocabulary = {
   errorTypes: string[]
@@ -22,10 +22,9 @@ export const loadErrorDetectionSeedVocabulary = async (
   path = DEFAULT_SEED_VOCAB_PATH,
 ): Promise<ErrorDetectionSeedVocabulary> => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON<ErrorDetectionSeedVocabulary>(raw, createDefaultSeedVocabulary())
-  } catch (error) {
-    console.error("[error-detection][seed-vocabulary] Failed to load seed vocabulary", { path, error })
-    return createDefaultSeedVocabulary()
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { errorTypes: [] }) as { errorTypes: string[] };
+  } catch (e) {
+    return { errorTypes: [] };
   }
-}
+};

@@ -33,7 +33,7 @@ export async function readFile(
   owner: string,
   repo: string,
   path: string,
-  ref = "main"
+  ref = "main",
 ): Promise<string> {
   const token = await getInstallationAccessToken(installationId);
   const response = await request("GET /repos/{owner}/{repo}/contents/{path}", {
@@ -43,6 +43,15 @@ export async function readFile(
     ref,
     headers: { authorization: `token ${token}` },
   });
+
+  // Type guard: ensure we're dealing with a file, not a directory or array
+  if (Array.isArray(response.data)) {
+    throw new Error(`Path ${path} is a directory, not a file`);
+  }
+  if (!("content" in response.data)) {
+    throw new Error(`No content found for ${path}`);
+  }
+
   return Buffer.from(response.data.content, "base64").toString("utf-8");
 }
 
@@ -57,7 +66,7 @@ export async function writeFile(
   message: string,
   content: string,
   sha?: string,
-  branch = "main"
+  branch = "main",
 ) {
   const token = await getInstallationAccessToken(installationId);
   const encoded = Buffer.from(content).toString("base64");
@@ -84,7 +93,10 @@ export async function writeFile(
     params.sha = sha;
   }
 
-  const response = await request("PUT /repos/{owner}/{repo}/contents/{path}", params);
+  const response = await request(
+    "PUT /repos/{owner}/{repo}/contents/{path}",
+    params,
+  );
   return response.data;
 }
 
@@ -96,17 +108,26 @@ export async function getFileSha(
   owner: string,
   repo: string,
   path: string,
-  ref = "main"
+  ref = "main",
 ): Promise<string | null> {
   try {
     const token = await getInstallationAccessToken(installationId);
-    const response = await request("GET /repos/{owner}/{repo}/contents/{path}", {
-      owner,
-      repo,
-      path,
-      ref,
-      headers: { authorization: `token ${token}` },
-    });
+    const response = await request(
+      "GET /repos/{owner}/{repo}/contents/{path}",
+      {
+        owner,
+        repo,
+        path,
+        ref,
+        headers: { authorization: `token ${token}` },
+      },
+    );
+
+    // Type guard: ensure we're dealing with a file, not a directory or array
+    if (Array.isArray(response.data)) {
+      throw new Error(`Path ${path} is a directory, not a file`);
+    }
+
     return response.data.sha;
   } catch (error: unknown) {
     if (typeof error === 'object' && error !== null && 'status' in error && (error as { status?: number }).status === 404) {

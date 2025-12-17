@@ -13,5 +13,5 @@
  * @example tanh(0) // returns 0
  */
 export function tanh(x: number): number {
-  return Math.tanh(x)
+  return Math.tanh(x);
 }

@@ -1,4 +1,4 @@
-import { createElement, appendChildren, addListener } from '@utils/dom';
+import { createElement, appendChildren, addListener } from "@utils/dom";
 
 export interface NavLink {
   text: string;
@@ -9,27 +9,27 @@ export interface NavLink {
 export const createNavigation = (
   brandName: string,
   links: NavLink[],
-  onNavigate: (href: string) => void
+  onNavigate: (href: string) => void,
 ): HTMLElement => {
-  const nav = createElement('nav', 'nav-menu');
+  const nav = createElement("nav", "nav-menu");
 
-  const brand = createElement('a', 'nav-brand');
-  brand.href = '#';
+  const brand = createElement("a", "nav-brand");
+  brand.href = "#";
   brand.textContent = brandName;
-  addListener(brand, 'click', (e) => {
+  addListener(brand, "click", (e) => {
     e.preventDefault();
-    onNavigate('/');
+    onNavigate("/");
   });
 
-  const linksList = createElement('ul', 'nav-links');
+  const linksList = createElement("ul", "nav-links");
 
   links.forEach((link) => {
-    const li = createElement('li');
-    const a = createElement('a', `nav-link ${link.active ? 'active' : ''}`);
+    const li = createElement("li");
+    const a = createElement("a", `nav-link ${link.active ? "active" : ""}`);
     a.href = link.href;
     a.textContent = link.text;
 
-    addListener(a, 'click', (e) => {
+    addListener(a, "click", (e) => {
       e.preventDefault();
       onNavigate(link.href);
     });
@@ -42,14 +42,17 @@ export const createNavigation = (
   return nav;
 };
 
-export const updateActiveLink = (nav: HTMLElement, activeHref: string): void => {
-  const links = nav.querySelectorAll('.nav-link');
+export const updateActiveLink = (
+  nav: HTMLElement,
+  activeHref: string,
+): void => {
+  const links = nav.querySelectorAll(".nav-link");
   links.forEach((link) => {
-    const href = link.getAttribute('href');
+    const href = link.getAttribute("href");
     if (href === activeHref) {
-      link.classList.add('active');
+      link.classList.add("active");
     } else {
-      link.classList.remove('active');
+      link.classList.remove("active");
     }
   });
 };

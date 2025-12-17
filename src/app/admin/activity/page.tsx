@@ -3,13 +3,25 @@
  * Real-time system activity monitoring for administrators
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { RefreshCcw, Activity, Database, MessageSquare, Settings } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  RefreshCcw,
+  Activity,
+  Database,
+  MessageSquare,
+  Settings,
+} from "lucide-react";
 
 type ActivityEventMetaValue = string | number | boolean | null | ActivityEventMeta;
 
@@ -32,13 +44,13 @@ export default function ActivityPage() {
   const loadEvents = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/activity');
+      const response = await fetch("/api/admin/activity");
       if (response.ok) {
         const data = await response.json();
         setEvents(data.events || []);
       }
     } catch (error) {
-      console.error('Failed to load events:', error);
+      console.error("Failed to load events:", error);
     } finally {
       setLoading(false);
     }
@@ -56,17 +68,19 @@ export default function ActivityPage() {
   }, [autoRefresh]);
 
   const getEventIcon = (type: string) => {
-    if (type.includes('chat')) return <MessageSquare className="h-4 w-4" />;
-    if (type.includes('settings')) return <Settings className="h-4 w-4" />;
-    if (type.includes('database') || type.includes('save')) return <Database className="h-4 w-4" />;
+    if (type.includes("chat")) return <MessageSquare className="h-4 w-4" />;
+    if (type.includes("settings")) return <Settings className="h-4 w-4" />;
+    if (type.includes("database") || type.includes("save"))
+      return <Database className="h-4 w-4" />;
     return <Activity className="h-4 w-4" />;
   };
 
   const getEventColor = (type: string) => {
-    if (type.includes('create')) return 'bg-green-500/10 text-green-500';
-    if (type.includes('delete')) return 'bg-red-500/10 text-red-500';
-    if (type.includes('update') || type.includes('save')) return 'bg-blue-500/10 text-blue-500';
-    return 'bg-gray-500/10 text-gray-500';
+    if (type.includes("create")) return "bg-green-500/10 text-green-500";
+    if (type.includes("delete")) return "bg-red-500/10 text-red-500";
+    if (type.includes("update") || type.includes("save"))
+      return "bg-blue-500/10 text-blue-500";
+    return "bg-gray-500/10 text-gray-500";
   };
 
   return (
@@ -74,18 +88,24 @@ export default function ActivityPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">System Activity</h1>
-          <p className="text-muted-foreground">Real-time monitoring of system events</p>
+          <p className="text-muted-foreground">
+            Real-time monitoring of system events
+          </p>
         </div>
         <div className="flex gap-2">
           <Button
-            variant={autoRefresh ? 'default' : 'outline'}
+            variant={autoRefresh ? "default" : "outline"}
             onClick={() => setAutoRefresh(!autoRefresh)}
           >
-            <RefreshCcw className={`h-4 w-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
-            {autoRefresh ? 'Auto-Refresh On' : 'Auto-Refresh Off'}
+            <RefreshCcw
+              className={`h-4 w-4 mr-2 ${autoRefresh ? "animate-spin" : ""}`}
+            />
+            {autoRefresh ? "Auto-Refresh On" : "Auto-Refresh Off"}
           </Button>
           <Button onClick={loadEvents} disabled={loading}>
-            <RefreshCcw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCcw
+              className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
         </div>
@@ -110,7 +130,9 @@ export default function ActivityPage() {
                   key={index}
                   className="flex items-start gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                 >
-                  <div className={`p-2 rounded-lg ${getEventColor(event.type)}`}>
+                  <div
+                    className={`p-2 rounded-lg ${getEventColor(event.type)}`}
+                  >
                     {getEventIcon(event.type)}
                   </div>
                   <div className="flex-1 min-w-0">

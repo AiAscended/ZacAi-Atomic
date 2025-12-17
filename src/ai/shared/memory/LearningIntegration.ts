@@ -4,48 +4,8 @@
  * with URL lookup tools, knowledge retrieval, and domain-specific learning.
  */
 
-import { learningMemory, LearnedItem } from './LearningMemorySystem';
-import { lookupSeed } from '../seeds/seedLookup';
-
-type SeedLookupResult = ReturnType<typeof lookupSeed>;
-
-type LookupSource = 'seed' | 'learned' | 'url-lookup';
-
-interface UrlLookupPayload {
-  definition: string;
-  source: string;
-  examples?: string[];
-  related?: string[];
-  type?: 'concept' | 'fact' | 'procedure';
-}
-
-interface UrlLookupResult {
-  found: boolean;
-  data: UrlLookupPayload | null;
-}
-
-type ExistingLookupResult = {
-  found: true;
-  fromExisting: true;
-  data: SeedLookupResult | LearnedItem;
-  source: Exclude<LookupSource, 'url-lookup'>;
-};
-
-type NewLookupResult = {
-  found: true;
-  fromExisting: false;
-  data: LearnedItem;
-  source: 'url-lookup';
-};
-
-type MissingLookupResult = {
-  found: false;
-  fromExisting: false;
-  data: null;
-  source: 'url-lookup';
-};
-
-type LookupAndLearnResult = ExistingLookupResult | NewLookupResult | MissingLookupResult;
+import { learningMemory, LearnedItem } from "./LearningMemorySystem";
+import { lookupSeed, searchSeeds } from "../seeds/seedLookup";
 
 // ============================================================================
 // URL Lookup Integration
@@ -58,12 +18,12 @@ export async function lookupAndLearn(
   sessionId: string,
   domain: string,
   term: string,
-  context: string
+  context: string,
 ): Promise<{
   found: boolean;
   fromExisting: boolean;
   data: LearnedItem | unknown;
-  source: 'seed' | 'learned' | 'url-lookup';
+  source: "seed" | "learned" | "url-lookup";
 }> {
   // 1. Check if already in seed vocabulary
   const seedData = await lookupSeed(term, domain);
@@ -72,7 +32,7 @@ export async function lookupAndLearn(
       found: true,
       fromExisting: true,
       data: seedData,
-      source: 'seed',
+      source: "seed",
     };
   }
 
@@ -83,7 +43,7 @@ export async function lookupAndLearn(
       found: true,
       fromExisting: true,
       data: learnedData,
-      source: 'learned',
+      source: "learned",
     };
   }
 
@@ -105,15 +65,15 @@ export async function lookupAndLearn(
         relatedTerms: urlLookupResult.data.related,
         confidence: 0.8,
         verified: true,
-        learnedFrom: 'url-lookup',
-      }
+        learnedFrom: "url-lookup",
+      },
     );
 
     return {
       found: true,
       fromExisting: false,
       data: learned,
-      source: 'url-lookup',
+      source: "url-lookup",
     };
   }
 
@@ -121,7 +81,7 @@ export async function lookupAndLearn(
     found: false,
     fromExisting: false,
     data: null,
-    source: 'url-lookup',
+    source: "url-lookup",
   };
 }
 
@@ -130,16 +90,16 @@ export async function lookupAndLearn(
  */
 async function performURLLookup(
   domain: string,
-  term: string
+  term: string,
 ): Promise<{ found: boolean; data?: unknown }> {
   // This would integrate with your actual URL lookup tools
   // For now, return a simulated response
-  
+
   console.log(`🔍 URL lookup: ${term} in ${domain}`);
-  
+
   // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
   // Return simulated data (replace with actual API call)
   return {
     found: false,
@@ -150,14 +110,17 @@ async function performURLLookup(
 /**
  * Determine category based on term and data
  */
-function determineCategory(term: string, data: unknown): LearnedItem['category'] {
-  if (term.match(/[+\-*/=]/)) return 'equation';
+function determineCategory(
+  term: string,
+  data: unknown,
+): LearnedItem["category"] {
+  if (term.match(/[+\-*/=]/)) return "equation";
   if (isUrlLookupData(data)) {
-    if (data.type === 'concept') return 'concept';
-    if (data.type === 'fact') return 'fact';
-    if (data.type === 'procedure') return 'procedure';
+    if (data.type === "concept") return "concept";
+    if (data.type === "fact") return "fact";
+    if (data.type === "procedure") return "procedure";
   }
-  return 'vocabulary';
+  return "vocabulary";
 }
 
 // ============================================================================
@@ -170,7 +133,7 @@ function determineCategory(term: string, data: unknown): LearnedItem['category']
 export async function extractAndLearnFromInput(
   sessionId: string,
   userInput: string,
-  detectedDomains: string[]
+  detectedDomains: string[],
 ): Promise<LearnedItem[]> {
   const learned: LearnedItem[] = [];
 
@@ -186,7 +149,7 @@ export async function extractAndLearnFromInput(
           sessionId,
           domain,
           term,
-          `Extracted from user input: "${userInput}"`
+          `Extracted from user input: "${userInput}"`,
         );
 
         if (result.found && !result.fromExisting && isLearnedItem(result.data)) {
@@ -216,16 +179,16 @@ function extractPotentialTerms(text: string): string[] {
   const words = text.split(/\s+/);
   const terms: string[] = [];
 
-  words.forEach(word => {
+  words.forEach((word) => {
     // Remove punctuation
-    const cleaned = word.replace(/[^\w\s-]/g, '');
-    
+    const cleaned = word.replace(/[^\w\s-]/g, "");
+
     // Keep technical-looking terms (capitalized, hyphenated, or mixed case)
     if (
       cleaned.length > 3 &&
       (cleaned[0] === cleaned[0].toUpperCase() ||
-       cleaned.includes('-') ||
-       cleaned.match(/[a-z][A-Z]/))
+        cleaned.includes("-") ||
+        cleaned.match(/[a-z][A-Z]/))
     ) {
       terms.push(cleaned);
     }
@@ -244,7 +207,7 @@ function extractPotentialTerms(text: string): string[] {
 export function enhancePromptWithContext(
   sessionId: string,
   prompt: string,
-  domains: string[]
+  domains: string[],
 ): {
   enhancedPrompt: string;
   contextAdded: string[];
@@ -260,39 +223,39 @@ export function enhancePromptWithContext(
   // Add user name if known
   if (session.userName) {
     contextParts.push(`User: ${session.userName}`);
-    contextAdded.push('userName');
+    contextAdded.push("userName");
   }
 
   // Add relevant learned items from this session
   const sessionLearning = learningMemory.getSessionLearning(sessionId);
-  const relevantLearning = sessionLearning.filter(item => 
-    domains.includes(item.domain)
+  const relevantLearning = sessionLearning.filter((item) =>
+    domains.includes(item.domain),
   );
 
   if (relevantLearning.length > 0) {
     const learningContext = relevantLearning
       .slice(-3) // Last 3 learned items
-      .map(item => `${item.term}: ${item.definition}`)
-      .join('\n');
-    
+      .map((item) => `${item.term}: ${item.definition}`)
+      .join("\n");
+
     contextParts.push(`Recently learned:\n${learningContext}`);
-    contextAdded.push('recentLearning');
+    contextAdded.push("recentLearning");
   }
 
   // Add conversation history (last 3 turns)
   const history = learningMemory.getConversationHistory(sessionId, 3);
   if (history.length > 0) {
     const historyText = history
-      .map(turn => `${turn.role}: ${turn.content}`)
-      .join('\n');
-    
+      .map((turn) => `${turn.role}: ${turn.content}`)
+      .join("\n");
+
     contextParts.push(`Recent conversation:\n${historyText}`);
-    contextAdded.push('conversationHistory');
+    contextAdded.push("conversationHistory");
   }
 
   // Build enhanced prompt
   if (contextParts.length > 0) {
-    const enhancedPrompt = `Context:\n${contextParts.join('\n\n')}\n\nCurrent query: ${prompt}`;
+    const enhancedPrompt = `Context:\n${contextParts.join("\n\n")}\n\nCurrent query: ${prompt}`;
     return { enhancedPrompt, contextAdded };
   }
 
@@ -311,12 +274,12 @@ export function getSessionLearningStats(sessionId: string) {
   if (!session) return null;
 
   const learned = learningMemory.getSessionLearning(sessionId);
-  
+
   const byDomain: Record<string, number> = {};
   const byCategory: Record<string, number> = {};
   const bySource: Record<string, number> = {};
 
-  learned.forEach(item => {
+  learned.forEach((item) => {
     byDomain[item.domain] = (byDomain[item.domain] || 0) + 1;
     byCategory[item.category] = (byCategory[item.category] || 0) + 1;
     bySource[item.learnedFrom] = (bySource[item.learnedFrom] || 0) + 1;
@@ -339,16 +302,16 @@ export function getSessionLearningStats(sessionId: string) {
  */
 export function getDomainLearningStats(domain: string) {
   const learned = learningMemory.getDomainLearning(domain);
-  
+
   const byCategory: Record<string, number> = {};
   const bySource: Record<string, number> = {};
   const byDate: Record<string, number> = {};
 
-  learned.forEach(item => {
+  learned.forEach((item) => {
     byCategory[item.category] = (byCategory[item.category] || 0) + 1;
     bySource[item.learnedFrom] = (bySource[item.learnedFrom] || 0) + 1;
-    
-    const date = item.timestamp.split('T')[0];
+
+    const date = item.timestamp.split("T")[0];
     byDate[date] = (byDate[date] || 0) + 1;
   });
 
@@ -378,12 +341,12 @@ export function learnFromURLLookup(
   options?: {
     examples?: string[];
     relatedTerms?: string[];
-  }
+  },
 ): LearnedItem {
   return learningMemory.learnItem(
     sessionId,
     domain,
-    'vocabulary',
+    "vocabulary",
     term,
     definition,
     source,
@@ -391,8 +354,8 @@ export function learnFromURLLookup(
     {
       ...options,
       verified: true,
-      learnedFrom: 'url-lookup',
-    }
+      learnedFrom: "url-lookup",
+    },
   );
 }
 
@@ -404,21 +367,21 @@ export function learnFromUserInput(
   domain: string,
   term: string,
   definition: string,
-  context: string
+  context: string,
 ): LearnedItem {
   return learningMemory.learnItem(
     sessionId,
     domain,
-    'vocabulary',
+    "vocabulary",
     term,
     definition,
-    'user-provided',
+    "user-provided",
     context,
     {
       confidence: 0.9,
       verified: false,
-      learnedFrom: 'user-input',
-    }
+      learnedFrom: "user-input",
+    },
   );
 }
 
@@ -431,12 +394,12 @@ export function learnFromSearch(
   term: string,
   definition: string,
   source: string,
-  context: string
+  context: string,
 ): LearnedItem {
   return learningMemory.learnItem(
     sessionId,
     domain,
-    'fact',
+    "fact",
     term,
     definition,
     source,
@@ -444,8 +407,8 @@ export function learnFromSearch(
     {
       confidence: 0.7,
       verified: false,
-      learnedFrom: 'search',
-    }
+      learnedFrom: "search",
+    },
   );
 }
 
@@ -458,17 +421,17 @@ interface UrlLookupData {
   source: string;
   examples: string[];
   related: string[];
-  type?: 'concept' | 'fact' | 'procedure';
+  type?: "concept" | "fact" | "procedure";
 }
 
 function isUrlLookupData(data: unknown): data is UrlLookupData {
-  if (typeof data !== 'object' || data === null) {
+  if (typeof data !== "object" || data === null) {
     return false;
   }
   const d = data as UrlLookupData;
   return (
-    typeof d.definition === 'string' &&
-    typeof d.source === 'string' &&
+    typeof d.definition === "string" &&
+    typeof d.source === "string" &&
     Array.isArray(d.examples) &&
     Array.isArray(d.related)
   );

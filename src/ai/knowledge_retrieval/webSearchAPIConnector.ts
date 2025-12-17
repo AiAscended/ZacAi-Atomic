@@ -5,10 +5,10 @@
  */
 
 export interface WebResult {
-  id: string
-  title: string
-  snippet: string
-  url?: string
+  id: string;
+  title: string;
+  snippet: string;
+  url?: string;
 }
 
 /**
@@ -20,8 +20,11 @@ export interface WebResult {
  * 2. Implement fetch calls to these APIs
  * 3. Parse and return results
  */
-export const webSearch = async (query: string, limit = 5): Promise<WebResult[]> => {
-  console.log("[v0] webSearch called with query:", query, "limit:", limit)
+export const webSearch = async (
+  query: string,
+  limit = 5,
+): Promise<WebResult[]> => {
+  console.log("[v0] webSearch called with query:", query);
 
   // For now, return empty array so domains can handle the fallback
   // In production, this would make real API calls to Google/Bing/DuckDuckGo
@@ -33,12 +36,14 @@ export const webSearch = async (query: string, limit = 5): Promise<WebResult[]> 
     // const data = await response.json()
     // return data.items.map(item => ({ id: item.id, title: item.title, snippet: item.snippet, url: item.link }))
 
-    console.log("[v0] webSearch: No API keys configured, returning empty results")
-    return []
+    console.log(
+      "[v0] webSearch: No API keys configured, returning empty results",
+    );
+    return [];
   } catch (error) {
-    console.error("[v0] webSearch error:", error)
-    return []
+    console.error("[v0] webSearch error:", error);
+    return [];
   }
-}
+};
 
-export const searchWeb = webSearch
+export const searchWeb = webSearch;

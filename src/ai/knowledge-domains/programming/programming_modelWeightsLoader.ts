@@ -1,22 +1,17 @@
 import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
 interface ModelWeights {
-  embedding_layer: number[][]
-  attention_weights: Record<string, Record<string, number[][]>>
-  feedforward_weights: Record<string, Record<string, number[][]>>
-  output_layer: Record<string, number[][]>
+  embedding_layer: number[][];
+  attention_weights: Record<string, Record<string, number[][]>>;
+  feedforward_weights: Record<string, Record<string, number[][]>>;
+  output_layer: Record<string, number[][]>;
 }
 
-const programmingWeightsManager = createDomainWeightsManager({
-  domainName: "programming",
-})
-
-let cachedWeights: ModelWeights | null = null
+let weightsLoaded = false;
+let modelWeights: ModelWeights | null = null;
 
 export async function loadProgrammingModelWeights(): Promise<ModelWeights> {
-  if (cachedWeights) {
-    return cachedWeights
-  }
+  if (weightsLoaded && modelWeights) return modelWeights;
 
   const rawWeights = await programmingWeightsManager.loadWeights()
   if (rawWeights) {
@@ -57,9 +52,14 @@ const buildFallbackWeights = (): ModelWeights => {
       },
     },
     output_layer: { w: initializeMatrix(128, 72) },
-  }
+  };
+
+  weightsLoaded = true;
+  return modelWeights;
 }
 
 function initializeMatrix(rows: number, cols: number): number[][] {
-  return Array.from({ length: rows }, () => Array.from({ length: cols }, () => (Math.random() - 0.5) * 0.1))
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => (Math.random() - 0.5) * 0.1),
+  );
 }

@@ -4,38 +4,66 @@
  * Handles inference for monitoring, logging, tracing, and metrics queries
  */
 
-import fs from 'fs/promises';
-import path from 'path';
+import { DOMAIN_NAME } from "./observability_constants";
 
-const DOMAIN_NAME = 'observability';
-const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
-const SEEDS_DIR = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`);
+export const observabilityRunInference = async (
+  input: string,
+  _context?: any,
+) => {
+  const lowerInput = input.toLowerCase();
 
-/**
- * Load seed data for inference
- */
-async function loadSeedData(): Promise<any[]> {
-  try {
-    const files = await fs.readdir(SEEDS_DIR);
-    const jsonFiles = files.filter(f => f.endsWith('.json'));
-    
-    const allConcepts: any[] = [];
-    for (const file of jsonFiles) {
-      const filePath = path.join(SEEDS_DIR, file);
-      const content = await fs.readFile(filePath, 'utf-8');
-      const data = JSON.parse(content);
-      
-      if (data.concepts && Array.isArray(data.concepts)) {
-        allConcepts.push(...data.concepts);
-      } else if (Array.isArray(data)) {
-        allConcepts.push(...data);
-      }
-    }
-    
-    return allConcepts;
-  } catch (error) {
-    console.error('[Observability] Error loading seed data:', error);
-    return [];
+  let responseText = "";
+  let confidence = 0.7;
+  const sources: string[] = [];
+
+  // Detect observability keywords
+  if (
+    lowerInput.includes("log") ||
+    lowerInput.includes("monitor") ||
+    lowerInput.includes("metric") ||
+    lowerInput.includes("trace") ||
+    lowerInput.includes("observability") ||
+    lowerInput.includes("telemetry") ||
+    lowerInput.includes("alert")
+  ) {
+    confidence = 0.85;
+
+    responseText = `I can help with observability and monitoring. Key pillars:
+
+**Logging:**
+- Structured logging (JSON logs)
+- Log levels (DEBUG, INFO, WARN, ERROR)
+- Log aggregation (ELK stack, Splunk)
+- Log analysis and parsing
+
+**Metrics:**
+- Performance metrics (latency, throughput)
+- Business metrics (users, revenue)
+- Infrastructure metrics (CPU, memory, disk)
+- Custom metrics and dashboards
+
+**Tracing:**
+- Distributed tracing
+- Request flow tracking
+- Span and trace IDs
+- Performance bottleneck identification
+
+**Alerting:**
+- Threshold-based alerts
+- Anomaly detection
+- Alert fatigue reduction
+- On-call and incident management
+
+What observability topic would you like to explore?`;
+  } else {
+    responseText = `I'm the Observability domain. I cover:
+- Logging best practices
+- Monitoring and metrics
+- Distributed tracing
+- Alerting strategies
+- Performance analysis
+
+How can I help you improve your system's observability?`;
   }
 }
 

@@ -3,18 +3,21 @@
  * Purpose: Small data augmentation routines for text (synonym swap, simple back-translation stub).
  */
 
-export const synonymSwap = (text: string, replacements: Record<string, string[]>) => {
+export const synonymSwap = (
+  text: string,
+  replacements: Record<string, string[]>,
+) => {
   // Replace one token randomly if it has synonyms
   const toks = text.split(/(\s+)/);
   for (let i = 0; i < toks.length; i++) {
-    const key = toks[i].toLowerCase().replace(/\W+/g, '');
+    const key = toks[i].toLowerCase().replace(/\W+/g, "");
     const opts = replacements[key];
     if (opts && opts.length) {
       toks[i] = opts[Math.floor(Math.random() * opts.length)];
       break;
     }
   }
-  return toks.join('');
+  return toks.join("");
 };
 
 export const backTranslationStub = async (text: string) => {

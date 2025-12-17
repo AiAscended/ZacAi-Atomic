@@ -28,9 +28,9 @@ export class GeneralAssistant {
     }
 
     return {
-      response: `I detected a general inquiry about "${normalized}". Let me route this through the general knowledge domain for deeper analysis.`,
-      confidence: 0.55,
-    }
+      response: "I can help with general queries.",
+      confidence: 0.7,
+    };
   }
 }
 

@@ -9,14 +9,14 @@
  */
 
 interface InteractionLog {
-  sessionId: string
-  timestamp: number
-  userPrompt: string
-  aiResponse: string
+  sessionId: string;
+  timestamp: number;
+  userPrompt: string;
+  aiResponse: string;
 }
 
 export class InteractionLogger {
-  private logs: InteractionLog[] = []
+  private logs: InteractionLog[] = [];
 
   /**
    * Log a single user interaction with AI response.
@@ -30,7 +30,7 @@ export class InteractionLogger {
       timestamp: Date.now(),
       userPrompt,
       aiResponse,
-    })
+    });
   }
 
   /**
@@ -39,6 +39,6 @@ export class InteractionLogger {
    * @returns array of InteractionLog
    */
   getLogs(sessionId: string): InteractionLog[] {
-    return this.logs.filter((log) => log.sessionId === sessionId)
+    return this.logs.filter((log) => log.sessionId === sessionId);
   }
 }

@@ -1,4 +1,4 @@
-import { normalizeText } from './mathematics_utils';
+import { normalizeText } from "./mathematics_utils";
 
 export const mathematicsTokenizer = (text: string) => {
   const t = normalizeText(text);

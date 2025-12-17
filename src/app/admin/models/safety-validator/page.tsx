@@ -3,13 +3,13 @@
  * Content policy compliance and safety checks
  */
 
-"use client"
+"use client";
 
-import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage"
+import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage";
 
 export default function SafetyValidatorPage() {
   return (
-    <ModelSettingsPage 
+    <ModelSettingsPage
       modelName="safety-validator"
       modelTitle="Safety Validator"
       modelDescription="Validates content against safety policies and detects harmful content"
@@ -19,8 +19,8 @@ export default function SafetyValidatorPage() {
         blockHateSpeech: true,
         blockViolence: true,
         blockSexualContent: true,
-        customFilters: []
+        customFilters: [],
       }}
     />
-  )
+  );
 }

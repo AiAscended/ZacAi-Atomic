@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface PanelState {
   visible: boolean;
@@ -15,13 +15,74 @@ export interface LayoutState {
   terminal: PanelState;
   aiChat: PanelState;
   currentLayout: string;
-  
+
   // Actions
-  togglePanel: (panel: keyof Omit<LayoutState, 'currentLayout' | 'togglePanel' | 'resizePanel' | 'minimizePanel' | 'maximizePanel' | 'restorePanel' | 'setLayout' | 'resetLayout'>) => void;
-  resizePanel: (panel: keyof Omit<LayoutState, 'currentLayout' | 'togglePanel' | 'resizePanel' | 'minimizePanel' | 'maximizePanel' | 'restorePanel' | 'setLayout' | 'resetLayout'>, size: number) => void;
-  minimizePanel: (panel: keyof Omit<LayoutState, 'currentLayout' | 'togglePanel' | 'resizePanel' | 'minimizePanel' | 'maximizePanel' | 'restorePanel' | 'setLayout' | 'resetLayout'>) => void;
-  maximizePanel: (panel: keyof Omit<LayoutState, 'currentLayout' | 'togglePanel' | 'resizePanel' | 'minimizePanel' | 'maximizePanel' | 'restorePanel' | 'setLayout' | 'resetLayout'>) => void;
-  restorePanel: (panel: keyof Omit<LayoutState, 'currentLayout' | 'togglePanel' | 'resizePanel' | 'minimizePanel' | 'maximizePanel' | 'restorePanel' | 'setLayout' | 'resetLayout'>) => void;
+  togglePanel: (
+    panel: keyof Omit<
+      LayoutState,
+      | "currentLayout"
+      | "togglePanel"
+      | "resizePanel"
+      | "minimizePanel"
+      | "maximizePanel"
+      | "restorePanel"
+      | "setLayout"
+      | "resetLayout"
+    >,
+  ) => void;
+  resizePanel: (
+    panel: keyof Omit<
+      LayoutState,
+      | "currentLayout"
+      | "togglePanel"
+      | "resizePanel"
+      | "minimizePanel"
+      | "maximizePanel"
+      | "restorePanel"
+      | "setLayout"
+      | "resetLayout"
+    >,
+    size: number,
+  ) => void;
+  minimizePanel: (
+    panel: keyof Omit<
+      LayoutState,
+      | "currentLayout"
+      | "togglePanel"
+      | "resizePanel"
+      | "minimizePanel"
+      | "maximizePanel"
+      | "restorePanel"
+      | "setLayout"
+      | "resetLayout"
+    >,
+  ) => void;
+  maximizePanel: (
+    panel: keyof Omit<
+      LayoutState,
+      | "currentLayout"
+      | "togglePanel"
+      | "resizePanel"
+      | "minimizePanel"
+      | "maximizePanel"
+      | "restorePanel"
+      | "setLayout"
+      | "resetLayout"
+    >,
+  ) => void;
+  restorePanel: (
+    panel: keyof Omit<
+      LayoutState,
+      | "currentLayout"
+      | "togglePanel"
+      | "resizePanel"
+      | "minimizePanel"
+      | "maximizePanel"
+      | "restorePanel"
+      | "setLayout"
+      | "resetLayout"
+    >,
+  ) => void;
   setLayout: (layout: string) => void;
   resetLayout: () => void;
 }
@@ -39,7 +100,7 @@ const defaultState = {
   preview: { ...defaultPanelState, size: 25 },
   terminal: { ...defaultPanelState, size: 10, visible: true },
   aiChat: { ...defaultPanelState, size: 20 },
-  currentLayout: 'default',
+  currentLayout: "default",
 };
 
 export const useLayoutStore = create<LayoutState>()(
@@ -119,13 +180,16 @@ export const useLayoutStore = create<LayoutState>()(
           },
         };
 
-        set({ ...layouts[layout as keyof typeof layouts], currentLayout: layout });
+        set({
+          ...layouts[layout as keyof typeof layouts],
+          currentLayout: layout,
+        });
       },
 
       resetLayout: () => set(defaultState),
     }),
     {
-      name: 'zacai-ide-layout',
-    }
-  )
+      name: "zacai-ide-layout",
+    },
+  ),
 );

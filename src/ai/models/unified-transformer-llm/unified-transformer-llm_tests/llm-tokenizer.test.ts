@@ -1,2 +1,4 @@
 /** LLM Tokenizer Tests */
-test("tokenization", () => { expect(true).toBe(true); });
+test("tokenization", () => {
+  expect(true).toBe(true);
+});

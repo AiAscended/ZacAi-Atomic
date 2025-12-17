@@ -1,4 +1,4 @@
-import ENGLISH_CORE_TOKENS from './english_tokens';
+import ENGLISH_CORE_TOKENS from "./english_tokens";
 
 /**
  * Build a stable token -> id map for English.
@@ -8,7 +8,7 @@ import ENGLISH_CORE_TOKENS from './english_tokens';
 export const buildEnglishTokenMap = () => {
   const map = new Map<string, number>();
   // reserved tokens
-  const reserved = ['[PAD]', '[UNK]', '[CLS]', '[SEP]', '[MASK]'];
+  const reserved = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"];
   reserved.forEach((t, i) => map.set(t, i));
 
   // start domain tokens after reserved
@@ -24,7 +24,7 @@ export const buildEnglishTokenMap = () => {
 export const englishTokenMap = buildEnglishTokenMap();
 
 export const getEnglishTokenId = (token: string): number => {
-  return englishTokenMap.get(token) ?? englishTokenMap.get('[UNK]')!;
+  return englishTokenMap.get(token) ?? englishTokenMap.get("[UNK]")!;
 };
 
 export const getEnglishTokenById = (id: number): string | undefined => {
@@ -34,6 +34,9 @@ export const getEnglishTokenById = (id: number): string | undefined => {
 
 export const englishTokenCount = () => englishTokenMap.size;
 
-const english_tokenMap_bundle = { englishTokenMap, getEnglishTokenId, getEnglishTokenById, englishTokenCount };
-
-export default english_tokenMap_bundle;
+export default {
+  englishTokenMap,
+  getEnglishTokenId,
+  getEnglishTokenById,
+  englishTokenCount,
+};

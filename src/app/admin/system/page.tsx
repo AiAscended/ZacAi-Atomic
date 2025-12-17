@@ -4,151 +4,162 @@
  * Features: Location/timezone, save confirmation, last updated display
  */
 
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useTheme } from "next-themes"
-import { useState, useEffect, useCallback } from "react"
-import { Moon, Sun, Monitor, Save, RotateCcw, Check, AlertCircle } from "lucide-react"
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
+import {
+  Moon,
+  Sun,
+  Monitor,
+  Save,
+  RotateCcw,
+  Check,
+  AlertCircle,
+} from "lucide-react";
 
 interface SystemSettings {
-  systemName: string
-  timezone: string
-  location: string
-  maxConcurrentRequests: number
-  requestTimeout: number
-  enableLogging: boolean
-  logLevel: string
-  theme: string
-  updatedAt: string
+  systemName: string;
+  timezone: string;
+  location: string;
+  maxConcurrentRequests: number;
+  requestTimeout: number;
+  enableLogging: boolean;
+  logLevel: string;
+  theme: string;
+  updatedAt: string;
 }
 
 export default function SystemPage() {
-  const { theme, setTheme, systemTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  
+  const { theme, setTheme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const [settings, setSettings] = useState<SystemSettings>({
-    systemName: 'ZacAi-Atomic',
-    timezone: 'America/New_York',
-    location: 'United States',
+    systemName: "ZacAi-Atomic",
+    timezone: "America/New_York",
+    location: "United States",
     maxConcurrentRequests: 10,
     requestTimeout: 30000,
     enableLogging: true,
-    logLevel: 'info',
-    theme: 'system',
-    updatedAt: new Date().toISOString()
-  })
+    logLevel: "info",
+    theme: "system",
+    updatedAt: new Date().toISOString(),
+  });
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+    loadSettings();
+  }, []);
 
   const loadSettings = useCallback(async () => {
     try {
-      setLoading(true)
-      setError(null)
-      const response = await fetch('/api/admin/settings/system')
-      const result = await response.json()
-      
+      setLoading(true);
+      setError(null);
+      const response = await fetch("/api/admin/settings/system");
+      const result = await response.json();
+
       if (result.success) {
-        setSettings(result.data)
+        setSettings(result.data);
         // Sync theme with loaded settings
         if (result.data.theme && result.data.theme !== theme) {
-          setTheme(result.data.theme)
+          setTheme(result.data.theme);
         }
       } else {
-        setError(result.error || 'Failed to load settings')
+        setError(result.error || "Failed to load settings");
       }
     } catch (err) {
-      setError('Network error loading settings')
-      console.error('[System Settings] Load error:', err)
+      setError("Network error loading settings");
+      console.error("[System Settings] Load error:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [setTheme, theme])
-
-  useEffect(() => {
-    void loadSettings()
-  }, [loadSettings])
+  };
 
   const saveSettings = async () => {
     try {
-      setSaving(true)
-      setError(null)
-      setShowSuccess(false)
-      
-      const response = await fetch('/api/admin/settings/system', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      setSaving(true);
+      setError(null);
+      setShowSuccess(false);
+
+      const response = await fetch("/api/admin/settings/system", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...settings,
-          theme: theme || 'system',
-          updatedAt: new Date().toISOString()
-        })
-      })
-      
-      const result = await response.json()
-      
+          theme: theme || "system",
+          updatedAt: new Date().toISOString(),
+        }),
+      });
+
+      const result = await response.json();
+
       if (result.success) {
-        setSettings(result.data)
-        setShowSuccess(true)
-        setTimeout(() => setShowSuccess(false), 3000)
+        setSettings(result.data);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
       } else {
-        setError(result.error || 'Failed to save settings')
+        setError(result.error || "Failed to save settings");
       }
     } catch (err) {
-      setError('Network error saving settings')
-      console.error('[System Settings] Save error:', err)
+      setError("Network error saving settings");
+      console.error("[System Settings] Save error:", err);
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const resetToDefaults = () => {
     setSettings({
-      systemName: 'ZacAi-Atomic',
-      timezone: 'America/New_York',
-      location: 'United States',
+      systemName: "ZacAi-Atomic",
+      timezone: "America/New_York",
+      location: "United States",
       maxConcurrentRequests: 10,
       requestTimeout: 30000,
       enableLogging: true,
-      logLevel: 'info',
-      theme: 'system',
-      updatedAt: new Date().toISOString()
-    })
-    setTheme('system')
-  }
+      logLevel: "info",
+      theme: "system",
+      updatedAt: new Date().toISOString(),
+    });
+    setTheme("system");
+  };
 
-  const currentTheme = theme === "system" ? systemTheme : theme
+  const currentTheme = theme === "system" ? systemTheme : theme;
 
   const timezones = [
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'America/Anchorage',
-    'Pacific/Honolulu',
-    'Europe/London',
-    'Europe/Paris',
-    'Europe/Berlin',
-    'Asia/Tokyo',
-    'Asia/Shanghai',
-    'Asia/Dubai',
-    'Australia/Sydney',
-    'UTC'
-  ]
+    "America/New_York",
+    "America/Chicago",
+    "America/Denver",
+    "America/Los_Angeles",
+    "America/Anchorage",
+    "Pacific/Honolulu",
+    "Europe/London",
+    "Europe/Paris",
+    "Europe/Berlin",
+    "Asia/Tokyo",
+    "Asia/Shanghai",
+    "Asia/Dubai",
+    "Australia/Sydney",
+    "UTC",
+  ];
 
-  const logLevels = ['debug', 'info', 'warn', 'error']
+  const logLevels = ["debug", "info", "warn", "error"];
 
   if (loading) {
     return (
@@ -158,7 +169,7 @@ export default function SystemPage() {
           <p className="text-muted-foreground">Loading settings...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -202,10 +213,12 @@ export default function SystemPage() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="systemName">System Name</Label>
-                <Input 
-                  id="systemName" 
+                <Input
+                  id="systemName"
                   value={settings.systemName}
-                  onChange={(e) => setSettings({ ...settings, systemName: e.target.value })}
+                  onChange={(e) =>
+                    setSettings({ ...settings, systemName: e.target.value })
+                  }
                 />
                 <p className="text-sm text-muted-foreground">
                   Display name for your AI system
@@ -221,22 +234,26 @@ export default function SystemPage() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="location">Location</Label>
-                <Input 
-                  id="location" 
+                <Input
+                  id="location"
                   placeholder="e.g., San Francisco, California, USA"
                   value={settings.location}
-                  onChange={(e) => setSettings({ ...settings, location: e.target.value })}
+                  onChange={(e) =>
+                    setSettings({ ...settings, location: e.target.value })
+                  }
                 />
                 <p className="text-sm text-muted-foreground">
                   Your location for time-based features and regional settings
                 </p>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="timezone">Timezone</Label>
-                <Select 
+                <Select
                   value={settings.timezone}
-                  onValueChange={(value) => setSettings({ ...settings, timezone: value })}
+                  onValueChange={(value) =>
+                    setSettings({ ...settings, timezone: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -250,7 +267,10 @@ export default function SystemPage() {
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-muted-foreground">
-                  Current time: {new Date().toLocaleString('en-US', { timeZone: settings.timezone })}
+                  Current time:{" "}
+                  {new Date().toLocaleString("en-US", {
+                    timeZone: settings.timezone,
+                  })}
                 </p>
               </div>
             </div>
@@ -291,7 +311,10 @@ export default function SystemPage() {
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Current theme: <span className="font-medium capitalize">{currentTheme || "dark"}</span>
+                    Current theme:{" "}
+                    <span className="font-medium capitalize">
+                      {currentTheme || "dark"}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -305,11 +328,16 @@ export default function SystemPage() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="maxConcurrent">Max Concurrent Requests</Label>
-                <Input 
-                  id="maxConcurrent" 
-                  type="number" 
+                <Input
+                  id="maxConcurrent"
+                  type="number"
                   value={settings.maxConcurrentRequests}
-                  onChange={(e) => setSettings({ ...settings, maxConcurrentRequests: parseInt(e.target.value) || 10 })}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      maxConcurrentRequests: parseInt(e.target.value) || 10,
+                    })
+                  }
                 />
                 <p className="text-sm text-muted-foreground">
                   Maximum number of simultaneous AI requests (1-100)
@@ -317,11 +345,16 @@ export default function SystemPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="timeout">Request Timeout (milliseconds)</Label>
-                <Input 
-                  id="timeout" 
-                  type="number" 
+                <Input
+                  id="timeout"
+                  type="number"
                   value={settings.requestTimeout}
-                  onChange={(e) => setSettings({ ...settings, requestTimeout: parseInt(e.target.value) || 30000 })}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      requestTimeout: parseInt(e.target.value) || 30000,
+                    })
+                  }
                 />
                 <p className="text-sm text-muted-foreground">
                   How long to wait before timing out (5000-120000 ms)
@@ -342,18 +375,22 @@ export default function SystemPage() {
                     Log system events and requests
                   </p>
                 </div>
-                <Switch 
+                <Switch
                   id="enableLogging"
                   checked={settings.enableLogging}
-                  onCheckedChange={(checked) => setSettings({ ...settings, enableLogging: checked })}
+                  onCheckedChange={(checked) =>
+                    setSettings({ ...settings, enableLogging: checked })
+                  }
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="logLevel">Log Level</Label>
-                <Select 
+                <Select
                   value={settings.logLevel}
-                  onValueChange={(value) => setSettings({ ...settings, logLevel: value })}
+                  onValueChange={(value) =>
+                    setSettings({ ...settings, logLevel: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -376,8 +413,8 @@ export default function SystemPage() {
       </Tabs>
 
       <div className="flex gap-3">
-        <Button 
-          onClick={saveSettings} 
+        <Button
+          onClick={saveSettings}
           disabled={saving}
           className="flex items-center gap-2"
         >
@@ -393,9 +430,9 @@ export default function SystemPage() {
             </>
           )}
         </Button>
-        
-        <Button 
-          variant="outline" 
+
+        <Button
+          variant="outline"
           onClick={resetToDefaults}
           className="flex items-center gap-2"
         >
@@ -404,5 +441,5 @@ export default function SystemPage() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

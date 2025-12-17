@@ -5,6 +5,7 @@
 
 const features = new Map<string, number[]>();
 
-export const putFeature = (key: string, vec: number[]) => features.set(key, vec.slice());
+export const putFeature = (key: string, vec: number[]) =>
+  features.set(key, vec.slice());
 export const getFeature = (key: string) => features.get(key) ?? null;
 export const listFeatureKeys = () => Array.from(features.keys());

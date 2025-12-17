@@ -19,8 +19,13 @@ export interface ModuleRegistrationOptions {
   metadata?: Record<string, unknown>
 }
 
-const DEFAULT_VERSION = "latest"
-const registry = new Map<string, ModuleRegistration>()
+export const registerModule = (
+  name: string,
+  factory: ModuleFactory,
+  version?: string,
+) => {
+  registry.set(name, { name, version, factory });
+};
 
 const buildKey = (name: string, version: string) => `${name}::${version}`
 

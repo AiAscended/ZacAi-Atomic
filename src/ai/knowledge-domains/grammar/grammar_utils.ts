@@ -8,13 +8,13 @@
 
 export const safeParseJSON = <T = unknown>(s: string, fallback: T): T => {
   try {
-    return JSON.parse(s) as T
-  } catch {
-    return fallback
+    return JSON.parse(s) as T;
+  } catch (e) {
+    return fallback;
   }
-}
+};
 
-export const normalizeText = (t: string) => t.replace(/\s+/g, " ").trim()
+export const normalizeText = (t: string) => t.replace(/\s+/g, " ").trim();
 
 /**
  * Detect sentence boundaries for grammar analysis
@@ -24,4 +24,4 @@ export const splitSentences = (text: string): string[] => {
     .split(/[.!?]+/)
     .map((s) => s.trim())
     .filter(Boolean);
-}
+};

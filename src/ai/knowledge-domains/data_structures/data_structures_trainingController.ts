@@ -6,14 +6,24 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { loadDataStructuresLearnedData, saveDataStructuresLearnedData } from "./data_structures_learnedDataManager"
+import {
+  loadDataStructuresLearnedData,
+  saveDataStructuresLearnedData,
+} from "./data_structures_learnedDataManager";
 
-type DataStructuresLearned = { notes: string[]; concepts: Record<string, unknown> }
+type DataStructuresLearned = {
+  notes: string[];
+  concepts: Record<string, unknown>;
+};
 
-export const dataStructuresRunTrainingEpoch = async (opts?: { epochs?: number }) => {
-  const data = (await loadDataStructuresLearnedData()) as DataStructuresLearned
-  const epoch = opts?.epochs ?? 1
-  data.notes.push(`data_structures trained ${epoch} epoch(s) at ${new Date().toISOString()}`)
-  await saveDataStructuresLearnedData(data)
-  return { success: true, epochs: epoch }
-}
+export const dataStructuresRunTrainingEpoch = async (opts?: {
+  epochs?: number;
+}) => {
+  const data = (await loadDataStructuresLearnedData()) as DataStructuresLearned;
+  const epoch = opts?.epochs ?? 1;
+  data.notes.push(
+    `data_structures trained ${epoch} epoch(s) at ${new Date().toISOString()}`,
+  );
+  await saveDataStructuresLearnedData(data);
+  return { success: true, epochs: epoch };
+};

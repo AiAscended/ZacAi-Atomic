@@ -6,29 +6,34 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { normalizeText } from "./environment_utils"
-import ENVIRONMENT_CORE_TOKENS from "./environment_tokens"
+import { normalizeText } from "./environment_utils";
+import ENVIRONMENT_CORE_TOKENS from "./environment_tokens";
 
-export const environmentTokenizer = (text: string, opts?: { includeSystemTokens?: boolean }) => {
-  const normalized = normalizeText(text)
-  const words = normalized.split(/\s+/)
+export const environmentTokenizer = (
+  text: string,
+  opts?: { includeSystemTokens?: boolean },
+) => {
+  const normalized = normalizeText(text);
+  const words = normalized.split(/\s+/);
 
-  const tokens: string[] = []
+  const tokens: string[] = [];
   for (const w of words) {
-    const upper = w.toUpperCase()
+    const upper = w.toUpperCase();
     if (ENVIRONMENT_CORE_TOKENS.includes(upper)) {
-      tokens.push(upper)
+      tokens.push(upper);
     } else if (ENVIRONMENT_CORE_TOKENS.includes(w)) {
-      tokens.push(w)
+      tokens.push(w);
     } else {
-      tokens.push(w)
+      tokens.push(w);
     }
   }
 
   if (opts?.includeSystemTokens) {
-    const sys = ["<SYS_ENVIRONMENT>", "ENVIRONMENT_BASE"].filter((s) => ENVIRONMENT_CORE_TOKENS.includes(s))
-    return { tokens: [...sys, ...tokens], count: tokens.length + sys.length }
+    const sys = ["<SYS_ENVIRONMENT>", "ENVIRONMENT_BASE"].filter((s) =>
+      ENVIRONMENT_CORE_TOKENS.includes(s),
+    );
+    return { tokens: [...sys, ...tokens], count: tokens.length + sys.length };
   }
 
-  return { tokens, count: tokens.length }
-}
+  return { tokens, count: tokens.length };
+};

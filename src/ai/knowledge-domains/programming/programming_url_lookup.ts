@@ -6,13 +6,13 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerSource } from "../url_lookup"
+import { registerSource } from "../url_lookup";
 
 export interface ProgrammingDocReference {
-  title: string
-  url: string
-  topics: string[]
-  description: string
+  title: string;
+  url: string;
+  topics: string[];
+  description: string;
 }
 
 export const PROGRAMMING_DOC_REFERENCES: ProgrammingDocReference[] = [
@@ -28,28 +28,31 @@ export const PROGRAMMING_DOC_REFERENCES: ProgrammingDocReference[] = [
     topics: ["programming", "debugging", "community"],
     description: "Programming Q&A community",
   },
-]
+];
 
-const REGISTERED_SOURCES: ProgrammingDocReference[] = [
-  ...PROGRAMMING_DOC_REFERENCES,
-  {
-    title: "DevDocs",
-    url: "https://devdocs.io",
-    topics: ["api", "reference", "docs"],
-    description: "API documentation browser",
-  },
-  {
-    title: "freeCodeCamp",
-    url: "https://www.freecodecamp.org",
-    topics: ["tutorials", "javascript", "fullstack"],
-    description: "Programming tutorials and examples",
-  },
-]
+registerSource(
+  "programming",
+  "MDN Web Docs",
+  "https://developer.mozilla.org",
+  "Comprehensive web development documentation",
+);
+registerSource(
+  "programming",
+  "Stack Overflow",
+  "https://stackoverflow.com",
+  "Programming Q&A community",
+);
+registerSource(
+  "programming",
+  "DevDocs",
+  "https://devdocs.io",
+  "API documentation browser",
+);
+registerSource(
+  "programming",
+  "freeCodeCamp",
+  "https://www.freecodecamp.org",
+  "Programming tutorials and examples",
+);
 
-export function registerProgrammingDocumentationSources(): void {
-  for (const reference of REGISTERED_SOURCES) {
-    registerSource("programming", reference.title, reference.url, reference.description)
-  }
-}
-
-registerProgrammingDocumentationSources()
+export default () => registerSource;

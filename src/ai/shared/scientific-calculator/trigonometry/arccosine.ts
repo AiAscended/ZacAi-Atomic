@@ -15,9 +15,9 @@
  */
 export function acos(value: number): number {
   if (value < -1 || value > 1) {
-    throw new Error("Arccosine input must be between -1 and 1")
+    throw new Error("Arccosine input must be between -1 and 1");
   }
-  return Math.acos(value)
+  return Math.acos(value);
 }
 
 /**
@@ -27,7 +27,7 @@ export function acos(value: number): number {
  */
 export function acosDeg(value: number): number {
   if (value < -1 || value > 1) {
-    throw new Error("Arccosine input must be between -1 and 1")
+    throw new Error("Arccosine input must be between -1 and 1");
   }
-  return (Math.acos(value) * 180) / Math.PI
+  return (Math.acos(value) * 180) / Math.PI;
 }

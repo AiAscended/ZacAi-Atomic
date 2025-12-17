@@ -6,19 +6,25 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import path from "path"
+import path from "path";
 
-import { domainRegistry } from "../domainRegistry"
-import { REACT_DOMAIN } from "./react_constants"
-import { loadReactSeedVocabulary } from "./react_vocabularyManager"
+import { domainRegistry } from "../domainRegistry";
+import { REACT_DOMAIN } from "./react_constants";
+import { loadReactSeedVocabulary } from "./react_vocabularyManager";
+import { reactRunInference } from "./react_inferenceController";
+import { reactRunTrainingEpoch } from "./react_trainingController";
 
-const DOMAIN_NAME = "react"
-const DOMAIN_DIR = path.join(process.cwd(), "src", "ai", "knowledge-domains", DOMAIN_NAME)
+const DOMAIN_NAME = "react";
+const DOMAIN_DIR = path.join(
+  process.cwd(),
+  "src",
+  "ai",
+  "knowledge-domains",
+  DOMAIN_NAME,
+);
 
-const resolveDomainPath = (...segments: string[]): string => path.join(DOMAIN_DIR, ...segments)
-
-export const reactInit = async (): Promise<void> => {
-  await loadReactSeedVocabulary()
+export const reactInit = async () => {
+  await loadReactSeedVocabulary();
 
   domainRegistry.registerDomain({
     name: REACT_DOMAIN,
@@ -26,12 +32,14 @@ export const reactInit = async (): Promise<void> => {
     description: "React framework, hooks, components, and state management",
     atomicLevel: "molecule",
     modules: [],
-    seedDataPath: resolveDomainPath(`${DOMAIN_NAME}_seeds`),
-    learnedDataPath: resolveDomainPath(`${DOMAIN_NAME}_learned`),
-    weightsPath: resolveDomainPath(`${DOMAIN_NAME}_weights`),
+    seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+    learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+    weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
     enabled: true,
-  })
-}
+  });
+};
 
 // Auto-initialize when imported
-void reactInit()
+void reactInit();
+
+export default reactInit;

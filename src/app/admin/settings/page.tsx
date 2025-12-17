@@ -3,18 +3,31 @@
  * Global system configuration and management
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Save, RefreshCcw, Settings, Database, Shield, Zap } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  Save,
+  RefreshCcw,
+  Settings,
+  Database,
+  Shield,
+  Zap,
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface SystemSettings {
   general: {
@@ -87,7 +100,7 @@ export default function SettingsPage() {
   const loadSettings = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/settings/system');
+      const response = await fetch("/api/admin/settings/system");
       if (response.ok) {
         const data = await response.json();
         setSettings(data);
@@ -96,50 +109,79 @@ export default function SettingsPage() {
         setSettings(getDefaultSettings());
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error('Failed to load settings:', message);
+      console.error("Failed to load settings:", error);
       setSettings(getDefaultSettings());
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    void loadSettings();
-  }, [loadSettings]);
+  const getDefaultSettings = (): SystemSettings => ({
+    general: {
+      systemName: "ZacAi-Atomic",
+      version: "0.0.2",
+      environment: "production",
+      maintenanceMode: false,
+    },
+    ai: {
+      maxTokens: 2048,
+      temperature: 0.7,
+      topP: 0.9,
+      frequencyPenalty: 0.0,
+      presencePenalty: 0.0,
+      streamingEnabled: true,
+    },
+    security: {
+      rateLimitEnabled: true,
+      rateLimitPerMinute: 60,
+      corsEnabled: true,
+      csrfProtection: true,
+      healthCheckEnabled: true,
+    },
+    storage: {
+      chatHistoryEnabled: true,
+      chatHistoryRetentionDays: 90,
+      activityLogEnabled: true,
+      activityLogRetentionDays: 30,
+    },
+  });
 
   const saveSettings = async () => {
     if (!settings) return;
 
     setSaving(true);
     try {
-      const response = await fetch('/api/admin/settings/system', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/admin/settings/system", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
 
       if (response.ok) {
         toast({
-          title: 'Settings saved',
-          description: 'System settings have been updated successfully.',
+          title: "Settings saved",
+          description: "System settings have been updated successfully.",
         });
       } else {
-        throw new Error('Failed to save settings');
+        throw new Error("Failed to save settings");
       }
     } catch (error) {
       console.error('[System Settings] Save error', error)
       toast({
-        title: 'Error',
-        description: `Failed to save settings. ${message}`,
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setSaving(false);
     }
   };
 
-  const updateSetting = (category: keyof SystemSettings, key: string, value: unknown) => {
+  const updateSetting = (
+    category: keyof SystemSettings,
+    key: string,
+    value: unknown,
+  ) => {
     if (!settings) return;
     setSettings({
       ...settings,
@@ -163,11 +205,13 @@ export default function SettingsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">System Settings</h1>
-          <p className="text-muted-foreground">Configure global system parameters</p>
+          <p className="text-muted-foreground">
+            Configure global system parameters
+          </p>
         </div>
         <Button onClick={saveSettings} disabled={saving}>
           <Save className="h-4 w-4 mr-2" />
-          {saving ? 'Saving...' : 'Save Settings'}
+          {saving ? "Saving..." : "Save Settings"}
         </Button>
       </div>
 
@@ -204,7 +248,9 @@ export default function SettingsPage() {
                   <Input
                     id="systemName"
                     value={settings.general.systemName}
-                    onChange={(e) => updateSetting('general', 'systemName', e.target.value)}
+                    onChange={(e) =>
+                      updateSetting("general", "systemName", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -212,18 +258,29 @@ export default function SettingsPage() {
                   <Input
                     id="version"
                     value={settings.general.version}
-                    onChange={(e) => updateSetting('general', 'version', e.target.value)}
+                    onChange={(e) =>
+                      updateSetting("general", "version", e.target.value)
+                    }
                   />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="environment">Environment</Label>
-                <Badge variant={settings.general.environment === 'production' ? 'default' : 'secondary'}>
+                <Badge
+                  variant={
+                    settings.general.environment === "production"
+                      ? "default"
+                      : "secondary"
+                  }
+                >
                   {settings.general.environment}
                 </Badge>
               </div>
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="maintenance" className="flex flex-col space-y-1">
+                <Label
+                  htmlFor="maintenance"
+                  className="flex flex-col space-y-1"
+                >
                   <span>Maintenance Mode</span>
                   <span className="font-normal text-sm text-muted-foreground">
                     Temporarily disable the system for maintenance
@@ -232,7 +289,9 @@ export default function SettingsPage() {
                 <Switch
                   id="maintenance"
                   checked={settings.general.maintenanceMode}
-                  onCheckedChange={(checked) => updateSetting('general', 'maintenanceMode', checked)}
+                  onCheckedChange={(checked) =>
+                    updateSetting("general", "maintenanceMode", checked)
+                  }
                 />
               </div>
             </CardContent>
@@ -253,7 +312,9 @@ export default function SettingsPage() {
                     id="maxTokens"
                     type="number"
                     value={settings.ai.maxTokens}
-                    onChange={(e) => updateSetting('ai', 'maxTokens', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateSetting("ai", "maxTokens", parseInt(e.target.value))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -265,7 +326,13 @@ export default function SettingsPage() {
                     min="0"
                     max="2"
                     value={settings.ai.temperature}
-                    onChange={(e) => updateSetting('ai', 'temperature', parseFloat(e.target.value))}
+                    onChange={(e) =>
+                      updateSetting(
+                        "ai",
+                        "temperature",
+                        parseFloat(e.target.value),
+                      )
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -277,7 +344,9 @@ export default function SettingsPage() {
                     min="0"
                     max="1"
                     value={settings.ai.topP}
-                    onChange={(e) => updateSetting('ai', 'topP', parseFloat(e.target.value))}
+                    onChange={(e) =>
+                      updateSetting("ai", "topP", parseFloat(e.target.value))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -289,7 +358,13 @@ export default function SettingsPage() {
                     min="0"
                     max="2"
                     value={settings.ai.frequencyPenalty}
-                    onChange={(e) => updateSetting('ai', 'frequencyPenalty', parseFloat(e.target.value))}
+                    onChange={(e) =>
+                      updateSetting(
+                        "ai",
+                        "frequencyPenalty",
+                        parseFloat(e.target.value),
+                      )
+                    }
                   />
                 </div>
               </div>
@@ -303,7 +378,9 @@ export default function SettingsPage() {
                 <Switch
                   id="streaming"
                   checked={settings.ai.streamingEnabled}
-                  onCheckedChange={(checked) => updateSetting('ai', 'streamingEnabled', checked)}
+                  onCheckedChange={(checked) =>
+                    updateSetting("ai", "streamingEnabled", checked)
+                  }
                 />
               </div>
             </CardContent>
@@ -314,7 +391,9 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Security Settings</CardTitle>
-              <CardDescription>Configure security and protection features</CardDescription>
+              <CardDescription>
+                Configure security and protection features
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between space-x-2">
@@ -327,17 +406,27 @@ export default function SettingsPage() {
                 <Switch
                   id="rateLimit"
                   checked={settings.security.rateLimitEnabled}
-                  onCheckedChange={(checked) => updateSetting('security', 'rateLimitEnabled', checked)}
+                  onCheckedChange={(checked) =>
+                    updateSetting("security", "rateLimitEnabled", checked)
+                  }
                 />
               </div>
               {settings.security.rateLimitEnabled && (
                 <div className="space-y-2">
-                  <Label htmlFor="rateLimitPerMinute">Requests Per Minute</Label>
+                  <Label htmlFor="rateLimitPerMinute">
+                    Requests Per Minute
+                  </Label>
                   <Input
                     id="rateLimitPerMinute"
                     type="number"
                     value={settings.security.rateLimitPerMinute}
-                    onChange={(e) => updateSetting('security', 'rateLimitPerMinute', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateSetting(
+                        "security",
+                        "rateLimitPerMinute",
+                        parseInt(e.target.value),
+                      )
+                    }
                   />
                 </div>
               )}
@@ -351,7 +440,9 @@ export default function SettingsPage() {
                 <Switch
                   id="cors"
                   checked={settings.security.corsEnabled}
-                  onCheckedChange={(checked) => updateSetting('security', 'corsEnabled', checked)}
+                  onCheckedChange={(checked) =>
+                    updateSetting("security", "corsEnabled", checked)
+                  }
                 />
               </div>
               <div className="flex items-center justify-between space-x-2">
@@ -364,11 +455,16 @@ export default function SettingsPage() {
                 <Switch
                   id="csrf"
                   checked={settings.security.csrfProtection}
-                  onCheckedChange={(checked) => updateSetting('security', 'csrfProtection', checked)}
+                  onCheckedChange={(checked) =>
+                    updateSetting("security", "csrfProtection", checked)
+                  }
                 />
               </div>
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="healthCheck" className="flex flex-col space-y-1">
+                <Label
+                  htmlFor="healthCheck"
+                  className="flex flex-col space-y-1"
+                >
                   <span>Health Check Endpoint</span>
                   <span className="font-normal text-sm text-muted-foreground">
                     Enable /api/health endpoint
@@ -377,7 +473,9 @@ export default function SettingsPage() {
                 <Switch
                   id="healthCheck"
                   checked={settings.security.healthCheckEnabled}
-                  onCheckedChange={(checked) => updateSetting('security', 'healthCheckEnabled', checked)}
+                  onCheckedChange={(checked) =>
+                    updateSetting("security", "healthCheckEnabled", checked)
+                  }
                 />
               </div>
             </CardContent>
@@ -388,11 +486,16 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Storage Settings</CardTitle>
-              <CardDescription>Configure data storage and retention</CardDescription>
+              <CardDescription>
+                Configure data storage and retention
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="chatHistory" className="flex flex-col space-y-1">
+                <Label
+                  htmlFor="chatHistory"
+                  className="flex flex-col space-y-1"
+                >
                   <span>Chat History</span>
                   <span className="font-normal text-sm text-muted-foreground">
                     Save chat conversations
@@ -401,22 +504,35 @@ export default function SettingsPage() {
                 <Switch
                   id="chatHistory"
                   checked={settings.storage.chatHistoryEnabled}
-                  onCheckedChange={(checked) => updateSetting('storage', 'chatHistoryEnabled', checked)}
+                  onCheckedChange={(checked) =>
+                    updateSetting("storage", "chatHistoryEnabled", checked)
+                  }
                 />
               </div>
               {settings.storage.chatHistoryEnabled && (
                 <div className="space-y-2">
-                  <Label htmlFor="chatRetention">Chat History Retention (days)</Label>
+                  <Label htmlFor="chatRetention">
+                    Chat History Retention (days)
+                  </Label>
                   <Input
                     id="chatRetention"
                     type="number"
                     value={settings.storage.chatHistoryRetentionDays}
-                    onChange={(e) => updateSetting('storage', 'chatHistoryRetentionDays', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateSetting(
+                        "storage",
+                        "chatHistoryRetentionDays",
+                        parseInt(e.target.value),
+                      )
+                    }
                   />
                 </div>
               )}
               <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="activityLog" className="flex flex-col space-y-1">
+                <Label
+                  htmlFor="activityLog"
+                  className="flex flex-col space-y-1"
+                >
                   <span>Activity Logging</span>
                   <span className="font-normal text-sm text-muted-foreground">
                     Track system activities
@@ -425,17 +541,27 @@ export default function SettingsPage() {
                 <Switch
                   id="activityLog"
                   checked={settings.storage.activityLogEnabled}
-                  onCheckedChange={(checked) => updateSetting('storage', 'activityLogEnabled', checked)}
+                  onCheckedChange={(checked) =>
+                    updateSetting("storage", "activityLogEnabled", checked)
+                  }
                 />
               </div>
               {settings.storage.activityLogEnabled && (
                 <div className="space-y-2">
-                  <Label htmlFor="activityRetention">Activity Log Retention (days)</Label>
+                  <Label htmlFor="activityRetention">
+                    Activity Log Retention (days)
+                  </Label>
                   <Input
                     id="activityRetention"
                     type="number"
                     value={settings.storage.activityLogRetentionDays}
-                    onChange={(e) => updateSetting('storage', 'activityLogRetentionDays', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      updateSetting(
+                        "storage",
+                        "activityLogRetentionDays",
+                        parseInt(e.target.value),
+                      )
+                    }
                   />
                 </div>
               )}

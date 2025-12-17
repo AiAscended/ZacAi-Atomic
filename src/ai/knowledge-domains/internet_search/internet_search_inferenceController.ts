@@ -12,14 +12,13 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { internetSearchTokenizer } from "./internet_search_tokenizer"
-import { internetSearchSemanticAnalyzer } from "./internet_search_semanticAnalyzer"
-import pretrainedWeights from "./internet_search_weights/internet_search_pretrained_weights.json"
-import seeds from "./internet_search_seeds/internet_search_seeds.json"
-import { normalizeThresholds, normalizeVocabularyWeights, type ThresholdLike } from "../utils/embeddingUtils"
-import { findSources } from "../url_lookup"
-import { scrapeURL, type ScrapedContent } from "../../shared/tools/webScraper"
-import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
+import { internetSearchTokenizer } from "./internet_search_tokenizer";
+import { internetSearchSemanticAnalyzer } from "./internet_search_semanticAnalyzer";
+import pretrainedWeights from "./internet_search_weights/internet_search_pretrained_weights.json";
+import seeds from "./internet_search_seeds/internet_search_seeds.json";
+import { findSources } from "../url_lookup";
+import { scrapeURL } from "../../shared/tools/webScraper";
+import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants";
 
 type SemanticAnalysis = ReturnType<typeof internetSearchSemanticAnalyzer>
 type DomainSource = ReturnType<typeof findSources>[number]
@@ -40,28 +39,11 @@ interface InternetSearchPretrainedWeights {
 }
 
 interface InferenceContext {
-  tokens: string[]
-  inferenceResults?: unknown
-  sentiment?: unknown
-  slots?: unknown
-  userProfile?: unknown
-}
-
-type SearchResult = {
-  title: string
-  snippet: string
-  url: string
-  source: string
-}
-
-type ThresholdWeights = {
-  token_match_weight: number
-  semantic_weight: number
-}
-
-const DEFAULT_THRESHOLDS: ThresholdWeights = {
-  token_match_weight: 0.6,
-  semantic_weight: 0.4,
+  tokens: string[];
+  inferenceResults?: any;
+  sentiment?: any;
+  slots?: any;
+  userProfile?: any;
 }
 
 /**
@@ -74,39 +56,42 @@ const THRESHOLDS = normalizeThresholds(PRETRAINED.thresholds, SEEDS.thresholds)
 const PATTERNS = SEEDS.patterns ?? []
 
 function calculateConfidence(tokens: string[], input: string): number {
-  const lowerInput = input.toLowerCase()
-  const vocabulary = (seeds as { vocabulary?: Record<string, number> }).vocabulary ?? {}
-  const thresholds = (pretrainedWeights as { thresholds?: ThresholdWeights }).thresholds ?? DEFAULT_THRESHOLDS
+  const lowerInput = input.toLowerCase();
+  const vocabulary = (pretrainedWeights as any).vocabulary || {};
 
-  let tokenScore = 0
-  let matchCount = 0
+  let tokenScore = 0;
+  let matchCount = 0;
 
   // Calculate token-based confidence
   for (const token of tokens) {
-    const lowerToken = token.toLowerCase()
-    if (VOCABULARY[lowerToken]) {
-      tokenScore += VOCABULARY[lowerToken]
-      matchCount++
+    const lowerToken = token.toLowerCase();
+    if (vocabulary[lowerToken]) {
+      tokenScore += vocabulary[lowerToken];
+      matchCount++;
     }
   }
 
-  const avgTokenScore = matchCount > 0 ? tokenScore / matchCount : 0
+  const avgTokenScore = matchCount > 0 ? tokenScore / matchCount : 0;
 
   // Semantic pattern matching
-  let semanticScore = 0
-  const patterns = (seeds as { patterns?: Array<{ pattern: string; weight: number }> }).patterns ?? []
+  let semanticScore = 0;
+  const patterns = seeds.patterns as Array<{ pattern: string; weight: number }>;
 
   for (const patternObj of patterns) {
     if (lowerInput.includes(patternObj.pattern)) {
-      semanticScore += patternObj.weight
+      semanticScore += patternObj.weight;
     }
   }
 
-  semanticScore = Math.min(semanticScore / 2, 1.0)
+  semanticScore = Math.min(semanticScore / 2, 1.0);
 
-  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
+  // Combine scores
+  const thresholds = (pretrainedWeights as any).thresholds || { highConfidence: 0.8, mediumConfidence: 0.5 };
+  const finalConfidence =
+    avgTokenScore * thresholds.token_match_weight +
+    semanticScore * thresholds.semantic_weight;
 
-  return Math.min(finalConfidence, 1.0)
+  return Math.min(finalConfidence, 1.0);
 }
 
 /**
@@ -118,14 +103,9 @@ function extractSearchQuery(input: string, _semantics: unknown): string {
     .replace(/^(can you |could you |please |would you )/i, "")
     .replace(/^(search for |find |lookup |google |tell me about )/i, "")
     .replace(/\?$/g, "")
-    .trim()
+    .trim();
 
-  if (!query && Array.isArray((semantics as { keywords?: string[] }).keywords)) {
-    const keywords = (semantics as { keywords?: string[] }).keywords ?? []
-    query = keywords.slice(0, 3).join(" ")
-  }
-
-  return query
+  return query;
 }
 
 /**
@@ -134,15 +114,18 @@ function extractSearchQuery(input: string, _semantics: unknown): string {
  */
 export async function internetSearchRunInference(
   input: string,
-  context?: InferenceContext,
-): Promise<InternetSearchInferenceResponse> {
-  const { tokens } = internetSearchTokenizer(input)
-  const semantics = internetSearchSemanticAnalyzer(input)
+  _context?: InferenceContext,
+): Promise<any> {
+  const tokens = internetSearchTokenizer(input).tokens;
+  const semantics = internetSearchSemanticAnalyzer(input);
 
-  const confidence = calculateConfidence(tokens, input)
+  const confidence = calculateConfidence(tokens, input);
 
-  console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} inference confidence:`, confidence)
-  console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} semantics:`, semantics)
+  console.log(
+    `[v0] ${INTERNET_SEARCH_DOMAIN} inference confidence:`,
+    confidence,
+  );
+  console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} semantics:`, semantics);
 
   if (confidence < 0.01) {
     return {
@@ -154,44 +137,47 @@ export async function internetSearchRunInference(
         code: "LOW_CONFIDENCE",
         message: `Query confidence (${confidence.toFixed(2)}) below threshold (0.01)`,
       },
-      metadata: {
-        tokensUsed: tokens.length,
-        semanticAnalysis: semantics,
-        searchQuery: "",
-        resultCount: 0,
-        method: "inference_only",
-        preferredEngine: context?.userProfile?.preferredEngine,
-      },
-    }
+    };
   }
 
-  const searchQuery = extractSearchQuery(input, semantics)
-  console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} extracted query:`, searchQuery)
+  const searchQuery = extractSearchQuery(input, semantics);
+  console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} extracted query:`, searchQuery);
 
-  const searchEngines = findSources(INTERNET_SEARCH_DOMAIN)
-  const results: SearchResult[] = []
+  const searchEngines = findSources(INTERNET_SEARCH_DOMAIN);
+  const results: any[] = [];
 
   for (const engine of searchEngines) {
     try {
-      const searchUrl = buildEngineSearchUrl(engine, searchQuery)
-      if (!searchUrl) continue
+      const searchUrl = `${engine.url}${engine.searchPath}${encodeURIComponent(searchQuery)}`;
+      console.log(
+        `[v0] ${INTERNET_SEARCH_DOMAIN} trying ${engine.name} at: ${searchUrl}`,
+      );
 
-      console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} trying ${engine.name} at: ${searchUrl}`)
-
-      const content = await scrapeURL(searchUrl)
+      const content = await scrapeURL(searchUrl);
 
       if (content && content.snippet.length > 50) {
-        results.push(mapScrapeToResult(content, engine.name))
+        results.push({
+          title: content.title,
+          snippet: content.snippet,
+          url: content.url,
+          source: engine.name,
+        });
       }
     } catch (error) {
-      console.error(`[v0] ${INTERNET_SEARCH_DOMAIN} ${engine.name} failed:`, error)
+      console.error(
+        `[v0] ${INTERNET_SEARCH_DOMAIN} ${engine.name} failed:`,
+        error,
+      );
     }
   }
 
   if (results.length > 0) {
     const resultText = results
-      .map((r, i) => `**${i + 1}. ${r.title}** (${r.source})\n${r.snippet}\n[Source](${r.url})`)
-      .join("\n\n")
+      .map(
+        (r, i) =>
+          `**${i + 1}. ${r.title}** (${r.source})\n${r.snippet}\n[Source](${r.url})`,
+      )
+      .join("\n\n");
 
     return {
       response: `**Search Results:**\n\n${resultText}`,
@@ -206,7 +192,7 @@ export async function internetSearchRunInference(
         method: "url_lookup_scraping",
         preferredEngine: context?.userProfile?.preferredEngine,
       },
-    }
+    };
   }
 
   return {
@@ -227,7 +213,7 @@ export async function internetSearchRunInference(
       method: "inference_only",
       preferredEngine: context?.userProfile?.preferredEngine,
     },
-  }
+  };
 }
 
 export default internetSearchRunInference;

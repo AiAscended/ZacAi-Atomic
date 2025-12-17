@@ -15,19 +15,19 @@
  */
 export function mode(...numbers: number[]): number[] {
   if (numbers.length === 0) {
-    throw new Error("Cannot calculate mode of empty array")
+    throw new Error("Cannot calculate mode of empty array");
   }
 
-  const frequency = new Map<number, number>()
-  let maxFreq = 0
+  const frequency = new Map<number, number>();
+  let maxFreq = 0;
 
   for (const num of numbers) {
-    const freq = (frequency.get(num) || 0) + 1
-    frequency.set(num, freq)
-    maxFreq = Math.max(maxFreq, freq)
+    const freq = (frequency.get(num) || 0) + 1;
+    frequency.set(num, freq);
+    maxFreq = Math.max(maxFreq, freq);
   }
 
   return Array.from(frequency.entries())
-    .filter(([, freq]) => freq === maxFreq)
-    .map(([num]) => num)
+    .filter(([_, freq]) => freq === maxFreq)
+    .map(([num, _]) => num);
 }

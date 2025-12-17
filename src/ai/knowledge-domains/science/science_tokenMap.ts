@@ -6,35 +6,38 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import SCIENCE_CORE_TOKENS from "./science_tokens"
+import SCIENCE_CORE_TOKENS from "./science_tokens";
 
 export const buildScienceTokenMap = () => {
-  const map = new Map<string, number>()
-  const reserved = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"]
-  reserved.forEach((t, i) => map.set(t, i))
+  const map = new Map<string, number>();
+  const reserved = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"];
+  reserved.forEach((t, i) => map.set(t, i));
 
-  let idx = reserved.length
+  let idx = reserved.length;
   for (const t of SCIENCE_CORE_TOKENS) {
-    if (map.has(t)) continue
-    map.set(t, idx++)
+    if (map.has(t)) continue;
+    map.set(t, idx++);
   }
 
-  return map
-}
+  return map;
+};
 
-export const scienceTokenMap = buildScienceTokenMap()
+export const scienceTokenMap = buildScienceTokenMap();
 
 export const getScienceTokenId = (token: string): number => {
-  return scienceTokenMap.get(token) ?? scienceTokenMap.get("[UNK]")!
-}
+  return scienceTokenMap.get(token) ?? scienceTokenMap.get("[UNK]")!;
+};
 
 export const getScienceTokenById = (id: number): string | undefined => {
-  for (const [k, v] of scienceTokenMap.entries()) if (v === id) return k
-  return undefined
-}
+  for (const [k, v] of scienceTokenMap.entries()) if (v === id) return k;
+  return undefined;
+};
 
-export const scienceTokenCount = () => scienceTokenMap.size
+export const scienceTokenCount = () => scienceTokenMap.size;
 
-const scienceTokenApi = { scienceTokenMap, getScienceTokenId, getScienceTokenById, scienceTokenCount }
-
-export default scienceTokenApi
+export default {
+  scienceTokenMap,
+  getScienceTokenId,
+  getScienceTokenById,
+  scienceTokenCount,
+};

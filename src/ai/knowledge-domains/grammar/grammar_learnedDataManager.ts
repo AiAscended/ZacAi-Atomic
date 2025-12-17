@@ -6,40 +6,28 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { safeParseJSON } from "./grammar_utils"
-import { storageAdapter } from "../storageAdapter"
-
-export type GrammarLearnedData = {
-  notes: string[]
-  concepts: Record<string, unknown>
-}
-
-const DEFAULT_LEARNED_DATA_PATH =
-  "/src/ai/knowledge-domains/grammar/grammar_learned/grammar_learnedData.json"
-
-const createDefaultLearnedData = (): GrammarLearnedData => ({ notes: [], concepts: {} })
+import { safeParseJSON } from "./grammar_utils";
+import { storageAdapter } from "../storageAdapter";
 
 export const loadGrammarLearnedData = async (
-  path = DEFAULT_LEARNED_DATA_PATH,
-): Promise<GrammarLearnedData> => {
+  path = "/src/ai/knowledge-domains/grammar/grammar_learned/grammar_learnedData.json",
+) => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON<GrammarLearnedData>(raw, createDefaultLearnedData())
-  } catch (error) {
-    console.error("[grammar][learned-data] Failed to load learned data", { path, error })
-    return createDefaultLearnedData()
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { notes: [], concepts: {} });
+  } catch (e) {
+    return { notes: [], concepts: {} };
   }
-}
+};
 
 export const saveGrammarLearnedData = async (
-  data: GrammarLearnedData,
-  path = DEFAULT_LEARNED_DATA_PATH,
-): Promise<boolean> => {
+  data: unknown,
+  path = "/src/ai/knowledge-domains/grammar/grammar_learned/grammar_learnedData.json",
+) => {
   try {
-    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
-    return true
-  } catch (error) {
-    console.error("[grammar][learned-data] Failed to persist learned data", { path, error })
-    return false
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2));
+    return true;
+  } catch (e) {
+    return false;
   }
-}
+};

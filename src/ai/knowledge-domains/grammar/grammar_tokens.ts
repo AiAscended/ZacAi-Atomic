@@ -92,6 +92,6 @@ export const GRAMMAR_CORE_TOKENS = [
   "TOKEN_28",
   "TOKEN_29",
   "TOKEN_30",
-]
+];
 
-export default GRAMMAR_CORE_TOKENS
+export default GRAMMAR_CORE_TOKENS;

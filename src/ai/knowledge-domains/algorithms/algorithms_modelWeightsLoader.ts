@@ -1,21 +1,14 @@
 import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-const algorithmsWeightsManager = createDomainWeightsManager({
-  domainName: "algorithms",
-})
+import { storageAdapter } from "../storageAdapter";
 
-export const algorithmsLoadWeights = async () => {
-  const weights = await algorithmsWeightsManager.loadWeights()
-  if (!weights) {
-    return { success: false, weights: null }
+export const algorithmsLoadWeights = async (
+  path = "/src/ai/knowledge-domains/algorithms/algorithms_weights/algorithms_trainingWeights.bin",
+) => {
+  try {
+    const buffer = await storageAdapter.readFile(path);
+    return { success: true, weights: buffer };
+  } catch {
+    return { success: false, weights: null };
   }
-  return { success: true, weights }
-}
-
-export const primeAlgorithmsWeights = async (): Promise<string | null> => {
-  return algorithmsWeightsManager.prime()
-}
-
-export const getAlgorithmsActiveWeightArtifact = () => {
-  return algorithmsWeightsManager.getActiveWeightArtifact()
-}
+};

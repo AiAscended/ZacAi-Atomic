@@ -3,13 +3,13 @@
  * Optimizes resource allocation and efficiency
  */
 
-"use client"
+"use client";
 
-import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage"
+import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage";
 
 export default function ResourceOptimizerPage() {
   return (
-    <ModelSettingsPage 
+    <ModelSettingsPage
       modelName="resource-optimizer"
       modelTitle="Resource Optimizer"
       modelDescription="Optimizes compute resource allocation for maximum efficiency"
@@ -20,8 +20,8 @@ export default function ResourceOptimizerPage() {
         priorityLevels: 3,
         enableAutoScaling: false,
         cpuThreshold: 0.8,
-        memoryThreshold: 0.85
+        memoryThreshold: 0.85,
       }}
     />
-  )
+  );
 }

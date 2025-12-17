@@ -1,66 +1,8 @@
-"use client"
+"use client";
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react"
-import { AlertTriangle, GitBranch, RefreshCw, ShieldCheck, Sparkles, Timer } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import type { SystemErrorRecord } from "@/lib/errors/types"
-
-type AutoResolveStrategy = "self-heal" | "rollback"
-
-interface ErrorResponse {
-  success: boolean
-  data: {
-    errors: SystemErrorRecord[]
-    stats: {
-      active: number
-      resolved: number
-      critical: number
-      warning: number
-    }
-    autoResolve: {
-      autoResolveErrors: boolean
-      errorRecoveryStrategy: AutoResolveStrategy
-      maxAutoResolveAttempts: number
-    }
-  }
-}
-
-const severityStyles: Record<SystemErrorRecord["severity"], { icon: ReactNode; tone: string; label: string }> = {
-  info: {
-    icon: <Sparkles className="h-4 w-4 text-sky-500" />,
-    tone: "sky",
-    label: "Info",
-  },
-  warning: {
-    icon: <AlertTriangle className="h-4 w-4 text-yellow-500" />,
-    tone: "yellow",
-    label: "Warning",
-  },
-  error: {
-    icon: <AlertTriangle className="h-4 w-4 text-red-500" />,
-    tone: "red",
-    label: "Error",
-  },
-  critical: {
-    icon: <ShieldCheck className="h-4 w-4 text-rose-500" />,
-    tone: "rose",
-    label: "Critical",
-  },
-}
-
-const statusCopy: Record<SystemErrorRecord["status"], { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  open: { label: "Open", variant: "destructive" },
-  resolving: { label: "Resolving", variant: "secondary" },
-  resolved: { label: "Resolved", variant: "default" },
-  failed: { label: "Failed", variant: "outline" },
-}
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, CheckCircle, XCircle, RefreshCw } from "lucide-react";
 
 export default function ErrorsPage() {
   const [errors, setErrors] = useState<SystemErrorRecord[]>([])
@@ -147,16 +89,14 @@ export default function ErrorsPage() {
         setResolvingId(null)
       }
     },
-    [fetchErrors]
-  )
-
-  const newestUpdate = useMemo(() => {
-    if (!errors.length) return null
-    return errors.reduce((latest, current) => {
-      if (!latest) return current
-      return latest.detectedAt > current.detectedAt ? latest : current
-    }, errors[0])
-  }, [errors])
+    {
+      id: 3,
+      domain: "Internet Search",
+      message: "URL lookup timeout",
+      severity: "error",
+      timestamp: "10 minutes ago",
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -262,9 +202,36 @@ export default function ErrorsPage() {
       </Card>
 
       <Card className="p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-          <h2 className="text-xl font-semibold">Incident Queue</h2>
-          <div className="text-sm text-muted-foreground">{errors.length} items • realtime from system activity logs</div>
+        <h2 className="text-xl font-semibold mb-4">Recent Issues</h2>
+        <div className="space-y-3">
+          {errors.map((error) => (
+            <div
+              key={error.id}
+              className="flex items-start gap-3 p-3 border rounded-lg"
+            >
+              {error.severity === "error" && (
+                <XCircle className="h-5 w-5 text-red-500 mt-0.5" />
+              )}
+              {error.severity === "warning" && (
+                <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5" />
+              )}
+              {error.severity === "info" && (
+                <CheckCircle className="h-5 w-5 text-blue-500 mt-0.5" />
+              )}
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium">{error.domain}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {error.timestamp}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">{error.message}</p>
+              </div>
+              <Button variant="ghost" size="sm">
+                Resolve
+              </Button>
+            </div>
+          ))}
         </div>
 
         {errorMessage && (
@@ -365,5 +332,5 @@ export default function ErrorsPage() {
         )}
       </Card>
     </div>
-  )
+  );
 }

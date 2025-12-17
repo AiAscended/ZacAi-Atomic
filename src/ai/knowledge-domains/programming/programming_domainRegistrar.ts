@@ -1,18 +1,19 @@
-import { PROGRAMMING_DOMAIN } from "./programming_constants"
+import { PROGRAMMING_DOMAIN } from "./programming_constants";
 
 export interface ProgrammingDomainMetadata {
-  name: string
-  version: string
-  description: string
-  capabilities: string[]
-  keywords: string[]
+  name: string;
+  version: string;
+  description: string;
+  capabilities: string[];
+  keywords: string[];
 }
 
 export function getProgrammingDomainMetadata(): ProgrammingDomainMetadata {
   return {
     name: PROGRAMMING_DOMAIN,
     version: "1.0.0",
-    description: "General programming concepts and best practices across languages",
+    description:
+      "General programming concepts and best practices across languages",
     capabilities: [
       "concept_explanation",
       "syntax_help",
@@ -32,5 +33,5 @@ export function getProgrammingDomainMetadata(): ProgrammingDomainMetadata {
       "debugging",
       "syntax",
     ],
-  }
+  };
 }

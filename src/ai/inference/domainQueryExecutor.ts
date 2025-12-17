@@ -4,10 +4,7 @@
  * and automated recovery attempts backed by the unified loader/registry stack.
  */
 
-import { domainRegistry } from '../knowledge-domains/domainRegistry';
-import { getUnifiedLoader, type LoadedModule } from '../shared/loader/unifiedLoader';
-import { getUnifiedRegistry, type ModuleManifest } from '../shared/registry/unifiedRegistry';
-import { logEvent } from '../../lib/systemActivityLogger';
+import { domainRegistry } from "../knowledge-domains/domainRegistry";
 
 export interface DomainQueryResult {
   domain: string;
@@ -50,10 +47,16 @@ type DomainInferenceHandler = (
 ) => Promise<DomainInferenceOutput> | DomainInferenceOutput;
 
 export class DomainQueryExecutor {
-  private loader = getUnifiedLoader();
-  private inferenceCache = new Map<string, DomainInferenceHandler>();
-
-  async queryDomainsByName(domainNames: string[], query: string): Promise<DomainQueryResult[]> {
+  /**
+   * Query specific domains by name with actual inference
+   * @param domainNames Array of domain names to query
+   * @param query The user query/prompt
+   * @returns Array of domain-specific results with confidence scores
+   */
+  async queryDomainsByName(
+    domainNames: string[],
+    query: string,
+  ): Promise<DomainQueryResult[]> {
     const results: DomainQueryResult[] = [];
 
     for (const domainName of domainNames) {
@@ -63,7 +66,7 @@ export class DomainQueryExecutor {
       } catch (error) {
         results.push({
           domain: domainName,
-          response: '',
+          response: "",
           confidence: 0,
           error: error instanceof Error ? error.message : String(error),
           diagnostics: {
@@ -92,8 +95,14 @@ export class DomainQueryExecutor {
     return results;
   }
 
-  private async querySingleDomain(domainName: string, query: string): Promise<DomainQueryResult> {
-    const diagnostics: DomainQueryResult['diagnostics'] = { attempts: [] };
+  /**
+   * Query a single domain with its inference controller
+   */
+  private async querySingleDomain(
+    domainName: string,
+    query: string,
+  ): Promise<DomainQueryResult> {
+    // Get domain from registry
     const domain = domainRegistry.getDomain(domainName);
 
     if (!domain || !domain.enabled) {
@@ -104,7 +113,7 @@ export class DomainQueryExecutor {
       ];
       return {
         domain: domainName,
-        response: '',
+        response: "",
         confidence: 0,
         error: `Domain ${domainName} not found or disabled`,
         status: 'unavailable',
@@ -112,20 +121,45 @@ export class DomainQueryExecutor {
       };
     }
 
-    const moduleStatus = await this.ensureDomainModule(domainName, diagnostics);
-
+    // Try to dynamically import domain inference controller
     try {
-      const handler = await this.getInferenceHandler(domainName, diagnostics);
+      const inferenceModule = await this.loadDomainInference(domainName);
 
-      if (!handler) {
-        diagnostics.notes = `No inference handler exported for ${domainName}.`;
-        diagnostics.suggestions = diagnostics.suggestions || [
-          `Verify ${domainName} exports a callable inference function (e.g. ${domainName}RunInference).`,
-          `Confirm ${domainName} inference controller path matches the unified registry manifest.`,
-        ];
+      if (!inferenceModule) {
+        // Fallback: basic domain response
         return {
           domain: domainName,
-          response: '',
+          response: `[${domainName}] Processing query: ${query}`,
+          confidence: 0.5,
+          metadata: { fallback: true },
+        };
+      }
+
+      // Call domain-specific inference with full context
+      // Build context object with tokens, embeddings, and any prior inference results
+      const context = {
+        query: query,
+        tokens: query.toLowerCase().split(/\s+/), // Basic tokenization
+        embeddings: [], // TODO: Add actual embeddings when available
+        inferenceResults: [], // Can be populated with prior domain results
+        sentiment: { sentiment: "neutral", score: 0.5 }, // Default neutral sentiment
+      };
+
+      console.log(
+        `[DomainQueryExecutor] Calling ${domainName} inference with query:`,
+        query.substring(0, 50),
+      );
+      const result = await inferenceModule(query, context);
+      console.log(`[DomainQueryExecutor] ${domainName} returned:`, {
+        hasResult: !!result,
+        confidence: result?.confidence,
+        responseLength: result?.response?.length,
+      });
+
+      if (!result) {
+        return {
+          domain: domainName,
+          response: "",
           confidence: 0,
           status: moduleStatus ?? 'unavailable',
           metadata: { fallback: true },
@@ -134,106 +168,23 @@ export class DomainQueryExecutor {
         };
       }
 
-      const context: DomainInferenceContext = {
-        query,
-        tokens: query.toLowerCase().split(/\s+/),
-        embeddings: [],
-        inferenceResults: [],
-        sentiment: { sentiment: 'neutral', score: 0.5 },
-      };
-
-      const result = await handler(query, context);
-      diagnostics.attempts.push({ action: 'execute_inference', outcome: 'success', timestamp: Date.now() });
-
-      if (!result) {
-        diagnostics.notes = `Domain ${domainName} returned an empty response.`;
-        return {
-          domain: domainName,
-          response: '',
-          confidence: 0,
-          status: moduleStatus ?? 'ready',
-          metadata: { notApplicable: true },
-          diagnostics,
-        };
-      }
-
       return {
         domain: domainName,
-        response: result.response || '',
-        confidence: result.confidence ?? 0.5,
+        response: result.response || "",
+        confidence: result.confidence || 0.5,
         topics: result.topics || [],
         metadata: result.metadata || {},
         status: moduleStatus ?? 'ready',
         diagnostics,
       };
     } catch (error) {
-      diagnostics.attempts.push({
-        action: 'execute_inference',
-        outcome: 'failure',
-        timestamp: Date.now(),
-        detail: error instanceof Error ? error.message : String(error),
-      });
-      logEvent('domain.inference_failure', {
-        domain: domainName,
-        message: error instanceof Error ? error.message : String(error),
-      });
-
-      const recovered = await this.tryHotReload(domainName, diagnostics);
-      if (recovered) {
-        try {
-          const handler = await this.getInferenceHandler(domainName, diagnostics, true);
-          if (handler) {
-            const retryContext: DomainInferenceContext = {
-              query,
-              tokens: query.toLowerCase().split(/\s+/),
-              embeddings: [],
-              inferenceResults: [],
-              sentiment: { sentiment: 'neutral', score: 0.5 },
-            };
-            const retryResult = await handler(query, retryContext);
-            diagnostics.attempts.push({
-              action: 'retry_after_reload',
-              outcome: retryResult ? 'success' : 'failure',
-              timestamp: Date.now(),
-              detail: retryResult ? undefined : 'Retry returned empty response.',
-            });
-
-            if (retryResult) {
-              diagnostics.notes = `Auto-recovery succeeded for ${domainName}.`;
-              return {
-                domain: domainName,
-                response: retryResult.response || '',
-                confidence: retryResult.confidence ?? 0.55,
-                topics: retryResult.topics || [],
-                metadata: retryResult.metadata || {},
-                status: 'ready',
-                diagnostics,
-              };
-            }
-          }
-        } catch (retryError) {
-          diagnostics.attempts.push({
-            action: 'retry_after_reload',
-            outcome: 'failure',
-            timestamp: Date.now(),
-            detail: retryError instanceof Error ? retryError.message : String(retryError),
-          });
-          logEvent('domain.retry_failure', {
-            domain: domainName,
-            message: retryError instanceof Error ? retryError.message : String(retryError),
-          });
-        }
-      }
-
-      diagnostics.notes = diagnostics.notes ?? `Domain ${domainName} failed to respond after automated recovery attempts.`;
-      diagnostics.suggestions = diagnostics.suggestions || [
-        `Inspect ${domainName} inference controller for runtime errors.`,
-        'Confirm registry manifest paths and rebuild affected bundles.',
-      ];
-
+      console.error(
+        `[DomainQueryExecutor] Error querying ${domainName}:`,
+        error,
+      );
       return {
         domain: domainName,
-        response: '',
+        response: "",
         confidence: 0,
         error: error instanceof Error ? error.message : String(error),
         status: recovered ? 'error' : moduleStatus ?? 'error',
@@ -242,31 +193,52 @@ export class DomainQueryExecutor {
     }
   }
 
-  private async ensureDomainModule(
-    domainName: string,
-    diagnostics: DomainQueryResult['diagnostics']
-  ): Promise<DomainQueryResult['status']> {
-    let loaded: LoadedModule | null = this.loader.getLoadedModule(domainName);
-
-    if (loaded?.status === 'ready' || loaded?.status === 'disabled') {
-      diagnostics?.attempts.push({
-        action: 'module_status_check',
-        outcome: 'success',
-        timestamp: Date.now(),
-        detail: loaded.status,
-      });
-      return loaded.status;
-    }
-
+  /**
+   * Dynamically load domain inference controller
+   */
+  private async loadDomainInference(domainName: string): Promise<any> {
     try {
-      loaded = await this.loader.loadModule(domainName);
-      diagnostics?.attempts.push({
-        action: 'load_module',
-        outcome: loaded.status === 'ready' ? 'success' : 'failure',
-        timestamp: Date.now(),
-        detail: loaded.errorMessage,
-      });
-      return loaded.status;
+      // Try to load domain-specific inference function
+      const moduleItem = await import(
+        `../knowledge-domains/${domainName}/${domainName}_inferenceController`
+      );
+
+      // Try common export patterns (most domains use these)
+      // Pattern 1: {domainName}RunInference
+      if (moduleItem[`${domainName}RunInference`]) {
+        return moduleItem[`${domainName}RunInference`];
+      }
+
+      // Pattern 2: generalRunInference (for general_knowledge)
+      if (
+        domainName === "general_knowledge" &&
+        moduleItem.generalRunInference
+      ) {
+        return moduleItem.generalRunInference;
+      }
+
+      // Pattern 3: default export
+      if (moduleItem.default) {
+        return moduleItem.default;
+      }
+
+      // Pattern 4: runInference
+      if (moduleItem.runInference) {
+        return moduleItem.runInference;
+      }
+
+      // Pattern 5: infer
+      if (moduleItem.infer) {
+        return moduleItem.infer;
+      }
+
+      // Log available exports for debugging
+      console.log(
+        `[DomainQueryExecutor] Available exports for ${domainName}:`,
+        Object.keys(moduleItem),
+      );
+
+      return null;
     } catch (error) {
       diagnostics?.attempts.push({
         action: 'load_module',
@@ -346,97 +318,6 @@ export class DomainQueryExecutor {
     return typedHandler;
   }
 
-  private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, domainName: string): Promise<T> {
-    if (!timeoutMs || timeoutMs <= 0) {
-      return promise;
-    }
-
-    return new Promise<T>((resolve, reject) => {
-      const timer = setTimeout(() => {
-        reject(new Error(`Domain ${domainName} inference timed out after ${timeoutMs}ms`));
-      }, timeoutMs);
-
-      promise
-        .then((value) => {
-          clearTimeout(timer);
-          resolve(value);
-        })
-        .catch((error) => {
-          clearTimeout(timer);
-          reject(error);
-        });
-    });
-  }
-
-  private resolveInferenceExport(domainName: string, module: Record<string, unknown>): DomainInferenceHandler | null {
-    const normalizedName = domainName.replace(/[-\s]/g, '_');
-    const exportsToCheck = [
-      module[`${normalizedName}RunInference`],
-      module[`${domainName}RunInference`],
-      module.runInference,
-      module.infer,
-      module.default,
-      module.execute,
-    ];
-
-    const handler = exportsToCheck.find((candidate) => typeof candidate === 'function');
-    return (handler as DomainInferenceHandler | undefined) ?? null;
-  }
-
-  private async getDomainManifest(domainName: string): Promise<ModuleManifest | null> {
-    try {
-      const registry = await getUnifiedRegistry();
-      return registry.modules[domainName] ?? null;
-    } catch (error) {
-      logEvent('domain.manifest_lookup_failed', {
-        domain: domainName,
-        message: error instanceof Error ? error.message : String(error),
-      });
-      return null;
-    }
-  }
-
-  private async tryHotReload(
-    domainName: string,
-    diagnostics: DomainQueryResult['diagnostics']
-  ): Promise<boolean> {
-    diagnostics?.attempts.push({
-      action: 'hot_reload',
-      outcome: 'failure',
-      timestamp: Date.now(),
-    });
-
-    try {
-      const reloaded = await this.loader.reloadModule(domainName);
-      diagnostics?.attempts.pop();
-      diagnostics?.attempts.push({
-        action: 'hot_reload',
-        outcome: reloaded.status === 'ready' ? 'success' : 'failure',
-        timestamp: Date.now(),
-        detail: reloaded.errorMessage,
-      });
-      if (reloaded.status === 'ready') {
-        this.inferenceCache.delete(domainName);
-        logEvent('domain.hot_reload_success', { domain: domainName });
-        return true;
-      }
-      return false;
-    } catch (error) {
-      diagnostics?.attempts.pop();
-      diagnostics?.attempts.push({
-        action: 'hot_reload',
-        outcome: 'failure',
-        timestamp: Date.now(),
-        detail: error instanceof Error ? error.message : String(error),
-      });
-      logEvent('domain.hot_reload_failure', {
-        domain: domainName,
-        message: error instanceof Error ? error.message : String(error),
-      });
-      return false;
-    }
-  }
-
   /**
    * Legacy method for backward compatibility.
    * @deprecated Use queryDomainsByName instead.
@@ -447,9 +328,9 @@ export class DomainQueryExecutor {
     for (const subtask of subtasks) {
       try {
         results[subtask] = { response: `Processing: ${subtask}` };
-      } catch (error) {
+      } catch (err) {
         results[subtask] = {
-          error: error instanceof Error ? error.message : String(error),
+          error: err instanceof Error ? err.message : String(err),
         };
       }
     }

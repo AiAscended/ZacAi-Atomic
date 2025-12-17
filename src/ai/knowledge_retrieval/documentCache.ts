@@ -31,14 +31,16 @@ export const DocumentCache = {
   // Hook called by orchestrator when a domain's data changes.
   onDomainDataChanged(payload: { domain?: string; file?: string } | unknown) {
     try {
-      if (!payload || typeof payload !== 'object') {
+      if (!payload || typeof payload !== "object") {
         cache.clear();
         return;
       }
       // If domain present, clear cache entries that mention the domain in the key.
       // Keys are free-form; this is a conservative clearing strategy.
       // Use a safe, typed extraction for domain field
-      const domain = (payload as Record<string, unknown>)['domain'] as string | undefined;
+      const domain = (payload as Record<string, unknown>)["domain"] as
+        | string
+        | undefined;
       if (!domain) {
         cache.clear();
         return;

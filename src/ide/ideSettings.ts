@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface IDESettings {
   // Editor settings
@@ -8,8 +8,8 @@ export interface IDESettings {
     fontFamily: string;
     tabSize: number;
     insertSpaces: boolean;
-    wordWrap: 'on' | 'off' | 'wordWrapColumn' | 'bounded';
-    lineNumbers: 'on' | 'off' | 'relative';
+    wordWrap: "on" | "off" | "wordWrapColumn" | "bounded";
+    lineNumbers: "on" | "off" | "relative";
     minimap: boolean;
     bracketPairColorization: boolean;
     formatOnSave: boolean;
@@ -18,8 +18,8 @@ export interface IDESettings {
 
   // Theme settings
   theme: {
-    editorTheme: 'vs-dark' | 'vs-light' | 'hc-black';
-    uiTheme: 'dark' | 'light' | 'system';
+    editorTheme: "vs-dark" | "vs-light" | "hc-black";
+    uiTheme: "dark" | "light" | "system";
   };
 
   // Terminal settings
@@ -40,7 +40,7 @@ export interface IDESettings {
 
   // File settings
   files: {
-    autoSave: 'off' | 'afterDelay' | 'onFocusChange' | 'onWindowChange';
+    autoSave: "off" | "afterDelay" | "onFocusChange" | "onWindowChange";
     autoSaveDelay: number;
     exclude: string[];
     watcherExclude: string[];
@@ -73,16 +73,16 @@ const defaultSettings: IDESettings = {
     fontFamily: "'Fira Code', 'Cascadia Code', Consolas, monospace",
     tabSize: 2,
     insertSpaces: true,
-    wordWrap: 'off',
-    lineNumbers: 'on',
+    wordWrap: "off",
+    lineNumbers: "on",
     minimap: true,
     bracketPairColorization: true,
     formatOnSave: true,
     formatOnPaste: true,
   },
   theme: {
-    editorTheme: 'vs-dark',
-    uiTheme: 'dark',
+    editorTheme: "vs-dark",
+    uiTheme: "dark",
   },
   terminal: {
     fontSize: 14,
@@ -97,10 +97,10 @@ const defaultSettings: IDESettings = {
     showInlineHints: true,
   },
   files: {
-    autoSave: 'afterDelay',
+    autoSave: "afterDelay",
     autoSaveDelay: 1000,
-    exclude: ['node_modules', '.git', 'dist', 'build'],
-    watcherExclude: ['node_modules/**', '.git/**'],
+    exclude: ["node_modules", ".git", "dist", "build"],
+    watcherExclude: ["node_modules/**", ".git/**"],
   },
   git: {
     enabled: true,
@@ -114,29 +114,29 @@ const defaultSettings: IDESettings = {
     openDevTools: false,
   },
   keybindings: {
-    'save': 'Ctrl+S',
-    'saveAll': 'Ctrl+Shift+S',
-    'quickOpen': 'Ctrl+P',
-    'commandPalette': 'Ctrl+Shift+P',
-    'toggleTerminal': 'Ctrl+`',
-    'toggleSidebar': 'Ctrl+B',
-    'formatDocument': 'Shift+Alt+F',
-    'find': 'Ctrl+F',
-    'replace': 'Ctrl+H',
-    'goToLine': 'Ctrl+G',
+    save: "Ctrl+S",
+    saveAll: "Ctrl+Shift+S",
+    quickOpen: "Ctrl+P",
+    commandPalette: "Ctrl+Shift+P",
+    toggleTerminal: "Ctrl+`",
+    toggleSidebar: "Ctrl+B",
+    formatDocument: "Shift+Alt+F",
+    find: "Ctrl+F",
+    replace: "Ctrl+H",
+    goToLine: "Ctrl+G",
   },
 };
 
 interface IDESettingsStore {
   settings: IDESettings;
   updateSettings: (updates: Partial<IDESettings>) => void;
-  updateEditorSettings: (updates: Partial<IDESettings['editor']>) => void;
-  updateThemeSettings: (updates: Partial<IDESettings['theme']>) => void;
-  updateTerminalSettings: (updates: Partial<IDESettings['terminal']>) => void;
-  updateAISettings: (updates: Partial<IDESettings['ai']>) => void;
-  updateFileSettings: (updates: Partial<IDESettings['files']>) => void;
-  updateGitSettings: (updates: Partial<IDESettings['git']>) => void;
-  updatePreviewSettings: (updates: Partial<IDESettings['preview']>) => void;
+  updateEditorSettings: (updates: Partial<IDESettings["editor"]>) => void;
+  updateThemeSettings: (updates: Partial<IDESettings["theme"]>) => void;
+  updateTerminalSettings: (updates: Partial<IDESettings["terminal"]>) => void;
+  updateAISettings: (updates: Partial<IDESettings["ai"]>) => void;
+  updateFileSettings: (updates: Partial<IDESettings["files"]>) => void;
+  updateGitSettings: (updates: Partial<IDESettings["git"]>) => void;
+  updatePreviewSettings: (updates: Partial<IDESettings["preview"]>) => void;
   updateKeybinding: (action: string, binding: string) => void;
   resetSettings: () => void;
   exportSettings: () => string;
@@ -243,13 +243,13 @@ export const useIDESettings = create<IDESettingsStore>()(
           set({ settings: { ...defaultSettings, ...parsed } });
           return true;
         } catch (error) {
-          console.error('Failed to import settings:', error);
+          console.error("Failed to import settings:", error);
           return false;
         }
       },
     }),
     {
-      name: 'zacai-ide-settings',
-    }
-  )
+      name: "zacai-ide-settings",
+    },
+  ),
 );

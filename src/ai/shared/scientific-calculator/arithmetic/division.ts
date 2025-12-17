@@ -16,9 +16,9 @@
  */
 export function divide(dividend: number, divisor: number): number {
   if (divisor === 0) {
-    throw new Error("Division by zero is undefined")
+    throw new Error("Division by zero is undefined");
   }
-  return dividend / divisor
+  return dividend / divisor;
 }
 
 /**
@@ -28,10 +28,14 @@ export function divide(dividend: number, divisor: number): number {
  * @param precision - Number of decimal places (default: 10)
  * @returns Quotient with specified precision
  */
-export function dividePrecise(dividend: number, divisor: number, precision = 10): number {
+export function dividePrecise(
+  dividend: number,
+  divisor: number,
+  precision = 10,
+): number {
   if (divisor === 0) {
-    throw new Error("Division by zero is undefined")
+    throw new Error("Division by zero is undefined");
   }
-  const multiplier = Math.pow(10, precision)
-  return Math.round((dividend / divisor) * multiplier) / multiplier
+  const multiplier = Math.pow(10, precision);
+  return Math.round((dividend / divisor) * multiplier) / multiplier;
 }

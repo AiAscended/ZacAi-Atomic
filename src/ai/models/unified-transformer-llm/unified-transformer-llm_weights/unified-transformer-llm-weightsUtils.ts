@@ -26,26 +26,31 @@ export class LLMWeightsUtils {
     const min = Math.min(...weights);
     const max = Math.max(...weights);
     const scale = (max - min) / (Math.pow(2, bits) - 1);
-    
+
     const quantized = new Int8Array(weights.length);
     for (let i = 0; i < weights.length; i++) {
       quantized[i] = Math.round((weights[i] - min) / scale);
     }
-    
+
     return quantized;
   }
 
   /**
    * Dequantize weights
    */
-  dequantize(quantized: Int8Array, min: number, max: number, bits: number = 8): Float32Array {
+  dequantize(
+    quantized: Int8Array,
+    min: number,
+    max: number,
+    bits: number = 8,
+  ): Float32Array {
     const scale = (max - min) / (Math.pow(2, bits) - 1);
     const dequantized = new Float32Array(quantized.length);
-    
+
     for (let i = 0; i < quantized.length; i++) {
       dequantized[i] = quantized[i] * scale + min;
     }
-    
+
     return dequantized;
   }
 }

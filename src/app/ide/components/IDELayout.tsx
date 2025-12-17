@@ -5,17 +5,20 @@
 
 "use client";
 
-import React from 'react';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { useIDELayoutStore } from '@/stores/ideLayoutStore';
-import { PanelContainer } from './PanelContainer';
-import { FileExplorer } from './FileExplorer';
-import { CodeEditor } from './CodeEditor';
-import { PreviewPanel } from './PreviewPanel';
-import { TerminalPanel } from './TerminalPanel';
-import { AIChatPanel } from './AIChatPanel';
-import { IDEToolbar } from './IDEToolbar';
-import { useLayoutStore } from '@/ide/layoutStore';
+import React from "react";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable";
+import { PanelContainer } from "./PanelContainer";
+import { FileExplorer } from "./FileExplorer";
+import { CodeEditor } from "./CodeEditor";
+import { PreviewPanel } from "./PreviewPanel";
+import { TerminalPanel } from "./TerminalPanel";
+import { AIChatPanel } from "./AIChatPanel";
+import { IDEToolbar } from "./IDEToolbar";
+import { useLayoutStore } from "@/lib/ide/layoutStore";
 
 interface IDELayoutProps {
   fileExplorer?: React.ReactNode;
@@ -133,22 +136,17 @@ export function IDELayout({
           {/* Files panel */}
           {panels.files.visible && (
             <>
-              <ResizablePanel defaultSize={15} minSize={10} maxSize={30}>
+              <ResizablePanel
+                defaultSize={layout.files.size}
+                minSize={10}
+                maxSize={30}
+              >
                 <PanelContainer
-                  id="files-panel"
-                  title="Files"
-                  onMinimize={() => handlePanelAction('files', 'minimize')}
-                  onMaximize={() => handlePanelAction('files', 'maximize')}
-                  onClose={() => handlePanelAction('files', 'close')}
-                  isMinimized={panels.files.minimized}
-                  isMaximized={panels.files.maximized}
+                  panelKey="files"
+                  title="Explorer"
                   className="h-full"
                 >
-                  {fileExplorer || (
-                    <div className="p-4 text-muted-foreground">
-                      File explorer coming soon...
-                    </div>
-                  )}
+                  <FileExplorer />
                 </PanelContainer>
               </ResizablePanel>
               <ResizableHandle />
@@ -158,25 +156,28 @@ export function IDELayout({
           {/* Editor + Terminal column */}
           <ResizablePanel defaultSize={panels.preview.visible || panels.aiChat.visible ? 45 : 85}>
             <ResizablePanelGroup direction="vertical">
-              {/* Editor panel */}
-              {panels.editor.visible && (
+              {/* Code Editor */}
+              <ResizablePanel defaultSize={70} minSize={30}>
+                <PanelContainer
+                  panelKey="editor"
+                  title="Editor"
+                  className="h-full"
+                >
+                  <CodeEditor />
+                </PanelContainer>
+              </ResizablePanel>
+
+              {/* Terminal */}
+              {layout.terminal.visible && (
                 <>
-                  <ResizablePanel defaultSize={panels.terminal.visible ? 70 : 100}>
+                  <ResizableHandle />
+                  <ResizablePanel defaultSize={30} minSize={15} maxSize={50}>
                     <PanelContainer
-                      id="editor-panel"
-                      title="Editor"
-                      onMinimize={() => handlePanelAction('editor', 'minimize')}
-                      onMaximize={() => handlePanelAction('editor', 'maximize')}
-                      onClose={() => handlePanelAction('editor', 'close')}
-                      isMinimized={panels.editor.minimized}
-                      isMaximized={panels.editor.maximized}
+                      panelKey="terminal"
+                      title="Terminal"
                       className="h-full"
                     >
-                      {editor || (
-                        <div className="p-4 text-muted-foreground">
-                          Editor coming soon...
-                        </div>
-                      )}
+                      <TerminalPanel />
                     </PanelContainer>
                   </ResizablePanel>
                   {panels.terminal.visible && <ResizableHandle />}
@@ -211,22 +212,17 @@ export function IDELayout({
           {panels.preview.visible && (
             <>
               <ResizableHandle />
-              <ResizablePanel defaultSize={20} minSize={15} maxSize={40}>
+              <ResizablePanel
+                defaultSize={layout.preview.size}
+                minSize={15}
+                maxSize={50}
+              >
                 <PanelContainer
-                  id="preview-panel"
+                  panelKey="preview"
                   title="Preview"
-                  onMinimize={() => handlePanelAction('preview', 'minimize')}
-                  onMaximize={() => handlePanelAction('preview', 'maximize')}
-                  onClose={() => handlePanelAction('preview', 'close')}
-                  isMinimized={panels.preview.minimized}
-                  isMaximized={panels.preview.maximized}
                   className="h-full"
                 >
-                  {preview || (
-                    <div className="p-4 text-muted-foreground">
-                      Preview coming soon...
-                    </div>
-                  )}
+                  <PreviewPanel />
                 </PanelContainer>
               </ResizablePanel>
             </>
@@ -236,22 +232,17 @@ export function IDELayout({
           {panels.aiChat.visible && (
             <>
               <ResizableHandle />
-              <ResizablePanel defaultSize={20} minSize={15} maxSize={40}>
+              <ResizablePanel
+                defaultSize={layout.aiChat.size}
+                minSize={15}
+                maxSize={40}
+              >
                 <PanelContainer
-                  id="ai-chat-panel"
-                  title="AI Assistant"
-                  onMinimize={() => handlePanelAction('aiChat', 'minimize')}
-                  onMaximize={() => handlePanelAction('aiChat', 'maximize')}
-                  onClose={() => handlePanelAction('aiChat', 'close')}
-                  isMinimized={panels.aiChat.minimized}
-                  isMaximized={panels.aiChat.maximized}
+                  panelKey="aiChat"
+                  title="ZacAi Assistant"
                   className="h-full"
                 >
-                  {aiChat || (
-                    <div className="p-4 text-muted-foreground">
-                      AI Chat coming soon...
-                    </div>
-                  )}
+                  <AIChatPanel />
                 </PanelContainer>
               </ResizablePanel>
             </>
