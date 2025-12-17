@@ -6,8 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./algorithms_weights/algorithms_pretrained_weights.json"
-import seedVocabulary from "./algorithms_seeds/algorithms_seedVocabulary.json"
+import pretrained from "./algorithms_seeds/algorithms_pretrained_weights.json"
 import { ALGORITHMS_DOMAIN } from "./algorithms_constants"
 import {
   buildSeedWeightMap,
