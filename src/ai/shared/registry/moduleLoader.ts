@@ -141,8 +141,8 @@ export class UnifiedModuleLoader {
     // Construct import path
     const importPath = `../${this.config.moduleType === "model" ? "models" : "knowledge-domains"}/${moduleId}/${entryPath}`;
     
-    const module = await import(importPath);
-    return module.default || module;
+    const importedModule = await import(importPath);
+    return importedModule.default || importedModule;
   }
   
   /**

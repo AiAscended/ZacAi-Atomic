@@ -154,7 +154,6 @@ export class SystemLoader {
     for (const entry of entryCandidates) {
       const specifier = buildAliasImport(manifest.relativePath, entry);
       try {
-        // eslint-disable-next-line no-await-in-loop
         const imported = await import(specifier);
         return (imported as Record<string, unknown>).default ?? imported;
       } catch (error) {
@@ -275,7 +274,6 @@ export function getSystemLoaderStats() {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var __zacaiSystemLoader: SystemLoader | undefined;
 }
 

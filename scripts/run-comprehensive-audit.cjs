@@ -191,7 +191,7 @@ async function phase4_fileSystem() {
     { path: 'src/ai/data/settings/domains.json', type: 'file', desc: 'Domain settings' },
     { path: 'src/ai/data/settings/models.json', type: 'file', desc: 'Model settings' },
     { path: 'src/ai/data/settings/users.json', type: 'file', desc: 'Users data' },
-    { path: 'src/ai/orchestration/mainOrchestrator.ts', type: 'file', desc: 'Main orchestrator' },
+    { path: 'src/ai/orchestration/main-orchestrator.ts', type: 'file', desc: 'Main orchestrator' },
     { path: 'src/app/api/chat/route.ts', type: 'file', desc: 'Chat API' },
     { path: 'src/app/api/chat-history/route.ts', type: 'file', desc: 'Chat history API' },
   ];

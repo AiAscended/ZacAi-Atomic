@@ -101,7 +101,7 @@ Implemented a complete production-grade admin settings infrastructure with secur
 
 ### 5. ✅ Orchestrator Runtime Configuration
 **Status:** Completed  
-**File Modified:** `src/ai/orchestration/mainOrchestrator.ts`
+**File Modified:** `src/ai/orchestration/main-orchestrator.ts`
 
 **Integration:**
 - Loads `OrchestratorSettings` from `settingsStore` during initialization

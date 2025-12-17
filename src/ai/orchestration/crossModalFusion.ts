@@ -5,7 +5,7 @@
  * integrated multi-modal reasoning and understanding.
  * 
  * Integration:
- * - Called by: mainOrchestrator.ts
+ * - Called by: main-orchestrator.ts
  * - Uses: Multi-modal fusion model, cross-attention mechanisms
  * - Coordinates: Text, vision, audio, code models
  */

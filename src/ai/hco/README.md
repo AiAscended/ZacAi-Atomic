@@ -121,6 +121,6 @@ npm run test         # vitest suites (coming Phase 3)
 - `docs/ZACAI-HCO-ULTIMATE-COPILOTMoE-AGENTS -MPLEMENTATION-PROMPT`
 - `docs/ZacAi Multi-Agent Task Flow and Interface Scaffolding.md`
 - `docs/AI-Pipeline-Process.md`
-- `src/ai/orchestration/mainOrchestrator.ts` (existing 15-step orchestrator)
+- `src/ai/orchestration/main-orchestrator.ts` (existing 15-step orchestrator)
 
 **Copy this README to the ZacAi docs directory after implementation milestones if you want centralized documentation.**

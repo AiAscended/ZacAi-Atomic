@@ -177,7 +177,7 @@ Execute a complete, systematic verification of the ZacAi-Atomic hybrid multi-mod
 ## 📋 PHASE 3: AI Pipeline Deep Dive
 
 ### 3.1 Main Orchestrator
-**Location:** `/src/ai/orchestration/mainOrchestrator.ts`
+**Location:** `/src/ai/orchestration/main-orchestrator.ts`
 
 **Tasks:**
 - [ ] Read full file (838 lines)

@@ -5,7 +5,7 @@
  * a unified response. Handles merging, deduplication, and synthesis.
  * 
  * Integration:
- * - Called by: mainOrchestrator.ts
+ * - Called by: main-orchestrator.ts
  * - Uses: responseSynthesizer.ts for final synthesis
  * - Returns: Aggregated results ready for formatting
  */

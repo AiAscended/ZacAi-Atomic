@@ -5,7 +5,7 @@
  * intent, and content analysis. Supports multi-domain queries.
  * 
  * Integration:
- * - Called by: mainOrchestrator.ts
+ * - Called by: main-orchestrator.ts
  * - Uses: system registry, keyword matching, intent classification
  * - Returns: List of domain names to query
  */

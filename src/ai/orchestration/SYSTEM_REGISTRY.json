@@ -1,6 +1,6 @@
 {
   "version": "3.0.0",
-  "generatedAt": "2025-12-16T03:27:15.773Z",
+  "generatedAt": "2025-12-17T01:33:23.733Z",
   "repoRoot": "/workspaces/ZacAi-Atomic",
   "modules": {
     "domain": {
@@ -39,8 +39,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.779Z",
-        "updatedAt": "2025-12-15T21:55:04.814Z"
+        "discoveredAt": "2025-12-17T01:33:23.739Z",
+        "updatedAt": "2025-12-16T05:13:11.247Z"
       },
       "code_review": {
         "id": "code_review",
@@ -77,8 +77,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.781Z",
-        "updatedAt": "2025-12-15T21:55:04.812Z"
+        "discoveredAt": "2025-12-17T01:33:23.744Z",
+        "updatedAt": "2025-12-16T05:13:11.247Z"
       },
       "data_integrity": {
         "id": "data_integrity",
@@ -115,8 +115,8 @@
           "hasLearnedData": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.782Z",
-        "updatedAt": "2025-12-15T21:55:04.810Z"
+        "discoveredAt": "2025-12-17T01:33:23.747Z",
+        "updatedAt": "2025-12-16T05:13:11.248Z"
       },
       "data_structures": {
         "id": "data_structures",
@@ -153,8 +153,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.784Z",
-        "updatedAt": "2025-12-15T21:55:04.808Z"
+        "discoveredAt": "2025-12-17T01:33:23.752Z",
+        "updatedAt": "2025-12-16T05:13:11.248Z"
       },
       "documentation": {
         "id": "documentation",
@@ -191,8 +191,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.786Z",
-        "updatedAt": "2025-12-15T21:55:04.809Z"
+        "discoveredAt": "2025-12-17T01:33:23.756Z",
+        "updatedAt": "2025-12-16T05:13:11.249Z"
       },
       "english": {
         "id": "english",
@@ -229,8 +229,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.788Z",
-        "updatedAt": "2025-12-15T21:55:04.813Z"
+        "discoveredAt": "2025-12-17T01:33:23.761Z",
+        "updatedAt": "2025-12-16T05:13:11.252Z"
       },
       "environment": {
         "id": "environment",
@@ -267,8 +267,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.790Z",
-        "updatedAt": "2025-12-15T21:55:04.812Z"
+        "discoveredAt": "2025-12-17T01:33:23.766Z",
+        "updatedAt": "2025-12-16T05:13:11.252Z"
       },
       "error_detection": {
         "id": "error_detection",
@@ -305,8 +305,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.793Z",
-        "updatedAt": "2025-12-15T21:55:04.811Z"
+        "discoveredAt": "2025-12-17T01:33:23.771Z",
+        "updatedAt": "2025-12-16T05:13:11.252Z"
       },
       "general_knowledge": {
         "id": "general_knowledge",
@@ -343,8 +343,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.795Z",
-        "updatedAt": "2025-12-15T21:55:04.810Z"
+        "discoveredAt": "2025-12-17T01:33:23.776Z",
+        "updatedAt": "2025-12-16T05:13:11.261Z"
       },
       "grammar": {
         "id": "grammar",
@@ -381,8 +381,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.797Z",
-        "updatedAt": "2025-12-15T21:55:04.814Z"
+        "discoveredAt": "2025-12-17T01:33:23.789Z",
+        "updatedAt": "2025-12-16T05:13:11.261Z"
       },
       "internet_search": {
         "id": "internet_search",
@@ -419,8 +419,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.799Z",
-        "updatedAt": "2025-12-15T21:55:04.811Z"
+        "discoveredAt": "2025-12-17T01:33:23.793Z",
+        "updatedAt": "2025-12-16T05:13:11.262Z"
       },
       "mathematics": {
         "id": "mathematics",
@@ -457,8 +457,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.802Z",
-        "updatedAt": "2025-12-15T21:55:04.812Z"
+        "discoveredAt": "2025-12-17T01:33:23.801Z",
+        "updatedAt": "2025-12-16T05:13:11.262Z"
       },
       "nextjs": {
         "id": "nextjs",
@@ -495,8 +495,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.806Z",
-        "updatedAt": "2025-12-15T21:55:04.814Z"
+        "discoveredAt": "2025-12-17T01:33:23.810Z",
+        "updatedAt": "2025-12-16T05:13:11.265Z"
       },
       "observability": {
         "id": "observability",
@@ -533,8 +533,8 @@
           "hasLearnedData": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.807Z",
-        "updatedAt": "2025-12-15T21:55:04.812Z"
+        "discoveredAt": "2025-12-17T01:33:23.813Z",
+        "updatedAt": "2025-12-16T05:13:11.265Z"
       },
       "programming": {
         "id": "programming",
@@ -571,8 +571,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.810Z",
-        "updatedAt": "2025-12-15T21:55:04.809Z"
+        "discoveredAt": "2025-12-17T01:33:23.822Z",
+        "updatedAt": "2025-12-16T05:13:11.271Z"
       },
       "react": {
         "id": "react",
@@ -609,8 +609,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.813Z",
-        "updatedAt": "2025-12-15T21:55:04.808Z"
+        "discoveredAt": "2025-12-17T01:33:23.828Z",
+        "updatedAt": "2025-12-16T05:13:11.271Z"
       },
       "repair": {
         "id": "repair",
@@ -647,8 +647,8 @@
           "hasLearnedData": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.814Z",
-        "updatedAt": "2025-12-15T21:55:04.813Z"
+        "discoveredAt": "2025-12-17T01:33:23.831Z",
+        "updatedAt": "2025-12-16T05:13:11.271Z"
       },
       "science": {
         "id": "science",
@@ -685,8 +685,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.816Z",
-        "updatedAt": "2025-12-15T21:55:04.809Z"
+        "discoveredAt": "2025-12-17T01:33:23.836Z",
+        "updatedAt": "2025-12-16T05:13:11.276Z"
       },
       "security": {
         "id": "security",
@@ -723,8 +723,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.818Z",
-        "updatedAt": "2025-12-15T21:55:04.809Z"
+        "discoveredAt": "2025-12-17T01:33:23.841Z",
+        "updatedAt": "2025-12-16T05:13:11.276Z"
       },
       "system": {
         "id": "system",
@@ -761,8 +761,8 @@
           "hasLearnedData": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.820Z",
-        "updatedAt": "2025-12-15T21:55:04.813Z"
+        "discoveredAt": "2025-12-17T01:33:23.845Z",
+        "updatedAt": "2025-12-16T05:13:11.276Z"
       },
       "testing": {
         "id": "testing",
@@ -799,8 +799,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.822Z",
-        "updatedAt": "2025-12-15T21:55:04.811Z"
+        "discoveredAt": "2025-12-17T01:33:23.849Z",
+        "updatedAt": "2025-12-16T05:13:11.276Z"
       },
       "typescript": {
         "id": "typescript",
@@ -837,8 +837,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.825Z",
-        "updatedAt": "2025-12-15T21:55:04.810Z"
+        "discoveredAt": "2025-12-17T01:33:23.854Z",
+        "updatedAt": "2025-12-16T05:13:11.277Z"
       },
       "version_control": {
         "id": "version_control",
@@ -875,8 +875,8 @@
           "hasLearnedData": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.827Z",
-        "updatedAt": "2025-12-15T21:55:04.808Z"
+        "discoveredAt": "2025-12-17T01:33:23.859Z",
+        "updatedAt": "2025-12-16T05:13:11.277Z"
       }
     },
     "model": {
@@ -913,7 +913,7 @@
           "modelType": "transformer",
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.830Z",
+        "discoveredAt": "2025-12-17T01:33:23.870Z",
         "updatedAt": "2025-12-13T04:35:31.105Z"
       },
       "convolutional-neural-network": {
@@ -949,7 +949,7 @@
           "modelType": "cnn",
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.833Z",
+        "discoveredAt": "2025-12-17T01:33:23.874Z",
         "updatedAt": "2025-12-13T04:35:31.106Z"
       },
       "diffusion-model": {
@@ -985,7 +985,7 @@
           "modelType": "diffusion",
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.835Z",
+        "discoveredAt": "2025-12-17T01:33:23.878Z",
         "updatedAt": "2025-12-13T04:35:31.107Z"
       },
       "generative-adversarial-network": {
@@ -1021,7 +1021,7 @@
           "modelType": "gan",
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.837Z",
+        "discoveredAt": "2025-12-17T01:33:23.883Z",
         "updatedAt": "2025-12-13T04:35:31.109Z"
       },
       "graph-neural-network": {
@@ -1055,7 +1055,7 @@
         "metadata": {
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.840Z",
+        "discoveredAt": "2025-12-17T01:33:23.888Z",
         "updatedAt": "2025-12-13T04:35:31.110Z"
       },
       "multi-modal-fusion": {
@@ -1089,7 +1089,7 @@
         "metadata": {
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.842Z",
+        "discoveredAt": "2025-12-17T01:33:23.893Z",
         "updatedAt": "2025-12-13T04:35:31.112Z"
       },
       "neuro-symbolic-reasoning": {
@@ -1123,7 +1123,7 @@
         "metadata": {
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.844Z",
+        "discoveredAt": "2025-12-17T01:33:23.898Z",
         "updatedAt": "2025-12-13T04:35:31.113Z"
       },
       "recurrent-neural-network": {
@@ -1159,7 +1159,7 @@
           "modelType": "rnn",
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.846Z",
+        "discoveredAt": "2025-12-17T01:33:23.902Z",
         "updatedAt": "2025-12-13T04:35:31.114Z"
       },
       "speech-to-text": {
@@ -1193,7 +1193,7 @@
         "metadata": {
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.849Z",
+        "discoveredAt": "2025-12-17T01:33:23.907Z",
         "updatedAt": "2025-12-13T04:35:31.116Z"
       },
       "text-to-speech": {
@@ -1227,7 +1227,7 @@
         "metadata": {
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.851Z",
+        "discoveredAt": "2025-12-17T01:33:23.911Z",
         "updatedAt": "2025-12-13T04:35:31.117Z"
       },
       "unified-transformer-llm": {
@@ -1263,8 +1263,8 @@
           "modelType": "llm",
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.854Z",
-        "updatedAt": "2025-12-15T01:24:30.889Z"
+        "discoveredAt": "2025-12-17T01:33:23.919Z",
+        "updatedAt": "2025-12-16T05:13:11.293Z"
       },
       "vision-transformer": {
         "id": "vision-transformer",
@@ -1299,7 +1299,7 @@
           "modelType": "multimodal",
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.857Z",
+        "discoveredAt": "2025-12-17T01:33:23.924Z",
         "updatedAt": "2025-12-13T04:35:31.120Z"
       },
       "wavenet-audio-model": {
@@ -1333,7 +1333,7 @@
         "metadata": {
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.859Z",
+        "discoveredAt": "2025-12-17T01:33:23.928Z",
         "updatedAt": "2025-12-13T04:35:31.122Z"
       }
     },
@@ -1362,7 +1362,7 @@
         "metadata": {
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.860Z",
+        "discoveredAt": "2025-12-17T01:33:23.930Z",
         "updatedAt": "2025-12-13T04:35:31.071Z"
       }
     },
@@ -1392,8 +1392,8 @@
         "metadata": {
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.861Z",
-        "updatedAt": "2025-12-13T05:53:06.144Z"
+        "discoveredAt": "2025-12-17T01:33:23.931Z",
+        "updatedAt": "2025-12-16T05:13:11.212Z"
       },
       "src": {
         "id": "src",
@@ -1419,8 +1419,8 @@
         "metadata": {
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.863Z",
-        "updatedAt": "2025-12-15T21:52:29.800Z"
+        "discoveredAt": "2025-12-17T01:33:23.935Z",
+        "updatedAt": "2025-12-16T05:13:11.227Z"
       },
       "tests": {
         "id": "tests",
@@ -1446,8 +1446,8 @@
         "metadata": {
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.863Z",
-        "updatedAt": "2025-12-15T21:52:29.800Z"
+        "discoveredAt": "2025-12-17T01:33:23.936Z",
+        "updatedAt": "2025-12-16T05:13:11.230Z"
       }
     },
     "cell": {
@@ -1477,7 +1477,7 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.864Z",
+        "discoveredAt": "2025-12-17T01:33:23.938Z",
         "updatedAt": "2025-12-13T04:35:31.071Z"
       },
       "context_management": {
@@ -1506,8 +1506,37 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.865Z",
-        "updatedAt": "2025-12-15T01:25:50.706Z"
+        "discoveredAt": "2025-12-17T01:33:23.939Z",
+        "updatedAt": "2025-12-16T05:13:11.202Z"
+      },
+      "core": {
+        "id": "core",
+        "name": "Core",
+        "category": "cell",
+        "relativePath": "src/ai/core",
+        "absolutePath": "/workspaces/ZacAi-Atomic/src/ai/core",
+        "entries": {
+          "index": "index.ts",
+          "router": null
+        },
+        "structure": {
+          "hasIndex": true,
+          "hasConfig": false,
+          "hasDocs": false
+        },
+        "enabled": false,
+        "status": "disabled",
+        "tags": [
+          "cell"
+        ],
+        "fileCount": 6,
+        "size": 20714,
+        "metadata": {
+          "hasIndexModule": true,
+          "enablementReason": "maintenance"
+        },
+        "discoveredAt": "2025-12-17T01:33:23.941Z",
+        "updatedAt": "2025-12-17T00:09:18.922Z"
       },
       "core_reasoning": {
         "id": "core_reasoning",
@@ -1535,7 +1564,7 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.865Z",
+        "discoveredAt": "2025-12-17T01:33:23.943Z",
         "updatedAt": "2025-12-13T04:35:31.071Z"
       },
       "data": {
@@ -1564,8 +1593,8 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.866Z",
-        "updatedAt": "2025-12-15T01:49:56.145Z"
+        "discoveredAt": "2025-12-17T01:33:23.945Z",
+        "updatedAt": "2025-12-16T05:13:11.209Z"
       },
       "data_pipeline": {
         "id": "data_pipeline",
@@ -1593,7 +1622,7 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.867Z",
+        "discoveredAt": "2025-12-17T01:33:23.947Z",
         "updatedAt": "2025-11-01T05:55:19.949Z"
       },
       "embedding": {
@@ -1622,7 +1651,7 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.868Z",
+        "discoveredAt": "2025-12-17T01:33:23.948Z",
         "updatedAt": "2025-12-13T04:35:31.071Z"
       },
       "hco": {
@@ -1646,13 +1675,13 @@
           "cell"
         ],
         "fileCount": 32,
-        "size": 122028,
+        "size": 122029,
         "metadata": {
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.870Z",
-        "updatedAt": "2025-12-15T21:52:29.800Z"
+        "discoveredAt": "2025-12-17T01:33:23.960Z",
+        "updatedAt": "2025-12-16T07:39:36.617Z"
       },
       "inference": {
         "id": "inference",
@@ -1680,8 +1709,8 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.871Z",
-        "updatedAt": "2025-12-15T21:50:54.208Z"
+        "discoveredAt": "2025-12-17T01:33:23.962Z",
+        "updatedAt": "2025-12-16T05:13:11.232Z"
       },
       "input_processing": {
         "id": "input_processing",
@@ -1709,7 +1738,7 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.872Z",
+        "discoveredAt": "2025-12-17T01:33:23.964Z",
         "updatedAt": "2025-11-26T06:29:01.818Z"
       },
       "knowledge-domains": {
@@ -1738,8 +1767,8 @@
           "hasIndexModule": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.915Z",
-        "updatedAt": "2025-12-15T21:55:04.814Z"
+        "discoveredAt": "2025-12-17T01:33:24.096Z",
+        "updatedAt": "2025-12-16T05:13:11.277Z"
       },
       "knowledge_retrieval": {
         "id": "knowledge_retrieval",
@@ -1767,8 +1796,8 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.915Z",
-        "updatedAt": "2025-12-15T01:01:25.619Z"
+        "discoveredAt": "2025-12-17T01:33:24.097Z",
+        "updatedAt": "2025-12-16T05:13:11.277Z"
       },
       "models": {
         "id": "models",
@@ -1796,8 +1825,8 @@
           "hasIndexModule": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.940Z",
-        "updatedAt": "2025-12-15T21:54:49.785Z"
+        "discoveredAt": "2025-12-17T01:33:24.159Z",
+        "updatedAt": "2025-12-16T05:13:11.293Z"
       },
       "monitoring": {
         "id": "monitoring",
@@ -1820,13 +1849,13 @@
           "cell"
         ],
         "fileCount": 6,
-        "size": 37363,
+        "size": 37465,
         "metadata": {
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.940Z",
-        "updatedAt": "2025-12-14T23:10:29.442Z"
+        "discoveredAt": "2025-12-17T01:33:24.160Z",
+        "updatedAt": "2025-12-17T01:27:27.061Z"
       },
       "orchestration": {
         "id": "orchestration",
@@ -1848,14 +1877,14 @@
         "tags": [
           "cell"
         ],
-        "fileCount": 37,
-        "size": 221015,
+        "fileCount": 38,
+        "size": 265110,
         "metadata": {
           "hasIndexModule": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.942Z",
-        "updatedAt": "2025-12-16T03:26:47.642Z"
+        "discoveredAt": "2025-12-17T01:33:24.165Z",
+        "updatedAt": "2025-12-16T10:15:45.805Z"
       },
       "output_generation": {
         "id": "output_generation",
@@ -1883,7 +1912,7 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.943Z",
+        "discoveredAt": "2025-12-17T01:33:24.166Z",
         "updatedAt": "2025-12-13T04:35:31.125Z"
       },
       "search-engine": {
@@ -1912,7 +1941,7 @@
           "hasIndexModule": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.943Z",
+        "discoveredAt": "2025-12-17T01:33:24.167Z",
         "updatedAt": "2025-11-01T05:55:19.959Z"
       },
       "search-queries": {
@@ -1941,7 +1970,7 @@
           "hasIndexModule": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.944Z",
+        "discoveredAt": "2025-12-17T01:33:24.168Z",
         "updatedAt": "2025-11-01T05:55:19.959Z"
       },
       "shared": {
@@ -1965,13 +1994,13 @@
           "cell"
         ],
         "fileCount": 105,
-        "size": 1205827,
+        "size": 1205887,
         "metadata": {
           "hasIndexModule": true,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.951Z",
-        "updatedAt": "2025-12-15T22:06:04.225Z"
+        "discoveredAt": "2025-12-17T01:33:24.182Z",
+        "updatedAt": "2025-12-16T10:15:45.880Z"
       },
       "speech": {
         "id": "speech",
@@ -1999,7 +2028,7 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.951Z",
+        "discoveredAt": "2025-12-17T01:33:24.183Z",
         "updatedAt": "2025-12-13T06:34:47.931Z"
       },
       "training": {
@@ -2028,8 +2057,37 @@
           "hasIndexModule": false,
           "enablementReason": "maintenance"
         },
-        "discoveredAt": "2025-12-16T03:27:15.953Z",
-        "updatedAt": "2025-12-15T00:28:49.696Z"
+        "discoveredAt": "2025-12-17T01:33:24.185Z",
+        "updatedAt": "2025-12-16T05:13:11.336Z"
+      },
+      "types": {
+        "id": "types",
+        "name": "Types",
+        "category": "cell",
+        "relativePath": "src/ai/types",
+        "absolutePath": "/workspaces/ZacAi-Atomic/src/ai/types",
+        "entries": {
+          "index": "index.ts",
+          "router": null
+        },
+        "structure": {
+          "hasIndex": true,
+          "hasConfig": false,
+          "hasDocs": false
+        },
+        "enabled": false,
+        "status": "disabled",
+        "tags": [
+          "cell"
+        ],
+        "fileCount": 1,
+        "size": 4902,
+        "metadata": {
+          "hasIndexModule": true,
+          "enablementReason": "maintenance"
+        },
+        "discoveredAt": "2025-12-17T01:33:24.185Z",
+        "updatedAt": "2025-12-16T06:04:27.909Z"
       }
     }
   },
@@ -2099,9 +2157,9 @@
     },
     {
       "path": "COMPREHENSIVE_AUDIT_STATUS.md",
-      "size": 17883,
-      "modifiedAt": "2025-11-26T06:29:01.793Z",
-      "hash": "2ae144bfa964b7c9991742e37e365828b900f0fb",
+      "size": 17884,
+      "modifiedAt": "2025-12-16T07:39:36.507Z",
+      "hash": "617ea254e6e2a01180cd2b98643efbc4d2b65558",
       "extension": "md"
     },
     {
@@ -2120,9 +2178,9 @@
     },
     {
       "path": "README.md",
-      "size": 12983,
-      "modifiedAt": "2025-12-13T07:32:08.314Z",
-      "hash": "0993528851e996e1a070f1f197eefad7bac244ee",
+      "size": 12984,
+      "modifiedAt": "2025-12-16T07:39:36.506Z",
+      "hash": "fef5fd41c89ee860134269fedb75983825df834e",
       "extension": "md"
     },
     {
@@ -2190,9 +2248,9 @@
     },
     {
       "path": "docs/ADMIN_FEATURES_COMPLETE.md",
-      "size": 10572,
-      "modifiedAt": "2025-11-04T23:10:54.922Z",
-      "hash": "6101051fb0623a139fbf8f4eb5d54601d94d5de5",
+      "size": 10573,
+      "modifiedAt": "2025-12-16T07:39:36.616Z",
+      "hash": "14bbe73808b117b37c8b5a152efd28766da3428e",
       "extension": "md"
     },
     {
@@ -2233,7 +2291,7 @@
     {
       "path": "docs/AiSymphony/WHAt-ARE-WE-BUiLDING.md",
       "size": 31697,
-      "modifiedAt": "2025-12-15T22:33:13.592Z",
+      "modifiedAt": "2025-12-16T05:13:11.151Z",
       "hash": "76ecb3d06cb6f652944bc696f3561ad5f005f26f",
       "extension": "md"
     },
@@ -2267,9 +2325,9 @@
     },
     {
       "path": "docs/COMPREHENSIVE_AUDIT_PROMPT.md",
-      "size": 23952,
-      "modifiedAt": "2025-11-26T06:29:01.794Z",
-      "hash": "9e65c420ef84a622418009b8895e5cfbe0a59a48",
+      "size": 23953,
+      "modifiedAt": "2025-12-16T07:39:36.511Z",
+      "hash": "2ba1612af1fad44221950c764738cc43859dd2e9",
       "extension": "md"
     },
     {
@@ -2386,9 +2444,9 @@
     },
     {
       "path": "docs/IMPLEMENTATION_SUMMARY.md",
-      "size": 15736,
-      "modifiedAt": "2025-11-01T21:55:00.216Z",
-      "hash": "8ae528bf581e869c3a283d306cef497a08d15f70",
+      "size": 15737,
+      "modifiedAt": "2025-12-16T07:39:36.518Z",
+      "hash": "f3453154c8cee1a6f4be323670bddf9f8ef682f2",
       "extension": "md"
     },
     {
@@ -2470,9 +2528,9 @@
     },
     {
       "path": "docs/PRODUCTION_READINESS_AUDIT_2025.md",
-      "size": 26920,
-      "modifiedAt": "2025-11-26T06:29:01.797Z",
-      "hash": "8c10452cc7c4f0fe305e87c5dbfd3295a707b207",
+      "size": 26921,
+      "modifiedAt": "2025-12-16T07:39:36.616Z",
+      "hash": "103b1d9e8a9d353a974ba324706cfc0e7254184e",
       "extension": "md"
     },
     {
@@ -2540,9 +2598,9 @@
     },
     {
       "path": "docs/SYSTEM_DATA_FLOW.md",
-      "size": 21236,
-      "modifiedAt": "2025-11-01T12:23:36.013Z",
-      "hash": "872b7c1d754849ee6ce6971b9eafe2e3f6f691cf",
+      "size": 21239,
+      "modifiedAt": "2025-12-16T07:39:36.507Z",
+      "hash": "308b7f61728fd5db22f0894ca5ad2d059c27cf23",
       "extension": "md"
     },
     {
@@ -2616,10 +2674,17 @@
       "extension": "md"
     },
     {
+      "path": "docs/ZacAi-Core/Systems-Phase-implementations. md",
+      "size": 3563,
+      "modifiedAt": "2025-12-16T05:13:11.161Z",
+      "hash": "1ffebcbf60baebc3fc32a03a0ec23803adb46bc8",
+      "extension": " md"
+    },
+    {
       "path": "docs/ZacAi-Core/ZacAi-Heart-Core",
-      "size": 68125,
-      "modifiedAt": "2025-12-16T02:25:51.791Z",
-      "hash": "3398cc9fb06849e054020d9185ecb44615373a72",
+      "size": 68129,
+      "modifiedAt": "2025-12-16T07:39:36.609Z",
+      "hash": "a08b4b1122b1ba1d2d5b407d388eac572fa409b2",
       "extension": ""
     },
     {
@@ -2630,11 +2695,53 @@
       "extension": ""
     },
     {
+      "path": "docs/ZacAi-Internal-Memory/ZACAI-HCO-Ultimate-Copilot-Prompt.txt",
+      "size": 42626,
+      "modifiedAt": "2025-12-16T05:13:11.162Z",
+      "hash": "f34a514e148b754842b6c30866ba2ec60e50bf21",
+      "extension": "txt"
+    },
+    {
+      "path": "docs/ZacAi-Internal-Memory/ZacAi-File-Folder-Tree-v0.0.9.txt",
+      "size": 13727,
+      "modifiedAt": "2025-12-16T05:13:11.162Z",
+      "hash": "02f92644742c475221e375095acc3365cf82950a",
+      "extension": "txt"
+    },
+    {
+      "path": "docs/ZacAi-Internal-Memory/ZacAi-Internal-Vector-Memory_251216.txt",
+      "size": 98200,
+      "modifiedAt": "2025-12-16T05:13:11.166Z",
+      "hash": "8716f5349017105293060adfe30b344fa6de3599",
+      "extension": "txt"
+    },
+    {
+      "path": "docs/ZacAi-Internal-Vector-Memory_251216.txt",
+      "size": 98200,
+      "modifiedAt": "2025-12-16T05:13:10.725Z",
+      "hash": "8716f5349017105293060adfe30b344fa6de3599",
+      "extension": "txt"
+    },
+    {
+      "path": "docs/ZacAi-v009 File Tree Structure _251216.txt",
+      "size": 13727,
+      "modifiedAt": "2025-12-16T05:13:10.728Z",
+      "hash": "02f92644742c475221e375095acc3365cf82950a",
+      "extension": "txt"
+    },
+    {
       "path": "docs/ZacAi_Coding_Agent.md",
       "size": 13560,
       "modifiedAt": "2025-11-09T23:30:38.152Z",
       "hash": "e167296852db36f51ae605b3f95cd03478cc2ae2",
       "extension": "md"
+    },
+    {
+      "path": "docs/__ZACAI HCO - ULTIMATE COPILOT IMPLEMENTATION PROMPT (100% COMPLETE)__.txt",
+      "size": 42626,
+      "modifiedAt": "2025-12-16T05:13:10.728Z",
+      "hash": "f34a514e148b754842b6c30866ba2ec60e50bf21",
+      "extension": "txt"
     },
     {
       "path": "docs/architecture/SYSTEM_ARCHITECTURE.md",
@@ -2652,9 +2759,9 @@
     },
     {
       "path": "docs/architecture/pipeline-audit.md",
-      "size": 23638,
-      "modifiedAt": "2025-11-02T03:21:51.507Z",
-      "hash": "a7f12ceaaa0289a9bc8abc26300a236f8dd2716b",
+      "size": 23639,
+      "modifiedAt": "2025-12-16T07:39:36.512Z",
+      "hash": "23ec7c1924db4210d4005346b81c4e21e0df6ffa",
       "extension": "md"
     },
     {
@@ -2722,9 +2829,9 @@
     },
     {
       "path": "eslint.config.mjs",
-      "size": 883,
-      "modifiedAt": "2025-11-26T06:29:01.799Z",
-      "hash": "e06ad652e6625a7810531a5e5ca6fce7d8b32c4c",
+      "size": 1063,
+      "modifiedAt": "2025-12-17T00:11:57.570Z",
+      "hash": "21f69d3726ba526e6e66d468b0aff98157e7d3c2",
       "extension": "mjs"
     },
     {
@@ -2737,22 +2844,22 @@
     {
       "path": "next.config.mjs",
       "size": 3362,
-      "modifiedAt": "2025-12-15T11:31:50.077Z",
+      "modifiedAt": "2025-12-16T05:13:11.166Z",
       "hash": "f61f378ca258887742bf514346a256b6141fdf7e",
       "extension": "mjs"
     },
     {
       "path": "package-lock.json",
       "size": 436635,
-      "modifiedAt": "2025-12-15T10:05:31.123Z",
+      "modifiedAt": "2025-12-17T01:23:03.561Z",
       "hash": "3d22d0006cae4640191259810b9dfd2fd12b6b0a",
       "extension": "json"
     },
     {
       "path": "package.json",
-      "size": 4195,
-      "modifiedAt": "2025-12-15T11:11:51.656Z",
-      "hash": "42e10ff0cdd24d1b1677decc50f0870502a72de9",
+      "size": 4252,
+      "modifiedAt": "2025-12-16T08:27:48.212Z",
+      "hash": "dd7aadb979f8be78e8474c17fe935b7f64f207e3",
       "extension": "json"
     },
     {
@@ -2924,6 +3031,13 @@
       "extension": "js"
     },
     {
+      "path": "scripts/heart-self-test.ts",
+      "size": 1767,
+      "modifiedAt": "2025-12-16T08:28:08.271Z",
+      "hash": "1ed64971f4f13445a1f00136e4d3293c0a50b7c5",
+      "extension": "ts"
+    },
+    {
       "path": "scripts/migrate-legacy-seeds-weights.cjs",
       "size": 5676,
       "modifiedAt": "2025-11-02T12:11:47.739Z",
@@ -2967,22 +3081,22 @@
     },
     {
       "path": "scripts/run-comprehensive-audit.cjs",
-      "size": 10154,
-      "modifiedAt": "2025-12-15T11:33:13.782Z",
-      "hash": "95da155c7cdd420b5283b13303ffca790b31c108",
+      "size": 10155,
+      "modifiedAt": "2025-12-16T07:22:28.603Z",
+      "hash": "ef59a5b52a4a7effa724ff967dac4e557602c38b",
       "extension": "cjs"
     },
     {
       "path": "scripts/scan-ai-modules.js",
       "size": 3995,
-      "modifiedAt": "2025-12-15T10:48:03.955Z",
+      "modifiedAt": "2025-12-16T05:13:11.189Z",
       "hash": "802c602625ab24f249ff155a87a87ebcc6dece57",
       "extension": "js"
     },
     {
       "path": "scripts/scan-domains.js",
       "size": 3139,
-      "modifiedAt": "2025-12-15T10:48:03.955Z",
+      "modifiedAt": "2025-12-16T05:13:11.193Z",
       "hash": "18fae439329cba1fbfe08dd1d56fb1893c3a74c4",
       "extension": "js"
     },
@@ -2996,22 +3110,22 @@
     {
       "path": "scripts/scan.js",
       "size": 5127,
-      "modifiedAt": "2025-12-15T10:46:45.928Z",
+      "modifiedAt": "2025-12-16T05:13:11.193Z",
       "hash": "8f25a6f274dbc4f95d1f36ebe41ddae988b6eb01",
       "extension": "js"
     },
     {
       "path": "scripts/seed-default-users.cjs",
       "size": 2720,
-      "modifiedAt": "2025-12-15T11:32:53.448Z",
+      "modifiedAt": "2025-12-16T05:13:11.193Z",
       "hash": "8e9d7905094ec0ae3acb25ad599c209c6b6b7ca9",
       "extension": "cjs"
     },
     {
       "path": "scripts/test-ai-pipeline.cjs",
-      "size": 16572,
-      "modifiedAt": "2025-11-04T19:14:01.548Z",
-      "hash": "c4db5ce740cb75f9aaa074754c07dc5d5715d181",
+      "size": 16574,
+      "modifiedAt": "2025-12-16T07:22:28.603Z",
+      "hash": "386f57374f0a8c0396d6d9aba0313048daca3418",
       "extension": "cjs"
     },
     {
@@ -3024,7 +3138,7 @@
     {
       "path": "server.ts",
       "size": 1911,
-      "modifiedAt": "2025-12-15T00:39:20.072Z",
+      "modifiedAt": "2025-12-16T05:13:11.196Z",
       "hash": "033a44a5664c0f8cbb28f68f11a3e190566302fd",
       "extension": "ts"
     },
@@ -3129,7 +3243,7 @@
     {
       "path": "src/ai/context_management/dialogueFlowController.ts",
       "size": 2390,
-      "modifiedAt": "2025-12-15T01:20:51.982Z",
+      "modifiedAt": "2025-12-16T05:13:11.196Z",
       "hash": "dd9f9acfd51bf87547bd2bc0ef136912b5277df3",
       "extension": "ts"
     },
@@ -3150,14 +3264,14 @@
     {
       "path": "src/ai/context_management/interactionLogger.ts",
       "size": 963,
-      "modifiedAt": "2025-12-15T01:25:50.706Z",
+      "modifiedAt": "2025-12-16T05:13:11.199Z",
       "hash": "6794f97f16a88736a97d17e77e7ec507cb4b7554",
       "extension": "ts"
     },
     {
       "path": "src/ai/context_management/sentimentEmotionDetector.ts",
       "size": 1175,
-      "modifiedAt": "2025-12-15T01:23:30.051Z",
+      "modifiedAt": "2025-12-16T05:13:11.202Z",
       "hash": "086d026eef27bc4482b5c1a441ca6636e24b7b54",
       "extension": "ts"
     },
@@ -3178,8 +3292,50 @@
     {
       "path": "src/ai/context_management/userProfileHandler.ts",
       "size": 1506,
-      "modifiedAt": "2025-12-15T01:23:45.528Z",
+      "modifiedAt": "2025-12-16T05:13:11.202Z",
       "hash": "1bd3309a8ffaae3c26568bb1ce76f6f16bfbdd91",
+      "extension": "ts"
+    },
+    {
+      "path": "src/ai/core/__tests__/heartCore.test.ts",
+      "size": 1322,
+      "modifiedAt": "2025-12-16T06:36:32.391Z",
+      "hash": "e95eefd0ae316b860816969c312052d83c43e466",
+      "extension": "ts"
+    },
+    {
+      "path": "src/ai/core/boot.ts",
+      "size": 3569,
+      "modifiedAt": "2025-12-17T00:09:06.410Z",
+      "hash": "bb3999ec67025b7b4dd6b34c5d8ea279dc278c4b",
+      "extension": "ts"
+    },
+    {
+      "path": "src/ai/core/heart-structure.ts",
+      "size": 6826,
+      "modifiedAt": "2025-12-16T07:20:11.762Z",
+      "hash": "503864222580ed10cd4eb84fdc055a7f1efe9621",
+      "extension": "ts"
+    },
+    {
+      "path": "src/ai/core/index.ts",
+      "size": 261,
+      "modifiedAt": "2025-12-16T06:32:48.257Z",
+      "hash": "b481783bbea865c4aefb332366bd387f5c4fb468",
+      "extension": "ts"
+    },
+    {
+      "path": "src/ai/core/self-heal.ts",
+      "size": 3161,
+      "modifiedAt": "2025-12-17T00:09:18.922Z",
+      "hash": "7db5fc175d73a9f2b54e0532ea4003d6d00195f1",
+      "extension": "ts"
+    },
+    {
+      "path": "src/ai/system-model/SystemModel.ts",
+      "size": 5575,
+      "modifiedAt": "2025-12-16T06:33:43.505Z",
+      "hash": "455767bccedf4b473d91ab2cfaae5cfc0967ed46",
       "extension": "ts"
     },
     {
@@ -3276,42 +3432,42 @@
     {
       "path": "src/ai/data/chat-history/user-aiascended-001/React Projects/chat-1762319787128-114a81559.json",
       "size": 860,
-      "modifiedAt": "2025-11-26T06:29:01.896Z",
+      "modifiedAt": "2025-12-16T05:13:11.208Z",
       "hash": "623c0e47e43410b0d08af38ab8ab141a3a1a7dd8",
       "extension": "json"
     },
     {
       "path": "src/ai/data/settings/domains.json",
       "size": 1366,
-      "modifiedAt": "2025-12-13T04:35:31.068Z",
+      "modifiedAt": "2025-12-16T05:13:11.208Z",
       "hash": "a4609657fc04a927f6d686a90c14c4fa1d687a86",
       "extension": "json"
     },
     {
       "path": "src/ai/data/settings/models.json",
       "size": 644,
-      "modifiedAt": "2025-11-26T06:29:01.794Z",
+      "modifiedAt": "2025-12-16T05:13:11.208Z",
       "hash": "3d6adcdcd7e857cce3c719b99baadff9d310f9a4",
       "extension": "json"
     },
     {
       "path": "src/ai/data/settings/system.json",
       "size": 266,
-      "modifiedAt": "2025-12-13T04:35:31.068Z",
+      "modifiedAt": "2025-12-16T05:13:11.208Z",
       "hash": "1f0f55a2054dd4ddabe9336944d1b851ade0f5f4",
       "extension": "json"
     },
     {
       "path": "src/ai/data/settings/users.json",
       "size": 701,
-      "modifiedAt": "2025-11-26T06:29:01.794Z",
+      "modifiedAt": "2025-12-16T05:13:11.208Z",
       "hash": "d04abe0270ebdbc156c8d28b13cdf106356d5987",
       "extension": "json"
     },
     {
       "path": "src/ai/data/system-activity.log",
       "size": 962,
-      "modifiedAt": "2025-12-15T01:49:56.145Z",
+      "modifiedAt": "2025-12-16T05:13:11.209Z",
       "hash": "aa65c0412f87090e405e8e828434e5e9f0873a09",
       "extension": "log"
     },
@@ -3450,218 +3606,218 @@
     },
     {
       "path": "src/ai/hco/README.md",
-      "size": 5979,
-      "modifiedAt": "2025-12-13T05:51:39.095Z",
-      "hash": "595b1a34acdd190fdcf900860496f34fe2ca0458",
+      "size": 5980,
+      "modifiedAt": "2025-12-16T07:39:36.617Z",
+      "hash": "87064d319fef0fcfe88fed9822a6f187427f8a6c",
       "extension": "md"
     },
     {
       "path": "src/ai/hco/deploy/docker-compose.gpu.yml",
       "size": 585,
-      "modifiedAt": "2025-12-13T05:53:06.144Z",
+      "modifiedAt": "2025-12-16T05:13:11.209Z",
       "hash": "c78f68e8049c63c613e46a8364589d7534681633",
       "extension": "yml"
     },
     {
       "path": "src/ai/hco/deploy/vercel.json",
       "size": 337,
-      "modifiedAt": "2025-12-13T05:52:54.214Z",
+      "modifiedAt": "2025-12-16T05:13:11.212Z",
       "hash": "5df16b199db1d415c1756603ff79e59e11debc6c",
       "extension": "json"
     },
     {
       "path": "src/ai/hco/package-lock.json",
       "size": 80867,
-      "modifiedAt": "2025-12-13T06:32:37.390Z",
+      "modifiedAt": "2025-12-16T05:13:11.214Z",
       "hash": "abfbce5a776aabb31f5019246fd8ea190fda7394",
       "extension": "json"
     },
     {
       "path": "src/ai/hco/package.json",
       "size": 518,
-      "modifiedAt": "2025-12-13T05:52:37.665Z",
+      "modifiedAt": "2025-12-16T05:13:11.214Z",
       "hash": "78ad64218bf465ca12ea357f1b964f9a3d0a1a7a",
       "extension": "json"
     },
     {
       "path": "src/ai/hco/src/agents/.gitkeep",
       "size": 0,
-      "modifiedAt": "2025-12-13T05:54:49.385Z",
+      "modifiedAt": "2025-12-16T05:13:11.217Z",
       "hash": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
       "extension": ""
     },
     {
       "path": "src/ai/hco/src/agents/CodeAgent.ts",
       "size": 2895,
-      "modifiedAt": "2025-12-15T21:52:29.800Z",
+      "modifiedAt": "2025-12-16T05:13:11.217Z",
       "hash": "a09efd7b06b04d2aac8d6f67370c0001ee64207f",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/agents/DebateAgent.ts",
       "size": 2993,
-      "modifiedAt": "2025-12-13T06:01:05.650Z",
+      "modifiedAt": "2025-12-16T05:13:11.217Z",
       "hash": "aed319fa964431325908beb887035d8133c61552",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/agents/EmpathyAgent.ts",
       "size": 2076,
-      "modifiedAt": "2025-12-13T06:01:17.125Z",
+      "modifiedAt": "2025-12-16T05:13:11.217Z",
       "hash": "01f694a1ce5f6967bb673937b29a91015f5ca822",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/agents/HypothesisAgent.ts",
       "size": 2075,
-      "modifiedAt": "2025-12-13T06:01:28.778Z",
+      "modifiedAt": "2025-12-16T05:13:11.217Z",
       "hash": "54f7c1452d9bac6dd18b6af9b11cbd0f2a6f64e0",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/agents/LogicAgent.ts",
       "size": 2562,
-      "modifiedAt": "2025-12-15T00:19:15.291Z",
+      "modifiedAt": "2025-12-16T05:13:11.218Z",
       "hash": "51288ab0862f077f3e185ac76c6ffd206cf80c59",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/agents/PerceiverAgent.ts",
       "size": 3301,
-      "modifiedAt": "2025-12-13T06:00:18.532Z",
+      "modifiedAt": "2025-12-16T05:13:11.219Z",
       "hash": "05c96e88d145a84bbc65467c0eca89f8e5b2755a",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/agents/ReflectAgent.ts",
       "size": 2249,
-      "modifiedAt": "2025-12-13T06:01:26.033Z",
+      "modifiedAt": "2025-12-16T05:13:11.226Z",
       "hash": "499e310781865d6a386e6a6cee30d86bfba9c0de",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/config/hcoConstants.ts",
       "size": 900,
-      "modifiedAt": "2025-12-13T05:53:25.276Z",
+      "modifiedAt": "2025-12-16T05:13:11.226Z",
       "hash": "81fab49a27083427dbe5db62c771998d3215420b",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/mainOrchestrator.ts",
       "size": 3338,
-      "modifiedAt": "2025-12-13T06:01:46.926Z",
+      "modifiedAt": "2025-12-16T05:13:11.226Z",
       "hash": "67efee8e31bd9cea2cc8268734bf314ef2721d70",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/prompts/code.prompt.md",
       "size": 302,
-      "modifiedAt": "2025-12-13T05:53:59.374Z",
+      "modifiedAt": "2025-12-16T05:13:11.226Z",
       "hash": "aa29d91cbace6143ea35a422a6d6f71040f30b63",
       "extension": "md"
     },
     {
       "path": "src/ai/hco/src/prompts/debate.prompt.md",
       "size": 430,
-      "modifiedAt": "2025-12-13T05:54:10.344Z",
+      "modifiedAt": "2025-12-16T05:13:11.226Z",
       "hash": "7241579fe72294b95764bfdc68edfea8a3f59971",
       "extension": "md"
     },
     {
       "path": "src/ai/hco/src/prompts/empathy.prompt.md",
       "size": 251,
-      "modifiedAt": "2025-12-13T05:54:15.464Z",
+      "modifiedAt": "2025-12-16T05:13:11.226Z",
       "hash": "af0cf35332ea255ddb25563fbcae68d445286953",
       "extension": "md"
     },
     {
       "path": "src/ai/hco/src/prompts/hypothesis.prompt.md",
       "size": 289,
-      "modifiedAt": "2025-12-13T05:53:53.195Z",
+      "modifiedAt": "2025-12-16T05:13:11.226Z",
       "hash": "dd32ac4d0b9719dc4a87cc5794440dac2275ef23",
       "extension": "md"
     },
     {
       "path": "src/ai/hco/src/prompts/logic.prompt.md",
       "size": 399,
-      "modifiedAt": "2025-12-13T05:54:04.564Z",
+      "modifiedAt": "2025-12-16T05:13:11.227Z",
       "hash": "efdf98555c80107615818e3000db6c223ef89866",
       "extension": "md"
     },
     {
       "path": "src/ai/hco/src/prompts/perceiver.prompt.md",
       "size": 278,
-      "modifiedAt": "2025-12-13T05:53:47.949Z",
+      "modifiedAt": "2025-12-16T05:13:11.227Z",
       "hash": "30e4c8268ed08e769bb91a6e97b21557f7a1d40c",
       "extension": "md"
     },
     {
       "path": "src/ai/hco/src/prompts/reflect.prompt.md",
       "size": 343,
-      "modifiedAt": "2025-12-13T05:54:20.941Z",
+      "modifiedAt": "2025-12-16T05:13:11.227Z",
       "hash": "7620ae72b37ae4ec5c08808d6e3e87dff1997598",
       "extension": "md"
     },
     {
       "path": "src/ai/hco/src/shared/memory.ts",
       "size": 1312,
-      "modifiedAt": "2025-12-13T05:53:31.088Z",
+      "modifiedAt": "2025-12-16T05:13:11.227Z",
       "hash": "0184df08e10db767791ad7e0a68e462559fdcfea",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/shared/retry.ts",
       "size": 508,
-      "modifiedAt": "2025-12-13T05:53:15.310Z",
+      "modifiedAt": "2025-12-16T05:13:11.227Z",
       "hash": "1b07a623bf6bd3e42c96546b045c908dfdc7c6b2",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/shared/toolSelector.ts",
       "size": 534,
-      "modifiedAt": "2025-12-15T21:52:29.800Z",
+      "modifiedAt": "2025-12-16T05:13:11.227Z",
       "hash": "c580dd9d2a9606a10428e5f9d9a07ebb8ebd8652",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/src/shared/types.ts",
       "size": 1774,
-      "modifiedAt": "2025-12-13T05:59:48.172Z",
+      "modifiedAt": "2025-12-16T05:13:11.227Z",
       "hash": "ec785672bcfa4affc2fd80117af2a1e332c4328f",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/tests/logicAgent.test.ts",
       "size": 960,
-      "modifiedAt": "2025-12-14T23:27:21.582Z",
+      "modifiedAt": "2025-12-16T05:13:11.227Z",
       "hash": "31fb8fb25b06b5fc9297e497835a14880c2ca348",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/tests/pipeline.test.ts",
       "size": 815,
-      "modifiedAt": "2025-12-13T06:02:15.673Z",
+      "modifiedAt": "2025-12-16T05:13:11.230Z",
       "hash": "e417c46d8e906e7e369ec7507082e81a2aaebec2",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/tests/reflectAgent.test.ts",
       "size": 1566,
-      "modifiedAt": "2025-12-15T21:52:29.800Z",
+      "modifiedAt": "2025-12-16T05:13:11.230Z",
       "hash": "de91355ed125c890763a8ef9801af9bd27c7bcfb",
       "extension": "ts"
     },
     {
       "path": "src/ai/hco/tsconfig.json",
       "size": 662,
-      "modifiedAt": "2025-12-13T06:05:23.905Z",
+      "modifiedAt": "2025-12-16T05:13:11.230Z",
       "hash": "5e56d60d7ea1f29664bec279167a1ccda594d1e3",
       "extension": "json"
     },
     {
       "path": "src/ai/hco/vitest.config.ts",
       "size": 468,
-      "modifiedAt": "2025-12-13T06:07:02.606Z",
+      "modifiedAt": "2025-12-16T05:13:11.230Z",
       "hash": "9d9f155f6c4c908a7a641076747d0c5d3861085a",
       "extension": "ts"
     },
@@ -3689,7 +3845,7 @@
     {
       "path": "src/ai/inference/domainQueryExecutor.ts",
       "size": 5773,
-      "modifiedAt": "2025-12-15T21:50:54.208Z",
+      "modifiedAt": "2025-12-16T05:13:11.232Z",
       "hash": "33c18ba1c21bbaae60c2f83ea5c88046d6867689",
       "extension": "ts"
     },
@@ -3864,14 +4020,14 @@
     {
       "path": "src/ai/knowledge-domains/algorithms/algorithms_domainRegistrar.ts",
       "size": 463,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.235Z",
       "hash": "bd96ff9549736adcd174dad3ca1fd38205876b3f",
       "extension": "ts"
     },
     {
       "path": "src/ai/knowledge-domains/algorithms/algorithms_embeddings.ts",
       "size": 1535,
-      "modifiedAt": "2025-12-15T01:17:21.995Z",
+      "modifiedAt": "2025-12-16T05:13:11.235Z",
       "hash": "b491dc4cc935d4bbe89e9a7fe8376a46cf4fcb53",
       "extension": "ts"
     },
@@ -3892,7 +4048,7 @@
     {
       "path": "src/ai/knowledge-domains/algorithms/algorithms_integrationAPI.ts",
       "size": 808,
-      "modifiedAt": "2025-12-15T21:55:04.814Z",
+      "modifiedAt": "2025-12-16T05:13:11.247Z",
       "hash": "2708fdd9cb34a98d4d28766795167a01b99e883b",
       "extension": "ts"
     },
@@ -4067,7 +4223,7 @@
     {
       "path": "src/ai/knowledge-domains/code_review/code_review_domainRegistrar.ts",
       "size": 504,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.247Z",
       "hash": "791484cebb93d5303d4f6a527b42b3046480c028",
       "extension": "ts"
     },
@@ -4095,7 +4251,7 @@
     {
       "path": "src/ai/knowledge-domains/code_review/code_review_integrationAPI.ts",
       "size": 806,
-      "modifiedAt": "2025-12-15T21:55:04.812Z",
+      "modifiedAt": "2025-12-16T05:13:11.247Z",
       "hash": "724920bf5fb798590614da8495fd19cd8f10972b",
       "extension": "ts"
     },
@@ -4291,7 +4447,7 @@
     {
       "path": "src/ai/knowledge-domains/data_integrity/data_integrity_integrationAPI.ts",
       "size": 3432,
-      "modifiedAt": "2025-12-15T21:55:04.810Z",
+      "modifiedAt": "2025-12-16T05:13:11.248Z",
       "hash": "17bb8011c1487880684b5b6990b5d70263e00659",
       "extension": "ts"
     },
@@ -4382,14 +4538,14 @@
     {
       "path": "src/ai/knowledge-domains/data_structures/data_structures_domainRegistrar.ts",
       "size": 518,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.248Z",
       "hash": "6217f42d2186e0b877bfba13154947d0ff59acb9",
       "extension": "ts"
     },
     {
       "path": "src/ai/knowledge-domains/data_structures/data_structures_embeddings.ts",
       "size": 1824,
-      "modifiedAt": "2025-12-15T01:17:21.995Z",
+      "modifiedAt": "2025-12-16T05:13:11.248Z",
       "hash": "59651ae368800c05329498ffeda4ecfc4cce99be",
       "extension": "ts"
     },
@@ -4410,7 +4566,7 @@
     {
       "path": "src/ai/knowledge-domains/data_structures/data_structures_integrationAPI.ts",
       "size": 882,
-      "modifiedAt": "2025-12-15T21:55:04.808Z",
+      "modifiedAt": "2025-12-16T05:13:11.248Z",
       "hash": "bd4c70cf8357754aed12d8d755c1c451e9713b3e",
       "extension": "ts"
     },
@@ -4585,7 +4741,7 @@
     {
       "path": "src/ai/knowledge-domains/documentation/documentation_domainRegistrar.ts",
       "size": 525,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.248Z",
       "hash": "eb2e09b65cb65dd4ae4163135d065d41ed885328",
       "extension": "ts"
     },
@@ -4613,7 +4769,7 @@
     {
       "path": "src/ai/knowledge-domains/documentation/documentation_integrationAPI.ts",
       "size": 844,
-      "modifiedAt": "2025-12-15T21:55:04.809Z",
+      "modifiedAt": "2025-12-16T05:13:11.249Z",
       "hash": "e499cbaedd6ba95a80f3c55b6ea9cc6edfec2ada",
       "extension": "ts"
     },
@@ -4809,7 +4965,7 @@
     {
       "path": "src/ai/knowledge-domains/english/english_domainRegistrar.ts",
       "size": 365,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.252Z",
       "hash": "b42b3d289f523a43c445a2e66b8247d70df5f73e",
       "extension": "ts"
     },
@@ -4851,7 +5007,7 @@
     {
       "path": "src/ai/knowledge-domains/english/english_integrationAPI.ts",
       "size": 861,
-      "modifiedAt": "2025-12-15T21:55:04.813Z",
+      "modifiedAt": "2025-12-16T05:13:11.252Z",
       "hash": "cf4249983848dacf897b694ff2182d25037351cc",
       "extension": "ts"
     },
@@ -5026,14 +5182,14 @@
     {
       "path": "src/ai/knowledge-domains/environment/environment_domainRegistrar.ts",
       "size": 474,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.252Z",
       "hash": "971a81624d70f4f93d3d9cd33b9102a1ca38c0b8",
       "extension": "ts"
     },
     {
       "path": "src/ai/knowledge-domains/environment/environment_embeddings.ts",
       "size": 1560,
-      "modifiedAt": "2025-12-15T01:17:21.995Z",
+      "modifiedAt": "2025-12-16T05:13:11.252Z",
       "hash": "f6177dbe16f8d0d37d4609b61856184e95123126",
       "extension": "ts"
     },
@@ -5054,7 +5210,7 @@
     {
       "path": "src/ai/knowledge-domains/environment/environment_integrationAPI.ts",
       "size": 824,
-      "modifiedAt": "2025-12-15T21:55:04.812Z",
+      "modifiedAt": "2025-12-16T05:13:11.252Z",
       "hash": "eb57837ec6512b1abdbe44581c6f8420e6e61230",
       "extension": "ts"
     },
@@ -5229,7 +5385,7 @@
     {
       "path": "src/ai/knowledge-domains/error_detection/error_detection_domainRegistrar.ts",
       "size": 547,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.252Z",
       "hash": "1d372c22c05fefb6b5aa8d2dbf57ee950954b8d0",
       "extension": "ts"
     },
@@ -5257,7 +5413,7 @@
     {
       "path": "src/ai/knowledge-domains/error_detection/error_detection_integrationAPI.ts",
       "size": 870,
-      "modifiedAt": "2025-12-15T21:55:04.811Z",
+      "modifiedAt": "2025-12-16T05:13:11.252Z",
       "hash": "e2f6858df12e1d8fb4e702fc1c92b0fe1485c4a3",
       "extension": "ts"
     },
@@ -5467,7 +5623,7 @@
     {
       "path": "src/ai/knowledge-domains/general_knowledge/general_knowledge_integrationAPI.ts",
       "size": 564,
-      "modifiedAt": "2025-12-15T21:55:04.810Z",
+      "modifiedAt": "2025-12-16T05:13:11.261Z",
       "hash": "c734d1b95c9e7a94993975145df2edb6b0be7f4f",
       "extension": "ts"
     },
@@ -5649,7 +5805,7 @@
     {
       "path": "src/ai/knowledge-domains/grammar/grammar_domainRegistrar.ts",
       "size": 460,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.261Z",
       "hash": "b99b0cd1308d85d9c10cdbbd0885b177af35c4b6",
       "extension": "ts"
     },
@@ -5677,7 +5833,7 @@
     {
       "path": "src/ai/knowledge-domains/grammar/grammar_integrationAPI.ts",
       "size": 748,
-      "modifiedAt": "2025-12-15T21:55:04.814Z",
+      "modifiedAt": "2025-12-16T05:13:11.261Z",
       "hash": "0b89c85648d79198123d295dc808a0dce6970204",
       "extension": "ts"
     },
@@ -5894,7 +6050,7 @@
     {
       "path": "src/ai/knowledge-domains/index.ts",
       "size": 3456,
-      "modifiedAt": "2025-12-15T09:05:47.609Z",
+      "modifiedAt": "2025-12-16T05:13:11.261Z",
       "hash": "82f14864bd4ec86e05e589b1e0dcfaf3493c1e9b",
       "extension": "ts"
     },
@@ -5915,7 +6071,7 @@
     {
       "path": "src/ai/knowledge-domains/internet_search/internet_search_inferenceController.ts",
       "size": 6230,
-      "modifiedAt": "2025-12-15T01:20:51.982Z",
+      "modifiedAt": "2025-12-16T05:13:11.261Z",
       "hash": "3c869e17238b7c9661972334933fb6aff96a838a",
       "extension": "ts"
     },
@@ -5936,7 +6092,7 @@
     {
       "path": "src/ai/knowledge-domains/internet_search/internet_search_integrationAPI.ts",
       "size": 1006,
-      "modifiedAt": "2025-12-15T21:55:04.811Z",
+      "modifiedAt": "2025-12-16T05:13:11.262Z",
       "hash": "b25c03ecb9a0dfccef9669b4a7f3a3105d2ceb4c",
       "extension": "ts"
     },
@@ -6125,7 +6281,7 @@
     {
       "path": "src/ai/knowledge-domains/mathematics/mathematics_integrationAPI.ts",
       "size": 562,
-      "modifiedAt": "2025-12-15T21:55:04.812Z",
+      "modifiedAt": "2025-12-16T05:13:11.262Z",
       "hash": "3f8e123a6cb6aad940ef0ee91028ab16d4a12884",
       "extension": "ts"
     },
@@ -6496,7 +6652,7 @@
     {
       "path": "src/ai/knowledge-domains/nextjs/nextjs_integrationAPI.ts",
       "size": 818,
-      "modifiedAt": "2025-12-15T21:55:04.814Z",
+      "modifiedAt": "2025-12-16T05:13:11.265Z",
       "hash": "f6f3b9f223694e801b2a65c3d3ea706ac5ed849b",
       "extension": "ts"
     },
@@ -6986,7 +7142,7 @@
     {
       "path": "src/ai/knowledge-domains/observability/observability_integrationAPI.ts",
       "size": 3314,
-      "modifiedAt": "2025-12-15T21:55:04.812Z",
+      "modifiedAt": "2025-12-16T05:13:11.265Z",
       "hash": "05beb2f7215e845090c5982065b752eb7ac9b1f4",
       "extension": "ts"
     },
@@ -7098,7 +7254,7 @@
     {
       "path": "src/ai/knowledge-domains/programming/programming_inferenceController.ts",
       "size": 6550,
-      "modifiedAt": "2025-12-15T01:19:14.807Z",
+      "modifiedAt": "2025-12-16T05:13:11.268Z",
       "hash": "13bbc5003d4c4d45d379a9f1ad5ee9d41f9634e2",
       "extension": "ts"
     },
@@ -7126,7 +7282,7 @@
     {
       "path": "src/ai/knowledge-domains/programming/programming_integrationAPI.ts",
       "size": 902,
-      "modifiedAt": "2025-12-15T21:55:04.809Z",
+      "modifiedAt": "2025-12-16T05:13:11.271Z",
       "hash": "c3b02e217a0ee2bfdd850005b11132ed51c9c961",
       "extension": "ts"
     },
@@ -7490,7 +7646,7 @@
     {
       "path": "src/ai/knowledge-domains/react/react_integrationAPI.ts",
       "size": 833,
-      "modifiedAt": "2025-12-15T21:55:04.808Z",
+      "modifiedAt": "2025-12-16T05:13:11.271Z",
       "hash": "16dd45431cc12ff0481bc373e3661e391b19b616",
       "extension": "ts"
     },
@@ -7707,7 +7863,7 @@
     {
       "path": "src/ai/knowledge-domains/repair/repair_integrationAPI.ts",
       "size": 3197,
-      "modifiedAt": "2025-12-15T21:55:04.813Z",
+      "modifiedAt": "2025-12-16T05:13:11.271Z",
       "hash": "6c25571f8e59c5f1f38b60fbc95c38194e081414",
       "extension": "ts"
     },
@@ -7805,7 +7961,7 @@
     {
       "path": "src/ai/knowledge-domains/science/science_domainRegistrar.ts",
       "size": 460,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.276Z",
       "hash": "a0f4b34b571ce90b7ae5c8d344b9c2a63fb98e78",
       "extension": "ts"
     },
@@ -7833,7 +7989,7 @@
     {
       "path": "src/ai/knowledge-domains/science/science_integrationAPI.ts",
       "size": 748,
-      "modifiedAt": "2025-12-15T21:55:04.809Z",
+      "modifiedAt": "2025-12-16T05:13:11.276Z",
       "hash": "13cc57945b6db05735c0579425278e89831c5a86",
       "extension": "ts"
     },
@@ -8008,7 +8164,7 @@
     {
       "path": "src/ai/knowledge-domains/security/security_domainRegistrar.ts",
       "size": 470,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.276Z",
       "hash": "c876f4dd34f381b2ad1a09f6186ec160900f8e8e",
       "extension": "ts"
     },
@@ -8036,7 +8192,7 @@
     {
       "path": "src/ai/knowledge-domains/security/security_integrationAPI.ts",
       "size": 764,
-      "modifiedAt": "2025-12-15T21:55:04.809Z",
+      "modifiedAt": "2025-12-16T05:13:11.276Z",
       "hash": "0c9ca4a327782d08adaf4777945421bd62c52aa5",
       "extension": "ts"
     },
@@ -8267,7 +8423,7 @@
     {
       "path": "src/ai/knowledge-domains/system/system_integrationAPI.ts",
       "size": 3351,
-      "modifiedAt": "2025-12-15T21:55:04.813Z",
+      "modifiedAt": "2025-12-16T05:13:11.276Z",
       "hash": "909d2e39b9c96ac0ac8be0051b7a343230689ce9",
       "extension": "ts"
     },
@@ -8428,7 +8584,7 @@
     {
       "path": "src/ai/knowledge-domains/testing/testing_domainRegistrar.ts",
       "size": 459,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.276Z",
       "hash": "3f6ff73a78d356fd6bde2628a2b6b59e3b621263",
       "extension": "ts"
     },
@@ -8456,7 +8612,7 @@
     {
       "path": "src/ai/knowledge-domains/testing/testing_integrationAPI.ts",
       "size": 748,
-      "modifiedAt": "2025-12-15T21:55:04.811Z",
+      "modifiedAt": "2025-12-16T05:13:11.276Z",
       "hash": "6def5faf5f1dfaccbbe7c6edb006f209f95e0792",
       "extension": "ts"
     },
@@ -8638,7 +8794,7 @@
     {
       "path": "src/ai/knowledge-domains/typescript/typescript_domainRegistrar.ts",
       "size": 510,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.276Z",
       "hash": "37ad683fb4d15731e1ff5025b5b5678d86cd6d17",
       "extension": "ts"
     },
@@ -8652,7 +8808,7 @@
     {
       "path": "src/ai/knowledge-domains/typescript/typescript_inferenceController.ts",
       "size": 22243,
-      "modifiedAt": "2025-12-15T01:18:25.688Z",
+      "modifiedAt": "2025-12-16T05:13:11.277Z",
       "hash": "0de17ec75791e299451bf73e44df23e0fb36ee08",
       "extension": "ts"
     },
@@ -8680,7 +8836,7 @@
     {
       "path": "src/ai/knowledge-domains/typescript/typescript_integrationAPI.ts",
       "size": 581,
-      "modifiedAt": "2025-12-15T21:55:04.810Z",
+      "modifiedAt": "2025-12-16T05:13:11.277Z",
       "hash": "9c6fc1c63139e7cc6fc0b3a94d1dc785625f42f9",
       "extension": "ts"
     },
@@ -8876,14 +9032,14 @@
     {
       "path": "src/ai/knowledge-domains/version_control/version_control_domainRegistrar.ts",
       "size": 518,
-      "modifiedAt": "2025-12-15T01:16:28.868Z",
+      "modifiedAt": "2025-12-16T05:13:11.277Z",
       "hash": "d26c9f4864e30c081ef681067189a4e25c75c0d5",
       "extension": "ts"
     },
     {
       "path": "src/ai/knowledge-domains/version_control/version_control_embeddings.ts",
       "size": 1653,
-      "modifiedAt": "2025-12-15T01:17:21.995Z",
+      "modifiedAt": "2025-12-16T05:13:11.277Z",
       "hash": "3b6a098ca4acd3e74f92b8125a5a22e4160fcb4c",
       "extension": "ts"
     },
@@ -8904,7 +9060,7 @@
     {
       "path": "src/ai/knowledge-domains/version_control/version_control_integrationAPI.ts",
       "size": 882,
-      "modifiedAt": "2025-12-15T21:55:04.808Z",
+      "modifiedAt": "2025-12-16T05:13:11.277Z",
       "hash": "92647689e9d6fcca1163d135d09b350f6613282c",
       "extension": "ts"
     },
@@ -9072,7 +9228,7 @@
     {
       "path": "src/ai/knowledge_retrieval/documentRetrieverRanker.ts",
       "size": 1273,
-      "modifiedAt": "2025-12-15T01:01:25.619Z",
+      "modifiedAt": "2025-12-16T05:13:11.277Z",
       "hash": "688eff27cd8f6db4a9ff77cc20df4f8f3200d31a",
       "extension": "ts"
     },
@@ -9912,14 +10068,14 @@
     {
       "path": "src/ai/models/index.ts",
       "size": 3653,
-      "modifiedAt": "2025-12-15T09:08:14.508Z",
+      "modifiedAt": "2025-12-16T05:13:11.277Z",
       "hash": "dfa8973ffa435c623a4a39105278bae43ccd9501",
       "extension": "ts"
     },
     {
       "path": "src/ai/models/modelLoader.ts",
       "size": 8510,
-      "modifiedAt": "2025-12-15T21:54:49.785Z",
+      "modifiedAt": "2025-12-16T05:13:11.290Z",
       "hash": "62c382700dfd09536fd96ef8037bba30bf30627f",
       "extension": "ts"
     },
@@ -10773,7 +10929,7 @@
     {
       "path": "src/ai/models/unified-transformer-llm/unified-transformer-llm_inference/llm-inferenceEngine.ts",
       "size": 6588,
-      "modifiedAt": "2025-12-15T00:23:01.879Z",
+      "modifiedAt": "2025-12-16T05:13:11.293Z",
       "hash": "1500414a79dbd30c7bca24214e10303d21bd6b09",
       "extension": "ts"
     },
@@ -10962,7 +11118,7 @@
     {
       "path": "src/ai/models/unified-transformer-llm/unified-transformer-llm_training/llm-trainer.ts",
       "size": 2395,
-      "modifiedAt": "2025-12-15T01:24:30.889Z",
+      "modifiedAt": "2025-12-16T05:13:11.293Z",
       "hash": "fba0cee89edb9426f4621ad40c92e6e592b976e4",
       "extension": "ts"
     },
@@ -10997,7 +11153,7 @@
     {
       "path": "src/ai/models/unified-transformer-llm/unified-transformer-llm_weights/unified-transformer-llm-weightsManager.ts",
       "size": 9301,
-      "modifiedAt": "2025-12-15T01:24:30.889Z",
+      "modifiedAt": "2025-12-16T05:13:11.293Z",
       "hash": "db2547a6ec12a0003035cb6737d2fc08b964d022",
       "extension": "ts"
     },
@@ -11353,9 +11509,9 @@
     },
     {
       "path": "src/ai/monitoring/learningMetricsTracker.ts",
-      "size": 7625,
-      "modifiedAt": "2025-12-13T04:35:31.122Z",
-      "hash": "3294966c2ee9a1f59cfe1816606383bc98015c18",
+      "size": 7727,
+      "modifiedAt": "2025-12-17T01:27:27.061Z",
+      "hash": "e72e13b4a34dc55dc8e30039a021a8f871b483a6",
       "extension": "ts"
     },
     {
@@ -11368,7 +11524,7 @@
     {
       "path": "src/ai/monitoring/metricsCollector.ts",
       "size": 3597,
-      "modifiedAt": "2025-12-14T23:10:29.442Z",
+      "modifiedAt": "2025-12-16T05:13:11.293Z",
       "hash": "37b0004a6a854bc74997e7bb3eaddabd996e9b0d",
       "extension": "ts"
     },
@@ -11389,7 +11545,7 @@
     {
       "path": "src/ai/orchestration/aiOrchestrator-v2.ts",
       "size": 4000,
-      "modifiedAt": "2025-12-15T01:26:59.459Z",
+      "modifiedAt": "2025-12-16T05:13:11.310Z",
       "hash": "df96a1a647a1ed6431e4fdfa6db63ba208e533b3",
       "extension": "ts"
     },
@@ -11403,15 +11559,15 @@
     {
       "path": "src/ai/orchestration/contextEnhancer.ts",
       "size": 3043,
-      "modifiedAt": "2025-12-15T01:24:13.259Z",
+      "modifiedAt": "2025-12-16T05:13:11.310Z",
       "hash": "d7bb73595028f5abe056d9e44e0bf5c393578699",
       "extension": "ts"
     },
     {
       "path": "src/ai/orchestration/crossModalFusion.ts",
-      "size": 12393,
-      "modifiedAt": "2025-12-13T04:35:31.123Z",
-      "hash": "e90b2d9e8c3de6a0f4c1e021d83608d1613fee18",
+      "size": 12394,
+      "modifiedAt": "2025-12-16T07:25:03.254Z",
+      "hash": "3ef07c0266cdaee0dbe8c88e5af21927b2e42ad3",
       "extension": "ts"
     },
     {
@@ -11424,15 +11580,15 @@
     {
       "path": "src/ai/orchestration/dependencyResolver.ts",
       "size": 1013,
-      "modifiedAt": "2025-12-15T09:25:57.796Z",
+      "modifiedAt": "2025-12-16T05:13:11.313Z",
       "hash": "cb1bb2cd86fe0c769a23d39a06dff9359b8e2e7f",
       "extension": "ts"
     },
     {
       "path": "src/ai/orchestration/domainRouter.ts",
-      "size": 9721,
-      "modifiedAt": "2025-12-15T21:54:49.785Z",
-      "hash": "12745fcf1c67f40e5b9e650fb53b15339e50a94c",
+      "size": 9722,
+      "modifiedAt": "2025-12-16T07:25:03.156Z",
+      "hash": "a6dce2e712946407e0bb96e1a975d6f29dcb66e4",
       "extension": "ts"
     },
     {
@@ -11452,29 +11608,36 @@
     {
       "path": "src/ai/orchestration/knowledgeRetriever.ts",
       "size": 3541,
-      "modifiedAt": "2025-12-15T01:04:17.250Z",
+      "modifiedAt": "2025-12-16T05:13:11.316Z",
       "hash": "b14ff69f687a5a361dbdafa0110a904ac7cc6995",
+      "extension": "ts"
+    },
+    {
+      "path": "src/ai/orchestration/legacy/main-orchestrator.legacy.ts",
+      "size": 52093,
+      "modifiedAt": "2025-12-16T07:22:28.661Z",
+      "hash": "4c44ab92a92e2a8ecc98dc0e5370cce5f14280ca",
       "extension": "ts"
     },
     {
       "path": "src/ai/orchestration/logger.ts",
       "size": 2284,
-      "modifiedAt": "2025-12-15T01:01:25.619Z",
+      "modifiedAt": "2025-12-16T05:13:11.316Z",
       "hash": "a4acc3ec3b1a0845bd9931aa609d519abcd99535",
       "extension": "ts"
     },
     {
-      "path": "src/ai/orchestration/mainOrchestrator.ts",
-      "size": 39071,
-      "modifiedAt": "2025-12-15T21:50:46.934Z",
-      "hash": "04a3d913fe4c81bfe217b29179bbdc6b1b38f063",
+      "path": "src/ai/orchestration/main-orchestrator.ts",
+      "size": 31157,
+      "modifiedAt": "2025-12-16T08:40:15.950Z",
+      "hash": "e72fc8ac54bdbad9be12e551028ad83d4ee79012",
       "extension": "ts"
     },
     {
       "path": "src/ai/orchestration/modelSelector.ts",
-      "size": 10681,
-      "modifiedAt": "2025-12-13T04:35:31.124Z",
-      "hash": "436566cefa2e7089e2bb69f7f765de5c1bfe600c",
+      "size": 10682,
+      "modifiedAt": "2025-12-16T07:25:03.221Z",
+      "hash": "92d81b03342f231b70d9cfa03291fc6589da06ab",
       "extension": "ts"
     },
     {
@@ -11493,9 +11656,9 @@
     },
     {
       "path": "src/ai/orchestration/promptHandler.ts",
-      "size": 5216,
-      "modifiedAt": "2025-12-13T04:35:31.124Z",
-      "hash": "900291fedfbbf6134f69dc5809dc9124f308842f",
+      "size": 5218,
+      "modifiedAt": "2025-12-16T07:20:11.807Z",
+      "hash": "b495dcaaa044e66745228734d2120bdc37b6a196",
       "extension": "ts"
     },
     {
@@ -11514,9 +11677,9 @@
     },
     {
       "path": "src/ai/orchestration/resultsAggregator.ts",
-      "size": 9566,
-      "modifiedAt": "2025-12-13T04:35:31.125Z",
-      "hash": "d52a5c115ea42128fd98dc05d9c20e1c1ed7614d",
+      "size": 9567,
+      "modifiedAt": "2025-12-16T07:25:03.254Z",
+      "hash": "2fa9bcf43754b66b2d94caad8cc226780fabd5e6",
       "extension": "ts"
     },
     {
@@ -11543,56 +11706,56 @@
     {
       "path": "src/ai/orchestration/system/index.ts",
       "size": 194,
-      "modifiedAt": "2025-12-15T10:35:31.355Z",
+      "modifiedAt": "2025-12-16T05:13:11.322Z",
       "hash": "b94e83ac2b8ccf56197db99e0bab645d1dbd7079",
       "extension": "ts"
     },
     {
       "path": "src/ai/orchestration/system/moduleConfigs.ts",
       "size": 7317,
-      "modifiedAt": "2025-12-16T03:26:47.628Z",
+      "modifiedAt": "2025-12-16T05:13:11.322Z",
       "hash": "5b3bd90db53605cfde53ebe2f9aa9273216ab4b9",
       "extension": "ts"
     },
     {
       "path": "src/ai/orchestration/system/systemActivityLog.ts",
       "size": 2845,
-      "modifiedAt": "2025-12-15T10:56:06.362Z",
+      "modifiedAt": "2025-12-16T05:13:11.322Z",
       "hash": "e1aeaa80ca7b8ff57f7c6095c078cc9e0e6ffbdb",
       "extension": "ts"
     },
     {
       "path": "src/ai/orchestration/system/systemLoader.ts",
-      "size": 8973,
-      "modifiedAt": "2025-12-16T03:26:47.630Z",
-      "hash": "586ffe95123234c7068d71085928d576e7634e1f",
+      "size": 8883,
+      "modifiedAt": "2025-12-16T10:15:45.805Z",
+      "hash": "bee08951e9008bdb7f5cc9ebf251ce0031a1307f",
       "extension": "ts"
     },
     {
       "path": "src/ai/orchestration/system/systemRegistry.ts",
       "size": 11820,
-      "modifiedAt": "2025-12-16T03:26:47.628Z",
+      "modifiedAt": "2025-12-16T05:13:11.326Z",
       "hash": "a03855937db15e1e448ddf45c2d7bc254e4e383b",
       "extension": "ts"
     },
     {
       "path": "src/ai/orchestration/system/systemSettings.ts",
       "size": 3427,
-      "modifiedAt": "2025-12-16T03:26:47.642Z",
+      "modifiedAt": "2025-12-16T05:13:11.326Z",
       "hash": "01795b1d5a85ba0be7c0b004867692b86f0c4a29",
       "extension": "ts"
     },
     {
       "path": "src/ai/orchestration/system/systemWatcher.ts",
       "size": 7230,
-      "modifiedAt": "2025-12-15T10:46:45.928Z",
+      "modifiedAt": "2025-12-16T05:13:11.326Z",
       "hash": "acf29632f534ae82ad054ccd59f75d1533a13b82",
       "extension": "ts"
     },
     {
       "path": "src/ai/orchestration/system/types.ts",
       "size": 2323,
-      "modifiedAt": "2025-12-15T08:57:25.310Z",
+      "modifiedAt": "2025-12-16T05:13:11.326Z",
       "hash": "bfe90c37ef8d1ce1561ad8632840fca5ace99c44",
       "extension": "ts"
     },
@@ -11627,7 +11790,7 @@
     {
       "path": "src/ai/orchestration/unifiedOrchestratorIntegration.ts",
       "size": 8813,
-      "modifiedAt": "2025-12-15T10:22:07.843Z",
+      "modifiedAt": "2025-12-16T05:13:11.326Z",
       "hash": "734bf983dc6286bd16aa59c06269ab1a10471a33",
       "extension": "ts"
     },
@@ -11808,9 +11971,9 @@
     },
     {
       "path": "src/ai/shared/loader/unifiedLoader.ts",
-      "size": 7890,
-      "modifiedAt": "2025-12-13T04:35:31.127Z",
-      "hash": "e980eae4f656eb58fc183d957e09185800d55752",
+      "size": 7914,
+      "modifiedAt": "2025-12-16T10:15:45.880Z",
+      "hash": "d724482a2a8ee3da891d993fed115bb38b34ad95",
       "extension": "ts"
     },
     {
@@ -11829,9 +11992,9 @@
     },
     {
       "path": "src/ai/shared/registry/moduleLoader.ts",
-      "size": 7731,
-      "modifiedAt": "2025-12-13T04:35:31.127Z",
-      "hash": "0a7f0a7fd1cab2b9a804e343346b82ad27314a0c",
+      "size": 7755,
+      "modifiedAt": "2025-12-16T10:15:45.880Z",
+      "hash": "d31f68c08e800222c388aa691568bede8253aabe",
       "extension": "ts"
     },
     {
@@ -11843,9 +12006,9 @@
     },
     {
       "path": "src/ai/shared/registry/unifiedRegistry.ts",
-      "size": 15513,
-      "modifiedAt": "2025-12-13T04:35:31.127Z",
-      "hash": "53a4e5591a2545c11866ea062b96ac4eb9cbcdfa",
+      "size": 15525,
+      "modifiedAt": "2025-12-16T10:15:45.880Z",
+      "hash": "fe13f920fd71f5ed51d89654dfb81bc43a52b2b2",
       "extension": "ts"
     },
     {
@@ -12110,7 +12273,7 @@
     {
       "path": "src/ai/shared/tools/codeFormatting/codeFormatter.ts",
       "size": 1183,
-      "modifiedAt": "2025-12-15T01:01:25.619Z",
+      "modifiedAt": "2025-12-16T05:13:11.330Z",
       "hash": "16fb2ee5c780269f72254c4ee6ba54630c6aa1c2",
       "extension": "ts"
     },
@@ -12166,7 +12329,7 @@
     {
       "path": "src/ai/shared/tools/url-lookup-tool.ts",
       "size": 8489,
-      "modifiedAt": "2025-12-15T00:23:01.879Z",
+      "modifiedAt": "2025-12-16T05:13:11.330Z",
       "hash": "78a55470da1da54aee6e254f0ea693f6817d6f20",
       "extension": "ts"
     },
@@ -12201,7 +12364,7 @@
     {
       "path": "src/ai/shared/validation/moduleValidator.ts",
       "size": 12009,
-      "modifiedAt": "2025-12-15T22:06:04.225Z",
+      "modifiedAt": "2025-12-16T05:13:11.335Z",
       "hash": "8b8003bdc30e5907deba699f517866e19559e97d",
       "extension": "ts"
     },
@@ -12530,7 +12693,7 @@
     {
       "path": "src/ai/training/autoTrainingScheduler.js",
       "size": 8045,
-      "modifiedAt": "2025-12-15T00:28:49.696Z",
+      "modifiedAt": "2025-12-16T05:13:11.336Z",
       "hash": "8dfac49eaa8e6d565378f938c09cc0dab9ced19c",
       "extension": "js"
     },
@@ -12633,6 +12796,13 @@
       "extension": "ts"
     },
     {
+      "path": "src/ai/types/index.ts",
+      "size": 4902,
+      "modifiedAt": "2025-12-16T06:04:27.909Z",
+      "hash": "07547150ac0270561e2ba87d20bb5655a64284be",
+      "extension": "ts"
+    },
+    {
       "path": "src/app/README.md",
       "size": 5479,
       "modifiedAt": "2025-11-01T05:55:19.962Z",
@@ -12648,15 +12818,15 @@
     },
     {
       "path": "src/app/admin/dashboard/page.tsx",
-      "size": 3977,
-      "modifiedAt": "2025-11-01T05:55:19.962Z",
-      "hash": "b6b724fdea548951932ffc093fef7ae87987ebb6",
+      "size": 6409,
+      "modifiedAt": "2025-12-16T08:31:16.318Z",
+      "hash": "6eb6dd8bf0d1bebdd7e91adbffbccaf07c1a178e",
       "extension": "tsx"
     },
     {
       "path": "src/app/admin/dev-console/page.tsx",
       "size": 6274,
-      "modifiedAt": "2025-12-15T10:53:59.264Z",
+      "modifiedAt": "2025-12-16T05:13:11.336Z",
       "hash": "a19b624179ccd249d05e711bfb645eb47031a5de",
       "extension": "tsx"
     },
@@ -12733,7 +12903,7 @@
     {
       "path": "src/app/admin/layout.tsx",
       "size": 1039,
-      "modifiedAt": "2025-12-15T00:49:19.394Z",
+      "modifiedAt": "2025-12-16T05:13:11.336Z",
       "hash": "f8d5b180d50fbe9a14684573f8742ba889005711",
       "extension": "tsx"
     },
@@ -12845,7 +13015,7 @@
     {
       "path": "src/app/admin/orchestrator/page.tsx",
       "size": 17137,
-      "modifiedAt": "2025-12-14T23:26:24.350Z",
+      "modifiedAt": "2025-12-16T05:13:11.336Z",
       "hash": "e9ba7fb0685113d43d0cfbe4f2d6cadb5c4bed77",
       "extension": "tsx"
     },
@@ -12901,7 +13071,7 @@
     {
       "path": "src/app/admin/users/page.tsx",
       "size": 14241,
-      "modifiedAt": "2025-12-15T00:34:48.579Z",
+      "modifiedAt": "2025-12-16T05:13:11.338Z",
       "hash": "a09c7d9db87bb3733929982f3d4421916d14e6e1",
       "extension": "tsx"
     },
@@ -12915,14 +13085,14 @@
     {
       "path": "src/app/api/admin/dev-console/file/route.ts",
       "size": 5141,
-      "modifiedAt": "2025-12-15T00:28:49.696Z",
+      "modifiedAt": "2025-12-16T05:13:11.342Z",
       "hash": "cea97119a18ce81d003ea205e35eb06b6905a249",
       "extension": "ts"
     },
     {
       "path": "src/app/api/admin/dev-console/files/route.ts",
       "size": 2992,
-      "modifiedAt": "2025-12-15T00:28:49.696Z",
+      "modifiedAt": "2025-12-16T05:13:11.342Z",
       "hash": "edba0a70bf05698436c22f62dbcf50cdcd69d582",
       "extension": "ts"
     },
@@ -13046,9 +13216,16 @@
       "extension": "ts"
     },
     {
+      "path": "src/app/api/admin/system/heartbeat/route.ts",
+      "size": 3613,
+      "modifiedAt": "2025-12-16T08:27:43.430Z",
+      "hash": "12bf45a68c9ee0697534aff6804152aa15666ead",
+      "extension": "ts"
+    },
+    {
       "path": "src/app/api/admin/system/status/route.ts",
       "size": 1007,
-      "modifiedAt": "2025-12-15T10:53:59.264Z",
+      "modifiedAt": "2025-12-16T05:13:11.342Z",
       "hash": "7a2731b335921d0e80537167418bbfe114e111e6",
       "extension": "ts"
     },
@@ -13062,7 +13239,7 @@
     {
       "path": "src/app/api/chat/route.ts",
       "size": 5732,
-      "modifiedAt": "2025-12-15T21:50:33.406Z",
+      "modifiedAt": "2025-12-16T05:13:11.342Z",
       "hash": "dea2fe530dc91b67cad6b710b31b0ae854324928",
       "extension": "ts"
     },
@@ -13110,9 +13287,9 @@
     },
     {
       "path": "src/app/api/learning/route.ts",
-      "size": 2297,
-      "modifiedAt": "2025-11-02T03:39:13.599Z",
-      "hash": "d212e05e5c308f8d73063090c11ad851fa4e55f8",
+      "size": 2298,
+      "modifiedAt": "2025-12-16T07:20:11.807Z",
+      "hash": "d82bd8b87e467c1ece358df97c5e3d0dd6df61ca",
       "extension": "ts"
     },
     {
@@ -13146,7 +13323,7 @@
     {
       "path": "src/app/ide/components/CodeEditor.tsx",
       "size": 11053,
-      "modifiedAt": "2025-12-15T01:42:54.957Z",
+      "modifiedAt": "2025-12-16T05:13:11.349Z",
       "hash": "bf805a1218192b7e481bb943ed71ae3c80ff3141",
       "extension": "tsx"
     },
@@ -13284,9 +13461,16 @@
       "extension": "tsx"
     },
     {
+      "path": "src/components/admin/dashboard/HeartStatusPanel.tsx",
+      "size": 6689,
+      "modifiedAt": "2025-12-16T08:31:01.768Z",
+      "hash": "99bab20f9f0208f001387e679ca93709f48e1f46",
+      "extension": "tsx"
+    },
+    {
       "path": "src/components/admin/dev-console/AdminCodeEditor.tsx",
       "size": 9517,
-      "modifiedAt": "2025-12-15T01:39:09.513Z",
+      "modifiedAt": "2025-12-16T05:13:11.349Z",
       "hash": "eeae65b04ef6442a75fcfbd3e19a02f9e82ab46a",
       "extension": "tsx"
     },
@@ -13314,7 +13498,7 @@
     {
       "path": "src/components/admin/dev-console/SystemAwarenessPanel.tsx",
       "size": 4936,
-      "modifiedAt": "2025-12-15T10:53:59.264Z",
+      "modifiedAt": "2025-12-16T05:13:11.349Z",
       "hash": "968dcdb27d5bf24b1d6a8da2b76ec2d34d7a88e3",
       "extension": "tsx"
     },
@@ -13795,6 +13979,13 @@
       "extension": "tsx"
     },
     {
+      "path": "src/data/system-activity.log",
+      "size": 45563,
+      "modifiedAt": "2025-12-17T01:32:22.817Z",
+      "hash": "b8f61971042215d2967f526adab231e792566844",
+      "extension": "log"
+    },
+    {
       "path": "src/hooks/use-mobile.ts",
       "size": 565,
       "modifiedAt": "2025-11-01T05:55:19.971Z",
@@ -13825,42 +14016,42 @@
     {
       "path": "src/lib/github/selfLearningWorkflow.ts",
       "size": 8823,
-      "modifiedAt": "2025-12-15T00:28:49.696Z",
+      "modifiedAt": "2025-12-16T05:13:11.349Z",
       "hash": "33fb0a3382fe6818c326471babbed1c025a7a167",
       "extension": "ts"
     },
     {
       "path": "src/lib/ide/aiAssistant.ts",
       "size": 9740,
-      "modifiedAt": "2025-12-15T01:39:17.593Z",
+      "modifiedAt": "2025-12-16T05:13:11.350Z",
       "hash": "fb864bd3d39a09b5c8ab32cab9a29fa40eaa8333",
       "extension": "ts"
     },
     {
       "path": "src/lib/ide/codeExecutor.ts",
       "size": 9398,
-      "modifiedAt": "2025-12-15T00:31:07.762Z",
+      "modifiedAt": "2025-12-16T05:13:11.352Z",
       "hash": "7d0ac2a4eddad6d7bf1324d94d1b5dee83d3531d",
       "extension": "ts"
     },
     {
       "path": "src/lib/ide/commandProcessor.ts",
       "size": 15020,
-      "modifiedAt": "2025-12-15T01:42:54.377Z",
+      "modifiedAt": "2025-12-16T05:13:11.352Z",
       "hash": "aa72c9529d885adccd0b1cb14736159f083b8561",
       "extension": "ts"
     },
     {
       "path": "src/lib/ide/editorStore.ts",
       "size": 4356,
-      "modifiedAt": "2025-12-15T01:33:58.507Z",
+      "modifiedAt": "2025-12-16T05:13:11.352Z",
       "hash": "36caf83e8441e06855dd52e723b6d0abbc2d0f2f",
       "extension": "ts"
     },
     {
       "path": "src/lib/ide/githubIntegration.ts",
       "size": 7835,
-      "modifiedAt": "2025-12-15T01:40:28.923Z",
+      "modifiedAt": "2025-12-16T05:13:11.355Z",
       "hash": "38412e6ce3e96f7196dbbb3e501f5fd312b9d799",
       "extension": "ts"
     },
@@ -13874,7 +14065,7 @@
     {
       "path": "src/lib/ide/useFileSystem.ts",
       "size": 4971,
-      "modifiedAt": "2025-12-15T01:39:09.513Z",
+      "modifiedAt": "2025-12-16T05:13:11.355Z",
       "hash": "dda9fffe14aaae447f2c505955f45501aae203fe",
       "extension": "ts"
     },
@@ -13888,21 +14079,21 @@
     {
       "path": "src/lib/ide/virtualFileSystem.ts",
       "size": 10123,
-      "modifiedAt": "2025-12-15T01:45:04.490Z",
+      "modifiedAt": "2025-12-16T05:13:11.355Z",
       "hash": "a38d03641d126ad3ce4342d6ea69102bd4d5099b",
       "extension": "ts"
     },
     {
       "path": "src/lib/productionHardening.ts",
       "size": 13212,
-      "modifiedAt": "2025-12-15T01:40:58.531Z",
+      "modifiedAt": "2025-12-16T05:13:11.363Z",
       "hash": "0118124d1162776c31b4b8a9044fb236228996cb",
       "extension": "ts"
     },
     {
       "path": "src/lib/settingsStore.ts",
       "size": 6155,
-      "modifiedAt": "2025-12-15T21:50:33.406Z",
+      "modifiedAt": "2025-12-16T05:13:11.363Z",
       "hash": "ca2c3f3fefc1a8de3c5149d58db4471f29aabcc5",
       "extension": "ts"
     },
@@ -13923,7 +14114,7 @@
     {
       "path": "src/lib/terminalManager.ts",
       "size": 5967,
-      "modifiedAt": "2025-12-15T00:49:38.192Z",
+      "modifiedAt": "2025-12-16T05:13:11.363Z",
       "hash": "aa9418e4a6cec2587d5cb85ac7e9085d1e57df5d",
       "extension": "ts"
     },
@@ -13979,28 +14170,28 @@
     {
       "path": "tailwind.config.ts",
       "size": 1655,
-      "modifiedAt": "2025-12-15T00:28:49.709Z",
+      "modifiedAt": "2025-12-16T05:13:11.363Z",
       "hash": "7c537390445cf3e046fa3c7a8b2fbf36b48ae899",
       "extension": "ts"
     },
     {
       "path": "tsconfig.json",
       "size": 1941,
-      "modifiedAt": "2025-12-15T11:31:36.088Z",
+      "modifiedAt": "2025-12-16T05:13:11.364Z",
       "hash": "74c4b10d4b7105197472bc41d39912fc4b06691c",
       "extension": "json"
     },
     {
       "path": "tsconfig.tsbuildinfo",
-      "size": 513938,
-      "modifiedAt": "2025-12-15T01:46:07.934Z",
-      "hash": "6e2baad7d2837730fdcb59a28415d8189fa82a29",
+      "size": 513939,
+      "modifiedAt": "2025-12-16T07:39:36.629Z",
+      "hash": "68adc7ebe1c58f37bf90d9957d70e5b3d9ef1e60",
       "extension": "tsbuildinfo"
     },
     {
       "path": "vitest.config.ts",
       "size": 1053,
-      "modifiedAt": "2025-12-15T11:32:23.277Z",
+      "modifiedAt": "2025-12-16T05:13:11.364Z",
       "hash": "84d2dcb001e720662d602b5e1b0e167af5a429fd",
       "extension": "ts"
     },
@@ -14013,8 +14204,8 @@
     }
   ],
   "stats": {
-    "totalModules": 60,
-    "totalFiles": 1711,
+    "totalModules": 62,
+    "totalFiles": 1730,
     "byCategory": {
       "domain": 23,
       "model": 13,
@@ -14023,7 +14214,7 @@
       "utility": 1,
       "pipeline": 0,
       "hco": 3,
-      "cell": 20
+      "cell": 22
     }
   }
 }

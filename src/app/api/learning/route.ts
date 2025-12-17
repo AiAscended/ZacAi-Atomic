@@ -4,7 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { mainOrchestrator } from '@/ai/orchestration/mainOrchestrator';
+import { mainOrchestrator } from '@/ai/orchestration/main-orchestrator';
 
 export async function GET(request: Request) {
   try {

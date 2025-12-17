@@ -6,6 +6,7 @@
 
 import { promises as fs } from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 export interface InferenceMetrics {
   // Input
@@ -55,6 +56,8 @@ export interface LearningData {
   };
 }
 
+const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+
 export class LearningMetricsTracker {
   private dataDir: string;
   private metricsFile: string;
@@ -62,7 +65,7 @@ export class LearningMetricsTracker {
   private maxCacheSize: number = 1000;
   
   constructor(dataDir?: string) {
-    this.dataDir = dataDir || path.join(__dirname, '../../../data/learning');
+    this.dataDir = dataDir || path.join(moduleDir, '../../../data/learning');
     this.metricsFile = path.join(this.dataDir, 'learnt.json');
   }
   

@@ -38,9 +38,17 @@ export async function POST(request: Request) {
     console.log("[v0] API route called")
 
     const body = await request.json()
-    console.log("[v0] Request body parsed:", { action: body.action, hasMessage: !!body.message })
+    const deducedAction = body.action ?? (typeof body.prompt === "string" || typeof body.message === "string" ? "chat" : undefined)
+    const action = deducedAction ?? "chat"
+    const message = typeof body.message === "string" ? body.message : typeof body.prompt === "string" ? body.prompt : undefined
+    const sessionId = typeof body.sessionId === "string" ? body.sessionId : undefined
 
-    const { action, message, sessionId } = body
+    console.log("[v0] Request body parsed:", {
+      action,
+      hasMessage: !!message,
+      hasPrompt: typeof body.prompt === "string",
+      sessionId,
+    })
 
     console.log("[v0] API received action:", action, "sessionId:", sessionId)
 
@@ -77,9 +85,9 @@ export async function POST(request: Request) {
 
     // Handle chat
     if (action === "chat") {
-      if (!message || typeof message !== "string") {
-        console.error("[v0] Invalid message:", message)
-        return NextResponse.json({ error: "Invalid message" }, { status: 400 })
+      if (!message) {
+        console.error("[v0] Invalid message payload", body)
+        return NextResponse.json({ error: "Missing message or prompt" }, { status: 400 })
       }
 
       console.log("[v0] Processing message:", message, "for session:", sessionId)

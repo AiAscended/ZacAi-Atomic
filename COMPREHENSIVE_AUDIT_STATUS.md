@@ -102,7 +102,7 @@ All required settings files created and functional:
 **Priority**: MEDIUM
 
 #### Components to Verify
-1. **Main Orchestrator** (`src/ai/orchestration/mainOrchestrator.ts` - 838 lines)
+1. **Main Orchestrator** (`src/ai/orchestration/main-orchestrator.ts` - 838 lines)
    - [ ] Initialization sequence
    - [ ] Domain registration (all 23 domains)
    - [ ] processPrompt() function with sample inputs
