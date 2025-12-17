@@ -246,15 +246,15 @@ export class DomainRegistry extends EventEmitter {
 export const domainRegistry = new DomainRegistry()
 
 /**
- * Helper function to list all domains
+ * Helper function to list all enabled domains
  */
-export const listDomains = (): DomainMetadata[] => {
-  return domainRegistry.getAllDomains()
+export function listDomains(): string[] {
+  return domainRegistry.getAllDomains().map((d) => d.name)
 }
 
 /**
  * Helper function to get a domain by name
  */
-export const getDomain = (name: string): DomainMetadata | undefined => {
+export function getDomain(name: string): DomainMetadata | undefined {
   return domainRegistry.getDomain(name)
 }

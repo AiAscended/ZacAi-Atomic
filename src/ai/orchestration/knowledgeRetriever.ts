@@ -55,34 +55,25 @@ export class KnowledgeRetriever {
       results.documents.push({
         content: cached?.content ?? '',
         source: "cache",
-        relevance: 1.0,
-      });
+        relevance: cached.relevance || 1.0,
+      })
     }
 
     // Step 2: Load from local knowledge base
+    const allKBDocs: Array<{ doc: import("../knowledge_retrieval/localKBLoader").KBDocument; domain: string }> = []
     for (const domain of domains) {
       const kbDocs = await this.kbLoader.load(domain)
-      results.documents.push(...kbDocs.map((doc) => ({ 
-        content: doc.text,
-        source: `kb:${domain}`,
-        relevance: 0.5
-      })))
+      allKBDocs.push(...kbDocs.map((doc) => ({ doc, domain })))
     }
 
     // Step 3: Retrieve and rank documents
-    if (results.documents.length > 0) {
-      // Convert to KBDocument format for ranking
-      const kbDocs = results.documents.map((doc, idx) => ({
-        id: `doc-${idx}`,
-        text: doc.content,
-        title: doc.source
-      }))
-      const ranked = this.retriever.retrieve(query, kbDocs)
-      results.documents = ranked.map((doc, idx) => ({
+    if (allKBDocs.length > 0) {
+      const rankedDocs = this.retriever.retrieve(query, allKBDocs.map(item => item.doc), 5)
+      results.documents.push(...rankedDocs.map((doc, idx) => ({
         content: doc.text,
-        source: doc.title || 'unknown',
-        relevance: 1.0 - (idx * 0.1) // Decreasing relevance
-      })).slice(0, 5)
+        relevance: 1.0 - (idx * 0.1), // Decreasing relevance
+        source: `kb:${allKBDocs.find(item => item.doc.id === doc.id)?.domain || 'unknown'}`,
+      })))
     }
 
     if (useWeb) {

@@ -266,8 +266,8 @@ export async function performSemanticInference(
         });
 
         // Extract code examples if available
-        if (seed.fullData?.examples) {
-          Array.isArray(seed.fullData?.examples) && seed.fullData.examples.forEach((ex: string) => {
+        if (seed.fullData.examples && Array.isArray(seed.fullData.examples)) {
+          seed.fullData.examples.forEach((ex: string) => {
             if (ex.includes('{') || ex.includes('function') || ex.includes('const') || ex.includes('import')) {
               codeExamples.push(ex);
             }
@@ -367,13 +367,15 @@ export async function searchCodeExamples(
   for (const keyword of keywords) {
     try {
       const seed = await seedRegistry.lookup(keyword, domain);
-      if (seed && seed.fullData && seed.fullData?.examples) {
-        Array.isArray(seed.fullData?.examples) && seed.fullData.examples.forEach((ex: string) => {
+      if (seed && seed.fullData && seed.fullData.examples && Array.isArray(seed.fullData.examples)) {
+        const fullData = seed.fullData;
+        const examples_array = fullData.examples as string[]; // Type assertion
+        examples_array.forEach((ex: string) => {
           if (ex.includes('{') || ex.includes('function') || ex.includes('const')) {
             examples.push({
               code: ex,
-              concept: ((seed.fullData as any)?.word || (seed.fullData as any)?.concept || '') as string,
-              language: ((seed.fullData as any)?.language || 'typescript') as string
+              concept: String(fullData.word || fullData.concept || 'unknown'),
+              language: String(fullData.language || 'typescript')
             });
           }
         });
@@ -396,8 +398,8 @@ export async function getRelatedConcepts(
   try {
     const seed = await seedRegistry.lookup(term, domain);
     if (seed && seed.fullData) {
-      const related = (seed.fullData as any)?.relatedConcepts || (seed.fullData as any)?.related;
-      return Array.isArray(related) ? related : [];
+      const relatedConcepts = seed.fullData.relatedConcepts || seed.fullData.related;
+      return Array.isArray(relatedConcepts) ? relatedConcepts as string[] : [];
     }
   } catch {
     // Seed not found
