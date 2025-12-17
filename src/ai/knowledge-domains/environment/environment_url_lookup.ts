@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerSource } from "../url_lookup";
+import { registerSource } from "../url_lookup"
 
 registerSource(
   "environment",

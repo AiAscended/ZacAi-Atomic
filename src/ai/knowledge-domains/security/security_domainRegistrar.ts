@@ -6,8 +6,8 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import meta from "./security_seeds/security_meta.json";
-import { SECURITY_DOMAIN } from "./security_constants";
+import meta from "./security_seeds/security_meta.json"
+import { SECURITY_DOMAIN } from "./security_constants"
 
 export const getDomainMeta = () => ({ ...meta, name: SECURITY_DOMAIN });
 export default getDomainMeta;

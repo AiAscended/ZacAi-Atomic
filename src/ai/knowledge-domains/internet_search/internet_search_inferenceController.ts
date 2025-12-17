@@ -38,6 +38,13 @@ interface InternetSearchPretrainedWeights {
   thresholds?: ThresholdLike
 }
 
+interface SearchResult {
+  title: string;
+  source: string;
+  snippet: string;
+  url: string;
+}
+
 interface InferenceContext {
   tokens: string[];
   inferenceResults?: any;
@@ -49,11 +56,9 @@ interface InferenceContext {
 /**
  * Calculate confidence using pretrained weights and token analysis
  */
-const SEEDS = seeds as InternetSearchSeeds
-const PRETRAINED = pretrainedWeights as InternetSearchPretrainedWeights
-const VOCABULARY = normalizeVocabularyWeights(SEEDS.vocabulary ?? {}, 0.7)
-const THRESHOLDS = normalizeThresholds(PRETRAINED.thresholds, SEEDS.thresholds)
-const PATTERNS = SEEDS.patterns ?? []
+function calculateConfidence(tokens: string[], input: string): number {
+  const lowerInput = input.toLowerCase()
+  const vocabulary = ((pretrainedWeights as any)?.vocabulary || {}) as Record<string, number>
 
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase();
@@ -64,10 +69,10 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   // Calculate token-based confidence
   for (const token of tokens) {
-    const lowerToken = token.toLowerCase();
-    if (vocabulary[lowerToken]) {
-      tokenScore += vocabulary[lowerToken];
-      matchCount++;
+    const lowerToken = token.toLowerCase()
+    if (vocabulary && vocabulary[lowerToken]) {
+      tokenScore += vocabulary[lowerToken]
+      matchCount++
     }
   }
 
@@ -86,10 +91,8 @@ function calculateConfidence(tokens: string[], input: string): number {
   semanticScore = Math.min(semanticScore / 2, 1.0);
 
   // Combine scores
-  const thresholds = (pretrainedWeights as any).thresholds || { highConfidence: 0.8, mediumConfidence: 0.5 };
-  const finalConfidence =
-    avgTokenScore * thresholds.token_match_weight +
-    semanticScore * thresholds.semantic_weight;
+  const thresholds = (pretrainedWeights as any)?.thresholds || { token_match_weight: 0.7, semantic_weight: 0.3 }
+  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
 
   return Math.min(finalConfidence, 1.0);
 }
@@ -143,8 +146,8 @@ export async function internetSearchRunInference(
   const searchQuery = extractSearchQuery(input, semantics);
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} extracted query:`, searchQuery);
 
-  const searchEngines = findSources(INTERNET_SEARCH_DOMAIN);
-  const results: any[] = [];
+  const searchEngines = findSources(INTERNET_SEARCH_DOMAIN)
+  const results: SearchResult[] = []
 
   for (const engine of searchEngines) {
     try {

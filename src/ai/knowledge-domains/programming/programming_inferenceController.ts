@@ -2,10 +2,10 @@ import { parseProgrammingInput } from "./programming_parser";
 import { analyzeProgrammingSemantics } from "./programming_semanticAnalyzer";
 
 export interface ProgrammingInferenceResult {
-  response: string;
-  confidence: number;
-  topics: string[];
-  metadata: { intent: string; complexity: string; parseType: string };
+  response: string
+  confidence: number
+  topics: string[]
+  metadata: { intent: string; complexity: string; parseType: string; hasCodeExample?: boolean }
 }
 
 // Code examples library

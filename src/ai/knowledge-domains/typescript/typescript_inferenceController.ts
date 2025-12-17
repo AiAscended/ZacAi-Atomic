@@ -19,15 +19,9 @@ interface InferenceContext {
   dialogueState?: any;
 }
 
-type CodeContext =
-  | "ai_function"
-  | "entry_point"
-  | "blockchain"
-  | "ai"
-  | "error_handling"
-  | "algorithm"
-  | "web"
-  | "general"
+function calculateConfidence(tokens: string[], input: string): number {
+  const lowerInput = input.toLowerCase()
+  const vocabulary = ((pretrainedWeights as any)?.vocabulary || {}) as Record<string, number>
 
 interface TypescriptSeedConfig {
   vocabulary?: string[] | Record<string, number>
@@ -75,10 +69,10 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   // Calculate token-based confidence using pretrained vocabulary
   for (const token of tokens) {
-    const lowerToken = token.toLowerCase();
-    if (vocabulary[lowerToken]) {
-      tokenScore += vocabulary[lowerToken];
-      matchCount++;
+    const lowerToken = token.toLowerCase()
+    if (vocabulary && vocabulary[lowerToken]) {
+      tokenScore += vocabulary[lowerToken]
+      matchCount++
     }
   }
 
@@ -105,10 +99,8 @@ function calculateConfidence(tokens: string[], input: string): number {
   semanticScore = Math.min(semanticScore / 2, 1.0);
 
   // Combine scores using weights from pretrained config
-  const thresholds = (pretrainedWeights as any).thresholds || { highConfidence: 0.8, mediumConfidence: 0.5 };
-  const finalConfidence =
-    avgTokenScore * thresholds.token_match_weight +
-    semanticScore * thresholds.semantic_weight;
+  const thresholds = (pretrainedWeights as any)?.thresholds || { token_match_weight: 0.7, semantic_weight: 0.3 }
+  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
 
   if (lowerInput.match(/\b(code|example|file|entry|main|index)\b/)) {
     return Math.min(finalConfidence + 0.2, 1.0);
@@ -858,12 +850,12 @@ console.log(user);
   }
 }
 
-export async function typescriptRunInference(
-  input: string,
-  _context?: InferenceContext,
-): Promise<any> {
-  const tokens = _context?.tokens || typescriptTokenizer(input);
-  const semantics = typescriptSemanticAnalyzer(input);
+export async function typescriptRunInference(input: string, _context?: InferenceContext): Promise<any> {
+  const contextTokens = (_context && typeof _context === 'object' && 'tokens' in _context) 
+    ? (_context as { tokens: string[] }).tokens 
+    : undefined;
+  const tokens = contextTokens || typescriptTokenizer(input)
+  const semantics = typescriptSemanticAnalyzer(input)
 
   const confidence = calculateConfidence(tokens, input);
 

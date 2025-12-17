@@ -17,5 +17,6 @@ export function seedLatentVector(payload: ModelPayload, seed = 'gan-seed'): Mode
 
 export const ganBundle = { ganUtility }
 
+const ganBundle = { ganUtility }; 
 
 export default ganBundle;
