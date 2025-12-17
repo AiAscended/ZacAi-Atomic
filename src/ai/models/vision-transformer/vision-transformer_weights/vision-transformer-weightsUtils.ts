@@ -2,8 +2,13 @@
  * Vision-transformer - Weights Utilities
  */
 
-export function loadWeights(path: string): any {
-  return {};
+import type { WeightDictionary } from "../../shared/modelTypes"
+
+export function loadWeights(path: string): WeightDictionary {
+  console.log(`Loading vision-transformer weights from ${path}`)
+  return {}
 }
 
-export default { loadWeights };
+const VIT_WEIGHT_UTILS = { loadWeights }
+
+export default VIT_WEIGHT_UTILS

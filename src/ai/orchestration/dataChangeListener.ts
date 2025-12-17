@@ -28,13 +28,16 @@ export const startDataChangeListener = () => {
               p: unknown
             ) => unknown;
             void fn(payload);
-          } catch (e) {
-            // ignore per-module errors
+          } catch (error) {
+            console.warn('[dataChangeListener] module hook failed', {
+              module: m.name,
+              error,
+            });
           }
         }
       }
-    } catch (e) {
-      // swallow errors to avoid bubbling
+    } catch (error) {
+      console.error('[dataChangeListener] Fatal listener error', error);
     }
   });
 };
@@ -42,8 +45,8 @@ export const startDataChangeListener = () => {
 // Auto-start when imported
 try {
   startDataChangeListener();
-} catch (e) {
-  // ignore
+} catch (error) {
+  console.error('[dataChangeListener] Unable to start listener', error);
 }
 
 export default startDataChangeListener;

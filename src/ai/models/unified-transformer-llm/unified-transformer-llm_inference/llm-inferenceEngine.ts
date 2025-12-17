@@ -9,6 +9,26 @@ import { LLMDecoder } from '../unified-transformer-llm_model/llm-decoder';
 import { LLMOutputHead } from '../unified-transformer-llm_model/llm-outputHead';
 import type { LLMModelConfig } from '../unified-transformer-llm_config/llm-modelConfig';
 
+type DecoderLayerWeights = ReturnType<LLMDecoder['getLayerWeights']>;
+type OutputHeadWeights = ReturnType<LLMOutputHead['getWeights']>;
+
+interface LLMWeightsMetadata {
+  config: LLMModelConfig;
+  trainedEpochs: number;
+  trainedSteps: number;
+  timestamp: string;
+}
+
+export interface LLMWeightsSnapshot {
+  embeddings: number[][];
+  decoderLayers: DecoderLayerWeights;
+  outputHead: OutputHeadWeights;
+}
+
+export interface LLMWeightsExport extends LLMWeightsSnapshot {
+  metadata: LLMWeightsMetadata;
+}
+
 export class LLMInferenceEngine {
   private config: LLMModelConfig;
   private tokenizer: LLMTokenizer;
@@ -177,28 +197,26 @@ export class LLMInferenceEngine {
   /**
    * Get all model weights (for saving)
    */
-  getWeights() {
+  getWeights(): LLMWeightsExport {
+    const metadata: LLMWeightsMetadata = {
+      config: this.config,
+      trainedEpochs: 0,
+      trainedSteps: 0,
+      timestamp: new Date().toISOString(),
+    };
+
     return {
       embeddings: this.embedding.getEmbeddings(),
       decoderLayers: this.decoder.getLayerWeights(),
       outputHead: this.outputHead.getWeights(),
-      metadata: {
-        config: this.config,
-        trainedEpochs: 0,
-        trainedSteps: 0,
-        timestamp: new Date().toISOString(),
-      },
+      metadata,
     };
   }
   
   /**
    * Load weights into model
    */
-  loadWeights(weights: {
-    embeddings: number[][];
-    decoderLayers: any[];
-    outputHead: { W: number[][], b: number[] };
-  }): void {
+  loadWeights(weights: LLMWeightsSnapshot): void {
     this.embedding.setEmbeddings(weights.embeddings);
     this.decoder.setLayerWeights(weights.decoderLayers);
     this.outputHead.setWeights(weights.outputHead);

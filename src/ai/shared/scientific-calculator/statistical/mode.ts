@@ -28,6 +28,6 @@ export function mode(...numbers: number[]): number[] {
   }
 
   return Array.from(frequency.entries())
-    .filter(([_, freq]) => freq === maxFreq)
-    .map(([num, _]) => num)
+    .filter(([, freq]) => freq === maxFreq)
+    .map(([num]) => num)
 }

@@ -1,18 +1,17 @@
-/**
- * File: src/ai/data/code_review/code_review_modelWeightsLoader.ts
- * Purpose: Load training weights for code review domain
- * Depends on: None
- * Depended on by: code_review_trainingController.ts
- * Creator: Vercel v0 Coding Assistant
- */
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-import { storageAdapter } from "../storageAdapter"
+const codeReviewWeightsManager = createDomainWeightsManager({
+  domainName: "code_review",
+})
 
-export const codeReviewLoadWeights = async (path = "/src/ai/knowledge-domains/code_review/code_review_weights/code_review_trainingWeights.bin") => {
-  try {
-    const raw = await storageAdapter.readFile(path)
-    return raw
-  } catch (e) {
-    return null
-  }
+export const codeReviewLoadWeights = async (): Promise<string | null> => {
+  return codeReviewWeightsManager.loadWeights()
+}
+
+export const primeCodeReviewWeights = async (): Promise<string | null> => {
+  return codeReviewWeightsManager.prime()
+}
+
+export const getCodeReviewActiveWeightArtifact = () => {
+  return codeReviewWeightsManager.getActiveWeightArtifact()
 }

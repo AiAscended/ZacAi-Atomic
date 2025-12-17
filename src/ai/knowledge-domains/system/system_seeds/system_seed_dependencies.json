@@ -14,7 +14,16 @@
       "name": "Transformers",
       "version": ">=4.40",
       "source": "https://huggingface.co"
+    },
+    {
+      "name": "CUDA",
+      "version": "12.2",
+      "source": "https://developer.nvidia.com/cuda-downloads"
+    },
+    {
+      "name": "Node.js",
+      "version": ">=20.11",
+      "source": "https://nodejs.org"
     }
-    // Add more dependencies as needed
   ]
 }

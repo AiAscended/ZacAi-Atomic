@@ -10,9 +10,29 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import * as yaml from "yaml";
 
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
 // ============================================================================
 // Types
 // ============================================================================
+
+export interface AdminTrainingSourcesConfig {
+  enabled: boolean;
+  auto_update?: boolean;
+  fields?: string[];
+  [key: string]: unknown;
+}
+
+export interface AdminConfig {
+  editable_fields?: string[];
+  field_bindings?: Record<string, string>;
+  training_sources_management?: AdminTrainingSourcesConfig;
+  upload_capabilities?: string[];
+  [key: string]: unknown;
+}
 
 export interface InstructionSet {
   domain?: {
@@ -27,17 +47,28 @@ export interface InstructionSet {
     version: string;
     description: string;
   };
+  role?: {
+    primary: string;
+    scope: string;
+    [key: string]: unknown;
+  };
+  capabilities?: string[];
   principles?: Array<{
     name: string;
     rule: string;
     priority: number;
   }>;
-  tools?: Record<string, any>;
-  inference?: Record<string, any>;
-  training?: Record<string, any>;
-  pipeline?: Record<string, any>;
-  tokenizer?: Record<string, any>;
-  [key: string]: any;
+  seeds?: Record<string, unknown>;
+  weights?: Record<string, unknown>;
+  tools?: Record<string, unknown>;
+  url_lookup?: Record<string, unknown>;
+  url_lookup_config?: Record<string, unknown>;
+  inference?: Record<string, unknown>;
+  training?: Record<string, unknown>;
+  pipeline?: Record<string, unknown>;
+  tokenizer?: Record<string, unknown>;
+  admin_config?: AdminConfig;
+  [key: string]: unknown;
 }
 
 export interface URLConfig {
@@ -48,17 +79,17 @@ export interface URLConfig {
     url: string;
     enabled: boolean;
     priority: number;
-    [key: string]: any;
+    [key: string]: unknown;
   }>;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface BaseTokens {
   version: string;
   description: string;
   totalTokens: number;
-  categories: Record<string, any>;
-  [key: string]: any;
+  categories: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 // ============================================================================
@@ -66,23 +97,35 @@ export interface BaseTokens {
 // ============================================================================
 
 export class InstructionLoader {
-  private cache: Map<string, { data: any; timestamp: number }> = new Map();
+  private cache: Map<string, CacheEntry<unknown>> = new Map();
   private cacheTTL = 300000; // 5 minutes
   
   /**
    * Load domain instructions (YAML)
    */
   async loadDomainInstructions(domainId: string): Promise<InstructionSet | null> {
-    const filePath = path.join(
+    const baseDir = path.join(
       process.cwd(),
       "src",
       "ai",
       "knowledge-domains",
-      domainId,
-      "domain-instructions.yaml"
+      domainId
     );
+
+    const candidates = [
+      "domain-instructions.yaml",
+      "domain-instructions.yml",
+      `${domainId}_instructions.yaml`,
+      `${domainId}_instructions.yml`,
+    ];
+
+    const resolvedPath = await this.resolveInstructionFile(baseDir, candidates);
+    if (!resolvedPath) {
+      console.warn(`No instruction file found for domain: ${domainId}`);
+      return null;
+    }
     
-    return await this.loadYAML<InstructionSet>(filePath);
+    return await this.loadYAML<InstructionSet>(resolvedPath);
   }
   
   /**
@@ -105,16 +148,28 @@ export class InstructionLoader {
    * Load model instructions (YAML)
    */
   async loadModelInstructions(modelId: string): Promise<InstructionSet | null> {
-    const filePath = path.join(
+    const baseDir = path.join(
       process.cwd(),
       "src",
       "ai",
       "models",
-      modelId,
-      "model-instructions.yaml"
+      modelId
     );
-    
-    return await this.loadYAML<InstructionSet>(filePath);
+
+    const candidates = [
+      "model-instructions.yaml",
+      "model-instructions.yml",
+      `${modelId}_instructions.yaml`,
+      `${modelId}_instructions.yml`,
+    ];
+
+    const resolvedPath = await this.resolveInstructionFile(baseDir, candidates);
+    if (!resolvedPath) {
+      console.warn(`No instruction file found for model: ${modelId}`);
+      return null;
+    }
+
+    return await this.loadYAML<InstructionSet>(resolvedPath);
   }
   
   /**
@@ -154,8 +209,8 @@ export class InstructionLoader {
     moduleType: "domain" | "model" | "orchestrator",
     moduleId: string,
     filename: string
-  ): Promise<any | null> {
-    const baseDir = moduleType === "domain" 
+  ): Promise<unknown | null> {
+    const baseDir = moduleType === "domain"
       ? "knowledge-domains"
       : moduleType === "model"
       ? "models"
@@ -185,23 +240,45 @@ export class InstructionLoader {
         return await this.loadText(filePath);
     }
   }
+
+  /**
+   * Resolve the first instruction file that exists from a candidate list
+   */
+  private async resolveInstructionFile(baseDir: string, candidates: string[]): Promise<string | null> {
+    for (const name of candidates) {
+      const candidatePath = path.join(baseDir, name);
+      if (await this.pathExists(candidatePath)) {
+        return candidatePath;
+      }
+    }
+    return null;
+  }
+
+  private async pathExists(filePath: string): Promise<boolean> {
+    try {
+      await fs.access(filePath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
   
   /**
    * Load YAML file
    */
-  private async loadYAML<T = any>(filePath: string): Promise<T | null> {
+  private async loadYAML<T = InstructionSet>(filePath: string): Promise<T | null> {
     // Check cache first
     const cached = this.getFromCache(filePath);
     if (cached) return cached as T;
     
     try {
       const content = await fs.readFile(filePath, "utf8");
-      const data = yaml.parse(content);
+      const data = yaml.parse(content) as T;
       
       // Add to cache
       this.addToCache(filePath, data);
       
-      return data as T;
+      return data;
     } catch (error) {
       console.warn(`Failed to load YAML file: ${filePath}`, error);
       return null;
@@ -211,19 +288,19 @@ export class InstructionLoader {
   /**
    * Load JSON file
    */
-  private async loadJSON<T = any>(filePath: string): Promise<T | null> {
+  private async loadJSON<T = Record<string, unknown>>(filePath: string): Promise<T | null> {
     // Check cache first
     const cached = this.getFromCache(filePath);
     if (cached) return cached as T;
     
     try {
       const content = await fs.readFile(filePath, "utf8");
-      const data = JSON.parse(content);
+      const data = JSON.parse(content) as T;
       
       // Add to cache
       this.addToCache(filePath, data);
       
-      return data as T;
+      return data;
     } catch (error) {
       console.warn(`Failed to load JSON file: ${filePath}`, error);
       return null;
@@ -233,9 +310,9 @@ export class InstructionLoader {
   /**
    * Load XML file (basic parsing)
    */
-  private async loadXML(filePath: string): Promise<any | null> {
+  private async loadXML(filePath: string): Promise<Record<string, string> | null> {
     // Check cache first
-    const cached = this.getFromCache(filePath);
+    const cached = this.getFromCache<Record<string, string>>(filePath);
     if (cached) return cached;
     
     try {
@@ -243,7 +320,7 @@ export class InstructionLoader {
       
       // Basic XML to JSON conversion (simplified)
       // For production, use a proper XML parser like 'fast-xml-parser'
-      const data = { raw: content };
+      const data: Record<string, string> = { raw: content };
       
       // Add to cache
       this.addToCache(filePath, data);
@@ -270,8 +347,8 @@ export class InstructionLoader {
   /**
    * Get from cache
    */
-  private getFromCache(key: string): any | null {
-    const cached = this.cache.get(key);
+  private getFromCache<T>(key: string): T | null {
+    const cached = this.cache.get(key) as CacheEntry<T> | undefined;
     
     if (!cached) return null;
     
@@ -287,7 +364,7 @@ export class InstructionLoader {
   /**
    * Add to cache
    */
-  private addToCache(key: string, data: any): void {
+  private addToCache<T>(key: string, data: T): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
@@ -304,19 +381,19 @@ export class InstructionLoader {
   /**
    * Get instruction field (helper)
    */
-  getInstructionField(instructions: InstructionSet, fieldPath: string): any {
+  getInstructionField<T = unknown>(instructions: InstructionSet, fieldPath: string): T | null {
     const parts = fieldPath.split(".");
-    let current: any = instructions;
+    let current: unknown = instructions;
     
     for (const part of parts) {
       if (current && typeof current === "object" && part in current) {
-        current = current[part];
+        current = (current as Record<string, unknown>)[part];
       } else {
         return null;
       }
     }
     
-    return current;
+    return current as T;
   }
 }
 

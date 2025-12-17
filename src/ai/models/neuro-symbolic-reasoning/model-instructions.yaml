@@ -1,0 +1,226 @@
+# Neuro-Symbolic Reasoning Model Instructions
+# Purpose: Combine neural embeddings with symbolic logic engines for verifiable reasoning
+
+model:
+  id: "neuro_symbolic_reasoning"
+  name: "Neuro-Symbolic Reasoning"
+  version: "1.2.0"
+  description: "Hybrid transformer encoder with differentiable logic layer and rule executor"
+  modality: "text+logic"
+  architecture:
+    neural_encoder: "Transformer encoder"
+    symbolic_module: "Differentiable knowledge graph + SAT solver"
+    max_rules: 256
+    knowledge_graph_size: "500k triples"
+  deployment:
+    runtime: "PyTorch + Z3"
+    container_image: "registry.internal.models/neuro-symbolic:1.2.0"
+    supports_batching: false
+
+role:
+  primary: "Structured reasoning and verification"
+  scope: "Evaluate logical claims, generate proofs, and enforce policy rules"
+  orchestration_behavior: "Invoked for compliance, chain verification, or whenever deterministic proof requested"
+
+capabilities:
+  - "Translate natural language statements into logical forms"
+  - "Query symbolic knowledge graphs"
+  - "Generate minimal proofs or counterexamples"
+  - "Explain rule applications step-by-step"
+  - "Sync admin-managed rulebooks"
+
+principles:
+  - name: "Soundness"
+    rule: "Never emit conclusions without proof or reference"
+    priority: P1
+  - name: "Traceability"
+    rule: "Attach rule IDs and premises to each output"
+    priority: P1
+  - name: "Fallback Safety"
+    rule: "Defer to general LLM when rules missing"
+    priority: P2
+
+seeds:
+  location: "./neuro-symbolic-reasoning_seeds/"
+  auto_load: true
+  format: "json"
+  rulebook_file: "rules.clp"
+  ontology_file: "ontology.yaml"
+
+weights:
+  location: "./neuro-symbolic-reasoning_weights/"
+  auto_load: true
+  format: "pt"
+  current: "./neuro-symbolic-reasoning_weights/neuro-symbolic-reasoning_current_weights.pt"
+  pretrained: "./neuro-symbolic-reasoning_pretrained_weights/neuro-symbolic-reasoning_pretrained_embeddings.bin"
+  fallback: "./neuro-symbolic-reasoning_pretrained_weights/neuro-symbolic-reasoning_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  rule_compiler:
+    enabled: true
+    description: "Parses admin rulebooks into executable form"
+    capabilities:
+      - "Validate syntax"
+      - "Version rules"
+  proof_explorer:
+    enabled: true
+    description: "Visualizes proof trees and counterexamples"
+    capabilities:
+      - "Export JSON proofs"
+      - "Highlight minimal unsat cores"
+  kg_syncer:
+    enabled: true
+    description: "Syncs knowledge graph slices from data stores"
+    capabilities:
+      - "Incremental updates"
+      - "Integrity checks"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Neuro-Symbolic Survey"
+        url: "https://arxiv.org/abs/2010.04719"
+        use_for: ["architecture"]
+      - name: "Z3 Solver"
+        url: "https://github.com/Z3Prover/z3"
+        use_for: ["proof engine"]
+      - name: "CLIPS"
+        url: "http://www.clipsrules.net"
+        use_for: ["rule syntax"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Neuro-Symbolic Survey"
+      url: "https://arxiv.org/abs/2010.04719"
+      use_for: ["architecture"]
+    - name: "Z3 Solver"
+      url: "https://github.com/Z3Prover/z3"
+      use_for: ["solver"]
+    - name: "CLIPS"
+      url: "http://www.clipsrules.net"
+      use_for: ["rule syntax"]
+  reference_triggers:
+    - "Rule syntax issues"
+    - "Proof engine tuning"
+    - "Architecture audits"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.9
+    max_tokens: 400
+    temperature: 0.2
+    top_p: 0.8
+    proof_depth_limit: 64
+  input_processing:
+    - "Identify claim type"
+    - "Translate text to logical form"
+    - "Load relevant rules"
+  reasoning_steps:
+    - "Embed text"
+    - "Ground entities in KG"
+    - "Execute rule_compiler"
+    - "Run solver"
+    - "Summarize proof or counterexample"
+  output_formatting:
+    - "Provide verdict (PROVED / DISPROVED / UNKNOWN)"
+    - "List rules and evidence"
+  validation:
+    - "Ensure proof depth below limit"
+    - "Check KG sync freshness"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adam"
+  learning_rate: 0.0001
+  batch_size: 64
+  update_frequency: "weekly"
+  epochs: 5
+  data_sources:
+    - "neuro-symbolic-reasoning_training/proofs.jsonl"
+    - "neuro-symbolic-reasoning_data/rule_pairs.parquet"
+    - "Admin rule feedback"
+  focus_areas:
+    - "Logical translation accuracy"
+    - "Proof compression"
+    - "Rule conflict detection"
+  evaluation_metrics:
+    - "Proof accuracy"
+    - "Unsat core precision"
+    - "Latency"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize claims"
+    - "Fetch KG slice"
+  processing:
+    - "Embed + translate"
+    - "Apply rules + solver"
+  postprocessing:
+    - "Generate proof tree"
+    - "Emit admin digest"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Rule conflict"
+      action: "Highlight conflicting rules and request admin resolution"
+    - error: "Solver timeout"
+      action: "Increase depth gradually, then fall back to heuristic reasoning"
+    - error: "KG desync"
+      action: "Trigger kg_syncer refresh"
+  recovery_strategies:
+    - "Escalate to system domain when solver repeatedly fails"
+    - "Fallback to unified_transformer_llm with disclaimer"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.rule_compiler.enabled"
+    - "tools.proof_explorer.enabled"
+    - "tools.kg_syncer.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/neuro-symbolic-reasoning"
+    compiler_toggle: "tools.rule_compiler.enabled"
+    proof_toggle: "tools.proof_explorer.enabled"
+    kg_toggle: "tools.kg_syncer.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "Proof Accuracy"
+      target: ">=0.97"
+    - name: "Solver Timeout Rate"
+      target: "<2%"
+    - name: "Rule Conflict Detection"
+      target: ">=0.9"
+metadata:
+  owners:
+    - "reasoning-lab@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/neuro-symbolic"

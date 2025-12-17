@@ -9,11 +9,20 @@
 import { safeParseJSON } from "./testing_utils"
 import { storageAdapter } from "../storageAdapter"
 
-export const loadTestingSeedVocabulary = async (path = "/src/ai/knowledge-domains/testing/testing_seeds/testing_seedVocabulary.json") => {
+const DEFAULT_VOCAB_PATH = "/src/ai/knowledge-domains/testing/testing_seeds/testing_seedVocabulary.json"
+
+export interface TestingSeedVocabulary {
+  frameworks: string[]
+}
+
+export const loadTestingSeedVocabulary = async (
+  path = DEFAULT_VOCAB_PATH,
+): Promise<TestingSeedVocabulary> => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { frameworks: [] }) as { frameworks: string[] }
-  } catch (e) {
+    return safeParseJSON<TestingSeedVocabulary>(raw, { frameworks: [] })
+  } catch (error) {
+    console.warn("[Testing] Unable to read seed vocabulary:", error)
     return { frameworks: [] }
   }
 }

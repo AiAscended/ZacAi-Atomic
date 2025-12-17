@@ -128,6 +128,7 @@ export class SettingsStore {
       
       this.settings = parsed;
     } catch (error) {
+      console.warn("Settings file missing or invalid, recreating defaults:", error);
       // File doesn't exist or is invalid, create default
       this.settings = this.getDefaultSettings();
       await this.save();

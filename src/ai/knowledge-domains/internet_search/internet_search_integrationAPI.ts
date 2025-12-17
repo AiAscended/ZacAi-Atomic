@@ -1,11 +1,13 @@
-import path from 'path'
+import path from "path"
 
+import { domainRegistry } from "../domainRegistry"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
-
-const DOMAIN_NAME = 'internet_search';
-const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
 import { loadInternetSearchSeedVocabulary } from "./internet_search_vocabularyManager"
-import { internetSearchRunInference } from "./internet_search_inferenceController"
+
+const DOMAIN_NAME = "internet_search"
+const DOMAIN_ROOT = path.join(process.cwd(), "src", "ai", "knowledge-domains", DOMAIN_NAME)
+
+const resolveDomainPath = (suffix: string) => path.join(DOMAIN_ROOT, `${DOMAIN_NAME}_${suffix}`)
 
 // TODO: Use internetSearchQuery for additional context-aware search
 /* const internetSearchQuery = async (input: string, context?: any) => {
@@ -25,6 +27,17 @@ import { internetSearchRunInference } from "./internet_search_inferenceControlle
 export const internetSearchInit = async () => {
   await loadInternetSearchSeedVocabulary()
 
+  domainRegistry.registerDomain({
+    name: INTERNET_SEARCH_DOMAIN,
+    displayName: "Internet Search",
+    description: "Web search capabilities, information retrieval, and research",
+    atomicLevel: "organ",
+    modules: [],
+    seedDataPath: resolveDomainPath("seeds"),
+    learnedDataPath: resolveDomainPath("learned"),
+    weightsPath: resolveDomainPath("weights"),
+    enabled: true,
+  })
 }
 
 void internetSearchInit()

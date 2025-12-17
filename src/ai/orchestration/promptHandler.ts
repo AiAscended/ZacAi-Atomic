@@ -4,7 +4,7 @@
  * from user input to final response, integrating all atomic modules.
  *
  * Dependencies:
- * - src/ai/orchestration/aiOrchestrator.ts (main orchestrator)
+ * - src/ai/orchestration/mainOrchestrator.ts (main conductor)
  * - src/ai/input_processing/* (input processing modules)
  * - src/ai/context_management/* (context and session management)
  * - src/ai/knowledge_retrieval/* (knowledge retrieval and search)
@@ -13,11 +13,11 @@
  * - src/ai/training/* (learning pipeline)
  *
  * Depended on by:
- * - src/ui/pages/index.tsx (chat interface)
- * - src/api/* (API endpoints)
+ * - src/app/page.tsx (chat interface)
+ * - src/app/api/* (API endpoints)
  */
 
-import { AIOrchestrator, type Prompt, type Response } from "./aiOrchestrator"
+import { MainOrchestrator, type OrchestratorResponse } from "./mainOrchestrator"
 import { textNormalizer } from "../input_processing/textNormalizer"
 import { detectLanguage } from "../input_processing/languageDetector"
 import { noiseFilter } from "../input_processing/noiseFilter"
@@ -28,26 +28,30 @@ import { publish } from "./eventBus"
 /**
  * Enhanced prompt with preprocessing metadata
  */
-export interface EnhancedPrompt extends Prompt {
+export interface EnhancedPrompt {
   normalized: string
   language: string
   tokens: string[]
   sentences: string[]
   isClean: boolean
+  sessionId?: string
+  timestamp: number
+  metadata?: Record<string, unknown>
 }
 
 /**
  * Prompt Handler - Coordinates the complete AI pipeline
+ * Thin wrapper around MainOrchestrator with input preprocessing
  */
 export class PromptHandler {
-  private orchestrator: AIOrchestrator
+  private orchestrator: MainOrchestrator
 
   constructor() {
-    this.orchestrator = AIOrchestrator.getInstance()
+    this.orchestrator = MainOrchestrator.getInstance()
   }
 
   /**
-   * Initialize the prompt handler and AI orchestrator
+   * Initialize the prompt handler and main orchestrator
    */
   public async initialize(): Promise<void> {
     await this.orchestrator.initialize()
@@ -60,7 +64,7 @@ export class PromptHandler {
     rawText: string,
     sessionId?: string,
     metadata?: Record<string, unknown>,
-  ): Promise<Response> {
+  ): Promise<OrchestratorResponse> {
     const startTime = Date.now()
 
     // Step 1: Input Processing Pipeline
@@ -68,12 +72,16 @@ export class PromptHandler {
 
     // Step 2: Validate input
     if (!enhancedPrompt.isClean || enhancedPrompt.tokens.length === 0) {
-      return this.createErrorResponse("Invalid or empty input", enhancedPrompt)
+      return this.createErrorResponse("Invalid or empty input", rawText)
     }
 
-    // Step 3: Process through orchestrator
+    // Step 3: Process through main orchestrator
     try {
-      const response = await this.orchestrator.processPrompt(enhancedPrompt)
+      const response = await this.orchestrator.processPrompt(
+        enhancedPrompt.normalized,
+        sessionId || `session-${Date.now()}`,
+        metadata
+      )
 
       // Step 4: Publish metrics
       publish("prompt:processed", {
@@ -89,7 +97,7 @@ export class PromptHandler {
       return response
     } catch (error) {
       console.error("[PromptHandler] Error processing prompt:", error)
-      return this.createErrorResponse("An error occurred while processing your request", enhancedPrompt)
+      return this.createErrorResponse("An error occurred while processing your request", rawText)
     }
   }
 
@@ -116,7 +124,6 @@ export class PromptHandler {
     const isClean = tokens.length > 0 && normalized.length > 0
 
     return {
-      text: rawText,
       normalized,
       language,
       tokens,
@@ -137,16 +144,20 @@ export class PromptHandler {
   /**
    * Create an error response
    */
-  private createErrorResponse(message: string, prompt: EnhancedPrompt): Response {
+  private createErrorResponse(message: string, originalPrompt: string): OrchestratorResponse {
     return {
       text: message,
       sources: [],
       confidence: 0,
       domains: [],
-      timestamp: Date.now(),
       metadata: {
-        error: true,
-        prompt: prompt.text,
+        processingTime: 0,
+        tokensUsed: 0,
+        originalPromptLength: originalPrompt.length,
+      },
+      contentBlocks: {
+        textBlocks: [{ id: "error-1", content: message }],
+        codeBlocks: [],
       },
     }
   }
@@ -155,7 +166,7 @@ export class PromptHandler {
    * Get session history
    */
   public getSessionHistory(sessionId: string): string[] {
-    // Future: implement session history retrieval
+    console.warn(`[PromptHandler] Session history requested for ${sessionId}, persistence not yet implemented.`)
     return []
   }
 
@@ -163,7 +174,7 @@ export class PromptHandler {
    * Clear session
    */
   public clearSession(sessionId: string): void {
-    // Future: implement session clearing
+    // TODO: Implement session clearing in stateManager
     publish("session:cleared", { sessionId, timestamp: Date.now() })
   }
 }

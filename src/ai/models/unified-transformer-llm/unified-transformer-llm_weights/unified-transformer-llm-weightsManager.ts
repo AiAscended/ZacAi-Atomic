@@ -5,7 +5,13 @@
 
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import type { LLMModelConfig } from '../unified-transformer-llm_config/llm-modelConfig';
+import type { LLMModelConfig } from '../llm-config/llm-modelConfig';
+import {
+  WeightsManifestManager,
+  type SaveWeightsOptions,
+  type WeightArtifactEntry,
+  type WeightArtifactType,
+} from '../../../shared/weights/weightsManifestManager';
 
 export interface ModelWeights {
   // Embedding weights
@@ -34,7 +40,7 @@ export interface ModelWeights {
   
   // Output head weights
   outputHead: {
-    W: number[][]; // [embeddingDim, vocabSize]
+    W: number[][]; // [vocabSize, embeddingDim]
     b: number[]; // [vocabSize]
   };
   
@@ -48,22 +54,69 @@ export interface ModelWeights {
   };
 }
 
+export interface LoadedWeightArtifact {
+  weights: ModelWeights;
+  artifact?: WeightArtifactEntry;
+}
+
 export class LLMWeightsManager {
   private weightsDir: string;
+  private manifestManager!: WeightsManifestManager;
+  private readonly preferenceOrder: WeightArtifactType[] = ['trained', 'pretrained', 'bootstrapped', 'checkpoint'];
   
   constructor(weightsDir?: string) {
-    this.weightsDir = weightsDir || path.join(__dirname, '../../../data/weights/llm');
+    const defaultDir = path.join(process.cwd(), 'data/weights/llm');
+    this.weightsDir = weightsDir || defaultDir;
+    this.manifestManager = new WeightsManifestManager(this.weightsDir, {
+      preferenceOrder: this.preferenceOrder,
+    });
+    void (async () => {
+      await this.manifestManager.ensureInitialized();
+      await this.manifestManager.ensureBaselineArtifact('model_weights.json');
+    })();
+  }
+
+  private resolvePath(filename: string): string {
+    return this.manifestManager.resolvePath(filename);
+  }
+
+  public async getActiveArtifact(preferenceOrder?: WeightArtifactType[]): Promise<WeightArtifactEntry | null> {
+    return this.manifestManager.getActiveArtifact(preferenceOrder);
+  }
+
+  public async loadBestAvailableWeights(preferenceOrder?: WeightArtifactType[]): Promise<LoadedWeightArtifact | null> {
+    const artifact = await this.getActiveArtifact(preferenceOrder);
+    if (artifact) {
+      const weights = await this.loadWeights(artifact.file);
+      return { weights, artifact };
+    }
+
+    const checkpoint = await this.loadLatestCheckpoint();
+    if (checkpoint) {
+      return { weights: checkpoint };
+    }
+
+    try {
+      const baseWeights = await this.loadWeights();
+      return { weights: baseWeights };
+    } catch {
+      return null;
+    }
   }
   
   /**
    * Save model weights to disk
    */
-  async saveWeights(weights: ModelWeights, filename: string = 'model_weights.json'): Promise<void> {
+  async saveWeights(
+    weights: ModelWeights,
+    filename: string = 'model_weights.json',
+    options?: SaveWeightsOptions
+  ): Promise<void> {
     try {
       // Ensure weights directory exists
       await fs.mkdir(this.weightsDir, { recursive: true });
       
-      const filepath = path.join(this.weightsDir, filename);
+      const filepath = this.resolvePath(filename);
       
       // Add timestamp to metadata
       weights.metadata.timestamp = new Date().toISOString();
@@ -71,6 +124,12 @@ export class LLMWeightsManager {
       // Convert to JSON and save
       const json = JSON.stringify(weights, null, 2);
       await fs.writeFile(filepath, json, 'utf-8');
+      
+      if (options?.type) {
+        await this.manifestManager.registerArtifact(filename, options as SaveWeightsOptions & { type: WeightArtifactType });
+      } else {
+        await this.manifestManager.ensureBaselineArtifact(filename);
+      }
       
       console.log(`✅ Model weights saved to: ${filepath}`);
       console.log(`   - Layers: ${weights.decoderLayers.length}`);
@@ -87,7 +146,7 @@ export class LLMWeightsManager {
    */
   async loadWeights(filename: string = 'model_weights.json'): Promise<ModelWeights> {
     try {
-      const filepath = path.join(this.weightsDir, filename);
+      const filepath = this.resolvePath(filename);
       
       // Read and parse JSON
       const json = await fs.readFile(filepath, 'utf-8');
@@ -122,7 +181,7 @@ export class LLMWeightsManager {
     weights.metadata.trainedSteps = step;
     weights.metadata.lastLoss = loss;
     
-    await this.saveWeights(weights, filename);
+    await this.saveWeights(weights, filename, { type: 'checkpoint' });
   }
   
   /**
@@ -197,7 +256,7 @@ export class LLMWeightsManager {
     
     // Initialize output head
     const outputHead = {
-      W: this.initializeMatrix(config.embeddingDim, config.vocabSize),
+      W: this.initializeMatrix(config.vocabSize, config.embeddingDim),
       b: new Array(config.vocabSize).fill(0),
     };
     

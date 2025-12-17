@@ -89,35 +89,47 @@ export const DomainSettingsSchema = z.object({
 // GitHub App Settings Schema
 // ============================================================================
 
-export const GitHubAppSettingsSchema = z.object({
-  appId: z.string().min(1),
-  clientId: z.string().min(1),
-  installations: z.array(
-    z.object({
-      installationId: z.string(),
-      accountLogin: z.string(),
-      accountType: z.enum(["User", "Organization"]),
-      installedAt: z.string(),
-      repositories: z.array(
-        z.object({
-          id: z.number(),
-          name: z.string(),
-          fullName: z.string(),
-          private: z.boolean(),
-          defaultBranch: z.string(),
-        })
-      ),
-      permissions: z.record(z.string(), z.string()),
-    })
-  ),
-  webhookSecret: z.string(),
-  webhookUrl: z.string().url().optional(),
-  enableAutoCommit: z.boolean(),
-  enablePRCreation: z.boolean(),
-  enableIssueSync: z.boolean(),
-  defaultBranch: z.string(),
-  commitMessagePrefix: z.string(),
-});
+export const GitHubAppSettingsSchema = z
+  .object({
+    appId: z.string(),
+    clientId: z.string(),
+    installations: z.array(
+      z.object({
+        installationId: z.string(),
+        accountLogin: z.string(),
+        accountType: z.enum(["User", "Organization"]),
+        installedAt: z.string(),
+        repositories: z.array(
+          z.object({
+            id: z.number(),
+            name: z.string(),
+            fullName: z.string(),
+            private: z.boolean(),
+            defaultBranch: z.string(),
+          })
+        ),
+        permissions: z.record(z.string(), z.string()),
+      })
+    ),
+    webhookSecret: z.string(),
+    webhookUrl: z.string().url().optional(),
+    enableAutoCommit: z.boolean(),
+    enablePRCreation: z.boolean(),
+    enableIssueSync: z.boolean(),
+    defaultBranch: z.string(),
+    commitMessagePrefix: z.string(),
+  })
+  .refine(
+    (data) => {
+      const hasAppId = data.appId.trim().length > 0;
+      const hasClientId = data.clientId.trim().length > 0;
+      return hasAppId === hasClientId;
+    },
+    {
+      message: 'appId and clientId must both be provided together or left blank',
+      path: ['appId'],
+    }
+  );
 
 // Public-facing (no secrets)
 export const GitHubAppSettingsPublicSchema = GitHubAppSettingsSchema.omit({
@@ -235,15 +247,25 @@ export function validateAdminSettings(data: unknown) {
 // Secret Redaction Utility
 // ============================================================================
 
-export function redactSecrets<T extends Record<string, any>>(obj: T): T {
-  const redacted = { ...obj } as any;
+type SecretBearingRecord = Record<string, unknown>;
+
+export function redactSecrets<T extends SecretBearingRecord>(obj: T): T {
+  const redacted: SecretBearingRecord = { ...obj };
   const secretKeys = ["privateKey", "webhookSecret", "apiKey", "secret", "password", "token"];
 
   for (const key of Object.keys(redacted)) {
+    const value = redacted[key];
     if (secretKeys.some(sk => key.toLowerCase().includes(sk.toLowerCase()))) {
       redacted[key] = "***REDACTED***";
-    } else if (typeof redacted[key] === "object" && redacted[key] !== null) {
-      redacted[key] = redactSecrets(redacted[key]);
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      redacted[key] = value.map(item =>
+        typeof item === "object" && item !== null ? redactSecrets(item as SecretBearingRecord) : item
+      );
+    } else if (typeof value === "object" && value !== null) {
+      redacted[key] = redactSecrets(value as SecretBearingRecord);
     }
   }
 

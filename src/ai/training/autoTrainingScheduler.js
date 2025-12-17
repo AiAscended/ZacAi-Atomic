@@ -15,9 +15,9 @@
  *   0 2 * * * cd /app && node src/ai/training/autoTrainingScheduler.js
  */
 
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { promises as fs } from "fs";
+import path from "path";
+import { fileURLToPath, pathToFileURL } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -108,6 +108,10 @@ class AutoTrainingScheduler {
    */
   async updateVocabularies(metrics) {
     let updateCount = 0;
+    const metricCount = Array.isArray(metrics) ? metrics.length : 0;
+    if (metricCount === 0) {
+      this.log('No metrics supplied for vocabulary updates (placeholder dataset).');
+    }
     
     try {
       const domains = await fs.readdir(this.domainsDir);
@@ -228,7 +232,14 @@ class AutoTrainingScheduler {
 }
 
 // Run if called directly
-if (require.main === module) {
+const isDirectRun = (() => {
+  const entryPoint = process.argv[1];
+  if (!entryPoint) return false;
+  const resolvedEntry = path.resolve(entryPoint);
+  return pathToFileURL(resolvedEntry).href === import.meta.url;
+})();
+
+if (isDirectRun) {
   const scheduler = new AutoTrainingScheduler();
   
   scheduler.run()
@@ -242,4 +253,5 @@ if (require.main === module) {
     });
 }
 
-module.exports = { AutoTrainingScheduler };
+export { AutoTrainingScheduler };
+export default AutoTrainingScheduler;

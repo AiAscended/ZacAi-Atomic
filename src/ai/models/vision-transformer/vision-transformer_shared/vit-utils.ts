@@ -4,4 +4,6 @@
 
 export function vitUtility(): void {}
 
-export default { vitUtility };
+const VIT_UTILS = { vitUtility }
+
+export default VIT_UTILS

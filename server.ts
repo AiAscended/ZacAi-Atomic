@@ -1,12 +1,13 @@
 /**
- * Entry point for the custom Next.js + WebSocket server used by the admin dev console.
- * Keeps everything in one place so `npm run dev` just works inside the Codespace/container.
+ * File: src/lib/server/websocketServer.ts
+ * Purpose: Initialize WebSocket server for dev console terminal
+ * Note: This needs to be called from the Next.js custom server
  */
 
 import { createServer } from 'http';
-import { parse, pathToFileURL } from 'url';
+import { parse } from 'url';
 import next from 'next';
-import { terminalManager } from './src/lib/terminalManager';
+import terminalManager from '@/lib/terminalManager';
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = 'localhost';
@@ -30,24 +31,24 @@ export async function startServer() {
   });
 
   // Initialize WebSocket terminal manager
-  terminalManager.initialize(server);
+  await terminalManager.initialize(server);
 
   server.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port}`);
   });
 
   // Graceful shutdown
-  process.once('SIGTERM', () => {
+  process.on('SIGTERM', () => {
     console.log('SIGTERM signal received: closing HTTP server');
-    terminalManager.cleanup();
+    terminalManager.closeAllTerminals();
     server.close(() => {
       console.log('HTTP server closed');
     });
   });
 
-  process.once('SIGINT', () => {
+  process.on('SIGINT', () => {
     console.log('SIGINT signal received: closing HTTP server');
-    terminalManager.cleanup();
+    terminalManager.closeAllTerminals();
     server.close(() => {
       console.log('HTTP server closed');
       process.exit(0);
@@ -55,12 +56,8 @@ export async function startServer() {
   });
 }
 
-// Start server if this module is executed directly (not imported)
-const invokedFromCLI = process.argv[1]
-  ? pathToFileURL(process.argv[1]).href === import.meta.url
-  : false;
-
-if (invokedFromCLI) {
+// Start server if this file is run directly (ESM compatible)
+if (import.meta.url === `file://${process.argv[1]}`) {
   startServer().catch((err) => {
     console.error('Error starting server:', err);
     process.exit(1);

@@ -1,0 +1,227 @@
+# WaveNet Audio Model Instructions
+# Purpose: Generate high-fidelity audio waveforms for sound design, sonic logos, and dataset augmentation
+
+model:
+  id: "wavenet_audio_model"
+  name: "WaveNet Audio Model"
+  version: "1.2.0"
+  description: "Dilated causal convolution stack conditioned on text/midi tokens"
+  modality: "audio"
+  architecture:
+    base: "WaveNet"
+    dilation_depth: 12
+    residual_channels: 256
+    skip_channels: 512
+    quantization: "16-bit mu-law"
+  deployment:
+    runtime: "CUDA"
+    container_image: "registry.internal.models/wavenet:1.2.0"
+    supports_streaming: true
+
+role:
+  primary: "Audio waveform synthesis"
+  scope: "Produce custom audio cues, regenerate sounds, and augment datasets for ML pipelines"
+  orchestration_behavior: "Engages when prompts reference #audio, #soundfx, or when audio augmentation tasks run"
+
+capabilities:
+  - "Condition on textual descriptors or MIDI tokens"
+  - "Generate loopable clips with sample-accurate seams"
+  - "Blend existing audio via style transfer"
+  - "Apply post-eq/compression presets"
+  - "Enforce safety filters for sensitive content"
+
+principles:
+  - name: "Audio Safety"
+    rule: "Reject disallowed phrases and maintain safe loudness (-18 to -10 LUFS)"
+    priority: P1
+  - name: "Loop Integrity"
+    rule: "Ensure loop points align when requested"
+    priority: P2
+  - name: "Attribution"
+    rule: "Log references when conditioning on existing assets"
+    priority: P2
+
+seeds:
+  location: "./wavenet-audio-model_seeds/"
+  auto_load: true
+  format: "json"
+  tokens_file: "wavenet_seed_tokens.json"
+  impulse_responses: "irs/"
+
+weights:
+  location: "./wavenet-audio-model_weights/"
+  auto_load: true
+  format: "pt"
+  current: "./wavenet-audio-model_weights/wavenet_current_weights.pt"
+  pretrained: "./wavenet-audio-model_pretrained_weights/wavenet_pretrained_embeddings.bin"
+  fallback: "./wavenet-audio-model_pretrained_weights/wavenet_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  waveform_visualizer:
+    enabled: true
+    description: "Renders spectrograms/waveforms for QA"
+    capabilities:
+      - "Highlight clipping"
+      - "Annotate loop points"
+  noise_scheduler:
+    enabled: true
+    description: "Controls temperature/noise shaping"
+    capabilities:
+      - "Auto-tune temperature for stability"
+      - "Expose admin overrides"
+  content_filter:
+    enabled: true
+    description: "Screens text/audio for sensitive content"
+    capabilities:
+      - "Inline redaction"
+      - "Policy tagging"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "WaveNet Paper"
+        url: "https://arxiv.org/abs/1609.03499"
+        use_for: ["architecture"]
+      - name: "Audio Safety"
+        url: "https://www.w3.org/TR/media-accessibility-reqs"
+        use_for: ["accessibility"]
+      - name: "Loudness Guidelines"
+        url: "https://www.ebu.ch/files/live/sites/ebu/files/Publications/Tech/tech3341.pdf"
+        use_for: ["loudness"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "WaveNet Paper"
+      url: "https://arxiv.org/abs/1609.03499"
+      use_for: ["architecture"]
+    - name: "EBU R128"
+      url: "https://www.ebu.ch/files/live/sites/ebu/files/Publications/Tech/tech3341.pdf"
+      use_for: ["loudness"]
+    - name: "Media Accessibility"
+      url: "https://www.w3.org/TR/media-accessibility-reqs"
+      use_for: ["accessibility"]
+  reference_triggers:
+    - "Loop/loudness disputes"
+    - "Architecture modifications"
+    - "Policy clarifications"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.8
+    max_audio_seconds: 90
+    temperature: 0.65
+    top_p: 0.92
+    chunk_size: 2048
+  input_processing:
+    - "Normalize prompts"
+    - "Detect conditioning mode (text/midi/audio)"
+    - "Run content_filter"
+  reasoning_steps:
+    - "Convert inputs to conditioning vectors"
+    - "Sample dilated convolution stack"
+    - "Apply noise_scheduler"
+    - "Run waveform_visualizer QA"
+  output_formatting:
+    - "Return base64 PCM + metadata (sample rate, duration, loop points)"
+    - "Attach spectrogram preview"
+  validation:
+    - "Check LUFS within safe range"
+    - "Ensure loops snap to zero crossings"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adamw"
+  learning_rate: 0.0003
+  batch_size: 48
+  update_frequency: "every-12-hours"
+  epochs: 10
+  data_sources:
+    - "wavenet-audio-model_training/corpus_manifest.json"
+    - "wavenet-audio-model_data/loop_library.parquet"
+    - "Accessibility QA annotations"
+  focus_areas:
+    - "Loop integrity"
+    - "Noise stability"
+    - "Policy alignment"
+  evaluation_metrics:
+    - "MOS"
+    - "Loop Seam Score"
+    - "Policy violation rate"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize audio references"
+    - "Tokenize MIDI/phoneme inputs"
+  processing:
+    - "Generate waveform"
+    - "Apply post-EQ"
+  postprocessing:
+    - "Normalize loudness"
+    - "Segment for streaming"
+    - "Render preview"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Prompt rejected"
+      action: "Return policy warning"
+    - error: "Loop alignment failure"
+      action: "Regenerate tail segment and crossfade"
+    - error: "Temperature instability"
+      action: "Lower temperature via noise_scheduler and retry"
+  recovery_strategies:
+    - "Escalate to security for repeated policy issues"
+    - "Escalate to observability for sustained latency spikes"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.waveform_visualizer.enabled"
+    - "tools.noise_scheduler.enabled"
+    - "tools.content_filter.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/wavenet-audio-model"
+    visualizer_toggle: "tools.waveform_visualizer.enabled"
+    scheduler_toggle: "tools.noise_scheduler.enabled"
+    filter_toggle: "tools.content_filter.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "MOS"
+      target: ">=4.3"
+    - name: "Loop Seam Score"
+      target: ">=0.95"
+    - name: "Policy Violations"
+      target: "<0.1%"
+metadata:
+  owners:
+    - "audio-research@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/wavenet"

@@ -1,0 +1,226 @@
+# Recurrent Neural Network Model Instructions
+# Purpose: Perform sequence modeling tasks (time-series forecasting, log analysis, token classification) with adaptive gating and memory
+
+model:
+  id: "recurrent_neural_network"
+  name: "Recurrent Neural Network"
+  version: "1.2.0"
+  description: "Stacked bidirectional LSTM/GRU layers with attention head for long-context retention"
+  modality: "sequence"
+  architecture:
+    encoder: "BiLSTM"
+    decoder: "Attention projection"
+    hidden_size: 1024
+    layers: 6
+    dropout: 0.15
+  deployment:
+    runtime: "ONNX Runtime"
+    container_image: "registry.internal.models/rnn:1.2.0"
+    supports_streaming: true
+
+role:
+  primary: "Temporal/sequential inference"
+  scope: "Handle log parsing, time-series prediction, and sequential tagging"
+  orchestration_behavior: "Invoked when orchestrator routes streaming data or ordered token tasks"
+
+capabilities:
+  - "Forecast multivariate time-series with uncertainty bands"
+  - "Perform sequence tagging (NER, anomaly labels)"
+  - "Summarize sequential logs with rolling context"
+  - "Detect drift across windows"
+  - "Integrate admin-provided feature dictionaries"
+
+principles:
+  - name: "Temporal Integrity"
+    rule: "Never shuffle timesteps; respect ordering and alignment"
+    priority: P1
+  - name: "Explainability"
+    rule: "Surface attention weights or salient windows with every prediction"
+    priority: P2
+  - name: "Resource Efficiency"
+    rule: "Switch to lightweight GRU mode for devices without AVX2"
+    priority: P2
+
+seeds:
+  location: "./recurrent-neural-network_seeds/"
+  auto_load: true
+  format: "json"
+  tokens_file: "recurrent-neural-network_seed_tokens.json"
+  feature_dictionary: "feature_map.yaml"
+
+weights:
+  location: "./recurrent-neural-network_weights/"
+  auto_load: true
+  format: "onnx"
+  current: "./recurrent-neural-network_weights/recurrent-neural-network_current_weights.onnx"
+  pretrained: "./recurrent-neural-network_pretrained_weights/recurrent-neural-network_pretrained_embeddings.bin"
+  fallback: "./recurrent-neural-network_pretrained_weights/recurrent-neural-network_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  sequence_profiler:
+    enabled: true
+    description: "Computes rolling stats and highlights anomalies"
+    capabilities:
+      - "Windowed mean/variance"
+      - "Seasonality detection"
+  gradient_clip_advisor:
+    enabled: true
+    description: "Suggests safe gradient clipping thresholds"
+    capabilities:
+      - "Monitor exploding gradients"
+      - "Auto-adjust clip norm"
+  attention_visualizer:
+    enabled: true
+    description: "Exports attention heatmaps for admin review"
+    capabilities:
+      - "Generate JSON + PNG heatmaps"
+      - "Rank top timesteps"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Sequence to Sequence Learning"
+        url: "https://arxiv.org/abs/1409.3215"
+        use_for: ["architecture"]
+      - name: "Graves LSTM"
+        url: "https://arxiv.org/abs/1308.0850"
+        use_for: ["theory"]
+      - name: "Numenta Anomaly Benchmark"
+        url: "https://github.com/numenta/NAB"
+        use_for: ["time-series"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Sequence to Sequence Learning"
+      url: "https://arxiv.org/abs/1409.3215"
+      use_for: ["architecture"]
+    - name: "Graves LSTM"
+      url: "https://arxiv.org/abs/1308.0850"
+      use_for: ["recurrent theory"]
+    - name: "NAB"
+      url: "https://github.com/numenta/NAB"
+      use_for: ["anomaly detection"]
+  reference_triggers:
+    - "Requests for theoretical backing"
+    - "Need to justify anomaly metrics"
+    - "Admin updates to feature dictionaries"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.8
+    max_tokens: 2048
+    temperature: 0.25
+    top_p: 0.85
+    beam_width: 4
+  input_processing:
+    - "Normalize timestamps"
+    - "Impute missing values"
+    - "Encode categorical fields using seeds"
+  reasoning_steps:
+    - "Run sequence_profiler to detect context"
+    - "Feed ordered sequence into encoder"
+    - "Compute attention summaries"
+    - "Generate predictions + explanations"
+  output_formatting:
+    - "Return JSON with prediction, confidence, explanation"
+    - "Include top contributing timesteps"
+  validation:
+    - "Ensure monotonic timestamps"
+    - "Reject inputs exceeding length limit"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adamw"
+  learning_rate: 0.0004
+  batch_size: 64
+  update_frequency: "nightly"
+  epochs: 8
+  data_sources:
+    - "recurrent-neural-network_training/sequences.parquet"
+    - "recurrent-neural-network_data/anomaly_labels.jsonl"
+    - "Shared telemetry corpus"
+  focus_areas:
+    - "Long-horizon stability"
+    - "Exploding/vanishing gradient mitigation"
+    - "Explainability alignment"
+  evaluation_metrics:
+    - "MAE / RMSE"
+    - "Anomaly F1"
+    - "Attention sparsity score"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Align series to uniform cadence"
+    - "Scale numeric features"
+  processing:
+    - "Run encoder/decoder passes"
+    - "Apply teacher forcing for scheduled sampling"
+  postprocessing:
+    - "Denormalize outputs"
+    - "Attach attention_visualizer artifacts"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Sequence length overflow"
+      action: "Downsample or truncate with warning"
+    - error: "Exploding gradients"
+      action: "Invoke gradient_clip_advisor and retry"
+    - error: "Missing timestamps"
+      action: "Request corrected input"
+  recovery_strategies:
+    - "Escalate to system domain for orchestration conflicts"
+    - "Fallback to general_knowledge for narrative summaries"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.sequence_profiler.enabled"
+    - "tools.gradient_clip_advisor.enabled"
+    - "tools.attention_visualizer.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/recurrent-neural-network"
+    profiler_toggle: "tools.sequence_profiler.enabled"
+    clipper_toggle: "tools.gradient_clip_advisor.enabled"
+    attention_toggle: "tools.attention_visualizer.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "Forecast MAE"
+      target: "<0.08 normalized"
+    - name: "Anomaly Recall"
+      target: ">=0.92"
+    - name: "Latency p95"
+      target: "<400ms for 2k timesteps"
+metadata:
+  owners:
+    - "sequence-platform@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/rnn"

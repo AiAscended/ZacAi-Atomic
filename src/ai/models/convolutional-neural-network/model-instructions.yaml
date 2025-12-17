@@ -1,0 +1,223 @@
+# Convolutional Neural Network Model Instructions
+# Purpose: Provide fast image classification, detection, and embedding generation for visual QA workflows
+
+model:
+  id: "convolutional_neural_network"
+  name: "Convolutional Neural Network"
+  version: "1.2.0"
+  description: "Hybrid EfficientNet/ResNet backbone with FPN head for detection tasks"
+  modality: "vision"
+  architecture:
+    backbone: "EfficientNet-B4"
+    detection_head: "FPN + RetinaNet"
+    input_resolution: "512x512"
+    parameters: "~70M"
+  deployment:
+    runtime: "TensorRT"
+    container_image: "registry.internal.models/cnn:1.2.0"
+    supports_batching: true
+
+role:
+  primary: "Visual classification and detection"
+  scope: "Label assets, detect defects, and embed images for similarity search"
+  orchestration_behavior: "Preferred when low-latency visual triage is required"
+
+capabilities:
+  - "Classify up to 2048 labels with hierarchical taxonomy"
+  - "Detect bounding boxes with confidence calibration"
+  - "Produce embeddings compatible with vector search"
+  - "Run lightweight edge mode when GPU unavailable"
+  - "Report saliency heatmaps for explainability"
+
+principles:
+  - name: "Low Latency"
+    rule: "Stay under 150ms for single image at 512x512"
+    priority: P1
+  - name: "Explainability"
+    rule: "Attach Grad-CAM heatmaps for high-severity findings"
+    priority: P2
+  - name: "Calibration"
+    rule: "Continuously align probabilities with admin calibration sets"
+    priority: P2
+
+seeds:
+  location: "./convolutional-neural-network_seeds/"
+  auto_load: true
+  format: "json"
+  label_map: "labels.json"
+  calibration_set: "calibration/"
+
+weights:
+  location: "./convolutional-neural-network_weights/"
+  auto_load: true
+  format: "safetensors"
+  current: "./convolutional-neural-network_weights/cnn_current_weights.safetensors"
+  pretrained: "./convolutional-neural-network_pretrained_weights/cnn_pretrained_embeddings.bin"
+  fallback: "./convolutional-neural-network_pretrained_weights/cnn_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  dataset_calibrator:
+    enabled: true
+    description: "Aligns probabilities to admin-provided calibration sets"
+    capabilities:
+      - "Temperature scaling"
+      - "Threshold tuning"
+  heatmap_generator:
+    enabled: true
+    description: "Produces Grad-CAM heatmaps"
+    capabilities:
+      - "Highlight regions per class"
+      - "Export overlays"
+  edge_runtime_switch:
+    enabled: true
+    description: "Switches to quantized ONNX model when GPU absent"
+    capabilities:
+      - "Quantization-aware toggling"
+      - "Performance reporting"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "EfficientNet"
+        url: "https://arxiv.org/abs/1905.11946"
+        use_for: ["architecture"]
+      - name: "RetinaNet"
+        url: "https://arxiv.org/abs/1708.02002"
+        use_for: ["detection"]
+      - name: "Grad-CAM"
+        url: "https://arxiv.org/abs/1610.02391"
+        use_for: ["explainability"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "EfficientNet"
+      url: "https://arxiv.org/abs/1905.11946"
+      use_for: ["backbone"]
+    - name: "RetinaNet"
+      url: "https://arxiv.org/abs/1708.02002"
+      use_for: ["detection head"]
+    - name: "Grad-CAM"
+      url: "https://arxiv.org/abs/1610.02391"
+      use_for: ["heatmaps"]
+  reference_triggers:
+    - "Architecture modifications"
+    - "Explainability questions"
+    - "Calibration audits"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.78
+    max_batch: 32
+    temperature: 0.3
+    top_k: 5
+  input_processing:
+    - "Resize + normalize"
+    - "Apply privacy masks if configured"
+    - "Load calibration set"
+  reasoning_steps:
+    - "Run backbone + detection head"
+    - "Calibrate scores"
+    - "Generate heatmaps if severity high"
+  output_formatting:
+    - "Return labels, confidences, boxes, embeddings"
+    - "Attach calibration summary"
+  validation:
+    - "Ensure inference time under limit"
+    - "Check label map consistency"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adamw"
+  learning_rate: 0.0002
+  batch_size: 128
+  update_frequency: "weekly"
+  epochs: 8
+  data_sources:
+    - "cnn_training/detection_dataset.parquet"
+    - "cnn_data/classification_balanced.json"
+    - "Calibration replay sets"
+  focus_areas:
+    - "Class imbalance handling"
+    - "Quantization readiness"
+    - "Explainability alignment"
+  evaluation_metrics:
+    - "mAP"
+    - "Top-1 accuracy"
+    - "Latency p95"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Augment images"
+    - "Normalize channels"
+  processing:
+    - "Run CNN + detection head"
+  postprocessing:
+    - "Decode boxes"
+    - "Generate embeddings"
+    - "Apply calibration"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Image too large"
+      action: "Resize with warning"
+    - error: "Calibration set missing"
+      action: "Fallback to default thresholds and alert admin"
+    - error: "Edge runtime unavailable"
+      action: "Force GPU path and log incident"
+  recovery_strategies:
+    - "Escalate to system domain for resource conflicts"
+    - "Escalate to documentation domain for unclear labels"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.dataset_calibrator.enabled"
+    - "tools.heatmap_generator.enabled"
+    - "tools.edge_runtime_switch.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/convolutional-neural-network"
+    calibrator_toggle: "tools.dataset_calibrator.enabled"
+    heatmap_toggle: "tools.heatmap_generator.enabled"
+    edge_toggle: "tools.edge_runtime_switch.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "Top-1 Accuracy"
+      target: ">=0.9"
+    - name: "mAP"
+      target: ">=0.55"
+    - name: "Latency p95"
+      target: "<150ms"
+metadata:
+  owners:
+    - "vision-core@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/cnn"

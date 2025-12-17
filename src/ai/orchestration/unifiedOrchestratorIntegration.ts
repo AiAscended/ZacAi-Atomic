@@ -6,18 +6,59 @@
  * to dynamically discover, load, and route requests to models/domains.
  */
 
-import {
-  getUnifiedRegistry,
-  getModulesForOrchestrator,
-  type ModuleManifest,
-} from "../shared/registry/unifiedRegistry";
+import { getUnifiedRegistry, type ModuleManifest } from "../shared/registry/unifiedRegistry";
 
-import {
-  getUnifiedLoader,
-  initializeAISystem,
-  getReadyModulesForOrchestrator,
-  type LoadedModule,
-} from "../shared/loader/unifiedLoader";
+import { getUnifiedLoader, initializeAISystem, type LoadedModule } from "../shared/loader/unifiedLoader";
+
+type OrchestratorContext = Record<string, unknown> | undefined;
+
+export interface OrchestratorRequest {
+  query: string;
+  context?: OrchestratorContext;
+  preferredModel?: string;
+  preferredDomain?: string;
+}
+
+interface ModuleSummary {
+  id: string;
+  name: string;
+  status: string;
+  type?: string;
+}
+
+interface RegistrySummary {
+  totalModules: number;
+  stats: unknown;
+  lastScanned: string | number | null | undefined;
+}
+
+interface LoadedModulesSummary {
+  stats: unknown;
+  models: ModuleSummary[];
+  domains: ModuleSummary[];
+}
+
+export interface OrchestratorStatus {
+  initialized: boolean;
+  registry: RegistrySummary;
+  loadedModules: LoadedModulesSummary;
+}
+
+interface InferenceCapable {
+  infer: (query: string, context?: OrchestratorContext) => Promise<unknown> | unknown;
+}
+
+interface DomainQueryable {
+  query: (query: string, context?: OrchestratorContext) => Promise<unknown> | unknown;
+}
+
+const isInferenceCapable = (instance: unknown): instance is InferenceCapable => {
+  return Boolean(instance && typeof (instance as { infer?: unknown }).infer === "function");
+};
+
+const isDomainQueryable = (instance: unknown): instance is DomainQueryable => {
+  return Boolean(instance && typeof (instance as { query?: unknown }).query === "function");
+};
 
 // ============================================================================
 // Orchestrator Integration
@@ -55,12 +96,7 @@ export class UnifiedOrchestrator {
   /**
    * Process request - orchestrator determines which models/domains to use
    */
-  async processRequest(request: {
-    query: string;
-    context?: any;
-    preferredModel?: string;
-    preferredDomain?: string;
-  }): Promise<any> {
+  async processRequest(request: OrchestratorRequest): Promise<unknown> {
     if (!this.initialized) {
       await this.initialize();
     }
@@ -142,11 +178,11 @@ export class UnifiedOrchestrator {
   /**
    * Execute request with model
    */
-  private async executeWithModel(model: LoadedModule, request: any): Promise<any> {
+  private async executeWithModel(model: LoadedModule, request: OrchestratorRequest): Promise<unknown> {
     console.log(`🤖 Using model: ${model.manifest.displayName}`);
     
     // Call model's inference engine
-    if (model.instance && typeof model.instance.infer === "function") {
+    if (isInferenceCapable(model.instance)) {
       return await model.instance.infer(request.query, request.context);
     }
     
@@ -161,11 +197,11 @@ export class UnifiedOrchestrator {
   /**
    * Execute request with domain
    */
-  private async executeWithDomain(domain: LoadedModule, request: any): Promise<any> {
+  private async executeWithDomain(domain: LoadedModule, request: OrchestratorRequest): Promise<unknown> {
     console.log(`📚 Using domain: ${domain.manifest.displayName}`);
     
     // Call domain's integration API
-    if (domain.instance && typeof domain.instance.query === "function") {
+    if (isDomainQueryable(domain.instance)) {
       return await domain.instance.query(request.query, request.context);
     }
     
@@ -213,11 +249,7 @@ export class UnifiedOrchestrator {
   /**
    * Get system status
    */
-  async getStatus(): Promise<{
-    initialized: boolean;
-    registry: any;
-    loadedModules: any;
-  }> {
+  async getStatus(): Promise<OrchestratorStatus> {
     const registry = await getUnifiedRegistry();
     const { models, domains, stats } = this.loader.getModulesForOrchestrator();
     

@@ -5,13 +5,13 @@
  * intent, and content analysis. Supports multi-domain queries.
  * 
  * Integration:
- * - Called by: main-orchestrator.ts
- * - Uses: system registry, keyword matching, intent classification
+ * - Called by: mainOrchestrator.ts
+ * - Uses: domainRegistry, keyword matching, intent classification
  * - Returns: List of domain names to query
  */
 
 import { logger } from "./logger"
-import { getEnabledDomains } from "../knowledge-domains"
+import { domainRegistry } from "../knowledge-domains/domainRegistry"
 
 export interface DomainRoutingCriteria {
   keywords: string[]
@@ -274,13 +274,13 @@ export class DomainRouter {
   /**
    * Route request to appropriate domains
    */
-  public async route(criteria: DomainRoutingCriteria): Promise<RoutedDomain[]> {
+  public route(criteria: DomainRoutingCriteria): RoutedDomain[] {
     const routedDomains: RoutedDomain[] = []
 
-    logger.info("DomainRouter", "Routing to domains", { criteria })
+    logger.info("DomainRouter: Routing to domains", { criteria })
 
     // Get all available domains from registry
-    const availableDomains = (await getEnabledDomains()).map((domain) => domain.id)
+    const availableDomains = domainRegistry.getAllDomains().map((domain) => domain.name)
 
     // Score each domain based on keyword matches
     for (const domainName of availableDomains) {
@@ -316,7 +316,7 @@ export class DomainRouter {
     // Limit to top 5 domains for performance
     const selectedDomains = routedDomains.slice(0, 5)
 
-    logger.info("DomainRouter", "Domains routed", {
+    logger.info("DomainRouter: Domains routed", {
       count: selectedDomains.length,
       domains: selectedDomains.map((d) => d.name),
     })
@@ -331,7 +331,6 @@ export class DomainRouter {
     const domainKeywords = this.domainKeywords.get(domainName) || []
     if (domainKeywords.length === 0) return 0
 
-    let matchCount = 0
     let totalWeight = 0
 
     for (const keyword of keywords) {
@@ -339,7 +338,6 @@ export class DomainRouter {
 
       for (const domainKeyword of domainKeywords) {
         if (lowerKeyword.includes(domainKeyword) || domainKeyword.includes(lowerKeyword)) {
-          matchCount++
           // Exact matches get higher weight
           const weight = lowerKeyword === domainKeyword ? 2.0 : 1.0
           totalWeight += weight
@@ -402,7 +400,7 @@ export class DomainRouter {
     this.domainKeywords.set(domainName, keywords)
     this.domainPriorities.set(domainName, priority)
 
-    logger.info("DomainRouter", "Added custom domain", {
+    logger.info("DomainRouter: Added custom domain", {
       domainName,
       keywordCount: keywords.length,
       priority,

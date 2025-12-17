@@ -196,7 +196,9 @@ export async function loadWeights(domainName: string): Promise<WeightsData> {
       vocabulary,
     }
   } catch (error) {
-    logger.error("WeightsLoader", `Failed to load weights for ${domainName}`, error)
+    logger.error("WeightsLoader", `Failed to load weights for ${domainName}`, {
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+    })
     throw error
   }
 }
@@ -232,7 +234,9 @@ export async function loadDomainWeights(
 
     return { layers, biases }
   } catch (error) {
-    logger.error("WeightsLoader", `Failed to load domain weights for ${domainName}`, error)
+    logger.error("WeightsLoader", `Failed to load domain weights for ${domainName}`, {
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+    })
     return null
   }
 }

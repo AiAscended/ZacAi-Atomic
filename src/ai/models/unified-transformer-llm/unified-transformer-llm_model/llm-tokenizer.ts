@@ -64,7 +64,7 @@ export class LLMTokenizer {
    * Get vocabulary size
    */
   getVocabSize(): number {
-    return this.vocabulary.size;
+    return vocabularyManager.getEffectiveVocabSize();
   }
 }
 

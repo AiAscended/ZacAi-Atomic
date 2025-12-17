@@ -8,15 +8,16 @@
 
 import GRAMMAR_CORE_TOKENS from "./grammar_tokens"
 
+const RESERVED_TOKENS = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"] as const
+
 export const buildGrammarTokenMap = () => {
   const map = new Map<string, number>()
-  const reserved = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"]
-  reserved.forEach((t, i) => map.set(t, i))
+  RESERVED_TOKENS.forEach((token, index) => map.set(token, index))
 
-  let idx = reserved.length
-  for (const t of GRAMMAR_CORE_TOKENS) {
-    if (map.has(t)) continue
-    map.set(t, idx++)
+  let idx = RESERVED_TOKENS.length
+  for (const token of GRAMMAR_CORE_TOKENS) {
+    if (map.has(token)) continue
+    map.set(token, idx++)
   }
 
   return map
@@ -35,4 +36,11 @@ export const getGrammarTokenById = (id: number): string | undefined => {
 
 export const grammarTokenCount = () => grammarTokenMap.size
 
-export default { grammarTokenMap, getGrammarTokenId, getGrammarTokenById, grammarTokenCount }
+const grammarTokenExports = {
+  grammarTokenMap,
+  getGrammarTokenId,
+  getGrammarTokenById,
+  grammarTokenCount,
+}
+
+export default grammarTokenExports

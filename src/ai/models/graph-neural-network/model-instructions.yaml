@@ -1,0 +1,225 @@
+# Graph Neural Network Model Instructions
+# Purpose: Reason over graph-structured data for relationship inference, fraud detection, and topology analysis
+
+model:
+  id: "graph_neural_network"
+  name: "Graph Neural Network"
+  version: "1.2.0"
+  description: "Heterogeneous GNN stack combining GraphSAGE encoder with attention-based readout"
+  modality: "graph"
+  architecture:
+    encoder: "GraphSAGE"
+    aggregator: "mean + attention"
+    depth: 4
+    hidden_dim: 512
+    edge_types: ["transaction", "ownership", "dependency"]
+  deployment:
+    runtime: "PyTorch Geometric + Triton"
+    container_image: "registry.internal.models/gnn:1.2.0"
+    supports_mini_batch: true
+
+role:
+  primary: "Graph reasoning and classification"
+  scope: "Predict node labels, link likelihoods, and subgraph anomalies"
+  orchestration_behavior: "Used when tasks reference knowledge graphs, dependency graphs, or fraud webs"
+
+capabilities:
+  - "Compute node embeddings on demand"
+  - "Predict missing edges with confidence intervals"
+  - "Score communities and highlight anomalies"
+  - "Explain predictions with subgraph extractions"
+  - "Sync admin-maintained ontology mappings"
+
+principles:
+  - name: "Topology Preservation"
+    rule: "Maintain structural information; avoid lossy flattening"
+    priority: P1
+  - name: "Explainable Paths"
+    rule: "Every classification must include k-shortest supporting paths"
+    priority: P2
+  - name: "Data Minimization"
+    rule: "Process only requested subgraphs to limit memory footprint"
+    priority: P2
+
+seeds:
+  location: "./graph-neural-network_seeds/"
+  auto_load: true
+  format: "json"
+  ontology_file: "ontologies.yaml"
+  tokens_file: "graph-neural-network_seed_tokens.json"
+
+weights:
+  location: "./graph-neural-network_weights/"
+  auto_load: true
+  format: "pt"
+  current: "./graph-neural-network_weights/graph-neural-network_current_weights.pt"
+  pretrained: "./graph-neural-network_pretrained_weights/graph-neural-network_pretrained_embeddings.bin"
+  fallback: "./graph-neural-network_pretrained_weights/graph-neural-network_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  subgraph_sampler:
+    enabled: true
+    description: "Extracts induced subgraphs with controllable radius"
+    capabilities:
+      - "Neighbor sampling"
+      - "Community detection"
+  path_explainer:
+    enabled: true
+    description: "Computes k-shortest supporting paths"
+    capabilities:
+      - "Edge attribution"
+      - "Counterfactual suggestions"
+  ontology_mapper:
+    enabled: true
+    description: "Aligns node/edge types with admin ontologies"
+    capabilities:
+      - "Type validation"
+      - "Auto-suggest missing mappings"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "GraphSAGE Paper"
+        url: "https://arxiv.org/abs/1706.02216"
+        use_for: ["architecture"]
+      - name: "PyG Documentation"
+        url: "https://pytorch-geometric.readthedocs.io"
+        use_for: ["runtime"]
+      - name: "Explainable GNN"
+        url: "https://arxiv.org/abs/2010.02089"
+        use_for: ["explainability"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "GraphSAGE Paper"
+      url: "https://arxiv.org/abs/1706.02216"
+      use_for: ["architecture"]
+    - name: "Explainable GNN"
+      url: "https://arxiv.org/abs/2010.02089"
+      use_for: ["explainability"]
+    - name: "PyG Docs"
+      url: "https://pytorch-geometric.readthedocs.io"
+      use_for: ["runtime"]
+  reference_triggers:
+    - "Requests for architectural justification"
+    - "Explainability or audit needs"
+    - "Ontology alignment questions"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.83
+    max_nodes: 20000
+    batch_size: 8
+    temperature: 0.3
+  input_processing:
+    - "Validate graph schema"
+    - "Map node/edge types via ontology_mapper"
+    - "Sample subgraph"
+  reasoning_steps:
+    - "Embed nodes with GraphSAGE"
+    - "Aggregate and classify"
+    - "Run path_explainer"
+    - "Rank predictions"
+  output_formatting:
+    - "Return predictions + probability + supporting paths"
+    - "Attach anomaly scores"
+  validation:
+    - "Ensure subgraph within limits"
+    - "Check ontology coverage"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adam"
+  learning_rate: 0.0002
+  batch_size: 128
+  update_frequency: "biweekly"
+  epochs: 6
+  data_sources:
+    - "graph-neural-network_training/graphs.pt"
+    - "graph-neural-network_data/labels.parquet"
+    - "Feedback loop annotations"
+  focus_areas:
+    - "Explainability fidelity"
+    - "Edge prediction precision"
+    - "Memory efficiency"
+  evaluation_metrics:
+    - "ROC-AUC"
+    - "Hits@K"
+    - "Path explanation agreement"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Build adjacency lists"
+    - "Normalize features"
+  processing:
+    - "Perform neighbor sampling"
+    - "Run GNN forward pass"
+  postprocessing:
+    - "Generate supporting paths"
+    - "Serialize embeddings when requested"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Graph too large"
+      action: "Request smaller subgraph or increase sampling radius in batches"
+    - error: "Unknown ontology type"
+      action: "Flag via ontology_mapper and ask admin to map"
+    - error: "Path explainer timeout"
+      action: "Return prediction without explanation and log warning"
+  recovery_strategies:
+    - "Escalate to system domain for resource allocation"
+    - "Escalate to data_integrity when schema mismatches recur"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.subgraph_sampler.enabled"
+    - "tools.path_explainer.enabled"
+    - "tools.ontology_mapper.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/graph-neural-network"
+    sampler_toggle: "tools.subgraph_sampler.enabled"
+    explainer_toggle: "tools.path_explainer.enabled"
+    ontology_toggle: "tools.ontology_mapper.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "ROC-AUC"
+      target: ">=0.9"
+    - name: "Explanation Coverage"
+      target: ">=95%"
+    - name: "Latency p95"
+      target: "<1.2s for 20k nodes"
+metadata:
+  owners:
+    - "graph-platform@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/gnn"

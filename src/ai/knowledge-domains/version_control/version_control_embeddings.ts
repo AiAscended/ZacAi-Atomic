@@ -7,14 +7,21 @@
  */
 
 import pretrained from "./version_control_weights/version_control_pretrained_weights.json"
+import seedVocabulary from "./version_control_seeds/version_control_seedVocabulary.json"
 import { VERSION_CONTROL_DOMAIN } from "./version_control_constants"
-
-const EMBEDDING_DIM = 128
+import {
+  buildSeedWeightMap,
+  deterministicVector,
+  normalizeSeedTokens,
+  resolveEmbeddingDimension,
+} from "../utils/embeddingUtils"
+import { updateFile } from "../dataRegistry"
+const EMBEDDING_DIM = resolveEmbeddingDimension(pretrained, 128)
+const SEED_TOKENS = normalizeSeedTokens(seedVocabulary)
+const SEED_WEIGHTS = buildSeedWeightMap(pretrained, SEED_TOKENS, EMBEDDING_DIM)
 
 export const getVersionControlEmbedding = (token: string): number[] => {
-  const weights = (pretrained as { seedWeights?: Record<string, number[]> }).seedWeights ?? {}
-  if (weights[token]) return weights[token]
-  return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
+  return SEED_WEIGHTS[token] ?? deterministicVector(token, EMBEDDING_DIM)
 }
 
 export const getVersionControlEmbeddingForTokens = (tokens: string[]) => tokens.map(getVersionControlEmbedding)
@@ -25,12 +32,16 @@ export const persistVersionControlWeights = (weights: Record<string, number[]>) 
     null,
     2,
   )
-  const { updateFile } = require("../../orchestration/fileWatcher")
   updateFile(VERSION_CONTROL_DOMAIN, "src/ai/knowledge-domains/version_control/version_control_weights/version_control_pretrained_weights.json", content)
   return {
     success: true,
     path: "src/ai/knowledge-domains/version_control/version_control_weights/version_control_pretrained_weights.json",
   }
 }
+const versionControlEmbeddingApi = {
+  getVersionControlEmbedding,
+  getVersionControlEmbeddingForTokens,
+  persistVersionControlWeights,
+}
 
-export default { getVersionControlEmbedding, getVersionControlEmbeddingForTokens, persistVersionControlWeights }
+export default versionControlEmbeddingApi

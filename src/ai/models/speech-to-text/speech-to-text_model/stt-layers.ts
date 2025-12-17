@@ -2,10 +2,18 @@
  * Speech-to-text - Layer Implementations
  */
 
+import type { ModelPayload } from '../../shared/modelTypes';
+
 export class STTLayer {
-  forward(input: any): any {
-    return input;
+  constructor(private readonly identifier: string) {}
+
+  forward(input: ModelPayload): ModelPayload {
+    return {
+      ...input,
+      lastLayer: this.identifier,
+    };
   }
 }
 
-export default STTLayer;
+export const defaultSttLayer = new STTLayer('stt-layer-1');
+

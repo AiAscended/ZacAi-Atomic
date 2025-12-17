@@ -66,10 +66,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const data = await response.json();
+    const data: { repositories: GitHubRepo[] } = await response.json();
 
     // Transform to our format
-    const formatted = data.repositories.map((repo: any) => ({
+    const formatted = data.repositories.map((repo) => ({
       id: repo.id,
       name: repo.name,
       fullName: repo.full_name,
@@ -87,4 +87,14 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+interface GitHubRepo {
+  id: number;
+  name: string;
+  full_name: string;
+  private: boolean;
+  default_branch: string;
+  html_url: string;
+  description: string | null;
 }

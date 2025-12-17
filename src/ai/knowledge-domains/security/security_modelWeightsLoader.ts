@@ -1,18 +1,17 @@
-/**
- * File: src/ai/data/security/security_modelWeightsLoader.ts
- * Purpose: Load training weights for security domain
- * Depends on: ../storageAdapter.ts
- * Depended on by: security_trainingController.ts
- * Creator: Vercel v0 Coding Assistant
- */
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-import { storageAdapter } from "../storageAdapter"
+const securityWeightsManager = createDomainWeightsManager({
+  domainName: "security",
+})
 
-export const securityLoadWeights = async (path = "/src/ai/knowledge-domains/security/security_weights/security_trainingWeights.bin") => {
-  try {
-    const raw = await storageAdapter.readFile(path)
-    return raw
-  } catch (e) {
-    return null
-  }
+export const securityLoadWeights = async (): Promise<string | null> => {
+  return securityWeightsManager.loadWeights()
+}
+
+export const primeSecurityWeights = async (): Promise<string | null> => {
+  return securityWeightsManager.prime()
+}
+
+export const getSecurityActiveWeightArtifact = () => {
+  return securityWeightsManager.getActiveWeightArtifact()
 }

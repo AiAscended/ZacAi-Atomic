@@ -1,0 +1,225 @@
+# Multi-Modal Fusion Model Instructions
+# Purpose: Fuse text, image, audio, and tabular signals into unified embeddings for reasoning and retrieval
+
+model:
+  id: "multi_modal_fusion"
+  name: "Multi-Modal Fusion"
+  version: "1.2.0"
+  description: "Cross-attention fusion transformer with modality-specific encoders"
+  modality: "multi-modal"
+  architecture:
+    text_encoder: "Transformer-encoder"
+    vision_encoder: "CLIP ViT-B/32"
+    audio_encoder: "AST"
+    tabular_encoder: "MLP"
+    fusion_layer: "Cross-attention + gated additive fusion"
+  deployment:
+    runtime: "PyTorch + Triton"
+    container_image: "registry.internal.models/multi-modal-fusion:1.2.0"
+    supports_batching: true
+
+role:
+  primary: "Embed and reason across modalities"
+  scope: "Answer questions, compare assets, and retrieve related items using multi-modal context"
+  orchestration_behavior: "Called when tasks include attachments (images/audio) or require cross-modal matching"
+
+capabilities:
+  - "Generate joint embeddings for text-image-audio bundles"
+  - "Compute similarity scores between heterogeneous assets"
+  - "Ground textual answers in visual/audio evidence"
+  - "Export fused embeddings to vector stores"
+  - "Explain contribution of each modality"
+
+principles:
+  - name: "Evidence Linking"
+    rule: "Always reference which modalities influenced the answer"
+    priority: P1
+  - name: "Resource Awareness"
+    rule: "Skip unused encoders to save compute"
+    priority: P2
+  - name: "Privacy"
+    rule: "Blur PII in images/audio transcripts"
+    priority: P1
+
+seeds:
+  location: "./multi-modal-fusion_seeds/"
+  auto_load: true
+  format: "json"
+  modality_config: "modalities.yaml"
+
+weights:
+  location: "./multi-modal-fusion_weights/"
+  auto_load: true
+  format: "pt"
+  current: "./multi-modal-fusion_weights/multi-modal-fusion_current_weights.pt"
+  pretrained: "./multi-modal-fusion_pretrained_weights/multi-modal-fusion_pretrained_embeddings.bin"
+  fallback: "./multi-modal-fusion_pretrained_weights/multi-modal-fusion_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  modality_router:
+    enabled: true
+    description: "Determines which encoders to activate"
+    capabilities:
+      - "Detect available attachments"
+      - "Apply privacy filters"
+  attribution_explainer:
+    enabled: true
+    description: "Breakdown of modality contributions"
+    capabilities:
+      - "Generate per-modality weights"
+      - "Produce textual explanations"
+  vector_exporter:
+    enabled: true
+    description: "Push fused embeddings to admin stores"
+    capabilities:
+      - "Batch export"
+      - "Metadata tagging"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "CLIP"
+        url: "https://arxiv.org/abs/2103.00020"
+        use_for: ["vision-text"]
+      - name: "Audio Spectrogram Transformer"
+        url: "https://arxiv.org/abs/2104.01778"
+        use_for: ["audio"]
+      - name: "Cross-modal Retrieval"
+        url: "https://arxiv.org/abs/1908.06359"
+        use_for: ["fusion"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "CLIP"
+      url: "https://arxiv.org/abs/2103.00020"
+      use_for: ["vision-text"]
+    - name: "AST"
+      url: "https://arxiv.org/abs/2104.01778"
+      use_for: ["audio"]
+    - name: "Cross-modal Retrieval"
+      url: "https://arxiv.org/abs/1908.06359"
+      use_for: ["fusion"]
+  reference_triggers:
+    - "Architecture discussions"
+    - "Attribution questions"
+    - "Vector store integration"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.8
+    max_tokens: 400
+    temperature: 0.4
+    top_p: 0.9
+    embedding_dim: 2048
+  input_processing:
+    - "Gather all modality inputs"
+    - "Run modality_router"
+    - "Normalize data types"
+  reasoning_steps:
+    - "Encode each modality"
+    - "Fuse via cross-attention"
+    - "Generate answer or similarity scores"
+    - "Use attribution_explainer"
+  output_formatting:
+    - "Return text answer + modality attribution table"
+    - "Include base64 embeddings when requested"
+  validation:
+    - "Ensure attachments sanitized"
+    - "Confirm embedding norms"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adamw"
+  learning_rate: 0.0002
+  batch_size: 96
+  update_frequency: "weekly"
+  epochs: 4
+  data_sources:
+    - "multi-modal-fusion_training/pairs.jsonl"
+    - "multi-modal-fusion_data/contrastive_examples.parquet"
+    - "Admin feedback loops"
+  focus_areas:
+    - "Attribution fidelity"
+    - "Low-resource modality performance"
+    - "Vector store compatibility"
+  evaluation_metrics:
+    - "Recall@K"
+    - "Attribution accuracy"
+    - "Latency p95"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Validate file formats"
+    - "Extract metadata"
+  processing:
+    - "Run modality encoders"
+    - "Fuse embeddings"
+  postprocessing:
+    - "Generate explanations"
+    - "Export vectors if configured"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Unsupported modality"
+      action: "Skip modality, warn user"
+    - error: "Missing attachment"
+      action: "Request re-upload"
+    - error: "Vector export failure"
+      action: "Retry and log incident"
+  recovery_strategies:
+    - "Escalate to data_integrity for corrupt files"
+    - "Escalate to security for privacy breaches"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.modality_router.enabled"
+    - "tools.attribution_explainer.enabled"
+    - "tools.vector_exporter.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/multi-modal-fusion"
+    router_toggle: "tools.modality_router.enabled"
+    attribution_toggle: "tools.attribution_explainer.enabled"
+    export_toggle: "tools.vector_exporter.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "Recall@10"
+      target: ">=0.85"
+    - name: "Attribution Accuracy"
+      target: ">=0.9"
+    - name: "Latency p95"
+      target: "<1.5s"
+metadata:
+  owners:
+    - "multimodal-platform@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/multi-modal-fusion"

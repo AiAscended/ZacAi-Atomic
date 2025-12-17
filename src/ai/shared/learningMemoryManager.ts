@@ -12,6 +12,9 @@
 import { promises as fs } from 'fs';
 import * as path from 'path';
 
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+type MetadataRecord = Record<string, JsonValue>;
+
 // ============================================================================
 // TYPES & INTERFACES
 // ============================================================================
@@ -35,12 +38,12 @@ export interface SessionMemory {
   sessionId: string;
   userId?: string;
   userName?: string;
-  userPreferences?: Record<string, any>;
+  userPreferences?: MetadataRecord;
   conversationHistory: ConversationTurn[];
   learnedConcepts: string[]; // IDs of concepts learned in this session
   createdAt: string;
   lastActive: string;
-  metadata: Record<string, any>;
+  metadata: MetadataRecord;
 }
 
 export interface ConversationTurn {
@@ -67,7 +70,15 @@ export interface ArchiveEntry {
   originalPath: string;
   archivedAt: string;
   reason: string;
-  metadata: Record<string, any>;
+  metadata: MetadataRecord;
+}
+
+export interface LearningMemoryStats {
+  activeSessions: number;
+  totalSessionFiles: number;
+  totalLearnedConcepts: number;
+  conceptsByDomain: Record<string, number>;
+  archivedFiles: number;
 }
 
 // ============================================================================
@@ -393,7 +404,7 @@ export class LearningMemoryManager {
 
           results.push(...matches);
         }
-      } catch (error) {
+      } catch {
         // Domain folder doesn't exist or other error
         continue;
       }
@@ -509,12 +520,12 @@ export class LearningMemoryManager {
   /**
    * Get statistics
    */
-  async getStatistics(): Promise<any> {
-    const stats = {
+  async getStatistics(): Promise<LearningMemoryStats> {
+    const stats: LearningMemoryStats = {
       activeSessions: this.activeSessions.size,
       totalSessionFiles: 0,
       totalLearnedConcepts: 0,
-      conceptsByDomain: {} as Record<string, number>,
+      conceptsByDomain: {},
       archivedFiles: 0
     };
 

@@ -1,0 +1,278 @@
+# English Domain Instructions
+# Purpose: Governance, guidelines, and operational instructions for English language domain
+
+domain:
+  id: english
+  name: English
+  version: "1.0.0"
+  description: "Expert English language domain covering grammar, vocabulary, writing, and comprehension"
+
+role:
+  primary: "Specialized knowledge inference for English"
+  scope: "Grammar, style, vocabulary, and comprehension guidance"
+  tone_guidelines: "Adjustable via admin controls; default to professional clarity"
+
+capabilities:
+  - "Understand grammar, syntax, and style rules"
+  - "Provide audience-aware rewrites and explanations"
+  - "Reference seed vocabulary for context and tone adaptation"
+  - "Sync URL lookup sources with admin-managed settings"
+  - "Record learned linguistic patterns for personalization"
+
+seeds:
+  location: "./english_seeds/"
+  auto_load: true
+  format: "json"
+  hydration: "on-demand"
+
+weights:
+  location: "./english_weights/"
+  auto_load: true
+  format: "binary"
+  fine_tune_target: "./english_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Core Principles
+principles:
+  - name: "Clarity and Precision"
+    rule: "Use clear, precise language appropriate to context"
+    priority: 1
+  
+  - name: "Grammar Correctness"
+    rule: "Follow standard English grammar rules"
+    priority: 2
+  
+  - name: "Context Awareness"
+    rule: "Adapt language register to audience and purpose (formal, casual, technical)"
+    priority: 3
+  
+  - name: "Natural Flow"
+    rule: "Maintain natural, idiomatic English expression"
+    priority: 4
+
+# Domain-Specific Knowledge
+foundational_concepts:
+  grammar:
+    - "Parts of speech: nouns, verbs, adjectives, adverbs, etc."
+    - "Sentence structure: subject, predicate, object"
+    - "Tenses: past, present, future, perfect, continuous"
+    - "Voice: active vs passive"
+    - "Mood: indicative, imperative, subjunctive"
+  
+  punctuation:
+    - "Period, comma, semicolon, colon"
+    - "Quotation marks and apostrophes"
+    - "Dashes and hyphens"
+    - "Parentheses and brackets"
+  
+  vocabulary:
+    - "Word formation: prefixes, suffixes, roots"
+    - "Synonyms and antonyms"
+    - "Idioms and phrasal verbs"
+    - "Formal vs informal vocabulary"
+  
+  writing_styles:
+    - "Academic writing"
+    - "Business communication"
+    - "Creative writing"
+    - "Technical documentation"
+  
+  comprehension:
+    - "Main idea identification"
+    - "Inference and implication"
+    - "Context clues"
+    - "Critical analysis"
+
+# Tool Configuration
+tools:
+  url_lookup:
+    enabled: true
+    sources:
+      - "Merriam-Webster Dictionary"
+      - "Oxford English Dictionary"
+      - "Grammar Books Online"
+      - "Thesaurus.com"
+    usage_guidelines:
+      - "Look up word definitions and usage"
+      - "Check spelling and pronunciation"
+      - "Find synonyms and antonyms"
+      - "Verify grammar rules"
+  
+  code_analyzer:
+    enabled: false
+    # Language analysis done through specialized functions
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.7
+    max_tokens: 500
+    temperature: 0.7
+    top_p: 0.9
+    tone_sensitivity: 0.6
+    profanity_filter: true
+
+  input_processing:
+    - "Identify language register (formal/informal)"
+    - "Parse sentence structure"
+    - "Recognize grammar patterns"
+    - "Detect spelling and vocabulary needs"
+  
+  reasoning_steps:
+    - "Analyze grammar correctness"
+    - "Check vocabulary appropriateness"
+    - "Evaluate clarity and coherence"
+    - "Consider context and audience"
+  
+  output_formatting:
+    - "Use proper grammar and punctuation"
+    - "Maintain consistent tone"
+    - "Provide clear explanations"
+    - "Include examples when helpful"
+  
+  validation:
+    - "Check grammatical correctness"
+    - "Verify spelling accuracy"
+    - "Ensure clarity of expression"
+    - "Validate punctuation usage"
+
+# Language Rules
+language_rules:
+  subject_verb_agreement:
+    - "Singular subjects take singular verbs"
+    - "Plural subjects take plural verbs"
+    - "Collective nouns follow specific rules"
+  
+  pronoun_antecedent:
+    - "Pronouns must agree with antecedents in number and gender"
+    - "Avoid ambiguous pronoun references"
+  
+  modifier_placement:
+    - "Place modifiers close to the words they modify"
+    - "Avoid dangling and misplaced modifiers"
+  
+  parallel_structure:
+    - "Use consistent grammatical form in lists and comparisons"
+    - "Maintain parallelism in compound structures"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.001
+  batch_size: 32
+  update_frequency: "daily"
+  curriculum_focus:
+    - "grammar_corrections"
+    - "tone_adaptation"
+    - "style_guides"
+  reinforcement_sources:
+    - "user_feedback"
+    - "admin_curated_examples"
+
+  data_sources:
+    - "Dictionaries: Merriam-Webster, Oxford"
+    - "Grammar guides and textbooks"
+    - "Literature corpus"
+    - "Technical and academic writing"
+    - "News articles and journalism"
+  
+  focus_areas:
+    - "Grammar rule patterns"
+    - "Vocabulary usage contexts"
+    - "Writing style variations"
+    - "Common error patterns"
+  
+  evaluation_metrics:
+    - "Grammar accuracy"
+    - "Vocabulary appropriateness"
+    - "Clarity and coherence"
+    - "Style consistency"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Tokenize text properly"
+    - "Identify sentence boundaries"
+    - "Parse grammatical structures"
+  
+  processing:
+    - "Apply grammar rules"
+    - "Check vocabulary usage"
+    - "Analyze context"
+  
+  postprocessing:
+    - "Format text appropriately"
+    - "Apply punctuation rules"
+    - "Ensure consistent style"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Subject-verb disagreement"
+      action: "Correct verb form to match subject number"
+    
+    - error: "Spelling mistakes"
+      action: "Use dictionary lookup to verify correct spelling"
+    
+    - error: "Punctuation errors"
+      action: "Apply standard punctuation rules"
+    
+    - error: "Unclear antecedents"
+      action: "Clarify pronoun references or use specific nouns"
+  
+  recovery_strategies:
+    - "Consult dictionary via URL lookup for word meanings"
+    - "Check grammar references for rule clarification"
+    - "Use thesaurus for vocabulary alternatives"
+    - "Review style guides for formatting"
+
+# URL Lookup Configuration
+url_lookup_config:
+  primary_sources:
+    - name: "Merriam-Webster Dictionary"
+      url: "https://www.merriam-webster.com"
+      use_for: ["definitions", "usage", "pronunciation"]
+    
+    - name: "Thesaurus.com"
+      url: "https://www.thesaurus.com"
+      use_for: ["synonyms", "antonyms", "related words"]
+    
+    - name: "Purdue OWL"
+      url: "https://owl.purdue.edu"
+      use_for: ["grammar rules", "writing guides", "citation styles"]
+  
+  reference_triggers:
+    - "When uncertain about word meaning"
+    - "For spelling verification"
+    - "To find appropriate synonyms"
+    - "For grammar rule clarification"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "principles"
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/english"
+    url_source_field: "tools.url_lookup.sources"
+    primary_lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seed_directory: "seeds.location"
+    weight_directory: "weights.location"
+  
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"
+      - "tools.url_lookup.sources"

@@ -1,0 +1,21 @@
+{
+  "artifacts": [
+    {
+      "id": "2c6089d6-a8f9-477f-8531-d891e8992bd7",
+      "type": "pretrained",
+      "file": "system_pretrained_weights.json",
+      "createdAt": "2025-12-07T12:09:06.325Z",
+      "source": "system-weights-config",
+      "notes": "Baseline pretrained weights (minimal functional)"
+    },
+    {
+      "id": "c3ecf31b-5663-4830-996a-f0ad2d1e8dd9",
+      "type": "trained",
+      "file": "system_trained_weights_v1_2025-11-05.json",
+      "createdAt": "2025-12-07T12:09:06.422Z",
+      "source": "system-weights-config",
+      "notes": "Production-ready trained weights v1"
+    }
+  ],
+  "activeArtifactId": "2c6089d6-a8f9-477f-8531-d891e8992bd7"
+}

@@ -56,7 +56,7 @@ export interface AIResponse {
   }>;
   domains: string[];
   confidence: number;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export class AIAssistant {
@@ -79,11 +79,13 @@ export class AIAssistant {
       }
 
       const data = await response.json();
-      if (!data.sessionId || typeof data.sessionId !== 'string') {
-        throw new Error('AI session ID missing in response');
+      const sessionId = typeof data.sessionId === 'string' ? data.sessionId : '';
+      if (!sessionId) {
+        throw new Error('Invalid session response from AI assistant');
       }
-      this.sessionId = data.sessionId;
-      return data.sessionId;
+
+      this.sessionId = sessionId;
+      return sessionId;
     } catch (error) {
       console.error('AI initialization error:', error);
       throw error;
@@ -97,6 +99,7 @@ export class AIAssistant {
     if (!this.sessionId) {
       await this.initialize();
     }
+    const sessionId = this.sessionId ?? (await this.initialize());
 
     try {
       // Enhance prompt with IDE context
@@ -108,7 +111,7 @@ export class AIAssistant {
         body: JSON.stringify({
           action: 'chat',
           message: enhancedPrompt,
-          sessionId: this.sessionId,
+          sessionId,
         }),
       });
 
@@ -227,27 +230,42 @@ export class AIAssistant {
     }> = [];
 
     // Look for explicit action commands
-    const actionPatterns = [
-      /create file `([^`]+)`/gi,
-      /update file `([^`]+)`/gi,
-      /delete file `([^`]+)`/gi,
-      /open file `([^`]+)`/gi,
+    const actionPatterns: Array<{
+      regex: RegExp;
+      type: 'create' | 'update' | 'delete' | 'open';
+    }> = [
+      { regex: /create file `([^`]+)`/gi, type: 'create' },
+      { regex: /update file `([^`]+)`/gi, type: 'update' },
+      { regex: /delete file `([^`]+)`/gi, type: 'delete' },
+      { regex: /open file `([^`]+)`/gi, type: 'open' },
     ];
 
     const codeBlocks = this.extractCodeBlocks(text);
 
+    actionPatterns.forEach(({ regex, type }) => {
+      regex.lastIndex = 0;
+      let match: RegExpExecArray | null;
+      while ((match = regex.exec(text)) !== null) {
+        actions.push({ type, file: match[1] });
+      }
+    });
+
     // If code blocks have filenames, suggest creating/updating them
     codeBlocks.forEach((block) => {
-      if (block.filename) {
-        const existsInProject = context.projectFiles.some((f) =>
-          f.endsWith(block.filename!)
-        );
-        actions.push({
-          type: existsInProject ? 'update' : 'create',
-          file: block.filename,
-          content: block.code,
-        });
+      const filename = block.filename;
+      if (!filename) {
+        return;
       }
+
+      const existsInProject = context.projectFiles.some((f) =>
+        f.endsWith(filename)
+      );
+
+      actions.push({
+        type: existsInProject ? 'update' : 'create',
+        file: filename,
+        content: block.code,
+      });
     });
 
     return actions;

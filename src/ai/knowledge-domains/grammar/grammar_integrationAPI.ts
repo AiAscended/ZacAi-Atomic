@@ -6,19 +6,31 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import path from 'path'
+import path from "path"
 
+import { domainRegistry } from "../domainRegistry"
 import { GRAMMAR_DOMAIN } from "./grammar_constants"
 import { loadGrammarSeedVocabulary } from "./grammar_vocabularyManager"
-import { grammarRunInference } from "./grammar_inferenceController"
-import { grammarRunTrainingEpoch } from "./grammar_trainingController"
 
-const DOMAIN_NAME = 'grammar';
-const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
+const DOMAIN_NAME = "grammar"
+const DOMAIN_ROOT = path.join(process.cwd(), "src", "ai", "knowledge-domains", DOMAIN_NAME)
+
+const resolveDomainPath = (suffix: string) => path.join(DOMAIN_ROOT, `${DOMAIN_NAME}_${suffix}`)
 
 export const grammarInit = async () => {
   await loadGrammarSeedVocabulary()
 
+  domainRegistry.registerDomain({
+    name: GRAMMAR_DOMAIN,
+    displayName: "Grammar",
+    description: "Grammar rules, syntax analysis, and language structure",
+    atomicLevel: "molecule",
+    modules: [],
+    seedDataPath: resolveDomainPath("seeds"),
+    learnedDataPath: resolveDomainPath("learned"),
+    weightsPath: resolveDomainPath("weights"),
+    enabled: true,
+  })
 }
 
 void grammarInit()

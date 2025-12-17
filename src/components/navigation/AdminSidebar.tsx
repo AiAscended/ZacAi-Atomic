@@ -1,13 +1,12 @@
 /**
  * File: components/navigation/AdminSidebar.tsx
  * Purpose: Sliding admin sidebar with icon-first expandable menu
- * Updated: Added auto-close on navigation, improved animations
+ * UX: X button inside menu, stays open for quick navigation, pushes content
  */
 
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import {
@@ -24,9 +23,10 @@ import {
   Plug,
   MessageSquare,
   X,
-  FlaskConical,
+  Terminal,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 interface MenuItem {
   id: string
@@ -53,39 +53,52 @@ const menuItems: MenuItem[] = [
     id: "knowledge-domains",
     label: "Knowledge Domains",
     icon: Database,
+    path: "/admin/domains",
     children: [
-      { id: "algorithms", label: "Algorithms", icon: Database, path: "/admin/domains/algorithms" },
-      { id: "code-review", label: "Code Review", icon: Database, path: "/admin/domains/code-review" },
-      { id: "data-integrity", label: "Data Integrity", icon: Database, path: "/admin/domains/data-integrity" },
-      { id: "data-structures", label: "Data Structures", icon: Database, path: "/admin/domains/data-structures" },
-      { id: "documentation", label: "Documentation", icon: Database, path: "/admin/domains/documentation" },
       { id: "english", label: "English", icon: Database, path: "/admin/domains/english" },
-      { id: "environment", label: "Environment", icon: Database, path: "/admin/domains/environment" },
-      { id: "error-detection", label: "Error Detection", icon: Database, path: "/admin/domains/error-detection" },
-      { id: "general-knowledge", label: "General Knowledge", icon: Database, path: "/admin/domains/general-knowledge" },
       { id: "grammar", label: "Grammar", icon: Database, path: "/admin/domains/grammar" },
-      { id: "internet-search", label: "Internet Search", icon: Database, path: "/admin/domains/internet-search" },
-      { id: "mathematics", label: "Mathematics", icon: Database, path: "/admin/domains/mathematics" },
-      { id: "nextjs", label: "Next.js", icon: Database, path: "/admin/domains/nextjs" },
-      { id: "observability", label: "Observability", icon: Database, path: "/admin/domains/observability" },
+      { id: "general_knowledge", label: "General Knowledge", icon: Database, path: "/admin/domains/general_knowledge" },
       { id: "programming", label: "Programming", icon: Database, path: "/admin/domains/programming" },
+      { id: "typescript", label: "TypeScript", icon: Database, path: "/admin/domains/typescript" },
       { id: "react", label: "React", icon: Database, path: "/admin/domains/react" },
-      { id: "repair", label: "Repair", icon: Database, path: "/admin/domains/repair" },
+      { id: "nextjs", label: "Next.js", icon: Database, path: "/admin/domains/nextjs" },
+      { id: "version_control", label: "Version Control", icon: Database, path: "/admin/domains/version_control" },
+      { id: "code_review", label: "Code Review", icon: Database, path: "/admin/domains/code_review" },
+      { id: "error_detection", label: "Error Detection", icon: Database, path: "/admin/domains/error_detection" },
+      { id: "testing", label: "Testing", icon: Database, path: "/admin/domains/testing" },
+      { id: "documentation", label: "Documentation", icon: Database, path: "/admin/domains/documentation" },
+      { id: "mathematics", label: "Mathematics", icon: Database, path: "/admin/domains/mathematics" },
       { id: "science", label: "Science", icon: Database, path: "/admin/domains/science" },
+      { id: "algorithms", label: "Algorithms", icon: Database, path: "/admin/domains/algorithms" },
+      { id: "data_structures", label: "Data Structures", icon: Database, path: "/admin/domains/data_structures" },
       { id: "security", label: "Security", icon: Database, path: "/admin/domains/security" },
       { id: "system", label: "System", icon: Database, path: "/admin/domains/system" },
-      { id: "testing", label: "Testing", icon: Database, path: "/admin/domains/testing" },
-      { id: "typescript", label: "TypeScript", icon: Database, path: "/admin/domains/typescript" },
-      { id: "version-control", label: "Version Control", icon: Database, path: "/admin/domains/version-control" },
+      { id: "environment", label: "Environment", icon: Database, path: "/admin/domains/environment" },
+      { id: "repair", label: "Repair", icon: Database, path: "/admin/domains/repair" },
+      { id: "data_integrity", label: "Data Integrity", icon: Database, path: "/admin/domains/data_integrity" },
+      { id: "observability", label: "Observability", icon: Database, path: "/admin/domains/observability" },
+      { id: "internet_search", label: "Internet Search", icon: Database, path: "/admin/domains/internet_search" },
     ],
   },
   {
     id: "ai-models",
     label: "AI Models",
     icon: Brain,
+    path: "/admin/models",
     children: [
-      { id: "models-overview", label: "Models Overview", icon: Brain, path: "/admin/models" },
-      { id: "model-layers", label: "Model Layers", icon: Layers, path: "/admin/model-layers" },
+      { id: "unified-transformer-llm", label: "Unified Transformer LLM", icon: Brain, path: "/admin/models/unified-transformer-llm" },
+      { id: "code-transformer", label: "Code Transformer", icon: Brain, path: "/admin/models/code-transformer" },
+      { id: "convolutional-neural-network", label: "Convolutional Neural Network", icon: Brain, path: "/admin/models/convolutional-neural-network" },
+      { id: "vision-transformer", label: "Vision Transformer", icon: Brain, path: "/admin/models/vision-transformer" },
+      { id: "diffusion-model", label: "Diffusion Model", icon: Brain, path: "/admin/models/diffusion-model" },
+      { id: "generative-adversarial-network", label: "Generative Adversarial Network", icon: Brain, path: "/admin/models/generative-adversarial-network" },
+      { id: "recurrent-neural-network", label: "Recurrent Neural Network", icon: Brain, path: "/admin/models/recurrent-neural-network" },
+      { id: "graph-neural-network", label: "Graph Neural Network", icon: Brain, path: "/admin/models/graph-neural-network" },
+      { id: "neuro-symbolic-reasoning", label: "Neuro-Symbolic Reasoning", icon: Brain, path: "/admin/models/neuro-symbolic-reasoning" },
+      { id: "multi-modal-fusion", label: "Multi-Modal Fusion", icon: Brain, path: "/admin/models/multi-modal-fusion" },
+      { id: "speech-to-text", label: "Speech-to-Text", icon: Brain, path: "/admin/models/speech-to-text" },
+      { id: "text-to-speech", label: "Text-to-Speech", icon: Brain, path: "/admin/models/text-to-speech" },
+      { id: "wavenet-audio-model", label: "WaveNet Audio Model", icon: Brain, path: "/admin/models/wavenet-audio-model" },
     ],
   },
   {
@@ -99,6 +112,12 @@ const menuItems: MenuItem[] = [
     label: "Tools Management",
     icon: Wrench,
     path: "/admin/tools",
+  },
+  {
+    id: "dev-console",
+    label: "Dev Console",
+    icon: Terminal,
+    path: "/admin/dev-console",
   },
   {
     id: "integrations",
@@ -119,12 +138,6 @@ const menuItems: MenuItem[] = [
     path: "/admin/system",
   },
   {
-    id: "tests",
-    label: "System Tests",
-    icon: FlaskConical,
-    path: "/admin/tests",
-  },
-  {
     id: "errors",
     label: "Error Detection",
     icon: AlertTriangle,
@@ -136,11 +149,10 @@ interface AdminSidebarProps {
   isOpen: boolean
   isExpanded: boolean
   onExpandToggle: () => void
-  onNavigate?: () => void
   onClose: () => void
 }
 
-export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate, onClose }: AdminSidebarProps) {
+export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onClose }: AdminSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
   const pathname = usePathname()
   const router = useRouter()
@@ -157,13 +169,21 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate, o
 
   const handleItemClick = (item: MenuItem) => {
     if (item.children) {
-      toggleExpanded(item.id)
+      // If item has both path and children, navigate to path on first click, toggle on second click
+      if (item.path && !expandedItems.has(item.id)) {
+        router.push(item.path)
+        // Also expand to show children
+        toggleExpanded(item.id)
+      } else {
+        toggleExpanded(item.id)
+      }
+      // Expand menu if collapsed when clicking parent items
       if (!isExpanded) {
         onExpandToggle()
       }
     } else if (item.path) {
       router.push(item.path)
-      // Don't auto-close menu - let users navigate freely
+      // Don't auto-close - let users navigate quickly between pages
     }
   }
 
@@ -183,6 +203,7 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate, o
             isActive && "bg-accent text-accent-foreground font-medium",
             depth > 0 && "pl-8",
           )}
+          title={!isExpanded ? item.label : undefined}
         >
           <Icon className="h-5 w-5 flex-shrink-0" />
           {isExpanded && (
@@ -212,29 +233,39 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate, o
         isOpen ? (isExpanded ? "w-64" : "w-16") : "w-0 -translate-x-full",
       )}
     >
-      <div className="flex flex-col h-full pb-4">
+      <div className="flex flex-col h-full">
         {/* Header with close button */}
-        <div className="flex items-center justify-between px-3 py-4 border-b">
-          {isExpanded && <span className="font-semibold text-lg">Menu</span>}
-          <button
+        <div className="h-14 border-b flex items-center justify-end px-3">
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-accent transition-colors ml-auto"
+            className="h-8 w-8"
             aria-label="Close menu"
           >
-            <X className="h-5 w-5" />
-          </button>
+            <X className="h-4 w-4" />
+          </Button>
         </div>
-        
-        <nav className="flex-1 overflow-y-auto px-2 space-y-1 pt-2">{menuItems.map((item) => renderMenuItem(item))}</nav>
-        
-        {isOpen && !isExpanded && (
-          <button
-            onClick={onExpandToggle}
-            className="mx-2 p-2 rounded-lg hover:bg-accent transition-colors"
-            aria-label="Expand menu"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
+
+        {/* Menu items */}
+        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
+          {menuItems.map((item) => renderMenuItem(item))}
+        </nav>
+
+        {/* Expand/collapse toggle at bottom */}
+        {isOpen && (
+          <div className="border-t p-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onExpandToggle}
+              className="w-full justify-start"
+              aria-label={isExpanded ? "Collapse menu" : "Expand menu"}
+            >
+              <ChevronRight className={cn("h-4 w-4 transition-transform", isExpanded && "rotate-180")} />
+              {isExpanded && <span className="ml-2 text-xs">Collapse</span>}
+            </Button>
+          </div>
         )}
       </div>
     </aside>

@@ -13,10 +13,12 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "dev": "next dev",
+    "dev": "tsx server.ts",
+    "dev:next": "next dev",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,html}\"",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "start": "next start",
+    "start": "tsx server.ts",
+    "start:next": "next start",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
@@ -27,8 +29,10 @@
     "scan:unified": "node scripts/scan-ai-modules.js"
   },
   "dependencies": {
-    "@monaco-editor/react": "^4.7.0",
+    "@monaco-editor/react": "^4.8.0-rc.2",
+    "@octokit/auth-app": "^8.1.2",
     "@octokit/request": "^9.1.3",
+    "@octokit/rest": "^22.0.1",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-aspect-ratio": "^1.1.1",
@@ -57,12 +61,17 @@
     "@radix-ui/react-toggle-group": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.6",
     "@vercel/analytics": "^1.4.1",
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/addon-web-links": "^0.11.0",
+    "@xterm/xterm": "^5.5.0",
+    "c": "^1.1.1",
     "ci": "^2.3.0",
     "cinp": "^1.1.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
     "embla-carousel-react": "^8.5.2",
+    "idb": "^8.0.3",
     "input-otp": "^1.4.1",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.454.0",
@@ -70,6 +79,7 @@
     "next": "^15.1.3",
     "next-themes": "^0.4.4",
     "node-cron": "^4.2.1",
+    "node-pty": "^1.0.0",
     "prismjs": "^1.30.0",
     "react": "^19.0.0",
     "react-day-picker": "^9.4.4",
@@ -86,7 +96,7 @@
     "xterm-addon-web-links": "^0.9.0",
     "yaml": "^2.8.1",
     "zod": "^4.1.12",
-    "zustand": "^5.0.2"
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
@@ -98,18 +108,24 @@
     "@types/prismjs": "^1.26.5",
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.2",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",
     "@vitejs/plugin-react": "^5.1.0",
-    "@vitest/ui": "^2.1.8",
+    "@vitest/ui": "^4.0.7",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.1.3",
+    "fake-indexeddb": "^6.2.5",
     "jsdom": "^25.0.1",
     "postcss": "^8.5.1",
     "prettier": "^3.4.2",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.20.6",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^4.0.7"
+  },
+  "overrides": {
+    "dompurify": "^3.2.4"
   }
 }

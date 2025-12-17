@@ -5,7 +5,47 @@
  */
 
 import { learningMemory, LearnedItem } from './LearningMemorySystem';
-import { lookupSeed, searchSeeds } from '../seeds/seedLookup';
+import { lookupSeed } from '../seeds/seedLookup';
+
+type SeedLookupResult = ReturnType<typeof lookupSeed>;
+
+type LookupSource = 'seed' | 'learned' | 'url-lookup';
+
+interface UrlLookupPayload {
+  definition: string;
+  source: string;
+  examples?: string[];
+  related?: string[];
+  type?: 'concept' | 'fact' | 'procedure';
+}
+
+interface UrlLookupResult {
+  found: boolean;
+  data: UrlLookupPayload | null;
+}
+
+type ExistingLookupResult = {
+  found: true;
+  fromExisting: true;
+  data: SeedLookupResult | LearnedItem;
+  source: Exclude<LookupSource, 'url-lookup'>;
+};
+
+type NewLookupResult = {
+  found: true;
+  fromExisting: false;
+  data: LearnedItem;
+  source: 'url-lookup';
+};
+
+type MissingLookupResult = {
+  found: false;
+  fromExisting: false;
+  data: null;
+  source: 'url-lookup';
+};
+
+type LookupAndLearnResult = ExistingLookupResult | NewLookupResult | MissingLookupResult;
 
 // ============================================================================
 // URL Lookup Integration
@@ -19,12 +59,7 @@ export async function lookupAndLearn(
   domain: string,
   term: string,
   context: string
-): Promise<{
-  found: boolean;
-  fromExisting: boolean;
-  data: LearnedItem | any;
-  source: 'seed' | 'learned' | 'url-lookup';
-}> {
+): Promise<LookupAndLearnResult> {
   // 1. Check if already in seed vocabulary
   const seedData = lookupSeed(term, domain);
   if (seedData) {
@@ -49,8 +84,8 @@ export async function lookupAndLearn(
 
   // 3. Perform URL lookup (simulated - you'd integrate with actual URL lookup)
   const urlLookupResult = await performURLLookup(domain, term);
-  
-  if (urlLookupResult.found) {
+
+  if (urlLookupResult.found && urlLookupResult.data) {
     // Learn the new term
     const learned = learningMemory.learnItem(
       sessionId,
@@ -91,7 +126,7 @@ export async function lookupAndLearn(
 async function performURLLookup(
   domain: string,
   term: string
-): Promise<{ found: boolean; data?: any }> {
+): Promise<UrlLookupResult> {
   // This would integrate with your actual URL lookup tools
   // For now, return a simulated response
   
@@ -110,7 +145,7 @@ async function performURLLookup(
 /**
  * Determine category based on term and data
  */
-function determineCategory(term: string, data: any): LearnedItem['category'] {
+function determineCategory(term: string, data: UrlLookupPayload | null): LearnedItem['category'] {
   if (term.match(/[+\-*/=]/)) return 'equation';
   if (data?.type === 'concept') return 'concept';
   if (data?.type === 'fact') return 'fact';

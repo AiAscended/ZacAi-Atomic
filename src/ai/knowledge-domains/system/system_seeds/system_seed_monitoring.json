@@ -5,7 +5,20 @@
       "check_type": "ping",
       "interval_seconds": 60,
       "alert_on_fail": true
+    },
+    {
+      "component_id": "comp-002",
+      "check_type": "query-latency",
+      "interval_seconds": 120,
+      "slo_ms": 150,
+      "alert_on_fail": true
+    },
+    {
+      "component_id": "comp-003",
+      "check_type": "gpu-utilization",
+      "interval_seconds": 30,
+      "threshold_percent": 85,
+      "alert_on_fail": false
     }
-    // Add more health checks as needed
   ]
 }

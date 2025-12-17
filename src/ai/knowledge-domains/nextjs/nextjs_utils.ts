@@ -8,12 +8,18 @@
 
 import { NEXTJS_CONCEPTS, NEXTJS_FEATURES } from "./nextjs_constants"
 
-export function isNextjsConcept(term: string): boolean {
-  return NEXTJS_CONCEPTS.includes(term as any)
+type NextjsConcept = (typeof NEXTJS_CONCEPTS)[number]
+type NextjsFeature = (typeof NEXTJS_FEATURES)[number]
+
+const CONCEPT_SET = new Set<string>(NEXTJS_CONCEPTS)
+const FEATURE_SET = new Set<string>(NEXTJS_FEATURES)
+
+export function isNextjsConcept(term: string): term is NextjsConcept {
+  return CONCEPT_SET.has(term)
 }
 
-export function isNextjsFeature(term: string): boolean {
-  return NEXTJS_FEATURES.includes(term as any)
+export function isNextjsFeature(term: string): term is NextjsFeature {
+  return FEATURE_SET.has(term)
 }
 
 export function extractNextjsTerms(text: string): string[] {

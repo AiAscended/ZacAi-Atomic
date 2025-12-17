@@ -7,6 +7,35 @@ domain:
   version: "1.0.0"
   description: "Expert mathematics domain with computational and theoretical knowledge"
 
+role:
+  primary: "Specialized knowledge inference for Mathematics"
+  scope: "Symbolic computation, proofs, numerical analysis"
+  tooling_expectations: "Always pair with scientific calculator and symbolic solver modules"
+
+capabilities:
+  - "Interpret LaTeX and ASCII math notation"
+  - "Leverage scientific calculator for numeric accuracy"
+  - "Invoke symbolic solver for proofs and simplifications"
+  - "Reference domain seeds for theorem metadata"
+  - "Sync URL lookup sources with admin edits"
+
+seeds:
+  location: "./mathematics_seeds/"
+  auto_load: true
+  format: "json"
+  hydration: "on-start"
+
+weights:
+  location: "./mathematics_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./mathematics_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
 # Core Principles
 principles:
   - name: "Order of Operations"
@@ -61,9 +90,15 @@ tools:
   url_lookup:
     enabled: true
     sources:
-      - "Wolfram MathWorld"
-      - "Math Stack Exchange"
-      - "OEIS"
+      - name: "Wolfram MathWorld"
+        url: "https://mathworld.wolfram.com"
+        use_for: ["definitions", "theorems", "visualizations"]
+      - name: "Math Stack Exchange"
+        url: "https://math.stackexchange.com"
+        use_for: ["worked examples", "proof discussions"]
+      - name: "OEIS"
+        url: "https://oeis.org"
+        use_for: ["integer sequences", "pattern lookup"]
     usage_guidelines:
       - "Use for theorem verification"
       - "Look up formula definitions"
@@ -94,8 +129,34 @@ tools:
       - "Show step-by-step solutions"
       - "Explain algebraic manipulations"
 
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Wolfram MathWorld"
+      url: "https://mathworld.wolfram.com"
+      use_for: ["theorems", "definitions"]
+    - name: "Math Stack Exchange"
+      url: "https://math.stackexchange.com"
+      use_for: ["proof techniques", "problem solving"]
+    - name: "OEIS"
+      url: "https://oeis.org"
+      use_for: ["sequence recognition"]
+  reference_triggers:
+    - "Unfamiliar theorem or identity referenced"
+    - "Need authoritative proof citation"
+    - "Sequence recognition required"
+    - "Precision check against trusted source"
+
 # Inference Guidelines
 inference:
+  parameters:
+    confidence_threshold: 0.8
+    max_tokens: 800
+    temperature: 0.4
+    top_p: 0.85
+    symbolic_solver_required: true
+
   input_processing:
     - "Parse mathematical notation correctly"
     - "Identify equation types and problem categories"
@@ -122,6 +183,15 @@ inference:
 
 # Training Guidelines
 training:
+  enabled: true
+  learning_rate: 0.0007
+  batch_size: 48
+  update_frequency: "daily"
+  optimizer: "adamw"
+  tool_alignment:
+    - "scientific_calculator"
+    - "symbolic_solver"
+
   data_sources:
     - "Mathematical textbooks"
     - "Academic papers"
@@ -203,19 +273,35 @@ integration:
     priority: "High for explicit math queries, medium for implicit"
 
 # Admin Configuration
-admin:
+admin_config:
   editable_fields:
-    - "sources in url_lookup"
-    - "tool enablement flags"
-    - "precision settings"
-    - "notation preferences"
-  
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+    - "tools.scientific_calculator.enabled"
+    - "tools.symbolic_solver.enabled"
+  field_bindings:
+    admin_page: "/admin/domains/mathematics"
+    url_sources: "tools.url_lookup.sources"
+    primary_lookup_sources: "url_lookup_config.primary_sources"
+    calculator_toggle: "tools.scientific_calculator.enabled"
+    symbolic_solver_toggle: "tools.symbolic_solver.enabled"
+    inference_knobs: "inference.parameters"
+    seed_directory: "seeds.location"
+    weight_directory: "weights.location"
   upload_capabilities:
     - "Custom formula libraries (JSON)"
     - "Additional instruction files (YAML)"
     - "Domain-specific tokenizer configs (XML)"
-  
-  settings_location: "/admin/domains/mathematics"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"
+      - "tools.url_lookup.sources"
 
 # Tokenizer Configuration
 tokenizer:

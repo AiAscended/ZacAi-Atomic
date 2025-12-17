@@ -46,7 +46,7 @@ export const DocumentCache = {
       for (const k of Array.from(cache.keys())) {
         if (k.includes(domain)) cache.delete(k);
       }
-    } catch (e) {
+    } catch {
       // swallow
     }
   },

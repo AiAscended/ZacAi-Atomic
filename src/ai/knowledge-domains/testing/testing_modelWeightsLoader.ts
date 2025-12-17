@@ -1,18 +1,25 @@
-/**
- * File: src/ai/data/testing/testing_modelWeightsLoader.ts
- * Purpose: Load training weights for testing domain
- * Depends on: ../storageAdapter.ts
- * Depended on by: testing_trainingController.ts
- * Creator: Vercel v0 Coding Assistant
- */
-
 import { storageAdapter } from "../storageAdapter"
+import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-export const testingLoadWeights = async (path = "/src/ai/knowledge-domains/testing/testing_weights/testing_trainingWeights.bin") => {
+const testingWeightsManager = createDomainWeightsManager({
+  domainName: "testing",
+})
+
+export const testingLoadWeights = async (): Promise<ArrayBuffer | null> => {
   try {
-    const raw = await storageAdapter.readFile(path)
-    return raw
-  } catch (e) {
+    const filename = await testingWeightsManager.resolveActiveWeightFile()
+    const fullPath = `${testingWeightsManager.storageBasePath}/${filename}`
+    return await storageAdapter.readBinaryFile(fullPath)
+  } catch (error) {
+    console.error("[Testing] Unable to load training weights:", error)
     return null
   }
+}
+
+export const primeTestingWeights = async (): Promise<string | null> => {
+  return testingWeightsManager.prime()
+}
+
+export const getTestingActiveWeightArtifact = () => {
+  return testingWeightsManager.getActiveWeightArtifact()
 }

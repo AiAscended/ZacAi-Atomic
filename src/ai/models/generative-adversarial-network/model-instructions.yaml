@@ -1,0 +1,225 @@
+# Generative Adversarial Network Model Instructions
+# Purpose: Synthesize or discriminate high-resolution imagery for creative ideation and anomaly detection
+
+model:
+  id: "generative_adversarial_network"
+  name: "Generative Adversarial Network"
+  version: "1.2.0"
+  description: "StyleGAN-inspired architecture with configurable generator/discriminator stacks"
+  modality: "vision"
+  architecture:
+    generator: "StyleGAN2"
+    discriminator: "PatchGAN"
+    latent_dim: 512
+    resolution: "1024x1024"
+    ema_decay: 0.995
+  deployment:
+    runtime: "CUDA"
+    container_image: "registry.internal.models/gan:1.2.0"
+    supports_batching: true
+
+role:
+  primary: "Generative + discriminative vision tasks"
+  scope: "Produce concept art, data augmentations, or detect manipulations via discriminator"
+  orchestration_behavior: "Activated when prompts include #render/#synthetic/#augment or when anomaly scans target images"
+
+capabilities:
+  - "Sample latent space with seed control"
+  - "Style-mix against reference exemplars"
+  - "Run discriminator-only mode for authenticity scoring"
+  - "Blend negative prompts to avoid artifacts"
+  - "Record provenance metadata for admin audits"
+
+principles:
+  - name: "Safety First"
+    rule: "Reject disallowed categories and watermark approved outputs"
+    priority: P1
+  - name: "Deterministic Seeds"
+    rule: "Honor provided seeds, logging generator settings"
+    priority: P2
+  - name: "Dual Validation"
+    rule: "When generating, also score with discriminator for coherence"
+    priority: P2
+
+seeds:
+  location: "./generative-adversarial-network_seeds/"
+  auto_load: true
+  format: "json"
+  latent_presets: "latents.npy"
+  cache: "warm"
+
+weights:
+  location: "./generative-adversarial-network_weights/"
+  auto_load: true
+  format: "safetensors"
+  current: "./generative-adversarial-network_weights/gan_current_weights.safetensors"
+  pretrained: "./generative-adversarial-network_pretrained_weights/gan_pretrained_embeddings.bin"
+  fallback: "./generative-adversarial-network_pretrained_weights/gan_pretrained_embeddings.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  prompt_curator:
+    enabled: true
+    description: "Normalizes text prompts and extracts style tokens"
+    capabilities:
+      - "Positive/negative prompt separation"
+      - "Safety lexicon enforcement"
+  discriminator_monitor:
+    enabled: true
+    description: "Monitors discriminator loss and authenticity scores"
+    capabilities:
+      - "Surface instability warnings"
+      - "Highlight likely artifacts"
+  watermark_service:
+    enabled: true
+    description: "Embeds invisible watermarks in exported images"
+    capabilities:
+      - "Toggle per admin policy"
+      - "Record watermark keys"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "StyleGAN2"
+        url: "https://arxiv.org/abs/1912.04958"
+        use_for: ["architecture"]
+      - name: "GAN Safety Guidelines"
+        url: "https://openai.com/safety"
+        use_for: ["policy"]
+      - name: "PatchGAN"
+        url: "https://arxiv.org/abs/1611.07004"
+        use_for: ["discriminator"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "StyleGAN2"
+      url: "https://arxiv.org/abs/1912.04958"
+      use_for: ["generator tuning"]
+    - name: "PatchGAN"
+      url: "https://arxiv.org/abs/1611.07004"
+      use_for: ["discriminator"]
+    - name: "GAN Safety Guidelines"
+      url: "https://openai.com/safety"
+      use_for: ["policy"]
+  reference_triggers:
+    - "Architecture debates"
+    - "Policy clarifications"
+    - "Watermarking requirements"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.8
+    max_tokens: 256
+    steps: 28
+    truncation_psi: 0.7
+    temperature: 0.4
+  input_processing:
+    - "Sanitize prompt"
+    - "Map style tags to latent presets"
+    - "Apply negative prompts"
+  reasoning_steps:
+    - "Sample latent"
+    - "Run generator"
+    - "Evaluate discriminator"
+    - "Blend/denoise if requested"
+  output_formatting:
+    - "Return base64 PNG + metadata (seed, truncation, watermark id)"
+    - "Attach discriminator score"
+  validation:
+    - "Ensure prompt passes safety filters"
+    - "Bound resolution to admin limits"
+
+# Training Guidelines
+training:
+  enabled: true
+  optimizer: "adam"
+  learning_rate: 0.0001
+  batch_size: 32
+  update_frequency: "weekly"
+  epochs: 6
+  data_sources:
+    - "gan_training/datasets.parquet"
+    - "gan_data/negative_prompts.json"
+    - "Safety review corpus"
+  focus_areas:
+    - "Mode collapse prevention"
+    - "Artifact reduction"
+    - "Safety classifier alignment"
+  evaluation_metrics:
+    - "FID"
+    - "Precision/Recall"
+    - "Policy violation rate"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Curate prompts"
+    - "Load latent presets"
+  processing:
+    - "Iterate generator/discriminator"
+  postprocessing:
+    - "Watermark"
+    - "Upload audit logs"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Prompt rejected"
+      action: "Return policy explanation"
+    - error: "Divergence detected"
+      action: "Lower learning rate / steps, notify admin"
+    - error: "GPU exhaustion"
+      action: "Queue job or reduce resolution"
+  recovery_strategies:
+    - "Escalate to security for repeated policy hits"
+    - "Escalate to observability for resource saturation"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "model.version"
+    - "capabilities"
+    - "tools.prompt_curator.enabled"
+    - "tools.discriminator_monitor.enabled"
+    - "tools.watermark_service.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/models/generative-adversarial-network"
+    curator_toggle: "tools.prompt_curator.enabled"
+    monitor_toggle: "tools.discriminator_monitor.enabled"
+    watermark_toggle: "tools.watermark_service.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"
+
+# Quality & Metadata
+quality:
+  metrics:
+    - name: "FID"
+      target: "<10"
+    - name: "Discriminator Precision"
+      target: ">=0.9"
+    - name: "Policy Violations"
+      target: "0"
+metadata:
+  owners:
+    - "vision-gen@aiasciended.dev"
+  audit_log_bucket: "gs://zacai-audits/models/gan"

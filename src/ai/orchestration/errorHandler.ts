@@ -217,7 +217,10 @@ export class ErrorHandler {
    * Recover from model errors (use fallback model)
    */
   private recoverFromModelError(error: StructuredError): boolean {
-    logger.info("Attempting model fallback", {})
+    logger.info("Attempting model fallback", {
+      errorType: error.type,
+      message: error.message,
+    })
     // Fallback logic will be handled by modelSelector
     return true
   }
@@ -226,7 +229,10 @@ export class ErrorHandler {
    * Recover from domain errors (use general domain)
    */
   private recoverFromDomainError(error: StructuredError): boolean {
-    logger.info("Falling back to general domain", {})
+    logger.info("Falling back to general domain", {
+      errorType: error.type,
+      message: error.message,
+    })
     return true
   }
 

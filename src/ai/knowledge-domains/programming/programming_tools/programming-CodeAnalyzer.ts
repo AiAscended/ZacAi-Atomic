@@ -14,7 +14,7 @@
  */
 export function analyzeCodeComplexity(
   code: string,
-  _language: string,
+  language: string,
 ): {
   linesOfCode: number
   cyclomaticComplexity: number
@@ -44,6 +44,10 @@ export function analyzeCodeComplexity(
   const commentPatterns = /(\/\/|\/\*|\*\/|#|<!--)/g
   const commentMatches = code.match(commentPatterns)
   const comments = commentMatches ? commentMatches.length : 0
+
+  if (language) {
+    console.log(`[Programming-CodeAnalyzer] Analyzing ${language} code sample`)
+  }
 
   return {
     linesOfCode,

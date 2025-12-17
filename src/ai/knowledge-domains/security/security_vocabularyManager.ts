@@ -9,11 +9,25 @@
 import { safeParseJSON } from "./security_utils"
 import { storageAdapter } from "../storageAdapter"
 
-export const loadSecuritySeedVocabulary = async (path = "/src/ai/knowledge-domains/security/security_seeds/security_seedVocabulary.json") => {
+type SecurityVocabularyFile = {
+  vulnerabilities?: string[]
+  vocabulary?: string[]
+}
+
+export const loadSecuritySeedVocabulary = async (
+  path = "/src/ai/knowledge-domains/security/security_seeds/security_seedVocabulary.json",
+) => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { vulnerabilities: [] }) as { vulnerabilities: string[] }
-  } catch (e) {
+    const parsed = safeParseJSON<SecurityVocabularyFile>(raw, { vulnerabilities: [] })
+    const normalized = Array.isArray(parsed.vulnerabilities)
+      ? parsed.vulnerabilities
+      : Array.isArray(parsed.vocabulary)
+        ? parsed.vocabulary
+        : []
+    return { vulnerabilities: normalized }
+  } catch (error) {
+    console.warn("[security] Failed to load seed vocabulary:", error)
     return { vulnerabilities: [] }
   }
 }

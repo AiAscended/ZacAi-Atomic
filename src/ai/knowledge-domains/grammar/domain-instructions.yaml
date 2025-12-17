@@ -1,0 +1,185 @@
+# Grammar Domain Instructions
+# Purpose: Ensure linguistic accuracy, clarity, and adherence to style guidelines across outputs
+
+domain:
+  id: grammar
+  name: Grammar
+  version: "1.2.0"
+  description: "Handles syntax correctness, tone adjustments, and multilingual proofreading"
+
+role:
+  primary: "Specialized knowledge inference for grammar"
+  scope: "Analyze text for grammatical correctness, suggest revisions, and enforce style"
+  orchestration_behavior: "Joins workflows when natural-language edits or QA are requested"
+
+capabilities:
+  - "Identify grammatical, punctuation, and agreement errors"
+  - "Rewrite sentences for clarity while preserving intent"
+  - "Adapt tone and register per admin-defined personas"
+  - "Provide explanations for each correction"
+  - "Collaborate with documentation and english domains"
+
+seeds:
+  location: "./grammar_seeds/"
+  auto_load: true
+  format: "json"
+  cache: "warm"
+
+weights:
+  location: "./grammar_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./grammar_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
+# Tool Configuration
+tools:
+  style_checker:
+    enabled: true
+    capabilities:
+      - "Validate against admin style guides"
+      - "Flag jargon or bias"
+  rewrite_planner:
+    enabled: true
+    capabilities:
+      - "Offer multiple rewrite options"
+      - "Tag changes by type"
+  localization_switchboard:
+    enabled: true
+    capabilities:
+      - "Adjust spelling variants (en-US vs en-GB, etc.)"
+      - "Surface locale-specific rules"
+  url_lookup:
+    enabled: true
+    sources:
+      - name: "Chicago Manual of Style"
+        url: "https://www.chicagomanualofstyle.org"
+        use_for: ["formal writing"]
+      - name: "APA Style"
+        url: "https://apastyle.apa.org"
+        use_for: ["academic"]
+      - name: "Merriam-Webster"
+        url: "https://www.merriam-webster.com"
+        use_for: ["definitions", "usage"]
+      - name: "PlainLanguage.gov"
+        url: "https://www.plainlanguage.gov"
+        use_for: ["clarity"]
+
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "Chicago Manual of Style"
+      url: "https://www.chicagomanualofstyle.org"
+      use_for: ["formal guidance"]
+    - name: "APA Style"
+      url: "https://apastyle.apa.org"
+      use_for: ["academic referencing"]
+    - name: "PlainLanguage.gov"
+      url: "https://www.plainlanguage.gov"
+      use_for: ["clarity standards"]
+  reference_triggers:
+    - "Style disputes"
+    - "Locale-specific rules"
+    - "Academic citations"
+
+# Inference Guidelines
+inference:
+  parameters:
+    confidence_threshold: 0.8
+    max_tokens: 600
+    temperature: 0.35
+    top_p: 0.85
+    require_change_log: true
+  input_processing:
+    - "Detect language/locale"
+    - "Identify desired tone or persona"
+    - "Check admin style overrides"
+  reasoning_steps:
+    - "Run style_checker"
+    - "Classify error types"
+    - "Generate rewrite options"
+  output_formatting:
+    - "Return edits in structured table (Original, Issue, Correction, Rationale)"
+    - "Highlight style notes"
+  validation:
+    - "Ensure rewrites keep semantic intent"
+    - "Verify localized rules applied"
+
+# Training Guidelines
+training:
+  enabled: true
+  learning_rate: 0.00045
+  batch_size: 40
+  update_frequency: "daily"
+  optimizer: "adamw"
+  data_sources:
+    - "Seeded grammars"
+    - "Support ticket communications"
+    - "Documentation change logs"
+  focus_areas:
+    - "Tone control"
+    - "Localization fidelity"
+    - "Explanatory feedback"
+  evaluation_metrics:
+    - "Correction accuracy"
+    - "User satisfaction"
+    - "Style compliance score"
+
+# Pipeline Instructions
+pipeline:
+  preprocessing:
+    - "Normalize whitespace and encode metadata"
+    - "Split sentences for analysis"
+  processing:
+    - "Apply rewrite_planner"
+    - "Run localization_switchboard if needed"
+  postprocessing:
+    - "Assemble change log"
+    - "Attach admin approval tags"
+
+# Error Handling
+error_handling:
+  common_errors:
+    - error: "Unsupported language"
+      action: "Escalate to english domain or request translation"
+    - error: "Conflicting style guides"
+      action: "Defer to admin-configured priority"
+    - error: "Ambiguous intent"
+      action: "Request clarification"
+  recovery_strategies:
+    - "Escalate to documentation domain for broader edits"
+    - "Route to system domain if orchestration dispute"
+
+# Admin Integration
+admin_config:
+  editable_fields:
+    - "domain.version"
+    - "capabilities"
+    - "tools.style_checker.enabled"
+    - "tools.rewrite_planner.enabled"
+    - "tools.localization_switchboard.enabled"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/grammar"
+    style_checker_toggle: "tools.style_checker.enabled"
+    rewrite_toggle: "tools.rewrite_planner.enabled"
+    localization_toggle: "tools.localization_switchboard.enabled"
+    lookup_sources: "url_lookup_config.primary_sources"
+    inference_knobs: "inference.parameters"
+    seeds_path: "seeds.location"
+    weights_path: "weights.location"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "tools.url_lookup.sources"
+      - "url_lookup_config"

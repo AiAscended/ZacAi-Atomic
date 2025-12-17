@@ -10,22 +10,28 @@ import pretrained from "./testing_weights/testing_pretrained_weights.json"
 import { TESTING_DOMAIN } from "./testing_constants"
 import { updateFile } from "../dataRegistry"
 
-const p = pretrained as Record<string, unknown>
-const EMBEDDING_DIM = typeof p.embeddingDim === "number" ? (p.embeddingDim as number) : 128
+interface TestingEmbeddingManifest {
+  embeddingDim?: number
+  seedWeights?: Record<string, number[]>
+}
 
-const seededVector = (s: string, dim = EMBEDDING_DIM) => {
-  const out: number[] = new Array(dim).fill(0).map((_, i) => {
-    let h = 2166136261 >>> 0
-    for (let j = 0; j < s.length; j++) h = Math.imul(h ^ s.charCodeAt(j), 16777619) >>> 0
-    const v = ((h >> (i % 24)) & 0xffff) / 0xffff
-    return (v - 0.5) * 0.4
+const manifest = pretrained as TestingEmbeddingManifest
+const EMBEDDING_DIM = typeof manifest.embeddingDim === "number" ? manifest.embeddingDim : 128
+
+const seededVector = (token: string, dimension = EMBEDDING_DIM): number[] => {
+  return new Array(dimension).fill(0).map((_, index) => {
+    let hash = 2166136261 >>> 0
+    for (let position = 0; position < token.length; position++) {
+      hash = Math.imul(hash ^ token.charCodeAt(position), 16777619) >>> 0
+    }
+    const sample = ((hash >> (index % 24)) & 0xffff) / 0xffff
+    return (sample - 0.5) * 0.4
   })
-  return out
 }
 
 export const getTestingEmbedding = (token: string): number[] => {
-  const seed = (p.seedWeights ?? {}) as Record<string, number[]>
-  if (Object.prototype.hasOwnProperty.call(seed, token)) return seed[token]
+  const seedWeights = manifest.seedWeights ?? {}
+  if (Object.prototype.hasOwnProperty.call(seedWeights, token)) return seedWeights[token]
   return seededVector(token, EMBEDDING_DIM)
 }
 
@@ -38,11 +44,18 @@ export const persistTestingWeights = (weights: Record<string, number[]>) => {
       null,
       2,
     )
-    updateFile(TESTING_DOMAIN, "src/ai/knowledge-domains/testing/testing_weights/testing_pretrained_weights.json", content)
+    updateFile(
+      TESTING_DOMAIN,
+      "src/ai/knowledge-domains/testing/testing_weights/testing_pretrained_weights.json",
+      content,
+    )
     return true
-  } catch (e) {
+  } catch (error) {
+    console.error("[Testing] Failed to persist pretrained weights:", error)
     return false
   }
 }
 
-export default { getTestingEmbedding, getTestingEmbeddingForTokens, persistTestingWeights }
+const testingEmbeddingApi = { getTestingEmbedding, getTestingEmbeddingForTokens, persistTestingWeights }
+
+export default testingEmbeddingApi

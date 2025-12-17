@@ -24,6 +24,7 @@ export interface FormatOptions {
  */
 export function formatCode(code: string, options: FormatOptions): string {
   const { language, tabSize = 2, useTabs = false, printWidth = 80 } = options
+  const maxWidth = Math.max(20, printWidth)
 
   // Basic formatting logic - in production, integrate with Prettier or similar
   let formatted = code.trim()
@@ -47,7 +48,9 @@ export function formatCode(code: string, options: FormatOptions): string {
 
     // Add indentation
     if (line.length > 0) {
-      formattedLines.push(indent.repeat(indentLevel) + line)
+      const prefix = indent.repeat(indentLevel)
+      const wrapped = wrapLine(prefix + line, maxWidth, prefix)
+      formattedLines.push(...wrapped)
     } else {
       formattedLines.push("")
     }
@@ -69,7 +72,7 @@ export function formatCode(code: string, options: FormatOptions): string {
       formatted = formatJavaScript(formatted, options)
       break
     case "python":
-      formatted = formatPython(formatted, options)
+      formatted = formatPython(formatted)
       break
     case "json":
       try {
@@ -99,7 +102,7 @@ function formatJavaScript(code: string, options: FormatOptions): string {
   return formatted
 }
 
-function formatPython(code: string, options: FormatOptions): string {
+function formatPython(code: string): string {
   // Python-specific formatting (PEP 8 style)
   let formatted = code
 
@@ -108,6 +111,40 @@ function formatPython(code: string, options: FormatOptions): string {
   formatted = formatted.replace(/([^=!<>])==([^=])/g, "$1 == $2")
 
   return formatted
+}
+
+function wrapLine(line: string, maxWidth: number, indentPrefix: string): string[] {
+  if (line.length <= maxWidth) {
+    return [line]
+  }
+
+  const content = line.startsWith(indentPrefix) ? line.slice(indentPrefix.length) : line
+  const words = content.split(/\s+/).filter(Boolean)
+  const wrapped: string[] = []
+  let current = ""
+
+  const flush = () => {
+    if (!current.length) return
+    wrapped.push(`${indentPrefix}${current}`)
+    current = ""
+  }
+
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word
+    if ((indentPrefix.length + candidate.length) > maxWidth && current) {
+      flush()
+      current = word
+    } else {
+      current = candidate
+    }
+
+    if ((indentPrefix.length + current.length) > maxWidth && !current.includes(" ")) {
+      flush()
+    }
+  }
+
+  flush()
+  return wrapped.length ? wrapped : [line]
 }
 
 /**

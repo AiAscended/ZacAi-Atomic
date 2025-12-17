@@ -40,9 +40,15 @@ export const persistDocumentationWeights = (weights: Record<string, number[]>) =
     )
     updateFile(DOCUMENTATION_DOMAIN, "src/ai/knowledge-domains/documentation/documentation_weights/documentation_pretrained_weights.json", content)
     return true
-  } catch (e) {
+  } catch (error) {
+    console.warn("Failed to persist documentation weights", error)
     return false
   }
 }
+const documentationEmbeddingExports = {
+  getDocumentationEmbedding,
+  getDocumentationEmbeddingForTokens,
+  persistDocumentationWeights,
+}
 
-export default { getDocumentationEmbedding, getDocumentationEmbeddingForTokens, persistDocumentationWeights }
+export default documentationEmbeddingExports

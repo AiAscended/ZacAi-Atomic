@@ -1,21 +1,14 @@
 {
 	"servers": {
-		"io.github.github/github-mcp-server": {
-			"type": "http",
-			"url": "https://api.githubcopilot.com/mcp/",
-			"headers": {
-				"Authorization": "${input:Authorization}"
-			},
+		"microsoft/markitdown": {
+			"type": "stdio",
+			"command": "uvx",
+			"args": [
+				"markitdown-mcp==0.0.1a4"
+			],
 			"gallery": "https://api.mcp.github.com",
-			"version": "0.26.0-rc.3"
+			"version": "1.0.0"
 		}
 	},
-	"inputs": [
-		{
-			"id": "Authorization",
-			"type": "promptString",
-			"description": "Authentication token (PAT or App token)",
-			"password": true
-		}
-	]
+	"inputs": []
 }

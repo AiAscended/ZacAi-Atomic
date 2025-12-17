@@ -60,10 +60,11 @@ describe('Admin Settings Validation', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should require appId and clientId', () => {
+    it('should require both appId and clientId when configuring GitHub', () => {
       const invalid = {
         ...DEFAULT_GITHUB_APP_SETTINGS,
-        appId: '',
+        appId: '123456',
+        clientId: '',
       };
       const result = validateGitHubAppSettings(invalid);
       expect(result.success).toBe(false);

@@ -99,7 +99,8 @@ export class ModelValidator {
           }
         }
       } catch (error) {
-        warnings.push("Could not validate base tokens file");
+        const reason = error instanceof Error ? error.message : String(error);
+        warnings.push(`Could not validate base tokens file: ${reason}`);
         score -= 5;
       }
     } else {

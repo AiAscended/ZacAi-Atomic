@@ -5,8 +5,11 @@
  * Ensures data reliability and integrity across the system.
  */
 
+import { domainRegistry } from '../domainRegistry';
 import fs from 'fs/promises';
 import path from 'path';
+
+type DataIntegrityConcept = Record<string, unknown>;
 
 const DOMAIN_NAME = 'data_integrity';
 const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DOMAIN_NAME);
@@ -15,12 +18,12 @@ const SEEDS_DIR = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`);
 /**
  * Load all seed data for data integrity domain
  */
-async function loadSeedData(): Promise<any[]> {
+async function loadSeedData(): Promise<DataIntegrityConcept[]> {
   try {
     const files = await fs.readdir(SEEDS_DIR);
     const jsonFiles = files.filter(f => f.endsWith('.json'));
     
-    const allConcepts: any[] = [];
+    const allConcepts: DataIntegrityConcept[] = [];
     for (const file of jsonFiles) {
       const filePath = path.join(SEEDS_DIR, file);
       const content = await fs.readFile(filePath, 'utf-8');
@@ -40,51 +43,6 @@ async function loadSeedData(): Promise<any[]> {
     console.error('[DataIntegrity] Error loading seed data:', error);
     return [];
   }
-}
-
-/**
- * Query the data integrity domain with a prompt
- */
-async function query(prompt: string): Promise<any> {
-  const normalizedPrompt = prompt.toLowerCase();
-  
-  // Keywords that indicate data integrity concerns
-  const integrityKeywords = [
-    'validate', 'validation', 'verify', 'check', 'integrity', 'quality',
-    'consistency', 'accuracy', 'completeness', 'constraint', 'error',
-    'duplicate', 'missing', 'corrupt', 'anomaly', 'outlier'
-  ];
-  
-  const hasIntegrityKeyword = integrityKeywords.some(keyword => 
-    normalizedPrompt.includes(keyword)
-  );
-  
-  if (!hasIntegrityKeyword) {
-    return null;
-  }
-  
-  const seedData = await loadSeedData();
-  
-  // Find matching concepts
-  const matches = seedData.filter(concept => {
-    const conceptText = JSON.stringify(concept).toLowerCase();
-    return integrityKeywords.some(keyword => conceptText.includes(keyword));
-  });
-  
-  if (matches.length === 0) {
-    return null;
-  }
-  
-  return {
-    domain: DOMAIN_NAME,
-    confidence: 0.8,
-    matches: matches.slice(0, 5), // Return top 5 matches
-    suggestion: 'Consider data validation rules, consistency checks, and quality metrics',
-    metadata: {
-      totalConcepts: seedData.length,
-      matchCount: matches.length
-    }
-  };
 }
 
 /**
@@ -109,7 +67,17 @@ export const dataIntegrityInit = async () => {
   // Register domain files for tracking;
 
   // Register the domain with the registry
-
+  domainRegistry.registerDomain({
+    name: DOMAIN_NAME,
+    displayName: 'Data Integrity',
+    description: 'Data Integrity domain capabilities',
+    atomicLevel: 'molecule',
+    modules: [],
+    seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+    learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+    weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
+    enabled: true
+  });
 };
 
 // Auto-initialize when imported

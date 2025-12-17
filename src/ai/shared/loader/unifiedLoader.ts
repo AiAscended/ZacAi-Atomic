@@ -10,6 +10,7 @@
  */
 
 import { getUnifiedRegistry, type ModuleManifest, type ModuleType } from "../registry/unifiedRegistry";
+import { getDomainInferenceImporter, getModuleImporter } from "./moduleImportMap"
 
 // ============================================================================
 // Types
@@ -17,11 +18,14 @@ import { getUnifiedRegistry, type ModuleManifest, type ModuleType } from "../reg
 
 export interface LoadedModule {
   manifest: ModuleManifest;
-  instance: any;
+  instance: unknown;
   loadedAt: string;
   status: "ready" | "loading" | "error" | "disabled";
   errorMessage?: string;
 }
+
+type InferenceImplementation = (...args: unknown[]) => unknown | Promise<unknown>
+type InferenceHandler = (...args: unknown[]) => Promise<unknown>
 
 // ============================================================================
 // Unified Loader
@@ -29,6 +33,8 @@ export interface LoadedModule {
 
 export class UnifiedLoader {
   private loadedModules: Map<string, LoadedModule> = new Map();
+  private domainInferenceHandlers: Map<string, InferenceHandler | null> = new Map();
+  private modelInferenceHandlers: Map<string, InferenceHandler | null> = new Map();
   
   /**
    * Load all enabled modules (models + domains)
@@ -105,23 +111,15 @@ export class UnifiedLoader {
     this.loadedModules.set(moduleId, loaded);
     
     try {
-      // Determine module path
-      const baseDir = manifest.moduleType === "model" ? "models" : "knowledge-domains";
-      
-      // Try to dynamically import the module
-      let modulePath: string | undefined;
-      
-      if (manifest.moduleType === "model" && manifest.paths.inferenceEnginePath) {
-        modulePath = `../../${baseDir}/${moduleId}/${manifest.paths.inferenceEnginePath}`;
-      } else if (manifest.moduleType === "domain" && manifest.paths.integrationAPIPath) {
-        modulePath = `../../${baseDir}/${moduleId}/${manifest.paths.integrationAPIPath}`;
+      const importer = getModuleImporter(moduleId, manifest.moduleType);
+
+      if (importer) {
+        const importedModule = await importer();
+        loaded.instance = (importedModule as { default?: unknown }).default ?? importedModule;
+      } else {
+        console.warn(`[UnifiedLoader] No importer registered for ${manifest.moduleType}: ${moduleId}`);
       }
-      
-      if (modulePath) {
-        const module = await import(modulePath);
-        loaded.instance = module.default || module;
-      }
-      
+
       loaded.status = "ready";
       console.log(`✅ Loaded ${manifest.moduleType}: ${manifest.displayName}`);
     } catch (error) {
@@ -155,6 +153,8 @@ export class UnifiedLoader {
   unloadModule(moduleId: string): void {
     if (this.loadedModules.has(moduleId)) {
       this.loadedModules.delete(moduleId);
+      this.domainInferenceHandlers.delete(moduleId);
+      this.modelInferenceHandlers.delete(moduleId);
       console.log(`🗑️  Unloaded module: ${moduleId}`);
     }
   }
@@ -214,7 +214,7 @@ export class UnifiedLoader {
     this.unloadModule(moduleId);
     
     // Bust require cache
-    const registry = await getUnifiedRegistry(true); // Force refresh
+    await getUnifiedRegistry(true); // Force refresh
     
     return await this.loadModule(moduleId);
   }
@@ -235,6 +235,95 @@ export class UnifiedLoader {
     
     // Reload all
     await this.loadAllModules();
+  }
+
+  /**
+   * Get (and cache) a domain inference handler if available
+   */
+  async getDomainInferenceHandler(domainId: string): Promise<InferenceHandler | null> {
+    if (this.domainInferenceHandlers.has(domainId)) {
+      return this.domainInferenceHandlers.get(domainId) || null;
+    }
+
+    try {
+      const registry = await getUnifiedRegistry();
+      const manifest = registry.modules[domainId];
+
+      if (!manifest || manifest.moduleType !== "domain") {
+        this.domainInferenceHandlers.set(domainId, null);
+        return null;
+      }
+
+      if (!manifest.paths.inferenceEnginePath) {
+        this.domainInferenceHandlers.set(domainId, null);
+        return null;
+      }
+
+      // Ensure base module is loaded so status reflects availability
+      if (!this.loadedModules.has(domainId)) {
+        await this.loadModule(domainId).catch(() => null);
+      }
+
+      const importer = getDomainInferenceImporter(domainId);
+      if (!importer) {
+        console.warn(`[UnifiedLoader] No inference importer registered for ${domainId}`);
+        this.domainInferenceHandlers.set(domainId, null);
+        return null;
+      }
+
+      const inferenceModule = await importer();
+      const handler = this.resolveInferenceExport(domainId, inferenceModule);
+      this.domainInferenceHandlers.set(domainId, handler);
+      return handler;
+    } catch (error) {
+      console.error(`[UnifiedLoader] Failed to load inference handler for ${domainId}`, error);
+      this.domainInferenceHandlers.set(domainId, null);
+      return null;
+    }
+  }
+
+  private resolveInferenceExport(domainId: string, module: unknown): InferenceHandler | null {
+    if (!module) {
+      return null;
+    }
+
+    const normalizedDomainId = domainId.replace(/[-_](\w)/g, (_, c: string) => c.toUpperCase());
+    const primaryKey = `${domainId}RunInference`;
+    const normalizedKey = `${normalizedDomainId}RunInference`;
+    const fallbackKey = `${domainId.split(/[-_]/)[0]}RunInference`;
+
+    const candidates = [
+      primaryKey,
+      normalizedKey,
+      fallbackKey,
+      "runInference",
+      "infer",
+      "default",
+    ];
+
+    const moduleRecord =
+      typeof module === "object" || typeof module === "function"
+        ? (module as Record<string, unknown>)
+        : null;
+
+    if (moduleRecord) {
+      for (const key of candidates) {
+        const candidate = moduleRecord[key];
+        if (typeof candidate === "function") {
+          return this.wrapInferenceHandler(candidate as InferenceImplementation);
+        }
+      }
+    }
+
+    if (typeof module === "function") {
+      return this.wrapInferenceHandler(module as InferenceImplementation);
+    }
+
+    return null;
+  }
+
+  private wrapInferenceHandler(fn: InferenceImplementation): InferenceHandler {
+    return async (...args: unknown[]) => fn(...args)
   }
 }
 

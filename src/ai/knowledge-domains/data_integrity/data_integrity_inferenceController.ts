@@ -5,12 +5,22 @@
 
 import { DOMAIN_NAME } from './data_integrity_constants';
 
-export const dataIntegrityRunInference = async (input: string, _context?: any) => {
+export interface DataIntegrityInferenceContext {
+  sessionId?: string;
+  subtasks?: string[];
+  [key: string]: unknown;
+}
+
+export const dataIntegrityRunInference = async (
+  input: string,
+  context?: DataIntegrityInferenceContext,
+) => {
   const lowerInput = input.toLowerCase();
   
   let responseText = '';
   let confidence = 0.7;
   const sources: string[] = [];
+  const sessionNote = context?.sessionId ? `\n\nSession: ${context.sessionId}` : '';
 
   // Detect data integrity keywords
   if (
@@ -43,7 +53,7 @@ export const dataIntegrityRunInference = async (input: string, _context?: any) =
 - Uniqueness constraints
 - Timeliness validation
 
-What specific data integrity topic would you like to explore?`;
+What specific data integrity topic would you like to explore?${sessionNote}`;
   } else {
     responseText = `I'm the Data Integrity domain. I specialize in:
 - Data validation strategies
@@ -52,7 +62,7 @@ What specific data integrity topic would you like to explore?`;
 - Error detection in data
 - Data cleaning and normalization
 
-How can I help you ensure data integrity?`;
+How can I help you ensure data integrity?${sessionNote}`;
   }
 
   return {

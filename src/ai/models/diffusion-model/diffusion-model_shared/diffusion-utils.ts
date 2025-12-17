@@ -4,4 +4,6 @@
 
 export function diffusionUtility(): void {}
 
-export default { diffusionUtility };
+const DIFFUSION_UTILS = { diffusionUtility }
+
+export default DIFFUSION_UTILS

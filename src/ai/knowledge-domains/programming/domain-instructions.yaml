@@ -7,6 +7,35 @@ domain:
   version: "1.0.0"
   description: "Expert programming domain with multi-language support and best practices"
 
+role:
+  primary: "Specialized knowledge inference for programming"
+  scope: "Language-agnostic architectural and implementation guidance"
+  orchestration_behavior: "Loads as a plug-in module and can run independently of other domains"
+
+capabilities:
+  - "Understand programming concepts across multiple languages"
+  - "Provide accurate domain-specific responses"
+  - "Reference code seeds and examples for context"
+  - "Integrate with admin-managed lookup sources"
+  - "Learn from user interactions and code reviews"
+
+seeds:
+  location: "./programming_seeds/"
+  auto_load: true
+  format: "json"
+  caching: "warm"
+
+weights:
+  location: "./programming_weights/"
+  auto_load: true
+  format: "binary"
+  fallback: "./programming_trainingWeights.bin"
+
+url_lookup:
+  enabled: true
+  config: "./url-lookup.json"
+  admin_field_binding: "tools.url_lookup.sources"
+
 # Core Principles
 principles:
   - name: "Code Quality"
@@ -86,10 +115,18 @@ tools:
   url_lookup:
     enabled: true
     sources:
-      - "MDN Web Docs"
-      - "W3Schools"
-      - "GitHub"
-      - "Stack Overflow"
+      - name: "MDN Web Docs"
+        url: "https://developer.mozilla.org"
+        use_for: ["JavaScript APIs", "browser features"]
+      - name: "W3Schools"
+        url: "https://www.w3schools.com"
+        use_for: ["syntax references", "HTML/CSS refreshers"]
+      - name: "GitHub"
+        url: "https://github.com"
+        use_for: ["real-world examples", "library source"]
+      - name: "Stack Overflow"
+        url: "https://stackoverflow.com"
+        use_for: ["troubleshooting", "bug fixes"]
     usage_guidelines:
       - "Look up API documentation"
       - "Find code examples and patterns"
@@ -115,8 +152,34 @@ tools:
       - "Performance metric computations"
       - "Big O notation analysis"
 
+# URL Lookup Configuration
+url_lookup_config:
+  config_file: "./url-lookup.json"
+  primary_sources:
+    - name: "MDN Web Docs"
+      url: "https://developer.mozilla.org"
+      use_for: ["JavaScript", "Web APIs"]
+    - name: "Stack Overflow"
+      url: "https://stackoverflow.com"
+      use_for: ["debugging", "community patterns"]
+    - name: "GitHub"
+      url: "https://github.com"
+      use_for: ["source code", "examples"]
+  reference_triggers:
+    - "Unknown API detected"
+    - "Security-sensitive snippet requested"
+    - "Need to cite real-world example"
+    - "User requests latest framework guidance"
+
 # Inference Guidelines
 inference:
+  parameters:
+    confidence_threshold: 0.75
+    max_tokens: 700
+    temperature: 0.45
+    top_p: 0.9
+    allow_tool_invocations: true
+
   input_processing:
     - "Identify programming language"
     - "Parse code structure and syntax"
@@ -165,6 +228,15 @@ code_generation:
 
 # Training Guidelines
 training:
+  enabled: true
+  learning_rate: 0.0008
+  batch_size: 64
+  update_frequency: "daily"
+  optimizer: "adamw"
+  replay_buffers:
+    - "code_reviews"
+    - "user_fixes"
+
   data_sources:
     - "Open source repositories (GitHub)"
     - "Programming textbooks"
@@ -247,19 +319,36 @@ integration:
     priority: "High for explicit programming queries"
 
 # Admin Configuration
-admin:
+admin_config:
   editable_fields:
-    - "Supported languages"
-    - "Style guide preferences"
-    - "URL lookup sources"
-    - "Security rules"
-  
+    - "languages"
+    - "code_generation.structure"
+    - "code_generation.style"
+    - "tools.url_lookup.sources"
+    - "url_lookup_config.primary_sources"
+    - "inference.parameters"
+    - "seeds.location"
+    - "weights.location"
+  field_bindings:
+    admin_page: "/admin/domains/programming"
+    language_matrix: "languages"
+    url_sources: "tools.url_lookup.sources"
+    primary_lookup_sources: "url_lookup_config.primary_sources"
+    security_rules: "code_generation.security"
+    inference_knobs: "inference.parameters"
+    seed_directory: "seeds.location"
+    weight_directory: "weights.location"
   upload_capabilities:
     - "Custom code templates (JSON)"
     - "Language-specific rules (YAML)"
     - "Linting configurations (XML)"
-  
-  settings_location: "/admin/domains/programming"
+  training_sources_management:
+    enabled: true
+    auto_update: true
+    fields:
+      - "training.data_sources"
+      - "url_lookup_config"
+      - "tools.url_lookup.sources"
 
 # Tokenizer Configuration
 tokenizer:

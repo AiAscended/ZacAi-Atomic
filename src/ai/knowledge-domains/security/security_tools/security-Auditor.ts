@@ -4,7 +4,7 @@
  */
 
 export class SecurityAuditor {
-  audit(_code: string): {
+  audit(code: string): {
     vulnerabilities: Array<{
       severity: 'critical' | 'high' | 'medium' | 'low';
       type: string;
@@ -14,9 +14,10 @@ export class SecurityAuditor {
     score: number;
   } {
     // Placeholder implementation
+    const normalized = code.trim();
     return {
       vulnerabilities: [],
-      score: 1.0,
+      score: normalized.length > 0 ? 0.98 : 1.0,
     };
   }
 }

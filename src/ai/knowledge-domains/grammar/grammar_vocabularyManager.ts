@@ -9,11 +9,23 @@
 import { safeParseJSON } from "./grammar_utils"
 import { storageAdapter } from "../storageAdapter"
 
-export const loadGrammarSeedVocabulary = async (path = "/src/ai/knowledge-domains/grammar/grammar_seeds/grammar_seedVocabulary.json") => {
+export type GrammarSeedVocabulary = {
+  rules: string[]
+}
+
+const DEFAULT_SEED_VOCAB_PATH =
+  "/src/ai/knowledge-domains/grammar/grammar_seeds/grammar_seedVocabulary.json"
+
+const createDefaultSeedVocabulary = (): GrammarSeedVocabulary => ({ rules: [] })
+
+export const loadGrammarSeedVocabulary = async (
+  path = DEFAULT_SEED_VOCAB_PATH,
+): Promise<GrammarSeedVocabulary> => {
   try {
     const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(raw, { rules: [] }) as { rules: string[] }
-  } catch (e) {
-    return { rules: [] }
+    return safeParseJSON<GrammarSeedVocabulary>(raw, createDefaultSeedVocabulary())
+  } catch (error) {
+    console.error("[grammar][seed-vocabulary] Failed to load seed vocabulary", { path, error })
+    return createDefaultSeedVocabulary()
   }
 }

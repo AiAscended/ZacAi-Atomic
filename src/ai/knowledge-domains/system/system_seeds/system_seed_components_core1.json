@@ -36,7 +36,30 @@
         "max_tokens": 8192
       },
       "tags": ["ai", "language", "core"]
+    },
+    {
+      "component_id": "comp-004",
+      "name": "ObservabilityStack",
+      "type": "monitoring",
+      "status": "active",
+      "config": {
+        "metrics": "Prometheus",
+        "tracing": "OpenTelemetry",
+        "logging": "Loki"
+      },
+      "tags": ["observability", "core", "metrics"]
+    },
+    {
+      "component_id": "comp-005",
+      "name": "FeatureFlagService",
+      "type": "control",
+      "status": "standby",
+      "config": {
+        "provider": "LaunchDarkly",
+        "sync_interval_sec": 30,
+        "audience_segments": ["beta", "internal", "public"]
+      },
+      "tags": ["control", "experimentation", "platform"]
     }
-    // Add up to 36 core components here; if more, create components_core2.json, etc.
   ]
 }

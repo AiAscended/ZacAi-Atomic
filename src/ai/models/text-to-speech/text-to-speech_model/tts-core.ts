@@ -2,17 +2,27 @@
  * Text-to-speech - Core Model Implementation
  */
 
+import type { ModelConfig, ModelPayload } from '../../shared/modelTypes';
+
 export class TTSModel {
-  private config: any;
-  
-  constructor(config: any) {
+  private readonly config: ModelConfig;
+
+  constructor(config: ModelConfig = {}) {
     this.config = config;
   }
-  
-  forward(input: any): any {
-    // Model forward pass implementation
-    return input;
+
+  forward(input: ModelPayload): ModelPayload {
+    return {
+      ...input,
+      configuration: this.config,
+      lastRun: Date.now(),
+    };
   }
 }
 
-export default TTSModel;
+export const defaultTtsConfig: ModelConfig = {
+  sampleRate: 22050,
+  vocoder: 'griffin-lim',
+  encoderLayers: 5,
+};
+

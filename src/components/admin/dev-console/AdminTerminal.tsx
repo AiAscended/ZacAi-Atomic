@@ -7,7 +7,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from 'react';
-import { Terminal as XTerm } from '@xterm/xterm';
+import { Terminal as XTerm, type IDisposable } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import '@xterm/xterm/css/xterm.css';
@@ -33,6 +33,7 @@ export function AdminTerminal({ className }: AdminTerminalProps) {
   const xtermRef = useRef<XTerm | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const dataListenerRef = useRef<IDisposable | null>(null);
   const [status, setStatus] = useState<ConnectionStatus>('disconnected');
   const [sessionId, setSessionId] = useState<string | null>(null);
 
@@ -82,6 +83,18 @@ export function AdminTerminal({ className }: AdminTerminalProps) {
     xtermRef.current = terminal;
     fitAddonRef.current = fitAddon;
 
+    // Ensure we only register a single data handler bound to the current WebSocket reference
+    dataListenerRef.current = terminal.onData((data) => {
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(
+          JSON.stringify({
+            type: 'input',
+            data,
+          })
+        );
+      }
+    });
+
     // Connect to WebSocket
     connectWebSocket();
 
@@ -106,6 +119,8 @@ export function AdminTerminal({ className }: AdminTerminalProps) {
     // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
+      dataListenerRef.current?.dispose();
+      dataListenerRef.current = null;
       terminal.dispose();
       
       if (wsRef.current) {
@@ -117,17 +132,17 @@ export function AdminTerminal({ className }: AdminTerminalProps) {
   const connectWebSocket = () => {
     if (!xtermRef.current) return;
 
-    setStatus('connecting');
-
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/api/admin/dev-console/terminal`;
+    const wsPath = process.env.NEXT_PUBLIC_TERMINAL_PATH || '/terminal';
+    const wsUrl = `${protocol}//${window.location.host}${wsPath}`;
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
+    setStatus('connecting');
 
     ws.onopen = () => {
-      setStatus('connected');
-      xtermRef.current?.writeln('Connected to terminal...\r\n');
+      xtermRef.current?.writeln('Initializing terminal session...\r\n');
+      ws.send(JSON.stringify({ type: 'init', userId: 'admin-console' }));
     };
 
     ws.onmessage = (event) => {
@@ -135,8 +150,12 @@ export function AdminTerminal({ className }: AdminTerminalProps) {
         const data = JSON.parse(event.data);
 
         switch (data.type) {
-          case 'session_id':
-            setSessionId(data.id);
+          case 'ready':
+            setSessionId(data.terminalId ?? data.id ?? null);
+            setStatus('connected');
+            xtermRef.current?.writeln(
+              `Connected to ${data.shell || 'terminal'} session ${data.terminalId || data.id}\r\n`
+            );
             break;
 
           case 'output':
@@ -144,7 +163,7 @@ export function AdminTerminal({ className }: AdminTerminalProps) {
             break;
 
           case 'exit':
-            xtermRef.current?.writeln(`\r\n\x1b[33mProcess exited with code ${data.exitCode}\x1b[0m\r\n`);
+            xtermRef.current?.writeln(`\r\n\x1b[33mProcess exited with code ${data.exitCode ?? ''}\x1b[0m\r\n`);
             setStatus('disconnected');
             break;
 
@@ -152,6 +171,8 @@ export function AdminTerminal({ className }: AdminTerminalProps) {
             xtermRef.current?.writeln(`\r\n\x1b[31mError: ${data.message}\x1b[0m\r\n`);
             setStatus('error');
             break;
+          default:
+            console.warn('Unknown terminal message', data);
         }
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -169,15 +190,7 @@ export function AdminTerminal({ className }: AdminTerminalProps) {
       xtermRef.current?.writeln('\r\n\x1b[33mConnection closed\x1b[0m\r\n');
     };
 
-    // Handle terminal input
-    xtermRef.current.onData((data) => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({
-          type: 'input',
-          data,
-        }));
-      }
-    });
+    // Handle terminal input is managed by dataListenerRef to avoid duplicate bindings
   };
 
   const handleReconnect = () => {

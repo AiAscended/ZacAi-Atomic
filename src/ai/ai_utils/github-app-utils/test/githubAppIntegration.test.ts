@@ -14,10 +14,10 @@
  * - Run with: npx jest test/githubAppIntegration.test.ts
  */
 
-import { getInstallationAccessToken } from '../src/ai/ai_utils/github-app/auth'
-import { listRepos, createRepo } from '../src/ai/ai_utils/github-app/repos'
-import { readFile, writeFile, getFileSha } from '../src/ai/ai_utils/github-app/files'
-import { searchRepos } from '../src/ai/ai_utils/github-app/search'
+import { getInstallationAccessToken } from '../auth'
+import { listRepos, createRepo } from '../repos'
+import { readFile, writeFile, getFileSha } from '../files'
+import { searchRepos } from '../search'
 
 const installationId = Number(process.env.TEST_GITHUB_INSTALLATION_ID || 0)
 

@@ -1,0 +1,13 @@
+{
+  "artifacts": [
+    {
+      "id": "0de34bb9-7ea6-4fdc-b5a6-fc324da2420b",
+      "type": "bootstrapped",
+      "file": "model_weights.json",
+      "createdAt": "2025-12-07T08:27:34.144Z",
+      "source": "initial-detection",
+      "notes": "Auto-registered baseline weights"
+    }
+  ],
+  "activeArtifactId": "0de34bb9-7ea6-4fdc-b5a6-fc324da2420b"
+}
