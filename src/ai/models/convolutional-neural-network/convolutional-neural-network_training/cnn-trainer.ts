@@ -5,8 +5,8 @@
 import { TrainingBatch } from '../../shared/modelTypes';
 
 export class CNNTrainer {
-  train(data: unknown): void {
-    console.log('Training convolutional-neural-network...');
+  train(data: any): void {
+    console.log("Training convolutional-neural-network...");
   }
 }
 

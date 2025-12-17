@@ -5,7 +5,8 @@
 
 const lake = new Map<string, string[]>();
 
-export const storeDataset = (name: string, rows: string[]) => lake.set(name, rows.slice());
+export const storeDataset = (name: string, rows: string[]) =>
+  lake.set(name, rows.slice());
 export const readDataset = (name: string) => lake.get(name) ?? [];
 export const listDatasets = () => Array.from(lake.keys());
 export const deleteDataset = (name: string) => lake.delete(name);

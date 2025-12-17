@@ -4,10 +4,10 @@
  * Features: Hierarchical display, status indicators, configuration links
  */
 
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { useRouter } from "next/navigation"
+import { Card } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 import {
   Atom,
   AudioLines,
@@ -21,25 +21,39 @@ import {
   Puzzle,
   Repeat,
   Sparkles,
-  Waves,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+  Database,
+  Shield,
+  Package,
+  Zap,
+  Activity,
+  Wrench,
+  Wand2,
+  FileOutput,
+  AlertCircle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AIModel {
-  id: string
-  name: string
-  description: string
-  icon: React.ComponentType<{ className?: string }>
-  status: "active" | "inactive" | "training"
-  path: string
-  category: "language" | "vision" | "audio" | "reasoning" | "fusion"
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  status: "active" | "inactive" | "training";
+  path: string;
+  category:
+    | "orchestration"
+    | "inference"
+    | "training"
+    | "monitoring"
+    | "utility";
 }
 
 const models: AIModel[] = [
   {
-    id: "unified-transformer-llm",
-    name: "Unified Transformer LLM",
-    description: "Primary reasoning backbone with retrieval-aware decoding",
+    id: "orchestrator",
+    name: "Main Orchestrator",
+    description:
+      "Coordinates all AI models, routes queries to appropriate domains",
     icon: Brain,
     status: "active",
     path: "/admin/models/unified-transformer-llm",
@@ -55,13 +69,14 @@ const models: AIModel[] = [
     category: "language",
   },
   {
-    id: "convolutional-neural-network",
-    name: "Convolutional Neural Network",
-    description: "Feature extraction backbone for perception-heavy workloads",
-    icon: Grid3X3,
-    status: "inactive",
-    path: "/admin/models/convolutional-neural-network",
-    category: "vision",
+    id: "domain-router",
+    name: "Domain Router",
+    description:
+      "Routes queries to relevant knowledge domains based on content analysis",
+    icon: Route,
+    status: "active",
+    path: "/admin/models/domain-router",
+    category: "orchestration",
   },
   {
     id: "vision-transformer",
@@ -73,10 +88,49 @@ const models: AIModel[] = [
     category: "vision",
   },
   {
-    id: "diffusion-model",
-    name: "Diffusion Model",
-    description: "Iterative denoising pipeline for high-fidelity synthesis",
+    id: "context-enhancer",
+    name: "Context Enhancer",
+    description:
+      "Enriches prompts with session history and contextual information",
     icon: Sparkles,
+    status: "active",
+    path: "/admin/models/context-enhancer",
+    category: "inference",
+  },
+  {
+    id: "knowledge-retriever",
+    name: "Knowledge Retriever",
+    description:
+      "RAG system for retrieving relevant information from knowledge base",
+    icon: Database,
+    status: "active",
+    path: "/admin/models/knowledge-retriever",
+    category: "inference",
+  },
+  {
+    id: "safety-validator",
+    name: "Safety Validator",
+    description:
+      "Validates inputs and outputs for safety, content policy compliance",
+    icon: Shield,
+    status: "active",
+    path: "/admin/models/safety-validator",
+    category: "utility",
+  },
+  {
+    id: "model-loader",
+    name: "Model Loader",
+    description: "Loads and manages model weights and configurations",
+    icon: Package,
+    status: "active",
+    path: "/admin/models/model-loader",
+    category: "utility",
+  },
+  {
+    id: "model-trainer",
+    name: "Model Trainer",
+    description: "Handles training epochs, backpropagation, and weight updates",
+    icon: Zap,
     status: "training",
     path: "/admin/models/diffusion-model",
     category: "vision",
@@ -91,28 +145,31 @@ const models: AIModel[] = [
     category: "vision",
   },
   {
-    id: "recurrent-neural-network",
-    name: "Recurrent Neural Network",
-    description: "Temporal modeling with LSTM/GRU cells for sequential signals",
-    icon: Repeat,
-    status: "inactive",
-    path: "/admin/models/recurrent-neural-network",
-    category: "reasoning",
+    id: "tool-registry",
+    name: "Tool Registry",
+    description:
+      "Manages available tools and their execution for function calling",
+    icon: Wrench,
+    status: "active",
+    path: "/admin/models/tool-registry",
+    category: "utility",
   },
   {
-    id: "graph-neural-network",
-    name: "Graph Neural Network",
-    description: "Graph-aware inference over relational structures and topologies",
-    icon: Network,
-    status: "inactive",
-    path: "/admin/models/graph-neural-network",
-    category: "reasoning",
+    id: "prompt-builder",
+    name: "Prompt Builder",
+    description:
+      "Constructs optimized prompts for different models and contexts",
+    icon: Wand2,
+    status: "active",
+    path: "/admin/models/prompt-builder",
+    category: "inference",
   },
   {
-    id: "neuro-symbolic-reasoning",
-    name: "Neuro-Symbolic Reasoning",
-    description: "Hybrid proof engine combining learned heuristics with symbolic steps",
-    icon: Puzzle,
+    id: "output-formatter",
+    name: "Output Formatter",
+    description:
+      "Formats responses for optimal display with code/text separation",
+    icon: FileOutput,
     status: "active",
     path: "/admin/models/neuro-symbolic-reasoning",
     category: "reasoning",
@@ -153,34 +210,34 @@ const models: AIModel[] = [
     path: "/admin/models/wavenet-audio-model",
     category: "audio",
   },
-]
+];
 
 const categories = {
-  language: { label: "Language & Code", color: "text-indigo-500" },
-  vision: { label: "Vision & Generation", color: "text-rose-500" },
-  audio: { label: "Audio & Speech", color: "text-amber-500" },
-  reasoning: { label: "Reasoning & Graph", color: "text-emerald-500" },
-  fusion: { label: "Fusion Systems", color: "text-cyan-500" },
-}
+  orchestration: { label: "Orchestration", color: "text-purple-500" },
+  inference: { label: "Inference", color: "text-blue-500" },
+  training: { label: "Training", color: "text-orange-500" },
+  monitoring: { label: "Monitoring", color: "text-green-500" },
+  utility: { label: "Utility", color: "text-gray-500" },
+};
 
 const statusColors = {
   active: "bg-green-500",
   inactive: "bg-gray-400",
   training: "bg-orange-500",
-}
+};
 
 export default function ModelsPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleModelClick = (path: string) => {
-    router.push(path)
-  }
+    router.push(path);
+  };
 
   const modelsByCategory = Object.keys(categories).map((category) => ({
     category,
     label: categories[category as keyof typeof categories].label,
     models: models.filter((m) => m.category === category),
-  }))
+  }));
 
   return (
     <div className="space-y-6">
@@ -188,7 +245,8 @@ export default function ModelsPage() {
         <div>
           <h1 className="text-3xl font-bold">AI Models</h1>
           <p className="text-muted-foreground mt-1">
-            {models.filter((m) => m.status === "active").length} active models • {models.length} total
+            {models.filter((m) => m.status === "active").length} active models •{" "}
+            {models.length} total
           </p>
         </div>
       </div>
@@ -196,12 +254,17 @@ export default function ModelsPage() {
       {modelsByCategory.map(({ category, label, models: categoryModels }) =>
         categoryModels.length > 0 ? (
           <div key={category} className="space-y-3">
-            <h2 className={cn("text-xl font-semibold", categories[category as keyof typeof categories].color)}>
+            <h2
+              className={cn(
+                "text-xl font-semibold",
+                categories[category as keyof typeof categories].color,
+              )}
+            >
               {label}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {categoryModels.map((model) => {
-                const Icon = model.icon
+                const Icon = model.icon;
                 return (
                   <Card
                     key={model.id}
@@ -214,19 +277,28 @@ export default function ModelsPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-sm truncate">{model.name}</h3>
-                          <div className={cn("h-2 w-2 rounded-full flex-shrink-0", statusColors[model.status])} />
+                          <h3 className="font-semibold text-sm truncate">
+                            {model.name}
+                          </h3>
+                          <div
+                            className={cn(
+                              "h-2 w-2 rounded-full flex-shrink-0",
+                              statusColors[model.status],
+                            )}
+                          />
                         </div>
-                        <p className="text-xs text-muted-foreground line-clamp-2">{model.description}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {model.description}
+                        </p>
                       </div>
                     </div>
                   </Card>
-                )
+                );
               })}
             </div>
           </div>
         ) : null,
       )}
     </div>
-  )
+  );
 }

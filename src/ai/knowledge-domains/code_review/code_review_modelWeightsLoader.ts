@@ -1,17 +1,14 @@
 import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-const codeReviewWeightsManager = createDomainWeightsManager({
-  domainName: "code_review",
-})
+import { storageAdapter } from "../storageAdapter";
 
-export const codeReviewLoadWeights = async (): Promise<string | null> => {
-  return codeReviewWeightsManager.loadWeights()
-}
-
-export const primeCodeReviewWeights = async (): Promise<string | null> => {
-  return codeReviewWeightsManager.prime()
-}
-
-export const getCodeReviewActiveWeightArtifact = () => {
-  return codeReviewWeightsManager.getActiveWeightArtifact()
-}
+export const codeReviewLoadWeights = async (
+  path = "/src/ai/knowledge-domains/code_review/code_review_weights/code_review_trainingWeights.bin",
+) => {
+  try {
+    const raw = await storageAdapter.readFile(path);
+    return raw;
+  } catch (e) {
+    return null;
+  }
+};

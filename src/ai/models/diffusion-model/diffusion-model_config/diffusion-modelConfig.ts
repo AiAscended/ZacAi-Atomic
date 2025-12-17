@@ -14,8 +14,8 @@ export interface DIFFUSIONModelConfig {
 }
 
 export const defaultDIFFUSIONConfig: DIFFUSIONModelConfig = {
-  modelName: 'diffusion-model',
-  version: '1.0.0',
+  modelName: "diffusion-model",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

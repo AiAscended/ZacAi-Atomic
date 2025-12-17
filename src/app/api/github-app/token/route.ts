@@ -24,13 +24,13 @@ export async function POST(request: NextRequest) {
         Authorization: `Bearer ${appJwt}`,
         Accept: "application/vnd.github+json",
       },
-    }
+    },
   );
 
   if (!githubResponse.ok) {
     return NextResponse.json(
       { error: "Failed to retrieve GitHub access token" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 

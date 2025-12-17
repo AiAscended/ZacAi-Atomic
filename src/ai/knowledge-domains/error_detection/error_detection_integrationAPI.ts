@@ -6,20 +6,25 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import path from "path"
+import path from "path";
 
-import { domainRegistry } from "../domainRegistry"
-import { ERROR_DETECTION_DOMAIN } from "./error_detection_constants"
-import { loadErrorDetectionSeedVocabulary } from "./error_detection_vocabularyManager"
+import { domainRegistry } from "../domainRegistry";
+import { ERROR_DETECTION_DOMAIN } from "./error_detection_constants";
+import { loadErrorDetectionSeedVocabulary } from "./error_detection_vocabularyManager";
+import { errorDetectionRunInference } from "./error_detection_inferenceController";
+import { errorDetectionRunTrainingEpoch } from "./error_detection_trainingController";
 
-const DOMAIN_NAME = "error_detection"
-const DOMAIN_DIR = path.join(process.cwd(), "src", "ai", "knowledge-domains", DOMAIN_NAME)
-const DOMAIN_SEED_PATH = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`)
-const DOMAIN_LEARNED_PATH = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`)
-const DOMAIN_WEIGHTS_PATH = path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`)
+const DOMAIN_NAME = "error_detection";
+const DOMAIN_DIR = path.join(
+  process.cwd(),
+  "src",
+  "ai",
+  "knowledge-domains",
+  DOMAIN_NAME,
+);
 
-export const errorDetectionInit = async (): Promise<void> => {
-  await loadErrorDetectionSeedVocabulary()
+export const errorDetectionInit = async () => {
+  await loadErrorDetectionSeedVocabulary();
 
   domainRegistry.registerDomain({
     name: ERROR_DETECTION_DOMAIN,
@@ -27,11 +32,11 @@ export const errorDetectionInit = async (): Promise<void> => {
     description: "Error identification, validation, and diagnostic analysis",
     atomicLevel: "molecule",
     modules: [],
-    seedDataPath: DOMAIN_SEED_PATH,
-    learnedDataPath: DOMAIN_LEARNED_PATH,
-    weightsPath: DOMAIN_WEIGHTS_PATH,
+    seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
+    learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
+    weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
     enabled: true,
-  })
-}
+  });
+};
 
-void errorDetectionInit()
+void errorDetectionInit();

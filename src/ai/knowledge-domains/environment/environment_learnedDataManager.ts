@@ -6,26 +6,28 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { safeParseJSON } from "./environment_utils"
-import { storageAdapter } from "../storageAdapter"
+import { safeParseJSON } from "./environment_utils";
+import { storageAdapter } from "../storageAdapter";
 
-export const loadEnvironmentLearnedData = async (path = "/src/ai/knowledge-domains/environment/environment_learned/environment_learnedData.json") => {
+export const loadEnvironmentLearnedData = async (
+  path = "/src/ai/knowledge-domains/environment/environment_learned/environment_learnedData.json",
+) => {
   try {
-    const content = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON(content, { notes: [], concepts: {} })
+    const content = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(content, { notes: [], concepts: {} });
   } catch {
-    return { notes: [], concepts: {} }
+    return { notes: [], concepts: {} };
   }
-}
+};
 
 export const saveEnvironmentLearnedData = async (
   data: unknown,
   path = "/src/ai/knowledge-domains/environment/environment_learned/environment_learnedData.json",
 ) => {
   try {
-    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
-    return { success: true }
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2));
+    return { success: true };
   } catch (err) {
-    return { success: false, error: String(err) }
+    return { success: false, error: String(err) };
   }
-}
+};

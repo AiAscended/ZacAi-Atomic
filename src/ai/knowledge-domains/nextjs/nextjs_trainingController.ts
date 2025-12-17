@@ -6,41 +6,47 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { loadNextjsModelWeights } from "./nextjs_modelWeightsLoader"
-import { getLearnedInteractions } from "./nextjs_learnedDataManager"
+import { loadNextjsModelWeights } from "./nextjs_modelWeightsLoader";
+import { getLearnedInteractions } from "./nextjs_learnedDataManager";
 
 export interface TrainingResult {
-  success: boolean
-  epochsCompleted: number
-  finalLoss: number
-  message: string
+  success: boolean;
+  epochsCompleted: number;
+  finalLoss: number;
+  message: string;
 }
 
-export async function nextjsRunTrainingEpoch(samples: unknown[]): Promise<TrainingResult> {
+export async function nextjsRunTrainingEpoch(
+  samples: any[],
+): Promise<TrainingResult> {
   try {
-    console.log(`[Next.js Domain] Starting training with ${samples.length} samples`)
+    console.log(
+      `[Next.js Domain] Starting training with ${samples.length} samples`,
+    );
 
-    await loadNextjsModelWeights()
-    const interactions = getLearnedInteractions()
+    await loadNextjsModelWeights();
+    const interactions = getLearnedInteractions();
 
-    const epochsCompleted = 1
-    const finalLoss = 0.1 + Math.random() * 0.05
+    const epochsCompleted = 1;
+    const finalLoss = 0.1 + Math.random() * 0.05;
 
-    console.log(`[Next.js Domain] Training complete. Loss: ${finalLoss.toFixed(4)}`)
+    console.log(
+      `[Next.js Domain] Training complete. Loss: ${finalLoss.toFixed(4)}`,
+    );
 
     return {
       success: true,
       epochsCompleted,
       finalLoss,
       message: `Trained on ${interactions.length} interactions`,
-    }
+    };
   } catch (error) {
-    console.error("[Next.js Domain] Training error:", error)
+    console.error("[Next.js Domain] Training error:", error);
     return {
       success: false,
       epochsCompleted: 0,
       finalLoss: 0,
       message: `Training failed: ${error}`,
-    }
+    };
   }
 }

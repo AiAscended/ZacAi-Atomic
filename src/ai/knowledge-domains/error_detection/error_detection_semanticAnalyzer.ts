@@ -6,15 +6,18 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { errorDetectionParser } from "./error_detection_parser"
+import { errorDetectionParser } from "./error_detection_parser";
 
 export const errorDetectionSemanticAnalyzer = (code: string) => {
-  const parsed = errorDetectionParser(code)
+  const parsed = errorDetectionParser(code);
 
   return {
     errors: parsed.syntaxErrors,
     errorCount: parsed.errorCount,
     hasErrorHandling: parsed.hasTryCatch,
-    potentialIssues: [parsed.hasUndefined && "undefined_usage", parsed.hasNull && "null_usage"].filter(Boolean),
-  }
-}
+    potentialIssues: [
+      parsed.hasUndefined && "undefined_usage",
+      parsed.hasNull && "null_usage",
+    ].filter(Boolean),
+  };
+};

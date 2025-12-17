@@ -6,25 +6,15 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { typescriptTokenizer } from "./typescript_tokenizer"
+import { typescriptTokenizer } from "./typescript_tokenizer";
 
-export interface TypescriptSemanticAnalysis {
-  hasTypeAnnotations: boolean
-  hasInterfaces: boolean
-  hasClasses: boolean
-  hasFunctions: boolean
-  hasAsyncCode: boolean
-  hasImports: boolean
-  hasExports: boolean
-  complexity: number
-  codeQuality: "valid" | "empty"
-}
+export function typescriptSemanticAnalyzer(input: string): Record<string, any> {
+  const tokens = typescriptTokenizer(input);
 
-export function typescriptSemanticAnalyzer(input: string): TypescriptSemanticAnalysis {
-  const tokens = typescriptTokenizer(input)
-
-  const analysis: TypescriptSemanticAnalysis = {
-    hasTypeAnnotations: tokens.some((t) => ["string", "number", "boolean", "any"].includes(t)),
+  const analysis = {
+    hasTypeAnnotations: tokens.some((t) =>
+      ["string", "number", "boolean", "any"].includes(t),
+    ),
     hasInterfaces: tokens.includes("interface"),
     hasClasses: tokens.includes("class"),
     hasFunctions: tokens.includes("function"),
@@ -33,7 +23,7 @@ export function typescriptSemanticAnalyzer(input: string): TypescriptSemanticAna
     hasExports: tokens.includes("export"),
     complexity: tokens.length,
     codeQuality: tokens.length > 0 ? "valid" : "empty",
-  }
+  };
 
-  return analysis
+  return analysis;
 }

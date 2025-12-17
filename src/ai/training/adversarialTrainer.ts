@@ -5,5 +5,5 @@
 
 export const generateAdversarial = (text: string) => {
   // Very small stub: return a perturbed text
-  return text.split('').reverse().join('');
+  return text.split("").reverse().join("");
 };

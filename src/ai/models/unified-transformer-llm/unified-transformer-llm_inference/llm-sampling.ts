@@ -29,7 +29,7 @@ export class LLMSampling {
     const probs = this.softmax(logits);
     const indexed = probs.map((val, idx) => ({ val, idx }));
     indexed.sort((a, b) => b.val - a.val);
-    
+
     let cumSum = 0;
     const nucleus: typeof indexed = [];
     for (const item of indexed) {
@@ -37,7 +37,7 @@ export class LLMSampling {
       nucleus.push(item);
       if (cumSum >= p) break;
     }
-    
+
     const selected = nucleus[Math.floor(Math.random() * nucleus.length)];
     return selected.idx;
   }
@@ -46,16 +46,16 @@ export class LLMSampling {
    * Temperature sampling
    */
   temperature(logits: number[], temp: number): number {
-    const scaledLogits = logits.map(l => l / temp);
+    const scaledLogits = logits.map((l) => l / temp);
     const probs = this.softmax(scaledLogits);
     return this.sample(probs);
   }
 
   private softmax(logits: number[]): number[] {
     const maxLogit = Math.max(...logits);
-    const exps = logits.map(l => Math.exp(l - maxLogit));
+    const exps = logits.map((l) => Math.exp(l - maxLogit));
     const sumExps = exps.reduce((a, b) => a + b, 0);
-    return exps.map(e => e / sumExps);
+    return exps.map((e) => e / sumExps);
   }
 
   private sample(probs: number[]): number {

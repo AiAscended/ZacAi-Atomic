@@ -6,5 +6,6 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-export const SECURITY_DOMAIN = "security"
-export const SECURITY_VOCAB_PATH = "/src/ai/knowledge-domains/security/security_seeds/security_seedVocabulary.json"
+export const SECURITY_DOMAIN = "security";
+export const SECURITY_VOCAB_PATH =
+  "/src/ai/knowledge-domains/security/security_seeds/security_seedVocabulary.json";

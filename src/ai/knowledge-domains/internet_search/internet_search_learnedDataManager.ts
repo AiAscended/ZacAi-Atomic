@@ -1,5 +1,5 @@
-import { storageAdapter } from "../storageAdapter"
-import { safeParseJSON } from "./internet_search_utils"
+import { storageAdapter } from "../storageAdapter";
+import { safeParseJSON } from "./internet_search_utils";
 
 export type InternetSearchLearnedData = {
   notes: string[]
@@ -15,23 +15,21 @@ export const loadInternetSearchLearnedData = async (
   path = DEFAULT_LEARNED_DATA_PATH,
 ): Promise<InternetSearchLearnedData> => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON<InternetSearchLearnedData>(raw, createDefaultLearnedData())
-  } catch (error) {
-    console.error("[internet-search][learned-data] Failed to load learned data", { path, error })
-    return createDefaultLearnedData()
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { notes: [], indexes: {} });
+  } catch (e) {
+    return { notes: [], indexes: {} };
   }
-}
+};
 
 export const saveInternetSearchLearnedData = async (
   data: InternetSearchLearnedData,
   path = DEFAULT_LEARNED_DATA_PATH,
 ): Promise<boolean> => {
   try {
-    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2))
-    return true
-  } catch (error) {
-    console.error("[internet-search][learned-data] Failed to persist learned data", { path, error })
-    return false
+    await storageAdapter.writeFile(path, JSON.stringify(data, null, 2));
+    return true;
+  } catch (e) {
+    return false;
   }
-}
+};

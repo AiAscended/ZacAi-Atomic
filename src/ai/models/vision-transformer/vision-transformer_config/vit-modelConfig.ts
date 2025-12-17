@@ -14,8 +14,8 @@ export interface VITModelConfig {
 }
 
 export const defaultVITConfig: VITModelConfig = {
-  modelName: 'vision-transformer',
-  version: '1.0.0',
+  modelName: "vision-transformer",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

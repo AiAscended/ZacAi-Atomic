@@ -13,5 +13,5 @@
  * @example pow2(10) // returns 1024
  */
 export function pow2(x: number): number {
-  return Math.pow(2, x)
+  return Math.pow(2, x);
 }

@@ -4,20 +4,20 @@
  * Supports multiple repository types: backup, data_library, stable, enhanced, experimental
  */
 
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import { execSync } from 'child_process';
+import { promises as fs } from "fs";
+import * as path from "path";
+import { execSync } from "child_process";
 
 export interface GitHubRepository {
   name: string;
   owner: string;
-  type: 'backup' | 'data_library' | 'stable' | 'enhanced' | 'experimental';
+  type: "backup" | "data_library" | "stable" | "enhanced" | "experimental";
   url: string;
   branch: string;
   enabled: boolean;
   lastBackup?: string;
   autoBackup?: boolean;
-  backupSchedule?: 'hourly' | 'daily' | 'weekly' | 'monthly';
+  backupSchedule?: "hourly" | "daily" | "weekly" | "monthly";
 }
 
 export interface BackupConfig {
@@ -49,7 +49,9 @@ export class GitHubBackupManager {
   private config: BackupConfig | null = null;
 
   constructor(configPath?: string) {
-    this.configPath = configPath || path.join(__dirname, '../../../data/github-backup-config.json');
+    this.configPath =
+      configPath ||
+      path.join(__dirname, "../../../data/github-backup-config.json");
   }
 
   /**
@@ -58,77 +60,77 @@ export class GitHubBackupManager {
   async initialize(): Promise<void> {
     try {
       // Try to load existing config
-      const data = await fs.readFile(this.configPath, 'utf-8');
+      const data = await fs.readFile(this.configPath, "utf-8");
       this.config = JSON.parse(data);
     } catch {
       // Create default config
       this.config = {
         repositories: [
           {
-            name: 'ZacAi-Backup',
-            owner: 'AiAscended',
-            type: 'backup',
-            url: '',
-            branch: 'main',
+            name: "ZacAi-Backup",
+            owner: "AiAscended",
+            type: "backup",
+            url: "",
+            branch: "main",
             enabled: false,
             autoBackup: true,
-            backupSchedule: 'daily'
+            backupSchedule: "daily",
           },
           {
-            name: 'ZacAi-DataLibrary',
-            owner: 'AiAscended',
-            type: 'data_library',
-            url: '',
-            branch: 'main',
+            name: "ZacAi-DataLibrary",
+            owner: "AiAscended",
+            type: "data_library",
+            url: "",
+            branch: "main",
             enabled: false,
             autoBackup: true,
-            backupSchedule: 'weekly'
+            backupSchedule: "weekly",
           },
           {
-            name: 'ZacAi-Stable',
-            owner: 'AiAscended',
-            type: 'stable',
-            url: '',
-            branch: 'main',
+            name: "ZacAi-Stable",
+            owner: "AiAscended",
+            type: "stable",
+            url: "",
+            branch: "main",
             enabled: false,
-            autoBackup: false
+            autoBackup: false,
           },
           {
-            name: 'ZacAi-Enhanced',
-            owner: 'AiAscended',
-            type: 'enhanced',
-            url: '',
-            branch: 'main',
+            name: "ZacAi-Enhanced",
+            owner: "AiAscended",
+            type: "enhanced",
+            url: "",
+            branch: "main",
             enabled: false,
-            autoBackup: false
+            autoBackup: false,
           },
           {
-            name: 'ZacAi-Experimental',
-            owner: 'AiAscended',
-            type: 'experimental',
-            url: '',
-            branch: 'dev',
+            name: "ZacAi-Experimental",
+            owner: "AiAscended",
+            type: "experimental",
+            url: "",
+            branch: "dev",
             enabled: false,
-            autoBackup: false
-          }
+            autoBackup: false,
+          },
         ],
-        defaultBranch: 'main',
-        commitMessage: 'Automated backup: {{date}}',
+        defaultBranch: "main",
+        commitMessage: "Automated backup: {{date}}",
         autoBackupEnabled: false,
         excludePatterns: [
-          'node_modules/',
-          '.next/',
-          '.git/',
-          '*.log',
-          'tmp/',
-          'cache/'
-        ]
+          "node_modules/",
+          ".next/",
+          ".git/",
+          "*.log",
+          "tmp/",
+          "cache/",
+        ],
       };
 
       await this.saveConfig();
     }
 
-    console.log('✅ GitHub Backup Manager initialized');
+    console.log("✅ GitHub Backup Manager initialized");
   }
 
   /**
@@ -155,7 +157,7 @@ export class GitHubBackupManager {
     if (!this.config) return;
 
     const existingIndex = this.config.repositories.findIndex(
-      r => r.name === repo.name && r.owner === repo.owner
+      (r) => r.name === repo.name && r.owner === repo.owner,
     );
 
     if (existingIndex >= 0) {
@@ -174,7 +176,7 @@ export class GitHubBackupManager {
     if (!this.config) await this.initialize();
     if (!this.config) return;
 
-    const repo = this.config.repositories.find(r => r.name === name);
+    const repo = this.config.repositories.find((r) => r.name === name);
     if (repo) {
       repo.enabled = enabled;
       await this.saveConfig();
@@ -184,11 +186,14 @@ export class GitHubBackupManager {
   /**
    * Backup to specific repository
    */
-  async backupToRepository(repoName: string, sourcePath: string): Promise<boolean> {
+  async backupToRepository(
+    repoName: string,
+    sourcePath: string,
+  ): Promise<boolean> {
     if (!this.config) await this.initialize();
     if (!this.config) return false;
 
-    const repo = this.config.repositories.find(r => r.name === repoName);
+    const repo = this.config.repositories.find((r) => r.name === repoName);
     if (!repo || !repo.enabled) {
       console.warn(`Repository ${repoName} not found or not enabled`);
       return false;
@@ -196,32 +201,41 @@ export class GitHubBackupManager {
 
     try {
       // Prepare backup directory
-      const backupDir = path.join('/tmp', `backup-${Date.now()}`);
+      const backupDir = path.join("/tmp", `backup-${Date.now()}`);
       await fs.mkdir(backupDir, { recursive: true });
 
       // Copy files to backup directory
-      await this.copyWithExclusions(sourcePath, backupDir, this.config.excludePatterns);
+      await this.copyWithExclusions(
+        sourcePath,
+        backupDir,
+        this.config.excludePatterns,
+      );
 
       // Initialize git if needed
-      const gitDir = path.join(backupDir, '.git');
+      const gitDir = path.join(backupDir, ".git");
       try {
         await fs.access(gitDir);
       } catch {
-        execSync('git init', { cwd: backupDir });
+        execSync("git init", { cwd: backupDir });
         if (repo.url) {
           execSync(`git remote add origin ${repo.url}`, { cwd: backupDir });
         }
       }
 
       // Configure git
-      execSync('git config user.name "ZacAi Automated Backup"', { cwd: backupDir });
+      execSync('git config user.name "ZacAi Automated Backup"', {
+        cwd: backupDir,
+      });
       execSync('git config user.email "backup@zacai.ai"', { cwd: backupDir });
 
       // Add files
-      execSync('git add .', { cwd: backupDir });
+      execSync("git add .", { cwd: backupDir });
 
       // Commit
-      const commitMsg = this.config.commitMessage.replace('{{date}}', new Date().toISOString());
+      const commitMsg = this.config.commitMessage.replace(
+        "{{date}}",
+        new Date().toISOString(),
+      );
       execSync(`git commit -m "${commitMsg}"`, { cwd: backupDir });
 
       // Push (if URL is configured)
@@ -229,7 +243,9 @@ export class GitHubBackupManager {
         execSync(`git push origin ${repo.branch}`, { cwd: backupDir });
         console.log(`✅ Backed up to ${repoName}`);
       } else {
-        console.log(`⚠️ Repository ${repoName} has no URL configured - local commit only`);
+        console.log(
+          `⚠️ Repository ${repoName} has no URL configured - local commit only`,
+        );
       }
 
       // Update last backup time
@@ -250,10 +266,15 @@ export class GitHubBackupManager {
    * Backup learned data to data_library repository
    */
   async backupLearnedData(): Promise<boolean> {
-    const repo = this.config?.repositories.find(r => r.type === 'data_library');
+    const repo = this.config?.repositories.find(
+      (r) => r.type === "data_library",
+    );
     if (!repo || !repo.enabled) return false;
 
-    const learnedPath = path.join(__dirname, '../../../data/learning-memory/learned');
+    const learnedPath = path.join(
+      __dirname,
+      "../../../data/learning-memory/learned",
+    );
     return await this.backupToRepository(repo.name, learnedPath);
   }
 
@@ -261,10 +282,13 @@ export class GitHubBackupManager {
    * Backup archived data
    */
   async backupArchivedData(): Promise<boolean> {
-    const repo = this.config?.repositories.find(r => r.type === 'backup');
+    const repo = this.config?.repositories.find((r) => r.type === "backup");
     if (!repo || !repo.enabled) return false;
 
-    const archivePath = path.join(__dirname, '../../../data/learning-memory/archive');
+    const archivePath = path.join(
+      __dirname,
+      "../../../data/learning-memory/archive",
+    );
     return await this.backupToRepository(repo.name, archivePath);
   }
 
@@ -282,16 +306,22 @@ export class GitHubBackupManager {
         let sourcePath: string;
 
         switch (repo.type) {
-          case 'data_library':
-            sourcePath = path.join(__dirname, '../../../data/learning-memory/learned');
+          case "data_library":
+            sourcePath = path.join(
+              __dirname,
+              "../../../data/learning-memory/learned",
+            );
             break;
-          case 'backup':
-            sourcePath = path.join(__dirname, '../../../data/learning-memory/archive');
+          case "backup":
+            sourcePath = path.join(
+              __dirname,
+              "../../../data/learning-memory/archive",
+            );
             break;
-          case 'stable':
-          case 'enhanced':
-          case 'experimental':
-            sourcePath = path.join(__dirname, '../../..');
+          case "stable":
+          case "enhanced":
+          case "experimental":
+            sourcePath = path.join(__dirname, "../../..");
             break;
           default:
             continue;
@@ -310,16 +340,17 @@ export class GitHubBackupManager {
 
     const lastBackup = new Date(repo.lastBackup);
     const now = new Date();
-    const hoursSince = (now.getTime() - lastBackup.getTime()) / (1000 * 60 * 60);
+    const hoursSince =
+      (now.getTime() - lastBackup.getTime()) / (1000 * 60 * 60);
 
     switch (repo.backupSchedule) {
-      case 'hourly':
+      case "hourly":
         return hoursSince >= 1;
-      case 'daily':
+      case "daily":
         return hoursSince >= 24;
-      case 'weekly':
+      case "weekly":
         return hoursSince >= 168;
-      case 'monthly':
+      case "monthly":
         return hoursSince >= 720;
       default:
         return false;
@@ -329,7 +360,11 @@ export class GitHubBackupManager {
   /**
    * Copy files with exclusion patterns
    */
-  private async copyWithExclusions(src: string, dest: string, excludePatterns: string[]): Promise<void> {
+  private async copyWithExclusions(
+    src: string,
+    dest: string,
+    excludePatterns: string[],
+  ): Promise<void> {
     await fs.mkdir(dest, { recursive: true });
 
     const entries = await fs.readdir(src, { withFileTypes: true });
@@ -340,11 +375,11 @@ export class GitHubBackupManager {
 
       // Check if path matches exclusion pattern
       const relativePath = path.relative(src, srcPath);
-      const shouldExclude = excludePatterns.some(pattern => {
-        if (pattern.endsWith('/')) {
+      const shouldExclude = excludePatterns.some((pattern) => {
+        if (pattern.endsWith("/")) {
           return relativePath.startsWith(pattern.slice(0, -1));
         }
-        return relativePath.includes(pattern.replace('*', ''));
+        return relativePath.includes(pattern.replace("*", ""));
       });
 
       if (shouldExclude) continue;
@@ -394,10 +429,11 @@ export class GitHubBackupManager {
     }
 
     return {
-      totalRepositories: config.repositories.length,
-      enabledRepositories: config.repositories.filter(r => r.enabled).length,
-      autoBackupEnabled: config.autoBackupEnabled,
-      repositories: config.repositories.map(r => ({
+      totalRepositories: this.config?.repositories.length || 0,
+      enabledRepositories:
+        this.config?.repositories.filter((r) => r.enabled).length || 0,
+      autoBackupEnabled: this.config?.autoBackupEnabled || false,
+      repositories: this.config?.repositories.map((r) => ({
         name: r.name,
         type: r.type,
         enabled: r.enabled,

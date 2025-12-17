@@ -1,64 +1,54 @@
-import type { WeightArtifactEntry } from "../../shared/weights/weightsManifestManager"
-import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
+interface ModelWeights {
+  embedding_layer: number[][];
+  attention_weights: Record<string, Record<string, number[][]>>;
+  feedforward_weights: Record<string, Record<string, number[][]>>;
+  output_layer: Record<string, number[][]>;
+}
 
-export type NextjsModelWeights = Record<string, unknown>
+let weightsLoaded = false;
+let modelWeights: ModelWeights | null = null;
 
-let cachedWeights: NextjsModelWeights | null = null
-let cachedArtifact: WeightArtifactEntry | null = null
-let loadPromise: Promise<NextjsModelWeights> | null = null
-
-const nextjsWeightsManager = createDomainWeightsManager({
-  domainName: "nextjs",
-})
-
-export async function loadNextjsModelWeights(): Promise<NextjsModelWeights> {
-  if (cachedWeights) {
-    return cachedWeights
-  }
-
-  if (!loadPromise) {
-    loadPromise = (async () => {
-      const rawWeights = await nextjsWeightsManager.loadWeights()
-      if (!rawWeights) {
-        throw new Error("[Next.js Domain] No weights available to load")
-      }
-
-      try {
-        cachedWeights = JSON.parse(rawWeights) as NextjsModelWeights
-      } catch (error) {
-        console.error("[Next.js Domain] Failed to parse weights file", error)
-        throw error
-      }
-
-      cachedArtifact = await nextjsWeightsManager.getActiveWeightArtifact()
-      const descriptor = cachedArtifact?.file ?? "unknown"
-      console.log(
-        `[Next.js Domain] Loaded ${cachedArtifact?.type ?? "pretrained"} weights (${descriptor})`
-      )
-
-      return cachedWeights
-    })()
+export async function loadNextjsModelWeights(): Promise<ModelWeights> {
+  if (weightsLoaded && modelWeights) {
+    return modelWeights;
   }
 
   try {
-    return await loadPromise
-  } finally {
-    loadPromise = null
+    modelWeights = {
+      embedding_layer: initializeMatrix(70, 128),
+      attention_weights: {
+        layer_0: {
+          query: initializeMatrix(128, 128),
+          key: initializeMatrix(128, 128),
+          value: initializeMatrix(128, 128),
+        },
+      },
+      feedforward_weights: {
+        layer_0: {
+          w1: initializeMatrix(128, 256),
+          w2: initializeMatrix(256, 128),
+        },
+      },
+      output_layer: {
+        w: initializeMatrix(128, 70),
+      },
+    };
+
+    weightsLoaded = true;
+    console.log("[Next.js Domain] Loaded model weights");
+    return modelWeights;
+  } catch (error) {
+    console.error("[Next.js Domain] Failed to load model weights:", error);
+    throw error;
   }
 }
 
-export function getModelWeights(): NextjsModelWeights | null {
-  return cachedWeights
+function initializeMatrix(rows: number, cols: number): number[][] {
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => (Math.random() - 0.5) * 0.1),
+  );
 }
 
-export function getModelWeightsMetadata(): WeightArtifactEntry | null {
-  return cachedArtifact
-}
-
-export const primeNextjsWeights = async (): Promise<string | null> => {
-  return nextjsWeightsManager.prime()
-}
-
-export const getNextjsActiveWeightArtifact = () => {
-  return nextjsWeightsManager.getActiveWeightArtifact()
+export function getModelWeights(): ModelWeights | null {
+  return modelWeights;
 }

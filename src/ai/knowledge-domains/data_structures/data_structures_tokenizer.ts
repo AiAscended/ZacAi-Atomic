@@ -6,29 +6,34 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { normalizeText } from "./data_structures_utils"
-import DATA_STRUCTURES_CORE_TOKENS from "./data_structures_tokens"
+import { normalizeText } from "./data_structures_utils";
+import DATA_STRUCTURES_CORE_TOKENS from "./data_structures_tokens";
 
-export const dataStructuresTokenizer = (text: string, opts?: { includeSystemTokens?: boolean }) => {
-  const normalized = normalizeText(text)
-  const words = normalized.split(/\s+/)
+export const dataStructuresTokenizer = (
+  text: string,
+  opts?: { includeSystemTokens?: boolean },
+) => {
+  const normalized = normalizeText(text);
+  const words = normalized.split(/\s+/);
 
-  const tokens: string[] = []
+  const tokens: string[] = [];
   for (const w of words) {
-    const upper = w.toUpperCase()
+    const upper = w.toUpperCase();
     if (DATA_STRUCTURES_CORE_TOKENS.includes(upper)) {
-      tokens.push(upper)
+      tokens.push(upper);
     } else if (DATA_STRUCTURES_CORE_TOKENS.includes(w)) {
-      tokens.push(w)
+      tokens.push(w);
     } else {
-      tokens.push(w)
+      tokens.push(w);
     }
   }
 
   if (opts?.includeSystemTokens) {
-    const sys = ["<SYS_DATA_STRUCTURES>", "DATA_STRUCTURES_BASE"].filter((s) => DATA_STRUCTURES_CORE_TOKENS.includes(s))
-    return { tokens: [...sys, ...tokens], count: tokens.length + sys.length }
+    const sys = ["<SYS_DATA_STRUCTURES>", "DATA_STRUCTURES_BASE"].filter((s) =>
+      DATA_STRUCTURES_CORE_TOKENS.includes(s),
+    );
+    return { tokens: [...sys, ...tokens], count: tokens.length + sys.length };
   }
 
-  return { tokens, count: tokens.length }
-}
+  return { tokens, count: tokens.length };
+};

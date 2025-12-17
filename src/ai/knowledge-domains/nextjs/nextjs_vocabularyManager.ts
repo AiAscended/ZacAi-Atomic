@@ -1,55 +1,44 @@
-import type { SeedConcept, SeedData } from "../../shared/loaders/universalSeedLoader"
-import { loadDomainSeeds } from "../../shared/loaders/universalSeedLoader"
-
-let vocabularyLoaded = false
-let vocabulary: string[] = []
-let seedDataCache: SeedData | null = null
-let loadPromise: Promise<void> | null = null
-
-const LABEL_CANDIDATES = [
-  "word",
-  "concept",
-  "term",
-  "name",
-  "title",
-  "label",
-]
+let vocabularyLoaded = false;
+let vocabulary: string[] = [];
 
 export async function loadNextjsSeedVocabulary(): Promise<void> {
-  if (vocabularyLoaded) return
-  if (loadPromise) {
-    await loadPromise
-    return
-  }
-
-  loadPromise = (async () => {
-    try {
-      const seedData = await loadDomainSeeds("nextjs")
-      seedDataCache = seedData
-      vocabulary = buildVocabularyFromSeedData(seedData)
-      vocabularyLoaded = true
-      console.log(
-        `[Next.js Domain] Loaded ${vocabulary.length} vocabulary terms from ${seedData.concepts.length} concepts`
-      )
-    } catch (error) {
-      console.error("[Next.js Domain] Failed to load vocabulary:", error)
-      throw error
-    }
-  })()
+  if (vocabularyLoaded) return;
 
   try {
-    await loadPromise
-  } finally {
-    loadPromise = null
+    vocabulary = [
+      "next.js",
+      "app-router",
+      "pages-router",
+      "server-components",
+      "client-components",
+      "server-actions",
+      "route-handlers",
+      "middleware",
+      "layouts",
+      "metadata",
+      "static-generation",
+      "server-side-rendering",
+      "dynamic-routes",
+      "api-routes",
+      "image-optimization",
+    ];
+
+    vocabularyLoaded = true;
+    console.log(
+      `[Next.js Domain] Loaded ${vocabulary.length} vocabulary terms`,
+    );
+  } catch (error) {
+    console.error("[Next.js Domain] Failed to load vocabulary:", error);
+    throw error;
   }
 }
 
 export function getNextjsVocabulary(): string[] {
-  return [...vocabulary]
+  return [...vocabulary];
 }
 
 export function isVocabularyLoaded(): boolean {
-  return vocabularyLoaded
+  return vocabularyLoaded;
 }
 
 export function getNextjsSeedData(): SeedData | null {

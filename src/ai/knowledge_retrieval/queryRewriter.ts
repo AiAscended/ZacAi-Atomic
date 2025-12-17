@@ -4,8 +4,8 @@
  */
 
 const synonyms: Record<string, string[]> = {
-  purchase: ['buy', 'acquire'],
-  error: ['bug', 'failure', 'issue'],
+  purchase: ["buy", "acquire"],
+  error: ["bug", "failure", "issue"],
 };
 
 export const rewriteQuery = (q: string) => {
@@ -15,5 +15,5 @@ export const rewriteQuery = (q: string) => {
     const s = synonyms[t.toLowerCase()];
     if (s) s.forEach((w) => expanded.add(w));
   }
-  return Array.from(expanded).join(' ');
+  return Array.from(expanded).join(" ");
 };

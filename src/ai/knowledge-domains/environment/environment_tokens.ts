@@ -44,15 +44,20 @@ export const ENVIRONMENT_CORE_TOKENS = [
   "<SYS_ENVIRONMENT>",
   "ENVIRONMENT_BASE",
   "ENVIRONMENT_SYS_TOKEN",
-]
+];
 
 export const analyzeEnvironmentTokens = (tokens: string[]) => {
   const operations = {
-    containerization: tokens.filter((t) => /docker|container|image|pod/.test(t.toLowerCase())).length,
-    cicd: tokens.filter((t) => /ci|cd|pipeline|deploy|build/.test(t.toLowerCase())).length,
-    cloud: tokens.filter((t) => /aws|azure|gcp|cloud/.test(t.toLowerCase())).length,
-  }
-  return operations
-}
+    containerization: tokens.filter((t) =>
+      /docker|container|image|pod/.test(t.toLowerCase()),
+    ).length,
+    cicd: tokens.filter((t) =>
+      /ci|cd|pipeline|deploy|build/.test(t.toLowerCase()),
+    ).length,
+    cloud: tokens.filter((t) => /aws|azure|gcp|cloud/.test(t.toLowerCase()))
+      .length,
+  };
+  return operations;
+};
 
-export default ENVIRONMENT_CORE_TOKENS
+export default ENVIRONMENT_CORE_TOKENS;

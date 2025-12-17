@@ -17,9 +17,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   } else if (req.method === "POST") {
     const { appId, clientId, webhookSecret } = req.body
 
-    if (!appId || !clientId || !webhookSecret) {
-      res.status(400).json({ error: "Missing required fields" })
-      return
+    if (!appId || !privateKey) {
+      res
+        .status(400)
+        .json({ error: "Missing required fields: appId and privateKey." });
+      return;
     }
 
     storedSettings = { appId, clientId, webhookSecret }

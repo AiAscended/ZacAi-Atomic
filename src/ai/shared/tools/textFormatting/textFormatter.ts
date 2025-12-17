@@ -4,30 +4,12 @@
  */
 
 export function cleanText(text: string): string {
-  if (!text) return ""
+  if (!text) return "";
   // Basic cleanup: trim, normalize whitespace
   return text.replace(/\s+/g, " ").trim();
 }
 
-export function summarizeText(text: string, maxLength = 4000): string {
-  if (text.length <= maxLength) {
-    return text
-  }
-
-  const sentences = text.split(/(?<=[.!?])\s+/)
-  let summary = ""
-
-  for (const sentence of sentences) {
-    const candidate = summary ? `${summary} ${sentence}` : sentence
-    if (candidate.length > maxLength) {
-      break
-    }
-    summary = candidate
-  }
-
-  if (!summary) {
-    summary = text.slice(0, maxLength)
-  }
-
-  return summary.trimEnd() + " …"
+export function summarizeText(text: string, maxLength = 500): string {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength).trim() + "...";
 }

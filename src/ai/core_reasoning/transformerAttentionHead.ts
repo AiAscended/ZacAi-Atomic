@@ -7,7 +7,7 @@
 export const scaledDotProductAttention = (
   q: number[][],
   k: number[][],
-  v: number[][]
+  v: number[][],
 ): number[][] => {
   // q,k,v: [seqLen][dim]
   const seq = q.length;

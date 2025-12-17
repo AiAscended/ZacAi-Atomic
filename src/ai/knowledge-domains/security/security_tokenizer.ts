@@ -6,47 +6,34 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { normalizeText } from "./security_utils"
-import SECURITY_CORE_TOKENS from "./security_tokens"
+import { normalizeText } from "./security_utils";
+import SECURITY_CORE_TOKENS from "./security_tokens";
 
-export interface SecurityTokenizerOptions {
-  includeSystemTokens?: boolean
-}
-
-export interface SecurityTokenizerResult {
-  tokens: string[]
-  length: number
-}
-
-const SYSTEM_TOKENS = ["<SYS_SECURITY>", "SECURITY_BASE"] as const
-
-/**
- * Tokenize arbitrary input while keeping domain primitives intact.
- */
 export const securityTokenizer = (
   text: string,
-  opts: SecurityTokenizerOptions = {}
-): SecurityTokenizerResult => {
-  const normalizedText = normalizeText(text)
-  const tokens: string[] = []
-  const rawSegments = normalizedText.split(/\s+/).filter(Boolean)
+  opts?: { includeSystemTokens?: boolean },
+) => {
+  const t = normalizeText(text);
+  const tokens: string[] = [];
+  const raw = t.split(/\s+/).filter(Boolean);
 
-  for (const chunk of rawSegments) {
-    const upper = chunk.toUpperCase()
+  for (const chunk of raw) {
+    const upper = chunk.toUpperCase();
     if (SECURITY_CORE_TOKENS.includes(upper)) {
-      tokens.push(upper)
+      tokens.push(upper);
     } else if (/^\d+$/.test(chunk)) {
-      for (const digit of chunk) tokens.push(digit)
+      for (const ch of chunk) tokens.push(ch);
     } else {
-      tokens.push(chunk.toLowerCase())
+      tokens.push(chunk.toLowerCase());
     }
   }
 
-  const includeSystemTokens = opts.includeSystemTokens ?? true
-  if (includeSystemTokens) {
-    const sysTokens = SYSTEM_TOKENS.filter((token) => SECURITY_CORE_TOKENS.includes(token))
-    return { tokens: [...sysTokens, ...tokens], length: tokens.length + sysTokens.length }
+  if (opts?.includeSystemTokens ?? true) {
+    const sys = ["<SYS_SECURITY>", "SECURITY_BASE"].filter((s) =>
+      SECURITY_CORE_TOKENS.includes(s),
+    );
+    return { tokens: [...sys, ...tokens], length: tokens.length + sys.length };
   }
 
-  return { tokens, length: tokens.length }
-}
+  return { tokens, length: tokens.length };
+};

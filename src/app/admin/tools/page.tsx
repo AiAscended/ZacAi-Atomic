@@ -4,14 +4,19 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Upload, Download, Settings } from "lucide-react"
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Upload, Download, Settings } from "lucide-react";
 
 export default function ToolsPage() {
-  const sharedTools = ["Scientific Calculator", "Code Linter", "Code Formatter", "Unit Converter"]
+  const sharedTools = [
+    "Scientific Calculator",
+    "Code Linter",
+    "Code Formatter",
+    "Unit Converter",
+  ];
 
   return (
     <div className="space-y-6">
@@ -27,7 +32,10 @@ export default function ToolsPage() {
         <h2 className="text-xl font-semibold mb-4">Shared Tools</h2>
         <div className="space-y-2">
           {sharedTools.map((tool) => (
-            <div key={tool} className="flex items-center justify-between p-3 border rounded-lg">
+            <div
+              key={tool}
+              className="flex items-center justify-between p-3 border rounded-lg"
+            >
               <span className="font-medium">{tool}</span>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm">
@@ -42,5 +50,5 @@ export default function ToolsPage() {
         </div>
       </Card>
     </div>
-  )
+  );
 }

@@ -17,6 +17,7 @@ export const tokenCounts = (text: string) => {
 export const ngrams = (text: string, n = 2) => {
   const toks = text.split(/\W+/).filter(Boolean);
   const out: string[] = [];
-  for (let i = 0; i + n <= toks.length; i++) out.push(toks.slice(i, i + n).join(' '));
+  for (let i = 0; i + n <= toks.length; i++)
+    out.push(toks.slice(i, i + n).join(" "));
   return out;
 };

@@ -5,7 +5,7 @@
  */
 
 // frameTimestamps is available in the same folder for convenience but not required here
-import { frameTimestamps } from './videoFrameExtractor';
+import { frameTimestamps } from "./videoFrameExtractor";
 
 export interface StreamSample<T> {
   ts: number; // seconds
@@ -15,7 +15,7 @@ export interface StreamSample<T> {
 export const synchronizeStreams = <A, V, T>(
   audio: StreamSample<A>[],
   video: StreamSample<V>[],
-  text: StreamSample<T>[]
+  text: StreamSample<T>[],
 ): Array<{ ts: number; audio?: A; video?: V; text?: T }> => {
   const allTs = new Set<number>();
   audio.forEach((s) => allTs.add(s.ts));

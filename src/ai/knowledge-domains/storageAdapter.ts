@@ -37,10 +37,10 @@ function resolveStoragePath(targetPath: string): string {
  * Provides a unified API that works in both Node.js (with fs) and browser (in-memory) environments
  */
 interface StorageAdapter {
-  readFile(path: string): Promise<string>
-  writeFile(path: string, content: string): Promise<void>
-  exists(path: string): Promise<boolean>
-  readdir(path: string): Promise<string[]>
+  readFile(path: string): Promise<string>;
+  writeFile(path: string, content: string): Promise<void>;
+  exists(path: string): Promise<boolean>;
+  readdir(path: string): Promise<string[]>;
 }
 
 class NodeStorage implements StorageAdapter {
@@ -80,12 +80,12 @@ class NodeStorage implements StorageAdapter {
  * Stores all data in memory using Map objects
  */
 class InMemoryStorage implements StorageAdapter {
-  private files: Map<string, string> = new Map()
-  private directories: Map<string, Set<string>> = new Map()
+  private files: Map<string, string> = new Map();
+  private directories: Map<string, Set<string>> = new Map();
 
   constructor() {
     // Pre-populate with domain data structures
-    this.initializeDomainData()
+    this.initializeDomainData();
   }
 
   private initializeDomainData(): void {
@@ -102,27 +102,33 @@ class InMemoryStorage implements StorageAdapter {
       "testing",
       "documentation",
       "security",
-    ]
+    ];
 
     domains.forEach((domain) => {
       // Initialize empty vocabulary
-      this.files.set(`src/ai/data/${domain}/${domain}_vocabulary.json`, JSON.stringify({ words: [], count: 0 }))
+      this.files.set(
+        `src/ai/data/${domain}/${domain}_vocabulary.json`,
+        JSON.stringify({ words: [], count: 0 }),
+      );
 
       // Initialize empty learned data
-      this.files.set(`src/ai/data/${domain}/${domain}_learnedData.json`, JSON.stringify({ patterns: [], examples: [] }))
+      this.files.set(
+        `src/ai/data/${domain}/${domain}_learnedData.json`,
+        JSON.stringify({ patterns: [], examples: [] }),
+      );
 
       // Initialize empty weights (binary data represented as base64)
-      this.files.set(`src/ai/data/${domain}/${domain}_trainingWeights.bin`, "")
+      this.files.set(`src/ai/data/${domain}/${domain}_trainingWeights.bin`, "");
 
       // Register directory
-      const dirPath = `src/ai/data/${domain}`
+      const dirPath = `src/ai/data/${domain}`;
       if (!this.directories.has(dirPath)) {
-        this.directories.set(dirPath, new Set())
+        this.directories.set(dirPath, new Set());
       }
-      this.directories.get(dirPath)!.add(`${domain}_vocabulary.json`)
-      this.directories.get(dirPath)!.add(`${domain}_learnedData.json`)
-      this.directories.get(dirPath)!.add(`${domain}_trainingWeights.bin`)
-    })
+      this.directories.get(dirPath)!.add(`${domain}_vocabulary.json`);
+      this.directories.get(dirPath)!.add(`${domain}_learnedData.json`);
+      this.directories.get(dirPath)!.add(`${domain}_trainingWeights.bin`);
+    });
   }
 
   private updateDirectoryListing(targetPath: string): void {
@@ -137,25 +143,32 @@ class InMemoryStorage implements StorageAdapter {
   }
 
   async readFile(path: string): Promise<string> {
-    const content = this.files.get(path)
+    const content = this.files.get(path);
     if (content === undefined) {
-      throw new Error(`File not found: ${path}`)
+      throw new Error(`File not found: ${path}`);
     }
-    return content
+    return content;
   }
 
   async writeFile(path: string, content: string): Promise<void> {
-    this.files.set(path, content)
-    this.updateDirectoryListing(path)
+    this.files.set(path, content);
+
+    // Update directory listing
+    const dirPath = path.substring(0, path.lastIndexOf("/"));
+    const fileName = path.substring(path.lastIndexOf("/") + 1);
+    if (!this.directories.has(dirPath)) {
+      this.directories.set(dirPath, new Set());
+    }
+    this.directories.get(dirPath)!.add(fileName);
   }
 
   async exists(path: string): Promise<boolean> {
-    return this.files.has(path) || this.directories.has(path)
+    return this.files.has(path) || this.directories.has(path);
   }
 
   async readdir(path: string): Promise<string[]> {
-    const dir = this.directories.get(path)
-    return dir ? Array.from(dir) : []
+    const dir = this.directories.get(path);
+    return dir ? Array.from(dir) : [];
   }
 
   readFileSync(path: string): string {
@@ -180,7 +193,7 @@ class InMemoryStorage implements StorageAdapter {
  * Singleton storage instance
  * Uses filesystem storage on the server and in-memory storage in the browser
  */
-let storageInstance: StorageAdapter | null = null
+let storageInstance: StorageAdapter | null = null;
 
 const isBrowserEnvironment = typeof window !== "undefined"
 
@@ -190,111 +203,55 @@ const isBrowserEnvironment = typeof window !== "undefined"
  */
 export function getStorage(): StorageAdapter {
   if (!storageInstance) {
-    storageInstance = isBrowserEnvironment ? new InMemoryStorage() : new NodeStorage()
+    storageInstance = new InMemoryStorage();
   }
-  return storageInstance
+  return storageInstance;
 }
 
 /**
  * Helper functions that mimic fs API but use the storage adapter
  */
 export const storage = {
-  async readFile(path: string, encoding: BufferEncoding = "utf8"): Promise<string> {
-    const normalized = encoding.toLowerCase() === "utf-8" ? "utf8" : encoding
-    if (normalized !== "utf8") {
-      throw new Error(`Unsupported encoding: ${encoding}`)
-    }
-    return getStorage().readFile(path)
+  async readFile(path: string, _encoding = "utf8"): Promise<string> {
+    return getStorage().readFile(path);
   },
 
   async writeFile(path: string, content: string): Promise<void> {
-    return getStorage().writeFile(path, content)
+    return getStorage().writeFile(path, content);
   },
 
   async exists(path: string): Promise<boolean> {
-    return getStorage().exists(path)
+    return getStorage().exists(path);
   },
 
   async readdir(path: string): Promise<string[]> {
-    return getStorage().readdir(path)
-  },
-
-  async readBinaryFile(path: string): Promise<ArrayBuffer> {
-    if (!isBrowserEnvironment) {
-      const resolved = resolveStoragePath(path)
-      const buffer = await fs.readFile(resolved)
-      return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
-    }
-
-    const content = await getStorage().readFile(path)
-    const encoder = new TextEncoder()
-    return encoder.encode(content).buffer
+    return getStorage().readdir(path);
   },
 
   // Synchronous versions for compatibility
-  readFileSync(targetPath: string, encoding: BufferEncoding = "utf8"): string {
-    const normalized = encoding.toLowerCase() === "utf-8" ? "utf8" : encoding
-    if (!isBrowserEnvironment) {
-      const resolved = resolveStoragePath(targetPath)
-      return fsSync.readFileSync(resolved, normalized)
+  readFileSync(path: string, _encoding = "utf8"): string {
+    // In browser environment, we can't do true sync, but we can return cached data
+    const instance = getStorage() as InMemoryStorage;
+    const content = (instance as any).files.get(path);
+    if (content === undefined) {
+      throw new Error(`File not found: ${path}`);
     }
-
-    const instance = getStorage()
-    if (instance instanceof InMemoryStorage) {
-      return instance.readFileSync(targetPath)
-    }
-
-    throw new Error("Unsupported storage adapter")
+    return content;
   },
 
-  readBinaryFileSync(targetPath: string): ArrayBuffer {
-    if (!isBrowserEnvironment) {
-      const resolved = resolveStoragePath(targetPath)
-      const buffer = fsSync.readFileSync(resolved)
-      return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
-    }
-
-    const instance = getStorage()
-    if (instance instanceof InMemoryStorage) {
-      const content = instance.readFileSync(targetPath)
-      const encoder = new TextEncoder()
-      return encoder.encode(content).buffer
-    }
-
-    throw new Error("Unsupported storage adapter")
+  writeFileSync(path: string, content: string): void {
+    const instance = getStorage() as InMemoryStorage;
+    (instance as any).files.set(path, content);
   },
 
-  writeFileSync(targetPath: string, content: string): void {
-    if (!isBrowserEnvironment) {
-      const resolved = resolveStoragePath(targetPath)
-      fsSync.mkdirSync(path.dirname(resolved), { recursive: true })
-      fsSync.writeFileSync(resolved, content, "utf8")
-      return
-    }
-
-    const instance = getStorage()
-    if (instance instanceof InMemoryStorage) {
-      instance.writeFileSync(targetPath, content)
-      return
-    }
-
-    throw new Error("Unsupported storage adapter")
+  existsSync(path: string): boolean {
+    const instance = getStorage() as InMemoryStorage;
+    return (
+      (instance as any).files.has(path) ||
+      (instance as any).directories.has(path)
+    );
   },
+};
 
-  existsSync(targetPath: string): boolean {
-    if (!isBrowserEnvironment) {
-      const resolved = resolveStoragePath(targetPath)
-      return fsSync.existsSync(resolved)
-    }
-
-    const instance = getStorage()
-    if (instance instanceof InMemoryStorage) {
-      return instance.existsSync(targetPath)
-    }
-
-    throw new Error("Unsupported storage adapter")
-  },
-}
-
-export const storageAdapter = storage
-export default storage
+export const storageAdapter = storage;
+export default storage;

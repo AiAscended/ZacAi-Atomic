@@ -6,54 +6,54 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { NEXTJS_CONCEPTS, NEXTJS_FEATURES } from "./nextjs_constants"
+import { NEXTJS_CONCEPTS, NEXTJS_FEATURES } from "./nextjs_constants";
 
-type NextjsConcept = (typeof NEXTJS_CONCEPTS)[number]
-type NextjsFeature = (typeof NEXTJS_FEATURES)[number]
-
-const CONCEPT_SET = new Set<string>(NEXTJS_CONCEPTS)
-const FEATURE_SET = new Set<string>(NEXTJS_FEATURES)
-
-export function isNextjsConcept(term: string): term is NextjsConcept {
-  return CONCEPT_SET.has(term)
+export function isNextjsConcept(term: string): boolean {
+  return NEXTJS_CONCEPTS.includes(term as any);
 }
 
-export function isNextjsFeature(term: string): term is NextjsFeature {
-  return FEATURE_SET.has(term)
+export function isNextjsFeature(term: string): boolean {
+  return NEXTJS_FEATURES.includes(term as any);
 }
 
 export function extractNextjsTerms(text: string): string[] {
-  const lowerText = text.toLowerCase()
-  const terms: string[] = []
+  const lowerText = text.toLowerCase();
+  const terms: string[] = [];
 
   for (const concept of NEXTJS_CONCEPTS) {
     if (lowerText.includes(concept)) {
-      terms.push(concept)
+      terms.push(concept);
     }
   }
 
   for (const feature of NEXTJS_FEATURES) {
     if (lowerText.includes(feature)) {
-      terms.push(feature)
+      terms.push(feature);
     }
   }
 
-  return [...new Set(terms)]
+  return [...new Set(terms)];
 }
 
 export function calculateNextjsRelevance(text: string): number {
-  const terms = extractNextjsTerms(text)
-  const lowerText = text.toLowerCase()
+  const terms = extractNextjsTerms(text);
+  const lowerText = text.toLowerCase();
 
-  let score = 0
+  let score = 0;
 
-  score += terms.length * 0.1
+  score += terms.length * 0.1;
 
-  if (lowerText.includes("next.js") || lowerText.includes("nextjs")) score += 0.4
+  if (lowerText.includes("next.js") || lowerText.includes("nextjs"))
+    score += 0.4;
 
-  if (lowerText.includes("app router") || lowerText.includes("pages router")) score += 0.2
+  if (lowerText.includes("app router") || lowerText.includes("pages router"))
+    score += 0.2;
 
-  if (lowerText.includes("server component") || lowerText.includes("server action")) score += 0.2
+  if (
+    lowerText.includes("server component") ||
+    lowerText.includes("server action")
+  )
+    score += 0.2;
 
-  return Math.min(score, 1.0)
+  return Math.min(score, 1.0);
 }

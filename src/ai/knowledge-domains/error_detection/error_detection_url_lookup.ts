@@ -6,15 +6,20 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerSource } from "../url_lookup"
+import { registerSource } from "../url_lookup";
 
 registerSource(
   "error_detection",
   "MDN Errors",
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors",
   "JavaScript error reference",
-)
-registerSource("error_detection", "Stack Overflow", "https://stackoverflow.com", "Error solutions community")
+);
+registerSource(
+  "error_detection",
+  "Stack Overflow",
+  "https://stackoverflow.com",
+  "Error solutions community",
+);
 
-export const errorDetectionSources = () => registerSource
-export default errorDetectionSources
+export const errorDetectionSources = () => registerSource;
+export default errorDetectionSources;

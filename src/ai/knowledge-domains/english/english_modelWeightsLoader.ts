@@ -1,17 +1,14 @@
 import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
 
-const englishWeightsManager = createDomainWeightsManager({
-  domainName: "english",
-})
+import { storageAdapter } from "../storageAdapter";
 
-export const englishLoadWeights = async (): Promise<string | null> => {
-  return englishWeightsManager.loadWeights()
-}
-
-export const primeEnglishWeights = async (): Promise<string | null> => {
-  return englishWeightsManager.prime()
-}
-
-export const getEnglishActiveWeightArtifact = () => {
-  return englishWeightsManager.getActiveWeightArtifact()
-}
+export const englishLoadWeights = async (
+  path = "/src/ai/knowledge-domains/english/english_weights/english_trainingWeights.bin",
+) => {
+  try {
+    const raw = await storageAdapter.readFile(path);
+    return raw;
+  } catch (e) {
+    return null;
+  }
+};

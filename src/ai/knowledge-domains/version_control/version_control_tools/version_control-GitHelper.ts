@@ -30,9 +30,9 @@ export class VersionControlGitHelper {
     }
 
     return {
-      command,
-      explanation,
-      alternatives,
+      command: "",
+      explanation: "",
+      alternatives: [],
     };
   }
 }

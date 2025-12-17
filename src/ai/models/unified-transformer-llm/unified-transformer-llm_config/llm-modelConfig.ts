@@ -5,7 +5,7 @@
 
 export interface LLMModelConfig {
   // Model architecture
-  modelType: 'encoder-decoder' | 'decoder-only';
+  modelType: "encoder-decoder" | "decoder-only";
   numLayers: number;
   numHeads: number;
   hiddenSize: number;
@@ -14,17 +14,17 @@ export interface LLMModelConfig {
   ffnSize: number;
   vocabSize: number;
   maxSequenceLength: number;
-  
+
   // Training configuration
   batchSize: number;
   learningRate: number;
   warmupSteps: number;
   maxSteps: number;
-  
+
   // Dropout and regularization
   dropoutRate: number;
   attentionDropout: number;
-  
+
   // Special tokens
   padTokenId: number;
   bosTokenId: number;
@@ -33,7 +33,7 @@ export interface LLMModelConfig {
 }
 
 export const defaultLLMConfig: LLMModelConfig = {
-  modelType: 'decoder-only',
+  modelType: "decoder-only",
   numLayers: 12,
   numHeads: 12,
   hiddenSize: 768,

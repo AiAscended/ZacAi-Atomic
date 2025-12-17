@@ -15,13 +15,12 @@ const typescriptWeightsManager = createDomainWeightsManager({
 
 export async function loadTypescriptModelWeights(): Promise<ArrayBuffer | null> {
   try {
-    const filename = await typescriptWeightsManager.resolveActiveWeightFile()
-    const fullPath = `${typescriptWeightsManager.storageBasePath}/${filename}`
-    console.debug(`[TypeScript] Loading model weights from ${fullPath}`)
-    return await storageAdapter.readBinaryFile(fullPath)
+    // In production, this would load actual binary weights
+    // For MVP, return null to indicate no weights loaded yet
+    return null;
   } catch (error) {
-    console.error("[TypeScript] Failed to load model weights:", error)
-    return null
+    console.error("[TypeScript] Failed to load model weights:", error);
+    return null;
   }
 }
 

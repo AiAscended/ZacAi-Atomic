@@ -33,7 +33,7 @@ export class LLMOutputHead {
    * Project hidden states to vocabulary logits
    */
   forward(hiddenStates: number[][]): number[][] {
-    return hiddenStates.map(hidden => {
+    return hiddenStates.map((hidden) => {
       const logits: number[] = [];
       for (let i = 0; i < this.vocabSize; i++) {
         let logit = 0;
@@ -51,9 +51,9 @@ export class LLMOutputHead {
    */
   softmax(logits: number[]): number[] {
     const maxLogit = Math.max(...logits);
-    const exps = logits.map(l => Math.exp(l - maxLogit));
+    const exps = logits.map((l) => Math.exp(l - maxLogit));
     const sumExps = exps.reduce((a, b) => a + b, 0);
-    return exps.map(e => e / sumExps);
+    return exps.map((e) => e / sumExps);
   }
 
   /**
@@ -63,21 +63,21 @@ export class LLMOutputHead {
     const probs = this.softmax(logits);
     return probs.indexOf(Math.max(...probs));
   }
-  
+
   /**
    * Get weight matrices (for saving)
    */
-  getWeights(): { W: number[][], b: number[] } {
+  getWeights(): { W: number[][]; b: number[] } {
     return {
       W: this.weights,
       b: new Array(this.vocabSize).fill(0), // Placeholder for bias
     };
   }
-  
+
   /**
    * Set weight matrices (for loading)
    */
-  setWeights(weights: { W: number[][], b: number[] }): void {
+  setWeights(weights: { W: number[][]; b: number[] }): void {
     this.weights = weights.W;
     // Note: bias not currently used in forward pass, but stored for future use
   }

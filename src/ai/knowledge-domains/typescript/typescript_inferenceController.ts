@@ -6,35 +6,17 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { typescriptTokenizer } from "./typescript_tokenizer"
-import {
-  typescriptSemanticAnalyzer,
-  type TypescriptSemanticAnalysis,
-} from "./typescript_semanticAnalyzer"
-import pretrainedWeights from "./typescript_weights/typescript_pretrained_weights.json"
-import seeds from "./typescript_seeds/typescript_seeds.json"
-import {
-  normalizeThresholds,
-  normalizeVocabularyWeights,
-  type ThresholdLike,
-} from "../utils/embeddingUtils"
-import { TYPESCRIPT_DOMAIN } from "./typescript_constants"
-
-interface TypeScriptPretrainedWeights {
-  vocabulary?: Record<string, number>
-  thresholds?: {
-    token_match_weight: number
-    semantic_weight: number
-  }
-}
+import { typescriptTokenizer } from "./typescript_tokenizer";
+import { typescriptSemanticAnalyzer } from "./typescript_semanticAnalyzer";
+import pretrainedWeights from "./typescript_weights/typescript_pretrained_weights.json";
 
 interface InferenceContext {
-  tokens: string[]
-  inferenceResults?: unknown
-  sentiment?: unknown
-  slots?: unknown
-  userProfile?: unknown
-  dialogueState?: unknown
+  tokens: string[];
+  inferenceResults?: any;
+  sentiment?: any;
+  slots?: any;
+  userProfile?: any;
+  dialogueState?: any;
 }
 
 type CodeContext =
@@ -85,101 +67,160 @@ const VOCABULARY = normalizeVocabularyWeights(seedConfig.vocabulary, 0.75)
 const THRESHOLDS = normalizeThresholds(pretrainedConfig.thresholds, seedConfig.thresholds)
 
 function calculateConfidence(tokens: string[], input: string): number {
-  const lowerInput = input.toLowerCase()
-  const weightsConfig = pretrainedWeights as unknown as TypeScriptPretrainedWeights
-  const vocabulary = weightsConfig.vocabulary ?? {}
+  const lowerInput = input.toLowerCase();
+  const vocabulary = (pretrainedWeights as any).vocabulary || {};
 
-  let tokenScore = 0
-  let matchCount = 0
+  let tokenScore = 0;
+  let matchCount = 0;
 
   // Calculate token-based confidence using pretrained vocabulary
   for (const token of tokens) {
-    const lowerToken = token.toLowerCase()
-    if (VOCABULARY[lowerToken]) {
-      tokenScore += VOCABULARY[lowerToken]
-      matchCount++
+    const lowerToken = token.toLowerCase();
+    if (vocabulary[lowerToken]) {
+      tokenScore += vocabulary[lowerToken];
+      matchCount++;
     }
   }
 
   // Normalize token score
-  const avgTokenScore = matchCount > 0 ? tokenScore / matchCount : 0
+  const avgTokenScore = matchCount > 0 ? tokenScore / matchCount : 0;
 
   // Semantic pattern matching
-  let semanticScore = 0
+  let semanticScore = 0;
   const patterns = [
     { regex: /\b(typescript|ts)\b/i, weight: 0.95 },
     { regex: /\b(code|example|sample|file)\b/i, weight: 0.75 },
     { regex: /\b(interface|type|class|function)\b/i, weight: 0.85 },
     { regex: /\b(show|demonstrate|create|generate)\b/i, weight: 0.65 },
     { regex: /\b(entry|point|main|index|page)\b/i, weight: 0.7 },
-  ]
+  ];
 
   for (const pattern of patterns) {
     if (pattern.regex.test(lowerInput)) {
-      semanticScore += pattern.weight
+      semanticScore += pattern.weight;
     }
   }
 
   // Normalize semantic score (max 1.0)
-  semanticScore = Math.min(semanticScore / 2, 1.0)
+  semanticScore = Math.min(semanticScore / 2, 1.0);
 
   // Combine scores using weights from pretrained config
-  const thresholds = weightsConfig.thresholds ?? {
-    token_match_weight: 0.6,
-    semantic_weight: 0.4,
-  }
-  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
+  const thresholds = (pretrainedWeights as any).thresholds || { highConfidence: 0.8, mediumConfidence: 0.5 };
+  const finalConfidence =
+    avgTokenScore * thresholds.token_match_weight +
+    semanticScore * thresholds.semantic_weight;
 
   if (lowerInput.match(/\b(code|example|file|entry|main|index)\b/)) {
-    return Math.min(finalConfidence + 0.2, 1.0)
+    return Math.min(finalConfidence + 0.2, 1.0);
   }
 
-  return Math.min(finalConfidence, 1.0)
+  return Math.min(finalConfidence, 1.0);
 }
 
-function detectCodeContext(tokens: string[], input: string): CodeContext {
-  const lowerInput = input.toLowerCase()
-  const lowerTokens = tokens.map((t) => t.toLowerCase())
+function detectCodeContext(tokens: string[], input: string): string {
+  const lowerInput = input.toLowerCase();
+  const lowerTokens = tokens.map((t) => t.toLowerCase());
 
-  if (lowerInput.match(/\b(ai function|ai process|function for ai|ai file)\b/)) {
-    return "ai_function"
+  if (
+    lowerInput.match(/\b(ai function|ai process|function for ai|ai file)\b/)
+  ) {
+    return "ai_function";
   }
 
-  if (lowerInput.match(/\b(entry point|main file|index file|starting point)\b/)) {
-    return "entry_point"
+  if (
+    lowerInput.match(/\b(entry point|main file|index file|starting point)\b/)
+  ) {
+    return "entry_point";
   }
 
   // Check for blockchain/crypto context
-  const blockchainKeywords = ["blockchain", "crypto", "cryptocurrency", "block", "chain", "bitcoin", "ethereum"]
-  if (blockchainKeywords.some((kw) => lowerTokens.includes(kw) || lowerInput.includes(kw))) {
-    return "blockchain"
+  const blockchainKeywords = [
+    "blockchain",
+    "crypto",
+    "cryptocurrency",
+    "block",
+    "chain",
+    "bitcoin",
+    "ethereum",
+  ];
+  if (
+    blockchainKeywords.some(
+      (kw) => lowerTokens.includes(kw) || lowerInput.includes(kw),
+    )
+  ) {
+    return "blockchain";
   }
 
   // Check for AI/ML context
-  const aiKeywords = ["ai", "artificial", "intelligence", "model", "neural", "machine", "learning", "train"]
-  if (aiKeywords.some((kw) => lowerTokens.includes(kw) || lowerInput.includes(kw))) {
-    return "ai"
+  const aiKeywords = [
+    "ai",
+    "artificial",
+    "intelligence",
+    "model",
+    "neural",
+    "machine",
+    "learning",
+    "train",
+  ];
+  if (
+    aiKeywords.some((kw) => lowerTokens.includes(kw) || lowerInput.includes(kw))
+  ) {
+    return "ai";
   }
 
   // Check for error handling context
-  const errorKeywords = ["error", "exception", "handling", "try", "catch", "throw"]
-  if (errorKeywords.some((kw) => lowerTokens.includes(kw) || lowerInput.includes(kw))) {
-    return "error_handling"
+  const errorKeywords = [
+    "error",
+    "exception",
+    "handling",
+    "try",
+    "catch",
+    "throw",
+  ];
+  if (
+    errorKeywords.some(
+      (kw) => lowerTokens.includes(kw) || lowerInput.includes(kw),
+    )
+  ) {
+    return "error_handling";
   }
 
   // Check for algorithm context
-  const algoKeywords = ["algorithm", "sort", "search", "optimize", "complexity"]
-  if (algoKeywords.some((kw) => lowerTokens.includes(kw) || lowerInput.includes(kw))) {
-    return "algorithm"
+  const algoKeywords = [
+    "algorithm",
+    "sort",
+    "search",
+    "optimize",
+    "complexity",
+  ];
+  if (
+    algoKeywords.some(
+      (kw) => lowerTokens.includes(kw) || lowerInput.includes(kw),
+    )
+  ) {
+    return "algorithm";
   }
 
   // Check for website/web app context
-  const webKeywords = ["website", "web", "app", "page", "component", "react", "vue", "angular"]
-  if (webKeywords.some((kw) => lowerTokens.includes(kw) || lowerInput.includes(kw))) {
-    return "web"
+  const webKeywords = [
+    "website",
+    "web",
+    "app",
+    "page",
+    "component",
+    "react",
+    "vue",
+    "angular",
+  ];
+  if (
+    webKeywords.some(
+      (kw) => lowerTokens.includes(kw) || lowerInput.includes(kw),
+    )
+  ) {
+    return "web";
   }
 
-  return "general"
+  return "general";
 }
 
 function generateCodeExample(context: CodeContext): string {
@@ -289,7 +330,7 @@ export async function evaluateModel(
   
   return correct / testData.length;
 }
-\`\`\``
+\`\`\``;
 
     case "entry_point":
       return `\`\`\`typescript
@@ -332,7 +373,7 @@ async function main(): Promise<void> {
 
 // Run the application
 main();
-\`\`\``
+\`\`\``;
 
     case "blockchain":
       return `\`\`\`typescript
@@ -443,7 +484,7 @@ class Blockchain {
 const blockchain = new Blockchain();
 blockchain.addBlock("Transaction 1");
 console.log("Valid?", blockchain.isChainValid());
-\`\`\``
+\`\`\``;
 
     case "ai":
       return `\`\`\`typescript
@@ -525,7 +566,7 @@ await model.train([
   { input: [1, 0, 1], expectedOutput: [1, 0] },
   { input: [0, 1, 0], expectedOutput: [0, 1] }
 ]);
-\`\`\``
+\`\`\``;
 
     case "error_handling":
       return `\`\`\`typescript
@@ -608,7 +649,7 @@ if (result.success) {
 } else {
   console.error('Error:', result.error.message);
 }
-\`\`\``
+\`\`\``;
 
     case "algorithm":
       return `\`\`\`typescript
@@ -672,7 +713,7 @@ const fibonacci = memoize((n: number): number => {
 });
 
 console.log(fibonacci(40)); // Fast with memoization
-\`\`\``
+\`\`\``;
 
     case "web":
       return `\`\`\`typescript
@@ -758,7 +799,7 @@ const store = new StateManager<AppState>({
 store.subscribe(state => {
   console.log('State updated:', state);
 });
-\`\`\``
+\`\`\``;
 
     default:
       return `\`\`\`typescript
@@ -813,19 +854,18 @@ userStore.add({ id: 1, name: 'Alice', email: 'alice@example.com', role: 'admin' 
 
 const user = await fetchUser(1);
 console.log(user);
-\`\`\``
+\`\`\``;
   }
 }
 
 export async function typescriptRunInference(
   input: string,
-  context?: InferenceContext,
-): Promise<TypescriptInferenceResponse> {
-  const tokens = context?.tokens ?? typescriptTokenizer(input)
-  const semantics = typescriptSemanticAnalyzer(input)
+  _context?: InferenceContext,
+): Promise<any> {
+  const tokens = _context?.tokens || typescriptTokenizer(input);
+  const semantics = typescriptSemanticAnalyzer(input);
 
-  const confidence = calculateConfidence(tokens, input)
-  const minConfidence = THRESHOLDS.minConfidence ?? 0.05
+  const confidence = calculateConfidence(tokens, input);
 
   if (confidence < minConfidence) {
     return {
@@ -837,32 +877,32 @@ export async function typescriptRunInference(
         code: "LOW_CONFIDENCE",
         message: `Query confidence (${confidence.toFixed(2)}) below threshold (${minConfidence.toFixed(2)})`,
       },
-    }
+    };
   }
 
-  const codeContext = detectCodeContext(tokens, input)
+  const codeContext = detectCodeContext(tokens, input);
 
-  const codeExample = generateCodeExample(codeContext)
+  const codeExample = generateCodeExample(codeContext);
 
-  let responseText = ""
+  let responseText = "";
   if (codeContext === "ai_function") {
     responseText = `Here's a TypeScript file with AI inference functions:
 
 ${codeExample}
 
-This demonstrates a complete AI inference system with training, evaluation, and prediction functions.`
+This demonstrates a complete AI inference system with training, evaluation, and prediction functions.`;
   } else if (codeContext === "entry_point") {
     responseText = `Here's a TypeScript entry point file (index.ts):
 
 ${codeExample}
 
-This demonstrates the main application entry point that orchestrates AI training and inference.`
+This demonstrates the main application entry point that orchestrates AI training and inference.`;
   } else {
     responseText = `Here's a TypeScript ${codeContext === "general" ? "" : codeContext + " "}code example:
 
 ${codeExample}
 
-This demonstrates TypeScript's type system${codeContext !== "general" ? ` for ${codeContext} use cases` : " with interfaces and classes"}.`
+This demonstrates TypeScript's type system${codeContext !== "general" ? ` for ${codeContext} use cases` : " with interfaces and classes"}.`;
   }
 
   return {
@@ -877,23 +917,25 @@ This demonstrates TypeScript's type system${codeContext !== "general" ? ` for ${
       pretrainedConfidence: confidence,
       suggestions: generateTypescriptSuggestions(semantics),
     },
-  }
+  };
 }
 
-function generateTypescriptSuggestions(semantics: TypescriptSemanticAnalysis): string[] {
-  const suggestions: string[] = []
+function generateTypescriptSuggestions(
+  semantics: Record<string, any>,
+): string[] {
+  const suggestions: string[] = [];
 
   if (!semantics.hasTypeAnnotations) {
-    suggestions.push("Consider adding type annotations for better type safety")
+    suggestions.push("Consider adding type annotations for better type safety");
   }
   if (semantics.hasAsyncCode && !semantics.hasFunctions) {
-    suggestions.push("Async code detected - ensure proper error handling")
+    suggestions.push("Async code detected - ensure proper error handling");
   }
   if (semantics.complexity > 100) {
-    suggestions.push("High complexity detected - consider refactoring")
+    suggestions.push("High complexity detected - consider refactoring");
   }
 
-  return suggestions
+  return suggestions;
 }
 
 export default typescriptRunInference;

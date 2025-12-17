@@ -1,45 +1,45 @@
 /**
  * File: src/ai/orchestration/domainRouter.ts
- * 
+ *
  * Routes requests to appropriate knowledge domains based on keywords,
  * intent, and content analysis. Supports multi-domain queries.
- * 
+ *
  * Integration:
  * - Called by: mainOrchestrator.ts
  * - Uses: domainRegistry, keyword matching, intent classification
  * - Returns: List of domain names to query
  */
 
-import { logger } from "./logger"
-import { domainRegistry } from "../knowledge-domains/domainRegistry"
+import { logger } from "./logger";
+import domainRegistry from "../knowledge-domains/domainRegistry";
 
 export interface DomainRoutingCriteria {
-  keywords: string[]
-  intent: string
-  language?: string
-  contentType: "general" | "technical" | "creative" | "analytical"
+  keywords: string[];
+  intent: string;
+  language?: string;
+  contentType: "general" | "technical" | "creative" | "analytical";
 }
 
 export interface RoutedDomain {
-  name: string
-  confidence: number
-  reason: string
-  priority: number
+  name: string;
+  confidence: number;
+  reason: string;
+  priority: number;
 }
 
 /**
  * DomainRouter Class
- * 
+ *
  * Intelligent routing to knowledge domains
  */
 export class DomainRouter {
-  private domainKeywords: Map<string, string[]>
-  private domainPriorities: Map<string, number>
+  private domainKeywords: Map<string, string[]>;
+  private domainPriorities: Map<string, number>;
 
   constructor() {
-    this.domainKeywords = new Map()
-    this.domainPriorities = new Map()
-    this.initializeDomainMappings()
+    this.domainKeywords = new Map();
+    this.domainPriorities = new Map();
+    this.initializeDomainMappings();
   }
 
   /**
@@ -56,8 +56,8 @@ export class DomainRouter {
       "sentence",
       "paragraph",
       "essay",
-    ])
-    this.domainPriorities.set("english", 90)
+    ]);
+    this.domainPriorities.set("english", 90);
 
     // Mathematics domain
     this.domainKeywords.set("mathematics", [
@@ -70,8 +70,8 @@ export class DomainRouter {
       "number",
       "solve",
       "formula",
-    ])
-    this.domainPriorities.set("mathematics", 95)
+    ]);
+    this.domainPriorities.set("mathematics", 95);
 
     // TypeScript domain
     this.domainKeywords.set("typescript", [
@@ -81,8 +81,8 @@ export class DomainRouter {
       "interface",
       "generic",
       "decorator",
-    ])
-    this.domainPriorities.set("typescript", 95)
+    ]);
+    this.domainPriorities.set("typescript", 95);
 
     // Programming domain
     this.domainKeywords.set("programming", [
@@ -94,8 +94,8 @@ export class DomainRouter {
       "loop",
       "condition",
       "algorithm",
-    ])
-    this.domainPriorities.set("programming", 92)
+    ]);
+    this.domainPriorities.set("programming", 92);
 
     // React domain
     this.domainKeywords.set("react", [
@@ -107,8 +107,8 @@ export class DomainRouter {
       "useState",
       "useEffect",
       "props",
-    ])
-    this.domainPriorities.set("react", 93)
+    ]);
+    this.domainPriorities.set("react", 93);
 
     // Next.js domain
     this.domainKeywords.set("nextjs", [
@@ -118,8 +118,8 @@ export class DomainRouter {
       "server component",
       "client component",
       "route",
-    ])
-    this.domainPriorities.set("nextjs", 94)
+    ]);
+    this.domainPriorities.set("nextjs", 94);
 
     // Science domain
     this.domainKeywords.set("science", [
@@ -130,8 +130,8 @@ export class DomainRouter {
       "experiment",
       "theory",
       "hypothesis",
-    ])
-    this.domainPriorities.set("science", 88)
+    ]);
+    this.domainPriorities.set("science", 88);
 
     // Grammar domain
     this.domainKeywords.set("grammar", [
@@ -142,8 +142,8 @@ export class DomainRouter {
       "verb",
       "noun",
       "adjective",
-    ])
-    this.domainPriorities.set("grammar", 90)
+    ]);
+    this.domainPriorities.set("grammar", 90);
 
     // Documentation domain
     this.domainKeywords.set("documentation", [
@@ -154,8 +154,8 @@ export class DomainRouter {
       "tutorial",
       "docs",
       "manual",
-    ])
-    this.domainPriorities.set("documentation", 85)
+    ]);
+    this.domainPriorities.set("documentation", 85);
 
     // Testing domain
     this.domainKeywords.set("testing", [
@@ -167,8 +167,8 @@ export class DomainRouter {
       "vitest",
       "cypress",
       "spec",
-    ])
-    this.domainPriorities.set("testing", 90)
+    ]);
+    this.domainPriorities.set("testing", 90);
 
     // Security domain
     this.domainKeywords.set("security", [
@@ -179,8 +179,8 @@ export class DomainRouter {
       "encryption",
       "xss",
       "sql injection",
-    ])
-    this.domainPriorities.set("security", 98)
+    ]);
+    this.domainPriorities.set("security", 98);
 
     // Error Detection domain
     this.domainKeywords.set("error_detection", [
@@ -191,8 +191,8 @@ export class DomainRouter {
       "crash",
       "fix",
       "issue",
-    ])
-    this.domainPriorities.set("error_detection", 93)
+    ]);
+    this.domainPriorities.set("error_detection", 93);
 
     // Code Review domain
     this.domainKeywords.set("code_review", [
@@ -202,8 +202,8 @@ export class DomainRouter {
       "improve",
       "optimize",
       "best practice",
-    ])
-    this.domainPriorities.set("code_review", 88)
+    ]);
+    this.domainPriorities.set("code_review", 88);
 
     // Data Structures domain
     this.domainKeywords.set("data_structures", [
@@ -215,8 +215,8 @@ export class DomainRouter {
       "stack",
       "queue",
       "hash",
-    ])
-    this.domainPriorities.set("data_structures", 90)
+    ]);
+    this.domainPriorities.set("data_structures", 90);
 
     // Algorithms domain
     this.domainKeywords.set("algorithms", [
@@ -227,8 +227,8 @@ export class DomainRouter {
       "big o",
       "optimization",
       "recursive",
-    ])
-    this.domainPriorities.set("algorithms", 91)
+    ]);
+    this.domainPriorities.set("algorithms", 91);
 
     // Version Control domain
     this.domainKeywords.set("version_control", [
@@ -239,8 +239,8 @@ export class DomainRouter {
       "merge",
       "pull request",
       "repository",
-    ])
-    this.domainPriorities.set("version_control", 87)
+    ]);
+    this.domainPriorities.set("version_control", 87);
 
     // Environment domain
     this.domainKeywords.set("environment", [
@@ -251,8 +251,8 @@ export class DomainRouter {
       "install",
       "deploy",
       "build",
-    ])
-    this.domainPriorities.set("environment", 85)
+    ]);
+    this.domainPriorities.set("environment", 85);
 
     // Internet Search domain
     this.domainKeywords.set("internet_search", [
@@ -263,28 +263,35 @@ export class DomainRouter {
       "web",
       "online",
       "internet",
-    ])
-    this.domainPriorities.set("internet_search", 80)
+    ]);
+    this.domainPriorities.set("internet_search", 80);
 
     // General domain (fallback)
-    this.domainKeywords.set("general", ["general", "help", "question", "what", "how", "why"])
-    this.domainPriorities.set("general", 70)
+    this.domainKeywords.set("general", [
+      "general",
+      "help",
+      "question",
+      "what",
+      "how",
+      "why",
+    ]);
+    this.domainPriorities.set("general", 70);
   }
 
   /**
    * Route request to appropriate domains
    */
   public route(criteria: DomainRoutingCriteria): RoutedDomain[] {
-    const routedDomains: RoutedDomain[] = []
+    const routedDomains: RoutedDomain[] = [];
 
-    logger.info("DomainRouter: Routing to domains", { criteria })
+    logger.info("DomainRouter", "Routing to domains", { criteria });
 
     // Get all available domains from registry
-    const availableDomains = domainRegistry.getAllDomains().map((domain) => domain.name)
+    const availableDomains = domainRegistry.getAllDomains();
 
     // Score each domain based on keyword matches
     for (const domainName of availableDomains) {
-      const score = this.calculateDomainScore(domainName, criteria.keywords)
+      const score = this.calculateDomainScore(domainName, criteria.keywords);
 
       if (score > 0) {
         routedDomains.push({
@@ -292,7 +299,7 @@ export class DomainRouter {
           confidence: score,
           reason: this.getDomainMatchReason(domainName, criteria.keywords),
           priority: this.domainPriorities.get(domainName) || 50,
-        })
+        });
       }
     }
 
@@ -303,90 +310,98 @@ export class DomainRouter {
         confidence: 0.5,
         reason: "Fallback domain",
         priority: 70,
-      })
+      });
     }
 
     // Sort by priority and confidence
     routedDomains.sort((a, b) => {
-      const priorityDiff = b.priority - a.priority
-      if (priorityDiff !== 0) return priorityDiff
-      return b.confidence - a.confidence
-    })
+      const priorityDiff = b.priority - a.priority;
+      if (priorityDiff !== 0) return priorityDiff;
+      return b.confidence - a.confidence;
+    });
 
     // Limit to top 5 domains for performance
-    const selectedDomains = routedDomains.slice(0, 5)
+    const selectedDomains = routedDomains.slice(0, 5);
 
     logger.info("DomainRouter: Domains routed", {
       count: selectedDomains.length,
       domains: selectedDomains.map((d) => d.name),
-    })
+    });
 
-    return selectedDomains
+    return selectedDomains;
   }
 
   /**
    * Calculate domain relevance score
    */
   private calculateDomainScore(domainName: string, keywords: string[]): number {
-    const domainKeywords = this.domainKeywords.get(domainName) || []
-    if (domainKeywords.length === 0) return 0
+    const domainKeywords = this.domainKeywords.get(domainName) || [];
+    if (domainKeywords.length === 0) return 0;
 
-    let totalWeight = 0
+    let matchCount = 0;
+    let totalWeight = 0;
 
     for (const keyword of keywords) {
-      const lowerKeyword = keyword.toLowerCase()
+      const lowerKeyword = keyword.toLowerCase();
 
       for (const domainKeyword of domainKeywords) {
-        if (lowerKeyword.includes(domainKeyword) || domainKeyword.includes(lowerKeyword)) {
+        if (
+          lowerKeyword.includes(domainKeyword) ||
+          domainKeyword.includes(lowerKeyword)
+        ) {
+          matchCount++;
           // Exact matches get higher weight
-          const weight = lowerKeyword === domainKeyword ? 2.0 : 1.0
-          totalWeight += weight
+          const weight = lowerKeyword === domainKeyword ? 2.0 : 1.0;
+          totalWeight += weight;
         }
       }
     }
 
     // Normalize score to 0-1 range
-    const maxPossibleScore = keywords.length * 2
-    return Math.min(totalWeight / Math.max(maxPossibleScore, 1), 1.0)
+    const maxPossibleScore = keywords.length * 2;
+    return Math.min(totalWeight / Math.max(maxPossibleScore, 1), 1.0);
   }
 
   /**
    * Get explanation for why domain was matched
    */
   private getDomainMatchReason(domainName: string, keywords: string[]): string {
-    const domainKeywords = this.domainKeywords.get(domainName) || []
-    const matchedKeywords: string[] = []
+    const domainKeywords = this.domainKeywords.get(domainName) || [];
+    const matchedKeywords: string[] = [];
 
     for (const keyword of keywords) {
-      const lowerKeyword = keyword.toLowerCase()
+      const lowerKeyword = keyword.toLowerCase();
 
       for (const domainKeyword of domainKeywords) {
-        if (lowerKeyword.includes(domainKeyword) || domainKeyword.includes(lowerKeyword)) {
-          matchedKeywords.push(keyword)
-          break
+        if (
+          lowerKeyword.includes(domainKeyword) ||
+          domainKeyword.includes(lowerKeyword)
+        ) {
+          matchedKeywords.push(keyword);
+          break;
         }
       }
     }
 
     if (matchedKeywords.length > 0) {
-      return `Matched keywords: ${matchedKeywords.slice(0, 3).join(", ")}`
+      return `Matched keywords: ${matchedKeywords.slice(0, 3).join(", ")}`;
     }
 
-    return "General relevance"
+    return "General relevance";
   }
 
   /**
    * Get all registered domains
    */
   public getAllDomains(): string[] {
-    return Array.from(this.domainKeywords.keys())
+    return Array.from(this.domainKeywords.keys());
   }
 
   /**
    * Get domain keywords
    */
   public getDomainKeywords(domainName: string): string[] {
-    return this.domainKeywords.get(domainName) || []
+    return this.domainKeywords.get(domainName) || [];
   }
 
   /**
@@ -395,17 +410,17 @@ export class DomainRouter {
   public addDomain(
     domainName: string,
     keywords: string[],
-    priority: number = 75
+    priority: number = 75,
   ): void {
-    this.domainKeywords.set(domainName, keywords)
-    this.domainPriorities.set(domainName, priority)
+    this.domainKeywords.set(domainName, keywords);
+    this.domainPriorities.set(domainName, priority);
 
     logger.info("DomainRouter: Added custom domain", {
       domainName,
       keywordCount: keywords.length,
       priority,
-    })
+    });
   }
 }
 
-export default DomainRouter
+export default DomainRouter;

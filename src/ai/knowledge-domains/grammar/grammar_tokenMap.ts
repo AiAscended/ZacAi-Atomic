@@ -6,41 +6,40 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import GRAMMAR_CORE_TOKENS from "./grammar_tokens"
+import GRAMMAR_CORE_TOKENS from "./grammar_tokens";
 
 const RESERVED_TOKENS = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"] as const
 
 export const buildGrammarTokenMap = () => {
-  const map = new Map<string, number>()
-  RESERVED_TOKENS.forEach((token, index) => map.set(token, index))
+  const map = new Map<string, number>();
+  const reserved = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"];
+  reserved.forEach((t, i) => map.set(t, i));
 
-  let idx = RESERVED_TOKENS.length
-  for (const token of GRAMMAR_CORE_TOKENS) {
-    if (map.has(token)) continue
-    map.set(token, idx++)
+  let idx = reserved.length;
+  for (const t of GRAMMAR_CORE_TOKENS) {
+    if (map.has(t)) continue;
+    map.set(t, idx++);
   }
 
-  return map
-}
+  return map;
+};
 
-export const grammarTokenMap = buildGrammarTokenMap()
+export const grammarTokenMap = buildGrammarTokenMap();
 
 export const getGrammarTokenId = (token: string): number => {
-  return grammarTokenMap.get(token) ?? grammarTokenMap.get("[UNK]")!
-}
+  return grammarTokenMap.get(token) ?? grammarTokenMap.get("[UNK]")!;
+};
 
 export const getGrammarTokenById = (id: number): string | undefined => {
-  for (const [k, v] of grammarTokenMap.entries()) if (v === id) return k
-  return undefined
-}
+  for (const [k, v] of grammarTokenMap.entries()) if (v === id) return k;
+  return undefined;
+};
 
-export const grammarTokenCount = () => grammarTokenMap.size
+export const grammarTokenCount = () => grammarTokenMap.size;
 
-const grammarTokenExports = {
+export default {
   grammarTokenMap,
   getGrammarTokenId,
   getGrammarTokenById,
   grammarTokenCount,
-}
-
-export default grammarTokenExports
+};

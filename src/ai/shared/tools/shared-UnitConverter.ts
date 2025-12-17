@@ -27,11 +27,11 @@ export enum UnitCategory {
  * Conversion result
  */
 export interface ConversionResult {
-  value: number
-  fromUnit: string
-  toUnit: string
-  category: UnitCategory
-  formula?: string
+  value: number;
+  fromUnit: string;
+  toUnit: string;
+  category: UnitCategory;
+  formula?: string;
 }
 
 /**
@@ -40,7 +40,10 @@ export interface ConversionResult {
  */
 export class UnitConverter {
   // Conversion factors to base units
-  private static readonly CONVERSIONS: Record<UnitCategory, Record<string, number>> = {
+  private static readonly CONVERSIONS: Record<
+    UnitCategory,
+    Record<string, number>
+  > = {
     [UnitCategory.LENGTH]: {
       meter: 1,
       m: 1,
@@ -182,35 +185,39 @@ export class UnitConverter {
       tb: 1099511627776,
       bit: 0.125,
     },
-  }
+  };
 
   /**
    * Convert value from one unit to another
    */
-  public static convert(value: number, fromUnit: string, toUnit: string): ConversionResult {
+  public static convert(
+    value: number,
+    fromUnit: string,
+    toUnit: string,
+  ): ConversionResult {
     // Normalize unit names
-    const from = fromUnit.toLowerCase().replace(/\s+/g, "")
-    const to = toUnit.toLowerCase().replace(/\s+/g, "")
+    const from = fromUnit.toLowerCase().replace(/\s+/g, "");
+    const to = toUnit.toLowerCase().replace(/\s+/g, "");
 
     // Find category
-    const category = this.findCategory(from)
+    const category = this.findCategory(from);
     if (!category) {
-      throw new Error(`Unknown unit: ${fromUnit}`)
+      throw new Error(`Unknown unit: ${fromUnit}`);
     }
 
     // Check if toUnit is in same category
     if (!this.CONVERSIONS[category][to]) {
-      throw new Error(`Cannot convert ${fromUnit} to ${toUnit}`)
+      throw new Error(`Cannot convert ${fromUnit} to ${toUnit}`);
     }
 
     // Special handling for temperature
     if (category === UnitCategory.TEMPERATURE) {
-      return this.convertTemperature(value, from, to)
+      return this.convertTemperature(value, from, to);
     }
 
     // Convert to base unit, then to target unit
-    const baseValue = value * this.CONVERSIONS[category][from]
-    const result = baseValue / this.CONVERSIONS[category][to]
+    const baseValue = value * this.CONVERSIONS[category][from];
+    const result = baseValue / this.CONVERSIONS[category][to];
 
     return {
       value: result,
@@ -218,53 +225,57 @@ export class UnitConverter {
       toUnit,
       category,
       formula: `${value} ${fromUnit} × ${this.CONVERSIONS[category][from]} ÷ ${this.CONVERSIONS[category][to]} = ${result} ${toUnit}`,
-    }
+    };
   }
 
   /**
    * Convert temperature (requires special formulas)
    */
-  private static convertTemperature(value: number, from: string, to: string): ConversionResult {
-    let result: number
-    let formula: string
+  private static convertTemperature(
+    value: number,
+    from: string,
+    to: string,
+  ): ConversionResult {
+    let result: number;
+    let formula: string;
 
     // Celsius conversions
     if (from === "c" || from === "celsius") {
       if (to === "f" || to === "fahrenheit") {
-        result = (value * 9) / 5 + 32
-        formula = `(${value}°C × 9/5) + 32 = ${result}°F`
+        result = (value * 9) / 5 + 32;
+        formula = `(${value}°C × 9/5) + 32 = ${result}°F`;
       } else if (to === "k" || to === "kelvin") {
-        result = value + 273.15
-        formula = `${value}°C + 273.15 = ${result}K`
+        result = value + 273.15;
+        formula = `${value}°C + 273.15 = ${result}K`;
       } else {
-        result = value
-        formula = `${value}°C = ${result}°C`
+        result = value;
+        formula = `${value}°C = ${result}°C`;
       }
     }
     // Fahrenheit conversions
     else if (from === "f" || from === "fahrenheit") {
       if (to === "c" || to === "celsius") {
-        result = ((value - 32) * 5) / 9
-        formula = `(${value}°F - 32) × 5/9 = ${result}°C`
+        result = ((value - 32) * 5) / 9;
+        formula = `(${value}°F - 32) × 5/9 = ${result}°C`;
       } else if (to === "k" || to === "kelvin") {
-        result = ((value - 32) * 5) / 9 + 273.15
-        formula = `((${value}°F - 32) × 5/9) + 273.15 = ${result}K`
+        result = ((value - 32) * 5) / 9 + 273.15;
+        formula = `((${value}°F - 32) × 5/9) + 273.15 = ${result}K`;
       } else {
-        result = value
-        formula = `${value}°F = ${result}°F`
+        result = value;
+        formula = `${value}°F = ${result}°F`;
       }
     }
     // Kelvin conversions
     else {
       if (to === "c" || to === "celsius") {
-        result = value - 273.15
-        formula = `${value}K - 273.15 = ${result}°C`
+        result = value - 273.15;
+        formula = `${value}K - 273.15 = ${result}°C`;
       } else if (to === "f" || to === "fahrenheit") {
-        result = ((value - 273.15) * 9) / 5 + 32
-        formula = `((${value}K - 273.15) × 9/5) + 32 = ${result}°F`
+        result = ((value - 273.15) * 9) / 5 + 32;
+        formula = `((${value}K - 273.15) × 9/5) + 32 = ${result}°F`;
       } else {
-        result = value
-        formula = `${value}K = ${result}K`
+        result = value;
+        formula = `${value}K = ${result}K`;
       }
     }
 
@@ -274,7 +285,7 @@ export class UnitConverter {
       toUnit: to,
       category: UnitCategory.TEMPERATURE,
       formula,
-    }
+    };
   }
 
   /**
@@ -283,35 +294,39 @@ export class UnitConverter {
   private static findCategory(unit: string): UnitCategory | null {
     for (const [category, units] of Object.entries(this.CONVERSIONS)) {
       if (units[unit] !== undefined) {
-        return category as UnitCategory
+        return category as UnitCategory;
       }
     }
-    return null
+    return null;
   }
 
   /**
    * Get all supported units for a category
    */
   public static getSupportedUnits(category: UnitCategory): string[] {
-    return Object.keys(this.CONVERSIONS[category])
+    return Object.keys(this.CONVERSIONS[category]);
   }
 
   /**
    * Get all supported categories
    */
   public static getSupportedCategories(): UnitCategory[] {
-    return Object.values(UnitCategory)
+    return Object.values(UnitCategory);
   }
 }
 
 /**
  * Convenience function for quick conversion
  */
-export function convertUnit(value: number, fromUnit: string, toUnit: string): ConversionResult {
-  return UnitConverter.convert(value, fromUnit, toUnit)
+export function convertUnit(
+  value: number,
+  fromUnit: string,
+  toUnit: string,
+): ConversionResult {
+  return UnitConverter.convert(value, fromUnit, toUnit);
 }
 
 /**
  * Export converter instance
  */
-export const converter = UnitConverter
+export const converter = UnitConverter;

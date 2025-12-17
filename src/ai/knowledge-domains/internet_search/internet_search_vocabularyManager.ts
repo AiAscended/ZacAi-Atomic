@@ -1,5 +1,5 @@
-import { storageAdapter } from "../storageAdapter"
-import { safeParseJSON } from "./internet_search_utils"
+import { storageAdapter } from "../storageAdapter";
+import { safeParseJSON } from "./internet_search_utils";
 
 export type InternetSearchSeedVocabulary = {
   terms: string[]
@@ -14,10 +14,9 @@ export const loadInternetSearchSeedVocabulary = async (
   path = DEFAULT_SEED_VOCAB_PATH,
 ): Promise<InternetSearchSeedVocabulary> => {
   try {
-    const raw = await storageAdapter.readFile(path, "utf-8")
-    return safeParseJSON<InternetSearchSeedVocabulary>(raw, createDefaultSeedVocabulary())
-  } catch (error) {
-    console.error("[internet-search][seed-vocabulary] Failed to load seed vocabulary", { path, error })
-    return createDefaultSeedVocabulary()
+    const raw = await storageAdapter.readFile(path, "utf-8");
+    return safeParseJSON(raw, { terms: [] }) as { terms: string[] };
+  } catch (e) {
+    return { terms: [] };
   }
-}
+};

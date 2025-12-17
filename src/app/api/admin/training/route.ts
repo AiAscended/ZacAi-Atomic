@@ -1,14 +1,13 @@
 /**
- * Training Automation API Route
- * Provides endpoints for managing training schedules and manual triggers
- * Path: /api/admin/training
+ * Admin Training Management API
+ *
+ * Control automated training pipeline
  */
 
-import { NextRequest, NextResponse } from 'next/server'
-import { settingsStore } from '@/ai/shared/config/settingsStore'
-import { mainOrchestrator } from '@/ai/orchestration/mainOrchestrator'
+import { NextRequest, NextResponse } from "next/server";
+import { trainingScheduler } from "@/ai/training/trainingManager";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/admin/training
@@ -16,86 +15,127 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET() {
   try {
-    const settings = await settingsStore.getTraining()
-    
-    // Get current metrics summary
-    const metrics = await mainOrchestrator.exportMetricsForTraining(0.5, 10)
-    
-    return NextResponse.json({
-      success: true,
-      settings,
-      metrics: {
-        totalSamples: metrics.length,
-        highConfidenceSamples: metrics.filter((m: any) => m.confidence > 0.7).length,
-        lastTrainingRun: settings.lastTrainingRun || null,
-        nextScheduledRun: settings.nextScheduledRun || null,
-      },
-    })
+    const body = await request.json();
+    const { action, params } = body;
+
+    switch (action) {
+      case "trigger":
+        const result = await trainingScheduler.runTraining(
+          params?.mode || "full",
+        );
+        return NextResponse.json({
+          success: true,
+          data: result,
+          message: "Training triggered successfully",
+        });
+
+      case "stop":
+        await trainingScheduler.stopTraining();
+        return NextResponse.json({
+          success: true,
+          message: "Training stopped",
+        });
+
+      case "export":
+        const exportedData = await trainingScheduler.exportMetrics();
+        return NextResponse.json({
+          success: true,
+          data: exportedData,
+        });
+
+      default:
+        return NextResponse.json(
+          { success: false, error: "Invalid action" },
+          { status: 400 },
+        );
+    }
   } catch (error) {
-    console.error('[Training API] Error:', error)
+    console.error("[Admin Training API] Error:", error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch training status' },
-      { status: 500 }
-    )
+      {
+        success: false,
+        error: "Training operation failed",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    );
   }
 }
 
-/**
- * POST /api/admin/training
- * Update training settings or trigger manual training
- */
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { action, settings } = body
+    const { searchParams } = new URL(request.url);
+    const view = searchParams.get("view") || "status";
 
-    if (action === 'trigger') {
-      // Manual training trigger
-      console.log('[Training API] Triggering manual training...')
-      
-      const minConfidence = settings?.minConfidence || 0.7
-      const maxSamples = settings?.maxSamples || 1000
-      
-      // Export training data
-      const trainingData = await mainOrchestrator.exportMetricsForTraining(
-        minConfidence,
-        maxSamples
-      )
-      
-      console.log(`[Training API] Exported ${trainingData.length} training samples`)
-      
-      // Update last training run timestamp
-      const currentSettings = await settingsStore.getTraining()
-      await settingsStore.updateTraining({
-        ...currentSettings,
-        lastTrainingRun: new Date().toISOString(),
-      })
-      
-      return NextResponse.json({
-        success: true,
-        message: 'Training triggered successfully',
-        samplesExported: trainingData.length,
-      })
-    } else if (action === 'updateSettings') {
-      // Update training settings
-      await settingsStore.updateTraining(settings)
-      
-      return NextResponse.json({
-        success: true,
-        message: 'Training settings updated',
-        settings,
-      })
-    } else {
-      return NextResponse.json(
-        { success: false, error: 'Invalid action' },
-        { status: 400 }
-      )
+    switch (view) {
+      case "status":
+        const status = trainingScheduler.getStatus();
+        return NextResponse.json({
+          success: true,
+          data: status,
+        });
+
+      case "history":
+        const history = trainingScheduler.getHistory();
+        return NextResponse.json({
+          success: true,
+          data: history,
+        });
+
+      case "settings":
+        const settings = trainingScheduler.getSettings();
+        return NextResponse.json({
+          success: true,
+          data: settings,
+        });
+
+      default:
+        return NextResponse.json(
+          { success: false, error: "Invalid view parameter" },
+          { status: 400 },
+        );
     }
   } catch (error) {
-    console.error('[Training API] Error:', error)
+    console.error("[Admin Training API] Error:", error);
     return NextResponse.json(
-      { success: false, error: 'Failed to process training request' },
-      { status: 500 }
-    )
+      {
+        success: false,
+        error: "Failed to retrieve training data",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { settings } = body;
+
+    if (!settings) {
+      return NextResponse.json(
+        { success: false, error: "Settings are required" },
+        { status: 400 },
+      );
+    }
+
+    await trainingScheduler.updateSettings(settings);
+
+    return NextResponse.json({
+      success: true,
+      message: "Training settings updated successfully",
+      data: settings,
+    });
+  } catch (error) {
+    console.error("[Admin Training API] Error updating settings:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to update settings",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    );
   }
 }

@@ -1,7 +1,7 @@
 /**
  * File: src/ai/knowledge-domains/domainScanner.ts
  * Purpose: Auto-discover and register knowledge domains dynamically
- * 
+ *
  * Features:
  * - Scans src/ai/knowledge-domains/ for domain directories
  * - Validates domain structure (seeds, weights, inference, training, integrationAPI)
@@ -23,7 +23,7 @@ export interface DomainManifest {
   version: string;
   description: string;
   enabled: boolean;
-  
+
   // Required structure
   structure: {
     hasSeedsFolder: boolean;
@@ -33,7 +33,7 @@ export interface DomainManifest {
     hasIntegrationAPI: boolean;
     hasTokenizer: boolean;
   };
-  
+
   // File paths (relative to domain folder)
   paths: {
     seedDataPath?: string;
@@ -47,7 +47,7 @@ export interface DomainManifest {
     tokenizerPath?: string;
     scriptsPath?: string;
   };
-  
+
   // Metadata
   metadata: {
     seedVocabSize?: number;
@@ -75,7 +75,12 @@ const REGISTRY_FILE = path.join(DOMAINS_DIR, "DOMAIN_REGISTRY.json");
 
 // Folders to skip during scan
 const SKIP_FOLDERS = ["shared", "node_modules", ".git"];
-const SKIP_FILES = ["registry.ts", "registerAllDomains.ts", "domainScanner.ts", "DOMAIN_REGISTRY.json"];
+const SKIP_FILES = [
+  "registry.ts",
+  "registerAllDomains.ts",
+  "domainScanner.ts",
+  "DOMAIN_REGISTRY.json",
+];
 
 // Required files pattern (flexible matching)
 const REQUIRED_PATTERNS = {
@@ -96,7 +101,7 @@ const REQUIRED_PATTERNS = {
 
 export class DomainScanner {
   private registry: DomainRegistry;
-  
+
   constructor() {
     this.registry = {
       version: "1.0.0",
@@ -106,21 +111,21 @@ export class DomainScanner {
       totalDomains: 0,
     };
   }
-  
+
   /**
    * Scan all domains in src/ai/knowledge-domains/
    */
   async scanDomains(): Promise<DomainRegistry> {
     console.log("🔍 Scanning for knowledge domains...");
-    
+
     try {
       const entries = await fs.readdir(DOMAINS_DIR, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         if (!entry.isDirectory() || SKIP_FOLDERS.includes(entry.name)) {
           continue;
         }
-        
+
         try {
           const manifest = await this.scanDomainDirectory(entry.name);
           if (manifest) {
@@ -133,69 +138,89 @@ export class DomainScanner {
           console.warn(`⚠️  Failed to scan domain: ${entry.name}`, error);
         }
       }
-      
+
       this.registry.totalDomains = Object.keys(this.registry.domains).length;
       this.registry.lastScanned = new Date().toISOString();
-      
+
       console.log(`✅ Found ${this.registry.totalDomains} domains`);
-      
+
       return this.registry;
     } catch (error) {
       console.error("❌ Failed to scan domains directory:", error);
       throw error;
     }
   }
-  
+
   /**
    * Scan individual domain directory
    */
-  private async scanDomainDirectory(domainFolderName: string): Promise<DomainManifest | null> {
+  private async scanDomainDirectory(
+    domainFolderName: string,
+  ): Promise<DomainManifest | null> {
     const domainPath = path.join(DOMAINS_DIR, domainFolderName);
-    
+
     console.log(`  📦 Scanning: ${domainFolderName}`);
-    
+
     // Read directory contents
     const files = await this.readDirectoryRecursive(domainPath);
-    
+
     // Check structure
     const structure = {
-      hasSeedsFolder: files.some(f => f.includes("seed")),
-      hasWeightsFolder: files.some(f => f.includes("weight")),
-      hasInferenceController: files.some(f => REQUIRED_PATTERNS.inferenceController.test(f)),
-      hasTrainingController: files.some(f => REQUIRED_PATTERNS.trainingController.test(f)),
-      hasIntegrationAPI: files.some(f => REQUIRED_PATTERNS.integrationAPI.test(f)),
-      hasTokenizer: files.some(f => REQUIRED_PATTERNS.tokenizer.test(f)),
+      hasSeedsFolder: files.some((f) => f.includes("seed")),
+      hasWeightsFolder: files.some((f) => f.includes("weight")),
+      hasInferenceController: files.some((f) =>
+        REQUIRED_PATTERNS.inferenceController.test(f),
+      ),
+      hasTrainingController: files.some((f) =>
+        REQUIRED_PATTERNS.trainingController.test(f),
+      ),
+      hasIntegrationAPI: files.some((f) =>
+        REQUIRED_PATTERNS.integrationAPI.test(f),
+      ),
+      hasTokenizer: files.some((f) => REQUIRED_PATTERNS.tokenizer.test(f)),
     };
-    
+
     // Build paths
     const paths: DomainManifest["paths"] = {
-      seedDataPath: files.find(f => REQUIRED_PATTERNS.seedData.test(f)),
-      seedVocabPath: files.find(f => REQUIRED_PATTERNS.seedVocab.test(f)),
-      pretrainedWeightsPath: files.find(f => f.includes("pretrained") && f.includes("weight")),
-      learnedDataPath: files.find(f => REQUIRED_PATTERNS.learnedData.test(f)),
-      trainingWeightsPath: files.find(f => REQUIRED_PATTERNS.trainingWeights.test(f)),
-      inferenceControllerPath: files.find(f => REQUIRED_PATTERNS.inferenceController.test(f)),
-      trainingControllerPath: files.find(f => REQUIRED_PATTERNS.trainingController.test(f)),
-      integrationAPIPath: files.find(f => REQUIRED_PATTERNS.integrationAPI.test(f)),
-      tokenizerPath: files.find(f => REQUIRED_PATTERNS.tokenizer.test(f)),
-      scriptsPath: files.find(f => f.includes("scripts")),
+      seedDataPath: files.find((f) => REQUIRED_PATTERNS.seedData.test(f)),
+      seedVocabPath: files.find((f) => REQUIRED_PATTERNS.seedVocab.test(f)),
+      pretrainedWeightsPath: files.find(
+        (f) => f.includes("pretrained") && f.includes("weight"),
+      ),
+      learnedDataPath: files.find((f) => REQUIRED_PATTERNS.learnedData.test(f)),
+      trainingWeightsPath: files.find((f) =>
+        REQUIRED_PATTERNS.trainingWeights.test(f),
+      ),
+      inferenceControllerPath: files.find((f) =>
+        REQUIRED_PATTERNS.inferenceController.test(f),
+      ),
+      trainingControllerPath: files.find((f) =>
+        REQUIRED_PATTERNS.trainingController.test(f),
+      ),
+      integrationAPIPath: files.find((f) =>
+        REQUIRED_PATTERNS.integrationAPI.test(f),
+      ),
+      tokenizerPath: files.find((f) => REQUIRED_PATTERNS.tokenizer.test(f)),
+      scriptsPath: files.find((f) => f.includes("scripts")),
     };
-    
+
     // Load seed vocab size
     let seedVocabSize = 0;
     if (paths.seedVocabPath) {
       try {
         const vocabContent = await fs.readFile(
           path.join(DOMAINS_DIR, domainFolderName, paths.seedVocabPath),
-          "utf8"
+          "utf8",
         );
         const vocab = JSON.parse(vocabContent);
-        seedVocabSize = Array.isArray(vocab) ? vocab.length : Object.keys(vocab).length;
+        seedVocabSize = Array.isArray(vocab)
+          ? vocab.length
+          : Object.keys(vocab).length;
       } catch {
         // Ignore parse errors
       }
     }
-    
+
     // Build manifest
     const manifest: DomainManifest = {
       domainId: domainFolderName,
@@ -212,29 +237,34 @@ export class DomainScanner {
         discoveredAt: new Date().toISOString(),
       },
     };
-    
+
     return manifest;
   }
-  
+
   /**
    * Recursively read directory files
    */
-  private async readDirectoryRecursive(dir: string, basePath: string = ""): Promise<string[]> {
+  private async readDirectoryRecursive(
+    dir: string,
+    basePath: string = "",
+  ): Promise<string[]> {
     const files: string[] = [];
-    
+
     try {
       const entries = await fs.readdir(dir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         if (SKIP_FILES.includes(entry.name)) continue;
-        
-        const relativePath = basePath ? `${basePath}/${entry.name}` : entry.name;
-        
+
+        const relativePath = basePath
+          ? `${basePath}/${entry.name}`
+          : entry.name;
+
         if (entry.isDirectory()) {
           if (!SKIP_FOLDERS.includes(entry.name)) {
             const subFiles = await this.readDirectoryRecursive(
               path.join(dir, entry.name),
-              relativePath
+              relativePath,
             );
             files.push(...subFiles);
           }
@@ -249,10 +279,10 @@ export class DomainScanner {
         console.warn(`DomainScanner: failed to read directory ${dir}: ${message}`);
       }
     }
-    
+
     return files;
   }
-  
+
   /**
    * Format display name from folder name
    */
@@ -261,10 +291,10 @@ export class DomainScanner {
       .replace(/_/g, " ")
       .replace(/-/g, " ")
       .split(" ")
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   }
-  
+
   /**
    * Save registry to file
    */
@@ -273,7 +303,7 @@ export class DomainScanner {
       await fs.writeFile(
         REGISTRY_FILE,
         JSON.stringify(this.registry, null, 2),
-        "utf8"
+        "utf8",
       );
       console.log(`💾 Registry saved to ${REGISTRY_FILE}`);
     } catch (error) {
@@ -281,7 +311,7 @@ export class DomainScanner {
       throw error;
     }
   }
-  
+
   /**
    * Load existing registry
    */
@@ -293,7 +323,7 @@ export class DomainScanner {
       return null;
     }
   }
-  
+
   /**
    * Get registry
    */
@@ -322,19 +352,21 @@ let cachedRegistry: DomainRegistry | null = null;
 /**
  * Get domain registry (cached)
  */
-export async function getDomainRegistry(forceRefresh = false): Promise<DomainRegistry> {
+export async function getDomainRegistry(
+  forceRefresh = false,
+): Promise<DomainRegistry> {
   if (cachedRegistry && !forceRefresh) {
     return cachedRegistry;
   }
-  
+
   // Try to load from file first
   const existing = await DomainScanner.loadRegistry();
-  
+
   if (existing && !forceRefresh) {
     cachedRegistry = existing;
     return existing;
   }
-  
+
   // Scan and rebuild
   const registry = await scanAndUpdateDomainRegistry();
   cachedRegistry = registry;
@@ -346,13 +378,17 @@ export async function getDomainRegistry(forceRefresh = false): Promise<DomainReg
  */
 export async function getEnabledDomains(): Promise<DomainManifest[]> {
   const registry = await getDomainRegistry();
-  return registry.enabledDomains.map(id => registry.domains[id]).filter(Boolean);
+  return registry.enabledDomains
+    .map((id) => registry.domains[id])
+    .filter(Boolean);
 }
 
 /**
  * Get domain by ID
  */
-export async function getDomainManifest(domainId: string): Promise<DomainManifest | null> {
+export async function getDomainManifest(
+  domainId: string,
+): Promise<DomainManifest | null> {
   const registry = await getDomainRegistry();
   return registry.domains[domainId] || null;
 }

@@ -6,4 +6,4 @@ export const safeParseJSON = <T = unknown>(s: string, fallback: T): T => {
   }
 };
 
-export const normalizeText = (t: string) => t.replace(/\s+/g, ' ').trim();
+export const normalizeText = (t: string) => t.replace(/\s+/g, " ").trim();

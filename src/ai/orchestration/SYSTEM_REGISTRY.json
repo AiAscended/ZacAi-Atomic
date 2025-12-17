@@ -11543,13 +11543,6 @@
       "extension": "md"
     },
     {
-      "path": "src/ai/orchestration/aiOrchestrator-v2.ts",
-      "size": 4000,
-      "modifiedAt": "2025-12-16T05:13:11.310Z",
-      "hash": "df96a1a647a1ed6431e4fdfa6db63ba208e533b3",
-      "extension": "ts"
-    },
-    {
       "path": "src/ai/orchestration/aiOrchestrator.ts",
       "size": 167,
       "modifiedAt": "2025-12-13T04:35:31.123Z",

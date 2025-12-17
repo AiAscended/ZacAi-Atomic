@@ -15,14 +15,14 @@
  */
 export function nthRoot(n: number, root: number): number {
   if (root === 0) {
-    throw new Error("Root cannot be zero")
+    throw new Error("Root cannot be zero");
   }
   if (n < 0 && root % 2 === 0) {
-    throw new Error("Even root of negative number is not real")
+    throw new Error("Even root of negative number is not real");
   }
 
-  const sign = n < 0 ? -1 : 1
-  return sign * Math.pow(Math.abs(n), 1 / root)
+  const sign = n < 0 ? -1 : 1;
+  return sign * Math.pow(Math.abs(n), 1 / root);
 }
 
 /**
@@ -31,5 +31,5 @@ export function nthRoot(n: number, root: number): number {
  * @returns Cube root of n
  */
 export function cbrt(n: number): number {
-  return Math.cbrt(n)
+  return Math.cbrt(n);
 }

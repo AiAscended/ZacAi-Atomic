@@ -6,11 +6,15 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { environmentParser } from "./environment_parser"
+import { environmentParser } from "./environment_parser";
 
 export const environmentSemanticAnalyzer = (code: string) => {
-  const tokens: string[] = []
+  const tokens: string[] = [];
   // Placeholder token array
-  const parsed = environmentParser(code)
-  return { tokens, parsed, semanticScore: tokens.length * 0.1 + parsed.tools.length * 2 }
-}
+  const parsed = environmentParser(code);
+  return {
+    tokens,
+    parsed,
+    semanticScore: tokens.length * 0.1 + parsed.tools.length * 2,
+  };
+};

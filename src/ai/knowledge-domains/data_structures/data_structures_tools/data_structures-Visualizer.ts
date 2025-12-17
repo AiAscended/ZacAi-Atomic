@@ -17,7 +17,10 @@ export type VisualizationMetadata = {
 }
 
 export class DataStructuresVisualizer {
-  visualize(_structure: unknown, type: string): {
+  visualize(
+    _structure: any,
+    type: string,
+  ): {
     visualization: string;
     metadata: Record<string, any>;
   } {
@@ -38,30 +41,9 @@ export class DataStructuresVisualizer {
 
   private visualizeArray(structure: ArrayStructure) {
     return {
-      visualization: `[${structure.values.join(', ')}]`,
-      metadata: { type: structure.type, nodes: structure.values.length },
-    }
-  }
-
-  private visualizeTree(structure: TreeStructure) {
-    const depth = this.calculateTreeDepth(structure)
-    return {
-      visualization: `Tree root: ${String(structure.value)}`,
-      metadata: { type: structure.type, depth },
-    }
-  }
-
-  private visualizeGraph(structure: GraphStructure) {
-    return {
-      visualization: `Graph with ${structure.nodes.length} nodes and ${structure.edges.length} edges`,
-      metadata: { type: structure.type, nodes: structure.nodes.length, edges: structure.edges.length },
-    }
-  }
-
-  private calculateTreeDepth(node: TreeStructure | undefined, depth = 0): number {
-    if (!node) return depth
-    const childDepths = (node.children ?? []).map(child => this.calculateTreeDepth(child, depth + 1))
-    return Math.max(depth, ...childDepths)
+      visualization: "",
+      metadata: { type },
+    };
   }
 }
 

@@ -16,8 +16,11 @@
 
 import jwt from "jsonwebtoken";
 
-const appId = process.env.GITHUB_APP_ID!;
-const privateKey = process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g, "\n");
+const appId = process.env.GITHUB_APP_ID || "";
+const privateKey = (process.env.GITHUB_APP_PRIVATE_KEY || "").replace(
+  /\\n/g,
+  "\n",
+);
 
 /**
  * Generates a signed JWT token for authenticating as GitHub App.
@@ -30,4 +33,26 @@ export function generateAppJwt() {
     iss: appId,
   };
   return jwt.sign(payload, privateKey, { algorithm: "RS256" });
+}
+
+/**
+ * Get an installation access token for a GitHub App installation.
+ * @param installationId - The installation ID
+ * @returns The access token string
+ */
+export async function getInstallationAccessToken(
+  installationId: number,
+): Promise<string> {
+  const jwt = generateAppJwt();
+  const response = await request(
+    "POST /app/installations/{installation_id}/access_tokens",
+    {
+      installation_id: installationId,
+      headers: {
+        authorization: `Bearer ${jwt}`,
+        accept: "application/vnd.github+json",
+      },
+    },
+  );
+  return response.data.token;
 }

@@ -30,27 +30,10 @@ export class InternetSearchWebScraper {
     )
 
     return {
-      content: simulatedContent,
-      metadata,
-      links: extractLinks(simulatedContent),
-    }
-  }
-
-  private buildMetadata(rawUrl: string): ScrapeMetadata {
-    try {
-      const parsed = new URL(rawUrl)
-      return {
-        domain: parsed.hostname,
-        scheme: parsed.protocol.replace(":", ""),
-        queryLength: parsed.search.length,
-      }
-    } catch {
-      return {
-        domain: "invalid",
-        scheme: "unknown",
-        queryLength: 0,
-      }
-    }
+      content: "",
+      metadata: {},
+      links: [],
+    };
   }
 }
 

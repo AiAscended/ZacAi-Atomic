@@ -37,33 +37,23 @@ export function typescriptParser(tokens: string[]): TypescriptASTSummary {
     functions: [],
     classes: [],
     interfaces: [],
-  }
+  };
 
   for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i]
+    const token = tokens[i];
 
     if (token === "import") {
-      const node: TypescriptDeclarationNode = { type: "ImportDeclaration", index: i }
-      ast.imports.push(node)
-      ast.declarations.push(node)
+      ast.imports.push({ type: "ImportDeclaration", index: i });
     } else if (token === "export") {
-      const node: TypescriptDeclarationNode = { type: "ExportDeclaration", index: i }
-      ast.exports.push(node)
-      ast.declarations.push(node)
+      ast.exports.push({ type: "ExportDeclaration", index: i });
     } else if (token === "function") {
-      const node: TypescriptDeclarationNode = { type: "FunctionDeclaration", index: i }
-      ast.functions.push(node)
-      ast.declarations.push(node)
+      ast.functions.push({ type: "FunctionDeclaration", index: i });
     } else if (token === "class") {
-      const node: TypescriptDeclarationNode = { type: "ClassDeclaration", index: i }
-      ast.classes.push(node)
-      ast.declarations.push(node)
+      ast.classes.push({ type: "ClassDeclaration", index: i });
     } else if (token === "interface") {
-      const node: TypescriptDeclarationNode = { type: "InterfaceDeclaration", index: i }
-      ast.interfaces.push(node)
-      ast.declarations.push(node)
+      ast.interfaces.push({ type: "InterfaceDeclaration", index: i });
     }
   }
 
-  return ast
+  return ast;
 }

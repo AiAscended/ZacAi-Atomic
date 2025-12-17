@@ -11,7 +11,12 @@ export const estimateLatencyMs = (batchSize: number, seqLen: number) => {
   return base + perToken + perBatch;
 };
 
-export const chooseBatchSize = (maxLatencyMs: number, seqLen: number, maxBatch = 32) => {
-  for (let b = maxBatch; b >= 1; b--) if (estimateLatencyMs(b, seqLen) <= maxLatencyMs) return b;
+export const chooseBatchSize = (
+  maxLatencyMs: number,
+  seqLen: number,
+  maxBatch = 32,
+) => {
+  for (let b = maxBatch; b >= 1; b--)
+    if (estimateLatencyMs(b, seqLen) <= maxLatencyMs) return b;
   return 1;
 };

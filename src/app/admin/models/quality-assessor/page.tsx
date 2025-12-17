@@ -3,13 +3,13 @@
  * Evaluates response quality and coherence
  */
 
-"use client"
+"use client";
 
-import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage"
+import { ModelSettingsPage } from "@/components/admin/ModelSettingsPage";
 
 export default function QualityAssessorPage() {
   return (
-    <ModelSettingsPage 
+    <ModelSettingsPage
       modelName="quality-assessor"
       modelTitle="Quality Assessor"
       modelDescription="Assesses response quality, coherence, and relevance"
@@ -19,8 +19,8 @@ export default function QualityAssessorPage() {
         factualityWeight: 0.3,
         minQualityScore: 0.7,
         enableGrammarCheck: true,
-        enableFactCheck: false
+        enableFactCheck: false,
       }}
     />
-  )
+  );
 }

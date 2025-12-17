@@ -16,9 +16,9 @@
  */
 export function modulo(dividend: number, divisor: number): number {
   if (divisor === 0) {
-    throw new Error("Modulo by zero is undefined")
+    throw new Error("Modulo by zero is undefined");
   }
-  return dividend % divisor
+  return dividend % divisor;
 }
 
 /**
@@ -29,7 +29,7 @@ export function modulo(dividend: number, divisor: number): number {
  */
 export function euclideanModulo(dividend: number, divisor: number): number {
   if (divisor === 0) {
-    throw new Error("Modulo by zero is undefined")
+    throw new Error("Modulo by zero is undefined");
   }
-  return ((dividend % divisor) + divisor) % divisor
+  return ((dividend % divisor) + divisor) % divisor;
 }

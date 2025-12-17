@@ -6,67 +6,61 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import pretrained from "./error_detection_weights/error_detection_pretrained_weights.json"
-import { ERROR_DETECTION_DOMAIN } from "./error_detection_constants"
-import { updateFile } from "../dataRegistry"
+import pretrained from "./error_detection_weights/error_detection_pretrained_weights.json";
+import { ERROR_DETECTION_DOMAIN } from "./error_detection_constants";
+import { updateFile } from "../dataRegistry";
 
-type ErrorDetectionSeedWeights = Record<string, number[]>
+const p = pretrained as Record<string, unknown>;
+const EMBEDDING_DIM =
+  typeof p.embeddingDim === "number" ? (p.embeddingDim as number) : 128;
 
-const WEIGHTS_PATH =
-  "src/ai/knowledge-domains/error_detection/error_detection_weights/error_detection_pretrained_weights.json"
-const PRETRAINED = pretrained as Partial<{
-  embeddingDim?: number
-  seedWeights?: ErrorDetectionSeedWeights
-}>
-const EMBEDDING_DIM = typeof PRETRAINED.embeddingDim === "number" ? PRETRAINED.embeddingDim : 128
-const SEED_WEIGHTS: ErrorDetectionSeedWeights =
-  (PRETRAINED.seedWeights as ErrorDetectionSeedWeights | undefined) ?? {}
-
-const seededVector = (token: string, dim = EMBEDDING_DIM) => {
-  return Array.from({ length: dim }, (_, index) => {
-    let hash = 2166136261 >>> 0
-    for (let j = 0; j < token.length; j++) {
-      hash = Math.imul(hash ^ token.charCodeAt(j), 16777619) >>> 0
-    }
-    const value = ((hash >> (index % 24)) & 0xffff) / 0xffff
-    return (value - 0.5) * 0.4
-  })
-}
+const seededVector = (s: string, dim = EMBEDDING_DIM) => {
+  const out: number[] = new Array(dim).fill(0).map((_, i) => {
+    let h = 2166136261 >>> 0;
+    for (let j = 0; j < s.length; j++)
+      h = Math.imul(h ^ s.charCodeAt(j), 16777619) >>> 0;
+    const v = ((h >> i % 24) & 0xffff) / 0xffff;
+    return (v - 0.5) * 0.4;
+  });
+  return out;
+};
 
 export const getErrorDetectionEmbedding = (token: string): number[] => {
-  return SEED_WEIGHTS[token] ?? seededVector(token, EMBEDDING_DIM)
-}
+  const seed = (p.seedWeights ?? {}) as Record<string, number[]>;
+  if (Object.prototype.hasOwnProperty.call(seed, token)) return seed[token];
+  return seededVector(token, EMBEDDING_DIM);
+};
 
-export const getErrorDetectionEmbeddingForTokens = (tokens: string[]) => tokens.map(getErrorDetectionEmbedding)
+export const getErrorDetectionEmbeddingForTokens = (tokens: string[]) =>
+  tokens.map(getErrorDetectionEmbedding);
 
-type PersistResult = {
-  success: boolean
-  path: string
-}
-
-export const persistErrorDetectionWeights = (weights: ErrorDetectionSeedWeights): PersistResult => {
+export const persistErrorDetectionWeights = (
+  weights: Record<string, number[]>,
+) => {
   try {
     const content = JSON.stringify(
-      { domain: ERROR_DETECTION_DOMAIN, version: "0.2", embeddingDim: EMBEDDING_DIM, seedWeights: weights },
+      {
+        domain: ERROR_DETECTION_DOMAIN,
+        version: "0.2",
+        embeddingDim: EMBEDDING_DIM,
+        seedWeights: weights,
+      },
       null,
       2,
-    )
-    const updated = updateFile(ERROR_DETECTION_DOMAIN, WEIGHTS_PATH, content)
-    if (!updated) {
-      console.error("[error-detection][persist] updateFile rejected write", WEIGHTS_PATH)
-      return { success: false, path: WEIGHTS_PATH }
-    }
-    return { success: true, path: WEIGHTS_PATH }
-  } catch (error) {
-    console.error("[error-detection][persist] Failed to persist embeddings", error)
-    return { success: false, path: WEIGHTS_PATH }
+    );
+    updateFile(
+      ERROR_DETECTION_DOMAIN,
+      "src/ai/knowledge-domains/error_detection/error_detection_weights/error_detection_pretrained_weights.json",
+      content,
+    );
+    return true;
+  } catch (e) {
+    return false;
   }
-}
+};
 
-const errorDetectionEmbeddingExports = {
+export default {
   getErrorDetectionEmbedding,
   getErrorDetectionEmbeddingForTokens,
   persistErrorDetectionWeights,
-}
-
-export default errorDetectionEmbeddingExports
+};

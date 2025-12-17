@@ -6,7 +6,7 @@
 export class SecurityAuditor {
   audit(code: string): {
     vulnerabilities: Array<{
-      severity: 'critical' | 'high' | 'medium' | 'low';
+      severity: "critical" | "high" | "medium" | "low";
       type: string;
       description: string;
       line?: number;

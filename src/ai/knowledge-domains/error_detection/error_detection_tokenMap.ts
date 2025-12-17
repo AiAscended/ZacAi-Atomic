@@ -6,35 +6,33 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import ERROR_DETECTION_CORE_TOKENS from "./error_detection_tokens"
+import ERROR_DETECTION_CORE_TOKENS from "./error_detection_tokens";
 
 const RESERVED_TOKENS = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"] as const
 
 export const buildErrorDetectionTokenMap = () => {
-  const map = new Map<string, number>()
-  RESERVED_TOKENS.forEach((token, index) => map.set(token, index))
-  let nextId = RESERVED_TOKENS.length
-  for (const token of ERROR_DETECTION_CORE_TOKENS) {
-    if (map.has(token)) continue
-    map.set(token, nextId++)
+  const map = new Map<string, number>();
+  const reserved = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"];
+  reserved.forEach((t, i) => map.set(t, i));
+  let idx = reserved.length;
+  for (const t of ERROR_DETECTION_CORE_TOKENS) {
+    if (map.has(t)) continue;
+    map.set(t, idx++);
   }
-  return map
-}
+  return map;
+};
 
-export const errorDetectionTokenMap = buildErrorDetectionTokenMap()
+export const errorDetectionTokenMap = buildErrorDetectionTokenMap();
 export const getErrorDetectionTokenId = (token: string): number =>
-  errorDetectionTokenMap.get(token) ?? errorDetectionTokenMap.get("[UNK]")!
+  errorDetectionTokenMap.get(token) ?? errorDetectionTokenMap.get("[UNK]")!;
 export const getErrorDetectionTokenById = (id: number): string | undefined => {
-  for (const [k, v] of errorDetectionTokenMap.entries()) if (v === id) return k
-  return undefined
-}
-export const errorDetectionTokenCount = () => errorDetectionTokenMap.size
-
-const errorDetectionTokenExports = {
+  for (const [k, v] of errorDetectionTokenMap.entries()) if (v === id) return k;
+  return undefined;
+};
+export const errorDetectionTokenCount = () => errorDetectionTokenMap.size;
+export default {
   errorDetectionTokenMap,
   getErrorDetectionTokenId,
   getErrorDetectionTokenById,
   errorDetectionTokenCount,
-}
-
-export default errorDetectionTokenExports
+};

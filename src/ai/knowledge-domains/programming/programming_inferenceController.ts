@@ -1,15 +1,18 @@
-import { parseProgrammingInput } from "./programming_parser"
-import { analyzeProgrammingSemantics } from "./programming_semanticAnalyzer"
+import { parseProgrammingInput } from "./programming_parser";
+import { analyzeProgrammingSemantics } from "./programming_semanticAnalyzer";
 
 export interface ProgrammingInferenceResult {
-  response: string
-  confidence: number
-  topics: string[]
-  metadata: { intent: string; complexity: string; parseType: string; hasCodeExample?: boolean }
+  response: string;
+  confidence: number;
+  topics: string[];
+  metadata: { intent: string; complexity: string; parseType: string };
 }
 
 // Code examples library
-const CODE_EXAMPLES: Record<string, { code: string; language: string; description: string }> = {
+const CODE_EXAMPLES: Record<
+  string,
+  { code: string; language: string; description: string }
+> = {
   function: {
     code: `// Function example in JavaScript/TypeScript
 function calculateSum(a: number, b: number): number {
@@ -23,7 +26,8 @@ const multiply = (x: number, y: number): number => x * y;
 console.log(calculateSum(5, 3));  // Output: 8
 console.log(multiply(4, 6));       // Output: 24`,
     language: "typescript",
-    description: "Functions are reusable blocks of code that perform specific tasks."
+    description:
+      "Functions are reusable blocks of code that perform specific tasks.",
   },
   class: {
     code: `// Class example with TypeScript
@@ -44,7 +48,8 @@ class Person {
 const person = new Person("Alice", 30);
 console.log(person.greet());`,
     language: "typescript",
-    description: "Classes are blueprints for creating objects with properties and methods."
+    description:
+      "Classes are blueprints for creating objects with properties and methods.",
   },
   array: {
     code: `// Array operations in JavaScript/TypeScript
@@ -62,7 +67,8 @@ const evens = numbers.filter(n => n % 2 === 0);
 const sum = numbers.reduce((acc, n) => acc + n, 0);
 // 15`,
     language: "typescript",
-    description: "Arrays are ordered collections of items with powerful built-in methods."
+    description:
+      "Arrays are ordered collections of items with powerful built-in methods.",
   },
   loop: {
     code: `// Different loop types in JavaScript/TypeScript
@@ -85,7 +91,8 @@ for (const fruit of fruits) {
   console.log(fruit);
 }`,
     language: "typescript",
-    description: "Loops allow you to execute code repeatedly based on conditions."
+    description:
+      "Loops allow you to execute code repeatedly based on conditions.",
   },
   async: {
     code: `// Async/Await example
@@ -108,7 +115,8 @@ async function fetchUserData(userId: string): Promise<User> {
 // Usage
 const user = await fetchUserData('123');`,
     language: "typescript",
-    description: "Async/await makes asynchronous code look and behave like synchronous code."
+    description:
+      "Async/await makes asynchronous code look and behave like synchronous code.",
   },
   promise: {
     code: `// Promise example
@@ -130,17 +138,15 @@ const results = await Promise.all([
   fetch('/api/comments')
 ]);`,
     language: "typescript",
-    description: "Promises represent eventual completion or failure of asynchronous operations."
-  }
+    description:
+      "Promises represent eventual completion or failure of asynchronous operations.",
+  },
 };
-
-export type ProgrammingInferenceContext = Record<string, unknown>
 
 export async function programmingRunInference(
   input: string,
-  context?: ProgrammingInferenceContext,
 ): Promise<ProgrammingInferenceResult | null> {
-  const lowerInput = input.toLowerCase()
+  const lowerInput = input.toLowerCase();
 
   if (context && Object.keys(context).length > 0) {
     console.log(`[Programming Domain] Context keys: ${Object.keys(context).join(", ")}`)
@@ -159,59 +165,56 @@ export async function programmingRunInference(
     "runtime",
     "example",
     "show me",
-  ]
+  ];
 
-  const isProgrammingQuery = programmingKeywords.some((keyword) => lowerInput.includes(keyword))
+  const isProgrammingQuery = programmingKeywords.some((keyword) =>
+    lowerInput.includes(keyword),
+  );
 
-  if (!isProgrammingQuery) return null
+  if (!isProgrammingQuery) return null;
 
   try {
-    const parseResult = parseProgrammingInput(input)
-    const semanticAnalysis = analyzeProgrammingSemantics(input)
+    const parseResult = parseProgrammingInput(input);
+    const semanticAnalysis = analyzeProgrammingSemantics(input);
 
-    let response = ``
-    let codeExample = null
+    let response = ``;
+    let codeExample = null;
 
     // Check if user is asking for code examples
     const requestsExample =
       lowerInput.includes("example") ||
       lowerInput.includes("show me") ||
       lowerInput.includes("code snippet") ||
-      lowerInput.includes("how to")
-
-    const wantsExample =
-      requestsExample ||
-      parseResult.metadata.hasCode ||
-      semanticAnalysis.intent === "implement"
+      lowerInput.includes("how to");
 
     // Find relevant code example based on keywords
     if (requestsExample) {
       for (const [key, example] of Object.entries(CODE_EXAMPLES)) {
         if (lowerInput.includes(key)) {
-          codeExample = example
-          response = `**${example.description}**\n\n`
-          response += `Here's a practical example:\n\n\`\`\`${example.language}\n${example.code}\n\`\`\`\n\n`
-          response += `${semanticAnalysis.suggestedResponse}`
-          break
+          codeExample = example;
+          response = `**${example.description}**\n\n`;
+          response += `Here's a practical example:\n\n\`\`\`${example.language}\n${example.code}\n\`\`\`\n\n`;
+          response += `${semanticAnalysis.suggestedResponse}`;
+          break;
         }
       }
     }
 
     // If no specific example found, give general response
     if (!codeExample) {
-      response = `${semanticAnalysis.suggestedResponse} Programming involves understanding core concepts like variables, functions, data structures, and algorithms.`
+      response = `${semanticAnalysis.suggestedResponse} Programming involves understanding core concepts like variables, functions, data structures, and algorithms.`;
 
       if (parseResult.type === "debugging") {
-        response = `**Debugging Tips:**\n\n`
-        response += `1. Read the error message carefully\n`
-        response += `2. Check variable values with console.log()\n`
-        response += `3. Use breakpoints in your debugger\n`
-        response += `4. Verify function inputs and outputs\n`
-        response += `5. Check for typos and syntax errors\n\n`
-        response += `${semanticAnalysis.suggestedResponse}`
+        response = `**Debugging Tips:**\n\n`;
+        response += `1. Read the error message carefully\n`;
+        response += `2. Check variable values with console.log()\n`;
+        response += `3. Use breakpoints in your debugger\n`;
+        response += `4. Verify function inputs and outputs\n`;
+        response += `5. Check for typos and syntax errors\n\n`;
+        response += `${semanticAnalysis.suggestedResponse}`;
       } else if (parseResult.type === "design") {
-        response = `**Design Patterns:**\n\n`
-        response += `Design patterns provide reusable solutions to common programming problems. ${semanticAnalysis.suggestedResponse}`
+        response = `**Design Patterns:**\n\n`;
+        response += `Design patterns provide reusable solutions to common programming problems. ${semanticAnalysis.suggestedResponse}`;
       }
     }
 
@@ -223,11 +226,10 @@ export async function programmingRunInference(
         intent: semanticAnalysis.intent,
         complexity: semanticAnalysis.complexity,
         parseType: parseResult.type,
-        hasCodeExample: !!codeExample,
       },
-    }
+    };
   } catch (error) {
-    console.error("[Programming Domain] Inference error:", error)
-    return null
+    console.error("[Programming Domain] Inference error:", error);
+    return null;
   }
 }

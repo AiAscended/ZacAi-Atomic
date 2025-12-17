@@ -14,8 +14,8 @@ export interface MULTIMODALModelConfig {
 }
 
 export const defaultMULTIMODALConfig: MULTIMODALModelConfig = {
-  modelName: 'multi-modal-fusion',
-  version: '1.0.0',
+  modelName: "multi-modal-fusion",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

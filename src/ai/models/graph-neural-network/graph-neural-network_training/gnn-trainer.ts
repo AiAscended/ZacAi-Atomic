@@ -5,8 +5,8 @@
 import type { TrainingBatch } from '../../shared/modelTypes';
 
 export class GNNTrainer {
-  train(data: unknown): void {
-    console.log('Training graph-neural-network...');
+  train(data: any): void {
+    console.log("Training graph-neural-network...");
   }
 }
 

@@ -6,33 +6,31 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import VERSION_CONTROL_CORE_TOKENS from "./version_control_tokens"
+import VERSION_CONTROL_CORE_TOKENS from "./version_control_tokens";
 
 export const buildVersionControlTokenMap = () => {
-  const map = new Map<string, number>()
-  let id = 0
-  map.set("[PAD]", id++)
-  map.set("[UNK]", id++)
-  map.set("[CLS]", id++)
+  const map = new Map<string, number>();
+  let id = 0;
+  map.set("[PAD]", id++);
+  map.set("[UNK]", id++);
+  map.set("[CLS]", id++);
   for (const t of VERSION_CONTROL_CORE_TOKENS) {
-    if (!map.has(t)) map.set(t, id++)
+    if (!map.has(t)) map.set(t, id++);
   }
-  return map
-}
+  return map;
+};
 
-export const versionControlTokenMap = buildVersionControlTokenMap()
+export const versionControlTokenMap = buildVersionControlTokenMap();
 export const getVersionControlTokenId = (token: string): number =>
-  versionControlTokenMap.get(token) ?? versionControlTokenMap.get("[UNK]")!
+  versionControlTokenMap.get(token) ?? versionControlTokenMap.get("[UNK]")!;
 export const getVersionControlTokenById = (id: number): string | undefined => {
-  for (const [k, v] of versionControlTokenMap.entries()) if (v === id) return k
-  return undefined
-}
-export const versionControlTokenCount = () => versionControlTokenMap.size
-const versionControlTokenApi = {
+  for (const [k, v] of versionControlTokenMap.entries()) if (v === id) return k;
+  return undefined;
+};
+export const versionControlTokenCount = () => versionControlTokenMap.size;
+export default {
   versionControlTokenMap,
   getVersionControlTokenId,
   getVersionControlTokenById,
   versionControlTokenCount,
-}
-
-export default versionControlTokenApi
+};

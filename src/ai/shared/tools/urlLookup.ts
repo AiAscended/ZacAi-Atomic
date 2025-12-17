@@ -7,15 +7,16 @@
  * Depended on by: All domain inference controllers
  */
 
-import urlSourcesData from "./urlSources.json"
+import urlSourcesData from "./urlSources.json";
+import { scrapeURL, type ScrapedContent } from "./webScraper";
 
 export interface URLSource {
-  name: string
-  url: string
-  description: string
-  searchPath?: string
-  apiPath?: string
-  format?: string
+  name: string;
+  url: string;
+  description: string;
+  searchPath?: string;
+  apiPath?: string;
+  format?: string;
 }
 
 /**
@@ -51,38 +52,60 @@ export async function fetchURL(url: string): Promise<string> {
  * Find URL sources for a specific domain
  */
 export function findSources(domain: string): URLSource[] {
-  const sources = urlSourcesData[domain as keyof typeof urlSourcesData] || []
-  return sources as URLSource[]
+  const sources = urlSourcesData[domain as keyof typeof urlSourcesData] || [];
+  return sources as URLSource[];
 }
 
 /**
  * Search within URL sources for specific content
  */
-export async function searchSources(domain: string, query: string): Promise<string[]> {
-  const sources = findSources(domain)
-  const results: string[] = []
+export async function searchSources(
+  domain: string,
+  query: string,
+): Promise<ScrapedContent[]> {
+  const sources = findSources(domain);
+  const results: ScrapedContent[] = [];
 
   for (const source of sources) {
     const searchUrl = source.searchPath
       ? `${source.url}${source.searchPath}${encodeURIComponent(query)}`
-      : `${source.url}/search?q=${encodeURIComponent(query)}`
+      : `${source.url}/search?q=${encodeURIComponent(query)}`;
 
-    console.log(`[v0] Searching ${source.name} at: ${searchUrl}`)
+    console.log(`[v0] Searching ${source.name} at: ${searchUrl}`);
 
-    const content = await fetchURL(searchUrl)
-    if (content && !content.includes("CORS blocked")) {
-      results.push(`From ${source.name}: ${content.substring(0, 500)}...`)
-    } else {
-      results.push(`From ${source.name}: (Search available at ${searchUrl})`)
+    const content = await scrapeURL(searchUrl);
+    if (content) {
+      results.push(content);
     }
   }
 
-  return results
+  return results;
+}
+
+/**
+ * Crawl all domain sources for a specific domain
+ */
+export async function crawlDomainSources(
+  domain: string,
+): Promise<ScrapedContent[]> {
+  const sources = findSources(domain);
+  const results: ScrapedContent[] = [];
+
+  for (const source of sources) {
+    console.log(`[v0] Crawling ${source.name} at: ${source.url}`);
+
+    const content = await scrapeURL(source.url);
+    if (content) {
+      results.push(content);
+    }
+  }
+
+  return results;
 }
 
 /**
  * Get search engine URLs for internet search domain
  */
 export function getSearchEngines(): URLSource[] {
-  return findSources("internet_search")
+  return findSources("internet_search");
 }

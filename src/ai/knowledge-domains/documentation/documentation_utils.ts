@@ -8,19 +8,18 @@
 
 export const safeParseJSON = <T = unknown>(s: string, fallback: T): T => {
   try {
-    return JSON.parse(s) as T
-  } catch (error) {
-    console.warn("Failed to parse documentation JSON", { error })
-    return fallback
+    return JSON.parse(s) as T;
+  } catch (e) {
+    return fallback;
   }
-}
+};
 
-export const normalizeText = (t: string) => t.replace(/\s+/g, " ").trim()
+export const normalizeText = (t: string) => t.replace(/\s+/g, " ").trim();
 
 export const extractDocComments = (code: string): string[] => {
-  const jsdocPattern = /\/\*\*[\s\S]*?\*\//g
-  const inlinePattern = /\/\/.*/g
-  const jsdocs = code.match(jsdocPattern) || []
-  const inline = code.match(inlinePattern) || []
-  return [...jsdocs, ...inline]
-}
+  const jsdocPattern = /\/\*\*[\s\S]*?\*\//g;
+  const inlinePattern = /\/\/.*/g;
+  const jsdocs = code.match(jsdocPattern) || [];
+  const inline = code.match(inlinePattern) || [];
+  return [...jsdocs, ...inline];
+};

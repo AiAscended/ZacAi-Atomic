@@ -4,26 +4,27 @@
  * Includes theme toggle in appearance tab
  */
 
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useTheme } from "next-themes"
-import { useState, useEffect } from "react"
-import { Moon, Sun, Monitor } from "lucide-react"
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
+import { Moon, Sun, Monitor } from "lucide-react";
 
 export default function SystemPage() {
-  const { theme, setTheme, systemTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const { theme, setTheme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
-  const currentTheme = theme === "system" ? systemTheme : theme
+  const currentTheme = theme === "system" ? systemTheme : theme;
 
   return (
     <div className="space-y-6">
@@ -71,7 +72,10 @@ export default function SystemPage() {
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Current theme: <span className="font-medium capitalize">{currentTheme || "dark"}</span>
+                    Current theme:{" "}
+                    <span className="font-medium capitalize">
+                      {currentTheme || "dark"}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -109,7 +113,10 @@ export default function SystemPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="embeddingModel">Embedding Model</Label>
-                <Input id="embeddingModel" defaultValue="text-embedding-ada-002" />
+                <Input
+                  id="embeddingModel"
+                  defaultValue="text-embedding-ada-002"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="chunkSize">Chunk Size</Label>
@@ -128,7 +135,9 @@ export default function SystemPage() {
                 <Input id="logLevel" defaultValue="INFO" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="metricsInterval">Metrics Collection Interval (ms)</Label>
+                <Label htmlFor="metricsInterval">
+                  Metrics Collection Interval (ms)
+                </Label>
                 <Input id="metricsInterval" type="number" defaultValue="5000" />
               </div>
             </div>
@@ -138,5 +147,5 @@ export default function SystemPage() {
 
       <Button>Save System Settings</Button>
     </div>
-  )
+  );
 }

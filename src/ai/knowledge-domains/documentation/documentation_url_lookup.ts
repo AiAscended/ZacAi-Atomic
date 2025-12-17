@@ -6,10 +6,20 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerSource } from "../url_lookup"
+import { registerSource } from "../url_lookup";
 
-registerSource("documentation", "JSDoc", "https://jsdoc.app", "JavaScript documentation standard")
-registerSource("documentation", "TypeDoc", "https://typedoc.org", "TypeScript documentation generator")
+registerSource(
+  "documentation",
+  "JSDoc",
+  "https://jsdoc.app",
+  "JavaScript documentation standard",
+);
+registerSource(
+  "documentation",
+  "TypeDoc",
+  "https://typedoc.org",
+  "TypeScript documentation generator",
+);
 
-export const documentationSources = () => registerSource
-export default documentationSources
+export const documentationSources = () => registerSource;
+export default documentationSources;

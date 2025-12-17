@@ -6,11 +6,15 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { dataStructuresParser } from "./data_structures_parser"
+import { dataStructuresParser } from "./data_structures_parser";
 
 export const dataStructuresSemanticAnalyzer = (code: string) => {
-  const tokens: string[] = []
+  const tokens: string[] = [];
   // Placeholder token array
-  const parsed = dataStructuresParser(code)
-  return { tokens, parsed, semanticScore: tokens.length * 0.1 + parsed.structures.length * 2 }
-}
+  const parsed = dataStructuresParser(code);
+  return {
+    tokens,
+    parsed,
+    semanticScore: tokens.length * 0.1 + parsed.structures.length * 2,
+  };
+};

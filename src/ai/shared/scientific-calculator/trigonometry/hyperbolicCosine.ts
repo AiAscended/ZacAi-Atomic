@@ -13,5 +13,5 @@
  * @example cosh(0) // returns 1
  */
 export function cosh(x: number): number {
-  return Math.cosh(x)
+  return Math.cosh(x);
 }

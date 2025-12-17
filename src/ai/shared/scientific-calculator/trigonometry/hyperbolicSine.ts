@@ -13,5 +13,5 @@
  * @example sinh(0) // returns 0
  */
 export function sinh(x: number): number {
-  return Math.sinh(x)
+  return Math.sinh(x);
 }

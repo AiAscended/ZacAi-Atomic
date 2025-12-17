@@ -5,13 +5,16 @@
 
 export type Step = (context: Record<string, unknown>) => Promise<void>;
 
-export const runWorkflow = async (steps: Step[], context: Record<string, unknown> = {}) => {
+export const runWorkflow = async (
+  steps: Step[],
+  context: Record<string, unknown> = {},
+) => {
   for (const step of steps) {
     try {
       await step(context);
     } catch (err) {
       // simple failure: attach error and stop
-      context['workflowError'] = err;
+      context["workflowError"] = err;
       throw err;
     }
   }

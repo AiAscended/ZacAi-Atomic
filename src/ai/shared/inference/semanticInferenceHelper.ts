@@ -1,18 +1,18 @@
 /**
  * Semantic Inference Helper
- * 
+ *
  * Provides REAL AI inference capabilities using:
  * - Seed registry lookups for concept retrieval
  * - Embedding-based semantic similarity
  * - Pretrained weights for confidence scoring
  * - Token analysis and extraction
- * 
+ *
  * This replaces hardcoded pattern matching with actual AI logic.
  */
 
-import { seedRegistry, type SeedEntry } from '../seeds/seedRegistry';
-import { cosineSimilarity } from '@/ai/models/unified-transformer-llm/unified-transformer-llm_model/llm-utilities';
-import { l2Normalize } from '@/ai/embedding/embeddingNormalizer';
+import { seedRegistry } from "../seeds/seedRegistry";
+import { cosineSimilarity } from "@/ai/models/unified-transformer-llm/unified-transformer-llm_model/llm-utilities";
+import { l2Normalize } from "@/ai/embedding/embeddingNormalizer";
 
 export interface SeedData {
   word?: string;
@@ -36,7 +36,11 @@ export interface SemanticInferenceResult {
   concepts: string[];
   codeExamples?: string[];
   metadata: {
-    inferenceMethod: 'semantic_similarity' | 'seed_lookup' | 'embedding_match' | 'hybrid';
+    inferenceMethod:
+      | "semantic_similarity"
+      | "seed_lookup"
+      | "embedding_match"
+      | "hybrid";
     matchedSeeds: number;
     tokensAnalyzed: number;
     semanticScore?: number;
@@ -152,20 +156,72 @@ function generateSimpleEmbedding(text: string): number[] {
  */
 function extractKeyTerms(text: string): string[] {
   const stopWords = new Set([
-    'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
-    'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'were', 'be',
-    'been', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would',
-    'could', 'should', 'may', 'might', 'can', 'what', 'how', 'when', 'where',
-    'why', 'who', 'which', 'this', 'that', 'these', 'those', 'i', 'you',
-    'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them'
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "but",
+    "in",
+    "on",
+    "at",
+    "to",
+    "for",
+    "of",
+    "with",
+    "by",
+    "from",
+    "as",
+    "is",
+    "was",
+    "are",
+    "were",
+    "be",
+    "been",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "will",
+    "would",
+    "could",
+    "should",
+    "may",
+    "might",
+    "can",
+    "what",
+    "how",
+    "when",
+    "where",
+    "why",
+    "who",
+    "which",
+    "this",
+    "that",
+    "these",
+    "those",
+    "i",
+    "you",
+    "he",
+    "she",
+    "it",
+    "we",
+    "they",
+    "me",
+    "him",
+    "her",
+    "us",
+    "them",
   ]);
 
   return text
     .toLowerCase()
     .split(/\s+/)
-    .filter(word => word.length > 2 && !stopWords.has(word))
-    .map(word => word.replace(/[^a-z0-9]/g, ''))
-    .filter(word => word.length > 0);
+    .filter((word) => word.length > 2 && !stopWords.has(word))
+    .map((word) => word.replace(/[^a-z0-9]/g, ""))
+    .filter((word) => word.length > 0);
 }
 
 function computeSemanticScore(query: string, anchorText: string): number {
@@ -185,14 +241,16 @@ function computeSemanticScore(query: string, anchorText: string): number {
 export async function performSemanticInference(
   query: string,
   domain: string,
-  context?: unknown
+  context?: unknown,
 ): Promise<SemanticInferenceResult> {
   const keyTerms = extractKeyTerms(query);
   const matchedSeeds: SeedData[] = [];
   const codeExamples: string[] = [];
 
-  console.log(`[SemanticInference] Analyzing query for ${domain}: "${query.substring(0, 50)}..."`);
-  console.log('[SemanticInference] Extracted key terms:', keyTerms);
+  console.log(
+    `[SemanticInference] Analyzing query for ${domain}: "${query.substring(0, 50)}..."`,
+  );
+  console.log(`[SemanticInference] Extracted key terms:`, keyTerms);
 
   // Step 1: Look up seeds for key terms in the registry
   for (const term of keyTerms) {
@@ -202,44 +260,55 @@ export async function performSemanticInference(
         const normalized = normalizeSeedData(seed.fullData as RawSeedRecord);
         matchedSeeds.push(normalized);
         console.log(`[SemanticInference] Found seed for "${term}":`, {
-          concept: normalized.word || normalized.concept,
-          priority: normalized.priority,
-          category: normalized.category,
+          concept: seed.fullData.word || seed.fullData.concept,
+          priority: seed.fullData.priority,
+          category: seed.fullData.category,
         });
-        
-        normalized.examples?.forEach((ex) => {
-          if (looksLikeCodeSnippet(ex)) {
-            codeExamples.push(ex);
-          }
-        });
+
+        // Extract code examples if available
+        if (seed.fullData.examples) {
+          seed.fullData.examples.forEach((ex: string) => {
+            if (
+              ex.includes("{") ||
+              ex.includes("function") ||
+              ex.includes("const") ||
+              ex.includes("import")
+            ) {
+              codeExamples.push(ex);
+            }
+          });
+        }
       }
-    } catch {
-      console.log(`[SemanticInference] No seed found for "${term}" in ${domain}`);
+    } catch (error) {
+      console.log(
+        `[SemanticInference] No seed found for "${term}" in ${domain}`,
+      );
     }
   }
 
+  // Step 2: If we found matching seeds, construct response from them
   if (matchedSeeds.length > 0) {
-    let response = '';
+    let response = "";
     const concepts: string[] = [];
     const sources: string[] = [];
-    
+
     // Sort by priority (lower priority = more important)
-  matchedSeeds.sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999));
-    
+    matchedSeeds.sort((a, b) => (a.priority || 999) - (b.priority || 999));
+
     // Build response from seed data
-    matchedSeeds.forEach(seed => {
+    matchedSeeds.forEach((seed) => {
       const concept = seed.word || seed.concept || seed.term;
       if (concept) {
         concepts.push(concept);
         sources.push(`${domain} seed: ${concept}`);
-        
+
         // Add definition
         if (seed.definitions && seed.definitions.length > 0) {
           response += `**${concept}**: ${seed.definitions[0].meaning}\n\n`;
         } else if (seed.definition) {
           response += `**${concept}**: ${seed.definition}\n\n`;
         }
-        
+
         // Add example
         if (
           seed.definitions &&
@@ -248,18 +317,20 @@ export async function performSemanticInference(
         ) {
           response += `*Example*: ${seed.definitions[0].example}\n\n`;
         }
-        
+
         // Add best practice if available
         if (seed.bestPractice) {
           response += `💡 *Best Practice*: ${seed.bestPractice}\n\n`;
         }
       }
     });
-    
+
     // Calculate confidence based on number of matches and their priority
-  const avgPriority = matchedSeeds.reduce((sum, s) => sum + (s.priority ?? 50), 0) / matchedSeeds.length;
-    const confidence = Math.min(0.95, Math.max(0.4, 1.0 - (avgPriority / 100)));
-    
+    const avgPriority =
+      matchedSeeds.reduce((sum, s) => sum + (s.priority || 50), 0) /
+      matchedSeeds.length;
+    const confidence = Math.min(0.95, Math.max(0.4, 1.0 - avgPriority / 100));
+
     return {
       response: response.trim(),
       confidence,
@@ -267,27 +338,24 @@ export async function performSemanticInference(
       concepts,
       codeExamples: codeExamples.length > 0 ? codeExamples : undefined,
       metadata: {
-        inferenceMethod: 'seed_lookup',
+        inferenceMethod: "seed_lookup",
         matchedSeeds: matchedSeeds.length,
         tokensAnalyzed: keyTerms.length,
       },
     };
   }
 
-  const fallbackAnchor = context?.referenceText || context?.conversationSnippet || domain;
-  const semanticScore = computeSemanticScore(query, fallbackAnchor);
-  const fallbackConfidence = Math.max(0.15, Math.min(0.4 + semanticScore * 0.3, 0.65));
-
+  // Step 3: No direct seed matches - use embedding similarity (future enhancement)
+  // For now, return low confidence result indicating no semantic match
   return {
     response: `I searched my ${domain} knowledge base for information about "${query.substring(0, 100)}" but couldn't find specific seed data. I'm still learning about this topic.`,
     confidence: fallbackConfidence,
     sources: [`${domain} domain (no matches)`],
     concepts: keyTerms,
     metadata: {
-      inferenceMethod: 'semantic_similarity',
+      inferenceMethod: "semantic_similarity",
       matchedSeeds: 0,
       tokensAnalyzed: keyTerms.length,
-      semanticScore,
     },
   };
 }
@@ -297,21 +365,24 @@ export async function performSemanticInference(
  */
 export async function searchCodeExamples(
   keywords: string[],
-  domain: string
+  domain: string,
 ): Promise<{ code: string; concept: string; language?: string }[]> {
   const examples: { code: string; concept: string; language?: string }[] = [];
 
   for (const keyword of keywords) {
     try {
       const seed = await seedRegistry.lookup(keyword, domain);
-      if (seed?.fullData && typeof seed.fullData === 'object') {
-        const normalized = normalizeSeedData(seed.fullData as RawSeedRecord);
-        normalized.examples?.forEach((ex) => {
-          if (looksLikeCodeSnippet(ex)) {
+      if (seed && seed.fullData && seed.fullData.examples) {
+        seed.fullData.examples.forEach((ex: string) => {
+          if (
+            ex.includes("{") ||
+            ex.includes("function") ||
+            ex.includes("const")
+          ) {
             examples.push({
               code: ex,
-              concept: normalized.word || normalized.concept || keyword,
-              language: normalized.language || 'typescript',
+              concept: seed.fullData.word || seed.fullData.concept,
+              language: seed.fullData.language || "typescript",
             });
           }
         });
@@ -329,7 +400,7 @@ export async function searchCodeExamples(
  */
 export async function getRelatedConcepts(
   term: string,
-  domain: string
+  domain: string,
 ): Promise<string[]> {
   try {
     const seed = await seedRegistry.lookup(term, domain);

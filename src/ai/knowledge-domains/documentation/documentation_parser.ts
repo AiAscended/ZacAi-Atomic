@@ -6,12 +6,12 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { extractDocComments } from "./documentation_utils"
+import { extractDocComments } from "./documentation_utils";
 
 export const documentationParser = (code: string) => {
-  const comments = extractDocComments(code)
-  const hasJSDoc = comments.some((c) => c.startsWith("/**"))
-  const hasTODO = /TODO|FIXME/i.test(code)
+  const comments = extractDocComments(code);
+  const hasJSDoc = comments.some((c) => c.startsWith("/**"));
+  const hasTODO = /TODO|FIXME/i.test(code);
 
   return {
     comments,
@@ -19,5 +19,5 @@ export const documentationParser = (code: string) => {
     hasJSDoc,
     hasTODO,
     coverage: comments.length > 0 ? "partial" : "none",
-  }
-}
+  };
+};

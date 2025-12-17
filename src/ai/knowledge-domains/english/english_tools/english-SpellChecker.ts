@@ -10,20 +10,20 @@
  * Spelling error with suggestions
  */
 export interface SpellingError {
-  word: string
-  position: number
-  suggestions: string[]
-  confidence: number
+  word: string;
+  position: number;
+  suggestions: string[];
+  confidence: number;
 }
 
 /**
  * Spell check result
  */
 export interface SpellCheckResult {
-  errors: SpellingError[]
-  errorCount: number
-  correctedText?: string
-  accuracy: number // 0-100
+  errors: SpellingError[];
+  errorCount: number;
+  correctedText?: string;
+  accuracy: number; // 0-100
 }
 
 /**
@@ -2715,130 +2715,131 @@ export class SpellChecker {
     "self-living",
     "self-existing",
     "self-being",
-  ])
+  ]);
 
   /**
    * Check spelling of text
    */
   public static check(text: string): SpellCheckResult {
-    const words = text.toLowerCase().match(/\b[a-z]+\b/g) || []
-    const errors: SpellingError[] = []
-    const uniqueWords = new Set(words)
+    const words = text.toLowerCase().match(/\b[a-z]+\b/g) || [];
+    const errors: SpellingError[] = [];
+    const uniqueWords = new Set(words);
 
     for (const word of uniqueWords) {
       if (!this.DICTIONARY.has(word) && word.length > 1) {
         // Find position of first occurrence
-        const position = text.toLowerCase().indexOf(word)
+        const position = text.toLowerCase().indexOf(word);
 
         // Generate suggestions
-        const suggestions = this.getSuggestions(word)
+        const suggestions = this.getSuggestions(word);
 
         errors.push({
           word,
           position,
           suggestions: suggestions.slice(0, 5), // Top 5 suggestions
           confidence: suggestions.length > 0 ? 0.8 : 0.5,
-        })
+        });
       }
     }
 
-    const totalWords = words.length
-    const errorCount = errors.length
-    const accuracy = totalWords > 0 ? ((totalWords - errorCount) / totalWords) * 100 : 100
+    const totalWords = words.length;
+    const errorCount = errors.length;
+    const accuracy =
+      totalWords > 0 ? ((totalWords - errorCount) / totalWords) * 100 : 100;
 
     return {
       errors,
       errorCount,
       accuracy: Math.round(accuracy),
-    }
+    };
   }
 
   /**
    * Get spelling suggestions for a word using edit distance
    */
   private static getSuggestions(word: string): string[] {
-    const suggestions: Array<{ word: string; distance: number }> = []
+    const suggestions: Array<{ word: string; distance: number }> = [];
 
     // Check all dictionary words
     for (const dictWord of this.DICTIONARY) {
-      const distance = this.levenshteinDistance(word, dictWord)
+      const distance = this.levenshteinDistance(word, dictWord);
 
       // Only consider words with small edit distance
       if (distance <= 2) {
-        suggestions.push({ word: dictWord, distance })
+        suggestions.push({ word: dictWord, distance });
       }
     }
 
     // Sort by edit distance (closest first)
-    suggestions.sort((a, b) => a.distance - b.distance)
+    suggestions.sort((a, b) => a.distance - b.distance);
 
-    return suggestions.map((s) => s.word)
+    return suggestions.map((s) => s.word);
   }
 
   /**
    * Calculate Levenshtein distance between two words
    */
   private static levenshteinDistance(word1: string, word2: string): number {
-    const len1 = word1.length
-    const len2 = word2.length
+    const len1 = word1.length;
+    const len2 = word2.length;
 
     // Create matrix
-    const matrix: number[][] = []
+    const matrix: number[][] = [];
     for (let i = 0; i <= len1; i++) {
-      matrix[i] = [i]
+      matrix[i] = [i];
     }
     for (let j = 0; j <= len2; j++) {
-      matrix[0][j] = j
+      matrix[0][j] = j;
     }
 
     // Fill matrix
     for (let i = 1; i <= len1; i++) {
       for (let j = 1; j <= len2; j++) {
-        const cost = word1[i - 1] === word2[j - 1] ? 0 : 1
+        const cost = word1[i - 1] === word2[j - 1] ? 0 : 1;
         matrix[i][j] = Math.min(
           matrix[i - 1][j] + 1, // Deletion
           matrix[i][j - 1] + 1, // Insertion
           matrix[i - 1][j - 1] + cost, // Substitution
-        )
+        );
       }
     }
 
-    return matrix[len1][len2]
+    return matrix[len1][len2];
   }
 
   /**
    * Auto-correct text by replacing misspelled words with best suggestions
    */
   public static autoCorrect(text: string): SpellCheckResult {
-    const result = this.check(text)
-    let correctedText = text
+    const result = this.check(text);
+    let correctedText = text;
 
     // Replace each error with its best suggestion
     for (const error of result.errors) {
       if (error.suggestions.length > 0) {
-        const regex = new RegExp(`\\b${error.word}\\b`, "gi")
-        correctedText = correctedText.replace(regex, error.suggestions[0])
+        const regex = new RegExp(`\\b${error.word}\\b`, "gi");
+        correctedText = correctedText.replace(regex, error.suggestions[0]);
       }
     }
 
     return {
       ...result,
       correctedText,
-    }
+    };
   }
 
   /**
    * Add word to dictionary (for learning)
    */
   public static addWord(word: string): void {
-    this.DICTIONARY.add(word.toLowerCase())
+    this.DICTIONARY.add(word.toLowerCase());
   }
 
   /**
    * Check if word is in dictionary
    */
   public static isValidWord(word: string): boolean {
-    return this.DICTIONARY.has(word.toLowerCase())
+    return this.DICTIONARY.has(word.toLowerCase());
   }
 }
 
@@ -2846,10 +2847,10 @@ export class SpellChecker {
  * Convenience function for quick spell check
  */
 export function checkSpelling(text: string): SpellCheckResult {
-  return SpellChecker.check(text)
+  return SpellChecker.check(text);
 }
 
 /**
  * Export spell checker instance
  */
-export const spellChecker = SpellChecker
+export const spellChecker = SpellChecker;

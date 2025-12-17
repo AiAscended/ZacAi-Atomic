@@ -6,13 +6,14 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { detectDataStructurePatterns } from "./data_structures_utils"
+import { detectDataStructurePatterns } from "./data_structures_utils";
 
 export const dataStructuresParser = (code: string) => {
-  const structures = detectDataStructurePatterns(code)
+  const structures = detectDataStructurePatterns(code);
   return {
     structures,
-    complexity: structures.length > 3 ? "high" : structures.length > 1 ? "medium" : "low",
+    complexity:
+      structures.length > 3 ? "high" : structures.length > 1 ? "medium" : "low",
     raw: code,
-  }
-}
+  };
+};

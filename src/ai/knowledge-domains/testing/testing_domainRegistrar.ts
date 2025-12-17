@@ -6,8 +6,8 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import meta from "./testing_seeds/testing_meta.json"
-import { TESTING_DOMAIN } from "./testing_constants"
+import meta from "./testing_seeds/testing_meta.json";
+import { TESTING_DOMAIN } from "./testing_constants";
 
-export const getDomainMeta = () => ({ ...meta, name: TESTING_DOMAIN })
-export default getDomainMeta
+export const getDomainMeta = () => ({ ...meta, name: TESTING_DOMAIN });
+export default getDomainMeta;

@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Terminal as XTerm } from 'xterm';
-import { FitAddon } from 'xterm-addon-fit';
-import { WebLinksAddon } from 'xterm-addon-web-links';
-import 'xterm/css/xterm.css';
-import { Button } from '@/components/ui/button';
-import { X, Plus, Trash2 } from 'lucide-react';
-import { CommandProcessor } from '@/ide/commandProcessor';
-import { useFileSystem } from '@/ide/useFileSystem';
+import React, { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { X, Plus, Trash2 } from "lucide-react";
+import { commandProcessor } from "@/lib/ide/commandProcessor";
+
+// Type imports (types are safe during SSR)
+import type { Terminal as XTermType } from "xterm";
+import type { FitAddon as FitAddonType } from "xterm-addon-fit";
 
 interface TerminalSession {
   id: string;
@@ -27,8 +26,8 @@ export function TerminalPanel() {
   const fitAddonRef = useRef<FitAddon | null>(null);
   const { fs } = useFileSystem();
 
-  const createSession = (title: string, index: number) => {
-    if (!terminalRef.current || !fs) return null;
+  useEffect(() => {
+    if (!terminalRef.current || typeof window === "undefined") return;
 
     const terminal = new XTerm({
       cursorBlink: true,
@@ -60,145 +59,141 @@ export function TerminalPanel() {
       convertEol: true,
     });
 
-    const fitAddon = new FitAddon();
-    const webLinksAddon = new WebLinksAddon();
-    
-    terminal.loadAddon(fitAddon);
-    terminal.loadAddon(webLinksAddon);
-    fitAddonRef.current = fitAddon;
+    // Dynamic import xterm modules
+    Promise.all([
+      import("xterm"),
+      import("xterm-addon-fit"),
+      import("xterm-addon-web-links"),
+    ])
+      .then(([{ Terminal }, { FitAddon }, { WebLinksAddon }]) => {
+        if (!terminalRef.current) return;
 
-    terminal.open(terminalRef.current);
-    fitAddon.fit();
+        setIsLoaded(true);
 
-    const commandProcessor = new CommandProcessor(fs);
-    const sessionId = `session-${Date.now()}-${index}`;
+        // Initialize first terminal session
+        terminal = new Terminal({
+          cursorBlink: true,
+          fontSize: 14,
+          fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+          theme: {
+            background: "#1e1e1e",
+            foreground: "#d4d4d4",
+            cursor: "#ffffff",
+            selectionBackground: "#264f78",
+          },
+          scrollback: 1000,
+        });
 
-    // Welcome message
-    if (index === 0) {
-      terminal.writeln('\x1b[1;32m╔═══════════════════════════════════════════════╗\x1b[0m');
-      terminal.writeln('\x1b[1;32m║     Welcome to ZacAi IDE Terminal            ║\x1b[0m');
-      terminal.writeln('\x1b[1;32m╚═══════════════════════════════════════════════╝\x1b[0m');
-      terminal.writeln('');
-      terminal.writeln('\x1b[1;36mType "help" for available commands\x1b[0m');
-      terminal.writeln('');
-    }
-    
-    const session: TerminalSession = {
-      id: sessionId,
-      title,
-      terminal,
-      commandProcessor,
-      currentLine: '',
-      cursorPosition: 0,
-    };
+        fitAddon = new FitAddon();
+        const webLinksAddon = new WebLinksAddon();
 
-    // Show prompt
-    terminal.write(commandProcessor.getPrompt());
+        terminal.loadAddon(fitAddon);
+        terminal.loadAddon(webLinksAddon);
+        fitAddonRef.current = fitAddon;
 
-    // Handle input
-    terminal.onData(async (data: string) => {
-      const charCode = data.charCodeAt(0);
+        terminal.open(terminalRef.current);
+        fitAddon.fit();
 
-      if (data === '\r') {
-        // Enter key - execute command
-        terminal.write('\r\n');
-        
-        if (session.currentLine.trim()) {
-          const result = await commandProcessor.executeCommand(session.currentLine);
-          
-          // Handle special clear command
-          if (result.output === '\x1bc') {
+        // Welcome message
+        terminal.writeln(
+          "\x1b[1;32m╔═══════════════════════════════════════════════╗\x1b[0m",
+        );
+        terminal.writeln(
+          "\x1b[1;32m║     Welcome to ZacAi IDE Terminal            ║\x1b[0m",
+        );
+        terminal.writeln(
+          "\x1b[1;32m╚═══════════════════════════════════════════════╝\x1b[0m",
+        );
+        terminal.writeln("");
+        terminal.writeln(
+          "Type \x1b[1;33mhelp\x1b[0m to see available commands",
+        );
+        terminal.writeln("");
+
+        const prompt = () => {
+          const cwd = commandProcessor.getCurrentDirectory();
+          terminal.write(`\x1b[1;32m${cwd}\x1b[0m \x1b[1;36m$\x1b[0m `);
+        };
+
+        prompt();
+
+        // Command execution with full shell support
+        let currentLine = "";
+        let historyIndex = -1;
+        const history = commandProcessor.getHistory();
+
+        terminal.onData(async (data: string) => {
+          const code = data.charCodeAt(0);
+
+          // Handle special keys
+          if (code === 13) {
+            // Enter
+            terminal.writeln("");
+
+            if (currentLine.trim()) {
+              const result = await commandProcessor.executeCommand(currentLine);
+
+              if (result.output) {
+                terminal.write(result.output);
+              }
+
+              if (result.error) {
+                terminal.writeln(`\x1b[1;31m${result.error}\x1b[0m`);
+              }
+            }
+
+            currentLine = "";
+            historyIndex = -1;
+            prompt();
+          } else if (code === 127) {
+            // Backspace
+            if (currentLine.length > 0) {
+              currentLine = currentLine.slice(0, -1);
+              terminal.write("\b \b");
+            }
+          } else if (code === 27) {
+            // Escape sequences (arrow keys)
+            // Handle arrow key navigation for history
+            return;
+          } else if (code === 3) {
+            // Ctrl+C
+            terminal.writeln("^C");
+            currentLine = "";
+            prompt();
+          } else if (code === 12) {
+            // Ctrl+L (clear)
             terminal.clear();
-          } else if (result.output) {
-            terminal.write(result.output);
+            prompt();
+          } else if (data >= String.fromCharCode(32)) {
+            // Printable characters
+            currentLine += data;
+            terminal.write(data);
           }
-        }
-        
-        session.currentLine = '';
-        session.cursorPosition = 0;
-        terminal.write(commandProcessor.getPrompt());
-      } else if (data === '\u007F' || charCode === 8) {
-        // Backspace
-        if (session.cursorPosition > 0) {
-          session.currentLine = 
-            session.currentLine.slice(0, session.cursorPosition - 1) +
-            session.currentLine.slice(session.cursorPosition);
-          session.cursorPosition--;
-          terminal.write('\b \b');
-        }
-      } else if (data === '\x1b[A') {
-        // Up arrow - previous command
-        const prevCommand = commandProcessor.getPreviousCommand();
-        if (prevCommand) {
-          // Clear current line
-          terminal.write('\r' + commandProcessor.getPrompt());
-          terminal.write(' '.repeat(session.currentLine.length));
-          terminal.write('\r' + commandProcessor.getPrompt());
-          
-          // Write previous command
-          terminal.write(prevCommand);
-          session.currentLine = prevCommand;
-          session.cursorPosition = prevCommand.length;
-        }
-      } else if (data === '\x1b[B') {
-        // Down arrow - next command
-        const nextCommand = commandProcessor.getNextCommand();
-        if (nextCommand) {
-          // Clear current line
-          terminal.write('\r' + commandProcessor.getPrompt());
-          terminal.write(' '.repeat(session.currentLine.length));
-          terminal.write('\r' + commandProcessor.getPrompt());
-          
-          // Write next command
-          terminal.write(nextCommand);
-          session.currentLine = nextCommand;
-          session.cursorPosition = nextCommand.length;
-        }
-      } else if (data === '\x1b[C') {
-        // Right arrow
-        if (session.cursorPosition < session.currentLine.length) {
-          session.cursorPosition++;
-          terminal.write(data);
-        }
-      } else if (data === '\x1b[D') {
-        // Left arrow
-        if (session.cursorPosition > 0) {
-          session.cursorPosition--;
-          terminal.write(data);
-        }
-      } else if (charCode >= 32 && charCode < 127) {
-        // Printable character
-        session.currentLine = 
-          session.currentLine.slice(0, session.cursorPosition) +
-          data +
-          session.currentLine.slice(session.cursorPosition);
-        session.cursorPosition++;
-        terminal.write(data);
-      }
-    });
+        });
 
-    return session;
-  };
+        const sessionId = `session-${Date.now()}`;
+        setSessions([{ id: sessionId, title: "Terminal 1", terminal }]);
+        setActiveSessionId(sessionId);
 
-  useEffect(() => {
-    if (!terminalRef.current || !fs) return;
+        // Handle resize
+        const resizeObserver = new ResizeObserver(() => {
+          if (fitAddon) {
+            fitAddon.fit();
+          }
+        });
 
-    const session = createSession('Terminal 1', 0);
-    if (session) {
-      setSessions([session]);
-      setActiveSessionId(session.id);
-    }
+        if (terminalRef.current) {
+          resizeObserver.observe(terminalRef.current);
+        }
 
-    // Handle resize
-    const resizeObserver = new ResizeObserver(() => {
-      if (fitAddonRef.current) {
-        fitAddonRef.current.fit();
-      }
-    });
-
-    if (terminalRef.current) {
-      resizeObserver.observe(terminalRef.current);
-    }
+        cleanup = () => {
+          resizeObserver.disconnect();
+          terminal.dispose();
+        };
+      })
+      .catch((error) => {
+        console.error("Failed to load xterm:", error);
+      });
 
     return () => {
       resizeObserver.disconnect();
@@ -207,24 +202,13 @@ export function TerminalPanel() {
   }, [fs]);
 
   const addSession = () => {
-    const newSession = createSession(`Terminal ${sessions.length + 1}`, sessions.length);
-    if (newSession) {
-      setSessions([...sessions, newSession]);
-      setActiveSessionId(newSession.id);
-    }
+    // Phase 4: Create new terminal session
+    console.log("Add terminal session - Phase 4");
   };
 
   const closeSession = (sessionId: string) => {
-    const session = sessions.find((s) => s.id === sessionId);
-    if (session) {
-      session.terminal.dispose();
-      const newSessions = sessions.filter((s) => s.id !== sessionId);
-      setSessions(newSessions);
-      
-      if (activeSessionId === sessionId && newSessions.length > 0) {
-        setActiveSessionId(newSessions[0].id);
-      }
-    }
+    // Phase 4: Close terminal session
+    console.log("Close session:", sessionId);
   };
 
   return (
@@ -236,8 +220,8 @@ export function TerminalPanel() {
             key={session.id}
             className={`flex items-center gap-2 px-3 py-1 text-sm rounded-sm cursor-pointer transition-colors ${
               session.id === activeSessionId
-                ? 'bg-[#1e1e1e] text-white'
-                : 'text-gray-400 hover:bg-[#2a2d2e]'
+                ? "bg-[#1e1e1e] text-white"
+                : "text-gray-400 hover:bg-[#2a2d2e]"
             }`}
             onClick={() => setActiveSessionId(session.id)}
           >

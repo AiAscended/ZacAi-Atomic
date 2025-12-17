@@ -6,17 +6,27 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { registerSource } from "../url_lookup"
+import { registerSource } from "../url_lookup";
 
 registerSource(
   "code_review",
   "Clean Code",
   "https://www.oreilly.com/library/view/clean-code/9780136083238/",
   "Code quality principles",
-)
-registerSource("code_review", "Refactoring Guru", "https://refactoring.guru", "Code smells and refactoring")
-registerSource("code_review", "SonarQube", "https://www.sonarqube.org", "Code quality metrics")
+);
+registerSource(
+  "code_review",
+  "Refactoring Guru",
+  "https://refactoring.guru",
+  "Code smells and refactoring",
+);
+registerSource(
+  "code_review",
+  "SonarQube",
+  "https://www.sonarqube.org",
+  "Code quality metrics",
+);
 
-export const codeReviewSources = () => registerSource
+export const codeReviewSources = () => registerSource;
 
-export default codeReviewSources
+export default codeReviewSources;

@@ -13,5 +13,5 @@
  * @example exp(1) // returns Math.E
  */
 export function exp(x: number): number {
-  return Math.exp(x)
+  return Math.exp(x);
 }

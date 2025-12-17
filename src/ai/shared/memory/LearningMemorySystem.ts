@@ -2,7 +2,7 @@
  * File: src/ai/shared/memory/LearningMemorySystem.ts
  * Description: Comprehensive learning and memory system with session management,
  * learned vocabulary storage, short/long-term memory, and date-stamped persistence.
- * 
+ *
  * Features:
  * - Session-based context management
  * - Real-time learned vocabulary storage
@@ -13,8 +13,8 @@
  * - Domain-specific learning storage
  */
 
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 // ============================================================================
 // Types and Interfaces
@@ -35,7 +35,7 @@ export interface SessionData {
 
 export interface ConversationTurn {
   timestamp: string;
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   metadata?: {
     intent?: string;
@@ -57,7 +57,13 @@ export interface LearnedItem {
   id: string;
   timestamp: string; // ISO date with time
   domain: string;
-  category: 'vocabulary' | 'concept' | 'equation' | 'fact' | 'procedure' | 'other';
+  category:
+    | "vocabulary"
+    | "concept"
+    | "equation"
+    | "fact"
+    | "procedure"
+    | "other";
   term: string;
   definition: string;
   source: string; // URL or reference
@@ -67,7 +73,7 @@ export interface LearnedItem {
   confidence: number; // 0-1
   verified: boolean;
   sessionId: string;
-  learnedFrom: 'url-lookup' | 'user-input' | 'inference' | 'search';
+  learnedFrom: "url-lookup" | "user-input" | "inference" | "search";
 }
 
 export interface LearnedDataFile {
@@ -84,17 +90,17 @@ export interface LearnedDataFile {
 
 export class LearningMemorySystem {
   private static instance: LearningMemorySystem;
-  
+
   // In-memory storage
   private activeSessions: Map<string, SessionData> = new Map();
   private shortTermMemory: Map<string, LearnedItem[]> = new Map(); // sessionId -> items
   private longTermMemory: Map<string, LearnedItem[]> = new Map(); // domain -> items
-  
+
   // File paths
-  private readonly SESSION_DIR = path.join(process.cwd(), 'data', 'sessions');
-  private readonly LEARNED_DIR = path.join(process.cwd(), 'data', 'learned');
-  private readonly ARCHIVE_DIR = path.join(process.cwd(), 'data', 'archive');
-  
+  private readonly SESSION_DIR = path.join(process.cwd(), "data", "sessions");
+  private readonly LEARNED_DIR = path.join(process.cwd(), "data", "learned");
+  private readonly ARCHIVE_DIR = path.join(process.cwd(), "data", "archive");
+
   // Configuration
   private readonly SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
   private readonly ARCHIVE_THRESHOLD_DAYS = 21;
@@ -122,11 +128,11 @@ export class LearningMemorySystem {
       this.SESSION_DIR,
       this.LEARNED_DIR,
       this.ARCHIVE_DIR,
-      path.join(this.SESSION_DIR, 'current'),
-      path.join(this.SESSION_DIR, 'archived'),
+      path.join(this.SESSION_DIR, "current"),
+      path.join(this.SESSION_DIR, "archived"),
     ];
 
-    dirs.forEach(dir => {
+    dirs.forEach((dir) => {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
@@ -168,15 +174,20 @@ export class LearningMemorySystem {
     this.shortTermMemory.set(sessionId, []);
     this.saveSessionToFile(session);
 
-    console.log(`✅ Created session: ${sessionId} ${userName ? `for ${userName}` : ''}`);
-    
+    console.log(
+      `✅ Created session: ${sessionId} ${userName ? `for ${userName}` : ""}`,
+    );
+
     return session;
   }
 
   /**
    * Get existing session or create new one
    */
-  public getOrCreateSession(sessionId?: string, userName?: string): SessionData {
+  public getOrCreateSession(
+    sessionId?: string,
+    userName?: string,
+  ): SessionData {
     if (sessionId && this.activeSessions.has(sessionId)) {
       const session = this.activeSessions.get(sessionId)!;
       session.lastActive = new Date().toISOString();
@@ -203,9 +214,9 @@ export class LearningMemorySystem {
    */
   public addConversationTurn(
     sessionId: string,
-    role: 'user' | 'assistant' | 'system',
+    role: "user" | "assistant" | "system",
     content: string,
-    metadata?: ConversationTurn['metadata']
+    metadata?: ConversationTurn["metadata"],
   ): void {
     const session = this.getSession(sessionId);
     if (!session) return;
@@ -221,7 +232,7 @@ export class LearningMemorySystem {
     session.metadata.totalTurns++;
 
     if (metadata?.domainsInvolved) {
-      metadata.domainsInvolved.forEach(domain => {
+      metadata.domainsInvolved.forEach((domain) => {
         if (!session.metadata.domainsUsed.includes(domain)) {
           session.metadata.domainsUsed.push(domain);
         }
@@ -234,7 +245,10 @@ export class LearningMemorySystem {
   /**
    * Get conversation history for context
    */
-  public getConversationHistory(sessionId: string, lastN?: number): ConversationTurn[] {
+  public getConversationHistory(
+    sessionId: string,
+    lastN?: number,
+  ): ConversationTurn[] {
     const session = this.getSession(sessionId);
     if (!session) return [];
 
@@ -245,14 +259,18 @@ export class LearningMemorySystem {
   /**
    * Update user context (e.g., remember user's name)
    */
-  public updateUserContext(sessionId: string, key: string, value: unknown): void {
+  public updateUserContext(
+    sessionId: string,
+    key: string,
+    value: unknown,
+  ): void {
     const session = this.getSession(sessionId);
     if (!session) return;
 
     session.userContext[key] = value;
-    
+
     // Special handling for userName
-    if (key === 'userName' && typeof value === 'string') {
+    if (key === "userName" && typeof value === "string") {
       session.userName = value;
     }
 
@@ -277,7 +295,7 @@ export class LearningMemorySystem {
   public learnItem(
     sessionId: string,
     domain: string,
-    category: LearnedItem['category'],
+    category: LearnedItem["category"],
     term: string,
     definition: string,
     source: string,
@@ -287,8 +305,8 @@ export class LearningMemorySystem {
       relatedTerms?: string[];
       confidence?: number;
       verified?: boolean;
-      learnedFrom?: LearnedItem['learnedFrom'];
-    }
+      learnedFrom?: LearnedItem["learnedFrom"];
+    },
   ): LearnedItem {
     const item: LearnedItem = {
       id: this.generateLearnedItemId(),
@@ -304,7 +322,7 @@ export class LearningMemorySystem {
       confidence: options?.confidence || 0.7,
       verified: options?.verified || false,
       sessionId,
-      learnedFrom: options?.learnedFrom || 'inference',
+      learnedFrom: options?.learnedFrom || "inference",
     };
 
     // Store in short-term memory (session)
@@ -328,7 +346,9 @@ export class LearningMemorySystem {
     // Save to domain-specific learned file
     this.saveLearnedItem(domain, item);
 
-    console.log(`📚 Learned new ${category}: "${term}" in ${domain} (from ${item.learnedFrom})`);
+    console.log(
+      `📚 Learned new ${category}: "${term}" in ${domain} (from ${item.learnedFrom})`,
+    );
 
     return item;
   }
@@ -338,8 +358,8 @@ export class LearningMemorySystem {
    */
   public isKnown(domain: string, term: string): boolean {
     const domainItems = this.longTermMemory.get(domain) || [];
-    return domainItems.some(item => 
-      item.term.toLowerCase() === term.toLowerCase()
+    return domainItems.some(
+      (item) => item.term.toLowerCase() === term.toLowerCase(),
     );
   }
 
@@ -348,9 +368,11 @@ export class LearningMemorySystem {
    */
   public retrieveLearnedItem(domain: string, term: string): LearnedItem | null {
     const domainItems = this.longTermMemory.get(domain) || [];
-    return domainItems.find(item => 
-      item.term.toLowerCase() === term.toLowerCase()
-    ) || null;
+    return (
+      domainItems.find(
+        (item) => item.term.toLowerCase() === term.toLowerCase(),
+      ) || null
+    );
   }
 
   /**
@@ -377,11 +399,11 @@ export class LearningMemorySystem {
   private saveSessionToFile(session: SessionData): void {
     try {
       const filename = `session_${session.sessionId}_${this.getDateStamp()}.json`;
-      const filepath = path.join(this.SESSION_DIR, 'current', filename);
-      
-      fs.writeFileSync(filepath, JSON.stringify(session, null, 2), 'utf-8');
+      const filepath = path.join(this.SESSION_DIR, "current", filename);
+
+      fs.writeFileSync(filepath, JSON.stringify(session, null, 2), "utf-8");
     } catch (error) {
-      console.error('Error saving session:', error);
+      console.error("Error saving session:", error);
     }
   }
 
@@ -399,10 +421,10 @@ export class LearningMemorySystem {
       const filepath = path.join(domainDir, filename);
 
       let data: LearnedDataFile;
-      
+
       if (fs.existsSync(filepath)) {
         // Append to existing file
-        const existing = JSON.parse(fs.readFileSync(filepath, 'utf-8'));
+        const existing = JSON.parse(fs.readFileSync(filepath, "utf-8"));
         data = existing;
         data.items.push(item);
         data.totalItems = data.items.length;
@@ -418,9 +440,9 @@ export class LearningMemorySystem {
         };
       }
 
-      fs.writeFileSync(filepath, JSON.stringify(data, null, 2), 'utf-8');
+      fs.writeFileSync(filepath, JSON.stringify(data, null, 2), "utf-8");
     } catch (error) {
-      console.error('Error saving learned item:', error);
+      console.error("Error saving learned item:", error);
     }
   }
 
@@ -429,17 +451,19 @@ export class LearningMemorySystem {
    */
   private loadActiveSessions(): void {
     try {
-      const currentDir = path.join(this.SESSION_DIR, 'current');
+      const currentDir = path.join(this.SESSION_DIR, "current");
       if (!fs.existsSync(currentDir)) return;
 
       const files = fs.readdirSync(currentDir);
       const now = Date.now();
 
-      files.forEach(file => {
-        if (!file.endsWith('.json')) return;
+      files.forEach((file) => {
+        if (!file.endsWith(".json")) return;
 
         const filepath = path.join(currentDir, file);
-        const session = JSON.parse(fs.readFileSync(filepath, 'utf-8')) as SessionData;
+        const session = JSON.parse(
+          fs.readFileSync(filepath, "utf-8"),
+        ) as SessionData;
 
         // Check if session is expired
         const expiresAt = new Date(session.expiresAt).getTime();
@@ -449,13 +473,16 @@ export class LearningMemorySystem {
         } else {
           // Load active session
           this.activeSessions.set(session.sessionId, session);
-          this.shortTermMemory.set(session.sessionId, session.learnedThisSession);
+          this.shortTermMemory.set(
+            session.sessionId,
+            session.learnedThisSession,
+          );
         }
       });
 
       console.log(`📂 Loaded ${this.activeSessions.size} active sessions`);
     } catch (error) {
-      console.error('Error loading sessions:', error);
+      console.error("Error loading sessions:", error);
     }
   }
 
@@ -469,18 +496,20 @@ export class LearningMemorySystem {
       const domains = fs.readdirSync(this.LEARNED_DIR);
       let totalItems = 0;
 
-      domains.forEach(domain => {
+      domains.forEach((domain) => {
         const domainDir = path.join(this.LEARNED_DIR, domain);
         if (!fs.statSync(domainDir).isDirectory()) return;
 
         const files = fs.readdirSync(domainDir);
         const allItems: LearnedItem[] = [];
 
-        files.forEach(file => {
-          if (!file.endsWith('.json')) return;
+        files.forEach((file) => {
+          if (!file.endsWith(".json")) return;
 
           const filepath = path.join(domainDir, file);
-          const data = JSON.parse(fs.readFileSync(filepath, 'utf-8')) as LearnedDataFile;
+          const data = JSON.parse(
+            fs.readFileSync(filepath, "utf-8"),
+          ) as LearnedDataFile;
           allItems.push(...data.items);
         });
 
@@ -488,9 +517,11 @@ export class LearningMemorySystem {
         totalItems += allItems.length;
       });
 
-      console.log(`📚 Loaded ${totalItems} learned items across ${domains.length} domains`);
+      console.log(
+        `📚 Loaded ${totalItems} learned items across ${domains.length} domains`,
+      );
     } catch (error) {
-      console.error('Error loading long-term memory:', error);
+      console.error("Error loading long-term memory:", error);
     }
   }
 
@@ -501,13 +532,13 @@ export class LearningMemorySystem {
     try {
       const currentPath = path.join(
         this.SESSION_DIR,
-        'current',
-        `session_${session.sessionId}_${this.getDateStamp()}.json`
+        "current",
+        `session_${session.sessionId}_${this.getDateStamp()}.json`,
       );
       const archivePath = path.join(
         this.SESSION_DIR,
-        'archived',
-        `session_${session.sessionId}_${this.getDateStamp()}.json`
+        "archived",
+        `session_${session.sessionId}_${this.getDateStamp()}.json`,
       );
 
       if (fs.existsSync(currentPath)) {
@@ -519,7 +550,7 @@ export class LearningMemorySystem {
 
       console.log(`📦 Archived session: ${session.sessionId}`);
     } catch (error) {
-      console.error('Error archiving session:', error);
+      console.error("Error archiving session:", error);
     }
   }
 
@@ -528,16 +559,17 @@ export class LearningMemorySystem {
    */
   public archiveOldLearning(): void {
     try {
-      const threshold = Date.now() - (this.ARCHIVE_THRESHOLD_DAYS * 24 * 60 * 60 * 1000);
+      const threshold =
+        Date.now() - this.ARCHIVE_THRESHOLD_DAYS * 24 * 60 * 60 * 1000;
 
-      Object.keys(this.LEARNED_DIR).forEach(domain => {
+      Object.keys(this.LEARNED_DIR).forEach((domain) => {
         const domainDir = path.join(this.LEARNED_DIR, domain);
         if (!fs.existsSync(domainDir)) return;
 
         const files = fs.readdirSync(domainDir);
 
-        files.forEach(file => {
-          if (!file.endsWith('.json')) return;
+        files.forEach((file) => {
+          if (!file.endsWith(".json")) return;
 
           const filepath = path.join(domainDir, file);
           const stats = fs.statSync(filepath);
@@ -555,7 +587,7 @@ export class LearningMemorySystem {
         });
       });
     } catch (error) {
-      console.error('Error archiving old learning:', error);
+      console.error("Error archiving old learning:", error);
     }
   }
 
@@ -576,8 +608,8 @@ export class LearningMemorySystem {
    */
   private getDateStamp(): string {
     const now = new Date();
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
     const year = String(now.getFullYear()).slice(-2);
     return `${day}-${month}-${year}`;
   }
@@ -587,9 +619,11 @@ export class LearningMemorySystem {
    */
   public getStatistics() {
     const activeSessions = this.activeSessions.size;
-    const totalLearned = Array.from(this.longTermMemory.values())
-      .reduce((sum, items) => sum + items.length, 0);
-    
+    const totalLearned = Array.from(this.longTermMemory.values()).reduce(
+      (sum, items) => sum + items.length,
+      0,
+    );
+
     return {
       activeSessions,
       totalLearnedItems: totalLearned,
@@ -613,7 +647,7 @@ export class LearningMemorySystem {
       }
     });
 
-    expired.forEach(sessionId => {
+    expired.forEach((sessionId) => {
       const session = this.activeSessions.get(sessionId);
       if (session) {
         this.archiveSession(session);

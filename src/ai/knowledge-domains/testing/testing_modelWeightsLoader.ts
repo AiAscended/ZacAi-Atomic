@@ -1,25 +1,20 @@
-import { storageAdapter } from "../storageAdapter"
-import { createDomainWeightsManager } from "../../shared/weights/domainWeightsLoaderFactory"
+/**
+ * File: src/ai/data/testing/testing_modelWeightsLoader.ts
+ * Purpose: Load training weights for testing domain
+ * Depends on: ../storageAdapter.ts
+ * Depended on by: testing_trainingController.ts
+ * Creator: Vercel v0 Coding Assistant
+ */
 
-const testingWeightsManager = createDomainWeightsManager({
-  domainName: "testing",
-})
+import { storageAdapter } from "../storageAdapter";
 
-export const testingLoadWeights = async (): Promise<ArrayBuffer | null> => {
+export const testingLoadWeights = async (
+  path = "/src/ai/knowledge-domains/testing/testing_weights/testing_trainingWeights.bin",
+) => {
   try {
-    const filename = await testingWeightsManager.resolveActiveWeightFile()
-    const fullPath = `${testingWeightsManager.storageBasePath}/${filename}`
-    return await storageAdapter.readBinaryFile(fullPath)
-  } catch (error) {
-    console.error("[Testing] Unable to load training weights:", error)
-    return null
+    const raw = await storageAdapter.readFile(path);
+    return raw;
+  } catch (e) {
+    return null;
   }
-}
-
-export const primeTestingWeights = async (): Promise<string | null> => {
-  return testingWeightsManager.prime()
-}
-
-export const getTestingActiveWeightArtifact = () => {
-  return testingWeightsManager.getActiveWeightArtifact()
-}
+};

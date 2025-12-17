@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   FolderIcon,
   FolderOpen,
@@ -13,20 +13,20 @@ import {
   Plus,
   Search,
   RefreshCw,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+} from "@/components/ui/context-menu";
 
 interface FileNode {
   name: string;
   path: string;
-  type: 'file' | 'directory';
+  type: "file" | "directory";
   children?: FileNode[];
   expanded?: boolean;
 }
@@ -34,55 +34,57 @@ interface FileNode {
 // Sample file tree structure
 const sampleFileTree: FileNode[] = [
   {
-    name: 'src',
-    path: '/src',
-    type: 'directory',
+    name: "src",
+    path: "/src",
+    type: "directory",
     expanded: true,
     children: [
       {
-        name: 'components',
-        path: '/src/components',
-        type: 'directory',
+        name: "components",
+        path: "/src/components",
+        type: "directory",
         expanded: false,
         children: [
-          { name: 'Button.tsx', path: '/src/components/Button.tsx', type: 'file' },
-          { name: 'Card.tsx', path: '/src/components/Card.tsx', type: 'file' },
+          {
+            name: "Button.tsx",
+            path: "/src/components/Button.tsx",
+            type: "file",
+          },
+          { name: "Card.tsx", path: "/src/components/Card.tsx", type: "file" },
         ],
       },
-      { name: 'app.tsx', path: '/src/app.tsx', type: 'file' },
-      { name: 'index.tsx', path: '/src/index.tsx', type: 'file' },
+      { name: "app.tsx", path: "/src/app.tsx", type: "file" },
+      { name: "index.tsx", path: "/src/index.tsx", type: "file" },
     ],
   },
   {
-    name: 'public',
-    path: '/public',
-    type: 'directory',
+    name: "public",
+    path: "/public",
+    type: "directory",
     expanded: false,
-    children: [
-      { name: 'logo.png', path: '/public/logo.png', type: 'file' },
-    ],
+    children: [{ name: "logo.png", path: "/public/logo.png", type: "file" }],
   },
-  { name: 'package.json', path: '/package.json', type: 'file' },
-  { name: 'tsconfig.json', path: '/tsconfig.json', type: 'file' },
-  { name: 'README.md', path: '/README.md', type: 'file' },
+  { name: "package.json", path: "/package.json", type: "file" },
+  { name: "tsconfig.json", path: "/tsconfig.json", type: "file" },
+  { name: "README.md", path: "/README.md", type: "file" },
 ];
 
 function getFileIcon(fileName: string) {
-  const ext = fileName.split('.').pop()?.toLowerCase();
-  
+  const ext = fileName.split(".").pop()?.toLowerCase();
+
   switch (ext) {
-    case 'tsx':
-    case 'jsx':
-    case 'ts':
-    case 'js':
+    case "tsx":
+    case "jsx":
+    case "ts":
+    case "js":
       return <FileCode className="w-4 h-4 text-blue-400" />;
-    case 'json':
+    case "json":
       return <FileJson className="w-4 h-4 text-yellow-400" />;
-    case 'png':
-    case 'jpg':
-    case 'svg':
-    case 'gif':
-      return <ImageIcon className="w-4 h-4 text-purple-400" aria-hidden="true" />;
+    case "png":
+    case "jpg":
+    case "svg":
+    case "gif":
+      return <Image className="w-4 h-4 text-purple-400" />;
     default:
       return <FileIcon className="w-4 h-4 text-gray-400" />;
   }
@@ -104,7 +106,7 @@ function FileTreeNode({
   const isSelected = selectedPath === node.path;
 
   const handleClick = () => {
-    if (node.type === 'directory') {
+    if (node.type === "directory") {
       onToggle(node.path);
     } else {
       onSelect(node);
@@ -117,12 +119,12 @@ function FileTreeNode({
         <ContextMenuTrigger>
           <div
             className={`flex items-center gap-1 py-1 px-2 cursor-pointer hover:bg-[#2a2d2e] ${
-              isSelected ? 'bg-[#37373d]' : ''
+              isSelected ? "bg-[#37373d]" : ""
             }`}
             style={{ paddingLeft: `${level * 12 + 8}px` }}
             onClick={handleClick}
           >
-            {node.type === 'directory' && (
+            {node.type === "directory" && (
               <span className="flex-shrink-0">
                 {node.expanded ? (
                   <ChevronDown className="w-4 h-4 text-gray-400" />
@@ -132,7 +134,7 @@ function FileTreeNode({
               </span>
             )}
             <span className="flex-shrink-0 ml-1">
-              {node.type === 'directory' ? (
+              {node.type === "directory" ? (
                 node.expanded ? (
                   <FolderOpen className="w-4 h-4 text-yellow-500" />
                 ) : (
@@ -142,7 +144,9 @@ function FileTreeNode({
                 getFileIcon(node.name)
               )}
             </span>
-            <span className="ml-1 text-sm text-gray-200 truncate">{node.name}</span>
+            <span className="ml-1 text-sm text-gray-200 truncate">
+              {node.name}
+            </span>
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>
@@ -154,7 +158,7 @@ function FileTreeNode({
         </ContextMenuContent>
       </ContextMenu>
 
-      {node.type === 'directory' && node.expanded && node.children && (
+      {node.type === "directory" && node.expanded && node.children && (
         <div>
           {node.children.map((child) => (
             <FileTreeNode
@@ -175,7 +179,7 @@ function FileTreeNode({
 export function FileExplorer() {
   const [fileTree, setFileTree] = useState<FileNode[]>(sampleFileTree);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const toggleNode = (path: string) => {
     const toggleInTree = (nodes: FileNode[]): FileNode[] => {
@@ -195,14 +199,16 @@ export function FileExplorer() {
   const handleSelect = (node: FileNode) => {
     setSelectedPath(node.path);
     // TODO: Open file in editor
-    console.log('Selected file:', node.path);
+    console.log("Selected file:", node.path);
   };
 
   return (
     <div className="h-full flex flex-col bg-[#252526]">
       {/* Header */}
       <div className="flex items-center justify-between p-2 border-b border-[#3e3e42]">
-        <span className="text-xs font-semibold text-gray-300 uppercase">Explorer</span>
+        <span className="text-xs font-semibold text-gray-300 uppercase">
+          Explorer
+        </span>
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" className="h-6 w-6">
             <Plus className="h-4 w-4" />

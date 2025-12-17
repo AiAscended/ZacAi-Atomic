@@ -4,33 +4,33 @@
 
 export function getFromStorage<T>(key: string, defaultValue: T): T {
   try {
-    const item = localStorage.getItem(key)
-    return item ? (JSON.parse(item) as T) : defaultValue
+    const item = localStorage.getItem(key);
+    return item ? (JSON.parse(item) as T) : defaultValue;
   } catch {
-    return defaultValue
+    return defaultValue;
   }
 }
 
 export function setToStorage<T>(key: string, value: T): void {
   try {
-    localStorage.setItem(key, JSON.stringify(value))
+    localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error("Failed to save to storage:", error)
+    console.error("Failed to save to storage:", error);
   }
 }
 
 export const removeFromStorage = (key: string): void => {
   try {
-    localStorage.removeItem(key)
+    localStorage.removeItem(key);
   } catch (error) {
-    console.error("Failed to remove from storage:", error)
+    console.error("Failed to remove from storage:", error);
   }
-}
+};
 
 export const clearStorage = (): void => {
   try {
-    localStorage.clear()
+    localStorage.clear();
   } catch (error) {
-    console.error("Failed to clear storage:", error)
+    console.error("Failed to clear storage:", error);
   }
-}
+};

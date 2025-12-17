@@ -14,8 +14,8 @@ export interface RNNModelConfig {
 }
 
 export const defaultRNNConfig: RNNModelConfig = {
-  modelName: 'recurrent-neural-network',
-  version: '1.0.0',
+  modelName: "recurrent-neural-network",
+  version: "1.0.0",
   inputDim: 512,
   outputDim: 512,
   numLayers: 6,

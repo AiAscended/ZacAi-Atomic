@@ -19,15 +19,15 @@ export function extractMainContent(html: string): string {
     .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, "")
     .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, "")
     .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, "")
-    .replace(/<aside[^>]*>[\s\S]*?<\/aside>/gi, "")
+    .replace(/<aside[^>]*>[\s\S]*?<\/aside>/gi, "");
 
   // Extract text from remaining HTML
   content = content
     .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
-    .trim()
+    .trim();
 
-  return content
+  return content;
 }
 
 /**
@@ -36,19 +36,23 @@ export function extractMainContent(html: string): string {
  * @returns Metadata object
  */
 export function extractMetadata(html: string): Record<string, string> {
-  const metadata: Record<string, string> = {}
+  const metadata: Record<string, string> = {};
 
   // Extract meta tags
-  const metaMatches = html.matchAll(/<meta[^>]+name=["']([^"']+)["'][^>]+content=["']([^"']+)["']/gi)
+  const metaMatches = html.matchAll(
+    /<meta[^>]+name=["']([^"']+)["'][^>]+content=["']([^"']+)["']/gi,
+  );
   for (const match of metaMatches) {
-    metadata[match[1]] = match[2]
+    metadata[match[1]] = match[2];
   }
 
   // Extract Open Graph tags
-  const ogMatches = html.matchAll(/<meta[^>]+property=["']og:([^"']+)["'][^>]+content=["']([^"']+)["']/gi)
+  const ogMatches = html.matchAll(
+    /<meta[^>]+property=["']og:([^"']+)["'][^>]+content=["']([^"']+)["']/gi,
+  );
   for (const match of ogMatches) {
-    metadata[`og:${match[1]}`] = match[2]
+    metadata[`og:${match[1]}`] = match[2];
   }
 
-  return metadata
+  return metadata;
 }

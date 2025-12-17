@@ -1,27 +1,27 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Textarea } from '@/components/ui/textarea';
-import { Send, Bot, User, Code2, FileCode, Bug, Sparkles, Copy, FileDown, Play, Check } from 'lucide-react';
-import { aiAssistant, type IDEContext } from '@/ide/aiAssistant';
-import { useEditorStore } from '@/ide/editorStore';
-import type { EditorTab } from '@/ide/editorStore';
-import { useFileSystem } from '@/ide/useFileSystem';
-import Prism from 'prismjs';
-import 'prismjs/themes/prism-tomorrow.css';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-jsx';
-import 'prismjs/components/prism-tsx';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-json';
-import 'prismjs/components/prism-python';
+import React, { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Send,
+  Bot,
+  User,
+  Code2,
+  FileCode,
+  Bug,
+  Sparkles,
+  Copy,
+  Check,
+} from "lucide-react";
+import { useAIIDE } from "@/lib/ide/aiIDEIntegration";
+import { useEditorStore } from "@/lib/ide/editorStore";
+import { useToast } from "@/hooks/use-toast";
 
 interface Message {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: Date;
   codeBlocks?: Array<{
@@ -33,41 +33,38 @@ interface Message {
 }
 
 const quickActions = [
-  { icon: Code2, label: 'Explain Code', action: 'explain' as const },
-  { icon: FileCode, label: 'Generate Code', action: 'generate' as const },
-  { icon: Bug, label: 'Fix Bug', action: 'fix' as const },
-  { icon: Sparkles, label: 'Optimize', action: 'optimize' as const },
+  { icon: Code2, label: "Explain Code", prompt: "Explain this code" },
+  { icon: FileCode, label: "Generate Code", prompt: "Generate code for" },
+  { icon: Bug, label: "Fix Bug", prompt: "Help fix this bug" },
+  { icon: Sparkles, label: "Optimize", prompt: "Optimize this code" },
 ];
 
 export function AIChatPanel() {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      role: 'assistant',
-      content: 'Hello! I\'m your ZacAi coding assistant powered by 23 knowledge domains and 13 AI models. I can help you with:\n\n• Code explanation and documentation\n• Bug fixing and debugging\n• Code generation and refactoring\n• Best practices and optimization\n• Testing and security analysis\n\nSelect code in the editor and use the quick actions, or just ask me anything!',
+      id: "1",
+      role: "assistant",
+      content:
+        "Hello! I'm your ZacAi Hybrid LLM coding assistant powered by 23 knowledge domains and 14 AI models. I can help you with:\n\n• Code explanation and documentation\n• Bug fixing and debugging\n• Code generation and refactoring\n• Best practices and optimization\n• Multi-language support\n• Real-time code analysis\n\nWhat would you like help with?",
       timestamp: new Date(),
     },
   ]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [input, setInput] = useState("");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { openFiles, activeFileId, getFileById, updateFileContent } = useEditorStore();
-  const { fs, fileTree } = useFileSystem();
+  const { toast } = useToast();
 
-  // Initialize AI assistant
-  useEffect(() => {
-    const initAI = async () => {
-      try {
-        await aiAssistant.initialize();
-        setIsInitialized(true);
-      } catch (error) {
-        console.error('Failed to initialize AI:', error);
-      }
-    };
-    initAI();
-  }, []);
+  // Use AI IDE integration
+  const {
+    isInitialized,
+    isLoading,
+    sendMessage,
+    explainCode,
+    fixCode,
+    optimizeCode,
+    generateCode,
+  } = useAIIDE();
+  const { getActiveTab } = useEditorStore();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -102,53 +99,80 @@ export function AIChatPanel() {
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      role: 'user',
+      role: "user",
       content: input,
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
+    const userInput = input;
+    setInput("");
 
     try {
-      const context = getIDEContext();
-      const response = await aiAssistant.sendMessage(input, context);
+      // Get current editor context
+      const activeTab = getActiveTab();
+      const context = activeTab
+        ? {
+            currentFile: {
+              path: activeTab.path,
+              content: activeTab.content,
+              language: activeTab.language,
+              cursorPosition: activeTab.cursorPosition,
+            },
+            openFiles: useEditorStore.getState().tabs.map((t) => t.path),
+          }
+        : undefined;
+
+      // Send to AI with full context
+      const response = await sendMessage(userInput, context);
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response.text,
+        role: "assistant",
+        content: response.content,
         timestamp: new Date(),
         codeBlocks: response.codeBlocks,
         domains: response.domains,
       };
 
-      setMessages((prev) => [...prev, aiMessage]);
+      // Handle code blocks and actions
+      if (response.code && response.code.length > 0) {
+        toast({
+          title: "Code Generated",
+          description: `${response.code.length} code snippet(s) available`,
+        });
+      }
     } catch (error) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+        role: "assistant",
+        content:
+          "I apologize, but I encountered an error processing your request. Please try again.",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
+
+      toast({
+        title: "Error",
+        description: "Failed to get AI response",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleQuickAction = async (
-    action: (typeof quickActions)[number]['action']
-  ) => {
-    const activeFile = getFileById(activeFileId);
-    
-    if (!activeFile) {
-      setInput(`${action} code for: `);
-      return;
-    }
+  const handleQuickAction = (prompt: string) => {
+    setInput(prompt + ": ");
+  };
 
-    setIsLoading(true);
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+    toast({
+      title: "Copied!",
+      description: "Code copied to clipboard",
+    });
+  };
 
     try {
       let response;
@@ -174,20 +198,37 @@ export function AIChatPanel() {
           return;
       }
 
-      const aiMessage: Message = {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: response.text,
-        timestamp: new Date(),
-        codeBlocks: response.codeBlocks,
-        domains: response.domains,
-      };
+      const language = match[1] || "plaintext";
+      const code = match[2].trim();
 
-      setMessages((prev) => [...prev, aiMessage]);
-    } catch (error) {
-      console.error('Quick action error:', error);
-    } finally {
-      setIsLoading(false);
+      // Add code block with copy button
+      parts.push(
+        <div
+          key={match.index}
+          className="my-2 rounded-md overflow-hidden border"
+        >
+          <div className="flex items-center justify-between bg-muted/50 px-3 py-1 border-b">
+            <span className="text-xs text-muted-foreground">{language}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2"
+              onClick={() => handleCopyCode(code)}
+            >
+              {copiedCode === code ? (
+                <Check className="h-3 w-3 text-green-500" />
+              ) : (
+                <Copy className="h-3 w-3" />
+              )}
+            </Button>
+          </div>
+          <pre className="p-3 overflow-x-auto bg-muted/30">
+            <code className="text-xs">{code}</code>
+          </pre>
+        </div>,
+      );
+
+      lastIndex = match.index + match[0].length;
     }
   };
 
@@ -250,10 +291,23 @@ export function AIChatPanel() {
       <ScrollArea className="flex-1 p-3" ref={scrollRef}>
         <div className="space-y-4">
           {messages.map((message) => (
-            <div key={message.id}>
+            <div
+              key={message.id}
+              className={`flex gap-2 ${
+                message.role === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              {message.role === "assistant" && (
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Bot className="h-4 w-4 text-primary" />
+                </div>
+              )}
+
               <div
-                className={`flex gap-2 ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                className={`max-w-[85%] rounded-lg p-3 ${
+                  message.role === "user"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted"
                 }`}
               >
                 {message.role === 'assistant' && (
@@ -296,78 +350,14 @@ export function AIChatPanel() {
                 )}
               </div>
 
-              {/* Code blocks with actions */}
-              {message.codeBlocks && message.codeBlocks.length > 0 && (
-                <div className="ml-10 mt-2 space-y-2">
-                  {message.codeBlocks.map((block, idx) => {
-                    const blockId = `${message.id}-${idx}`;
-                    const highlightedCode = Prism.highlight(
-                      block.code,
-                      Prism.languages[block.language] || Prism.languages.plaintext,
-                      block.language
-                    );
-
-                    return (
-                      <div
-                        key={idx}
-                        className="rounded-lg overflow-hidden border bg-background"
-                      >
-                        <div className="flex items-center justify-between px-3 py-2 bg-muted/50 border-b">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-muted-foreground">
-                              {block.language}
-                            </span>
-                            {block.filename && (
-                              <span className="text-xs text-muted-foreground">
-                                {block.filename}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 px-2 text-xs"
-                              onClick={() => handleCopyCode(block.code, blockId)}
-                            >
-                              {copiedCode === blockId ? (
-                                <>
-                                  <Check className="h-3 w-3 mr-1" />
-                                  Copied
-                                </>
-                              ) : (
-                                <>
-                                  <Copy className="h-3 w-3 mr-1" />
-                                  Copy
-                                </>
-                              )}
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 px-2 text-xs"
-                              onClick={() => handleInsertCode(block.code, block.filename)}
-                            >
-                              <FileDown className="h-3 w-3 mr-1" />
-                              {block.filename ? 'Create File' : 'Insert'}
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="p-3 overflow-x-auto">
-                          <pre className="text-xs">
-                            <code
-                              dangerouslySetInnerHTML={{ __html: highlightedCode }}
-                            />
-                          </pre>
-                        </div>
-                      </div>
-                    );
-                  })}
+              {message.role === "user" && (
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                  <User className="h-4 w-4 text-primary-foreground" />
                 </div>
               )}
             </div>
           ))}
-          
+
           {isLoading && (
             <div className="flex gap-2">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -392,7 +382,7 @@ export function AIChatPanel() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
+              if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
                 handleSend();
               }

@@ -14,7 +14,7 @@
  * @example power(2, 3) // returns 8
  */
 export function power(base: number, exponent: number): number {
-  return Math.pow(base, exponent)
+  return Math.pow(base, exponent);
 }
 
 /**
@@ -23,7 +23,7 @@ export function power(base: number, exponent: number): number {
  * @returns n^2
  */
 export function square(n: number): number {
-  return n * n
+  return n * n;
 }
 
 /**
@@ -32,5 +32,5 @@ export function square(n: number): number {
  * @returns n^3
  */
 export function cube(n: number): number {
-  return n * n * n
+  return n * n * n;
 }

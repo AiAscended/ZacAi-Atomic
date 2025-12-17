@@ -4,7 +4,10 @@
  */
 
 export class DocumentationGenerator {
-  generate(code: string, format: string = 'markdown'): {
+  generate(
+    _code: string,
+    _format: string = "markdown",
+  ): {
     documentation: string;
     sections: string[];
   } {
@@ -28,9 +31,9 @@ export class DocumentationGenerator {
     const doc = `Generated ${format} documentation for provided snippet with ${sections.length || 'no'} structural hints.`
 
     return {
-      documentation: doc,
-      sections,
-    }
+      documentation: "",
+      sections: [],
+    };
   }
 }
 

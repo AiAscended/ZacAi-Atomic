@@ -5,13 +5,13 @@
 
 "use client";
 
-import React from 'react';
-import { WindowControls } from './WindowControls';
-import { useLayoutStore } from '@/ide/layoutStore';
-import { cn } from '@/lib/utils';
+import React, { ReactNode } from "react";
+import { WindowControls } from "./WindowControls";
+import { useLayoutStore } from "@/lib/ide/layoutStore";
+import { cn } from "@/lib/utils";
 
 interface PanelContainerProps {
-  id: string;
+  panelKey: "files" | "editor" | "preview" | "terminal" | "aiChat";
   title: string;
   children: React.ReactNode;
   className?: string;
@@ -39,11 +39,14 @@ export function PanelContainer({
     <div
       id={id}
       className={cn(
-        'flex flex-col bg-background border border-border rounded-md overflow-hidden',
-        isMinimized && 'h-10',
-        isMaximized && 'fixed inset-4 z-50',
-        className
+        "flex flex-col bg-background border border-border rounded-md overflow-hidden",
+        panel.maximized && "fixed inset-4 z-50",
+        panel.minimized && "h-10",
+        className,
       )}
+      style={{
+        transition: "all 0.2s ease-in-out",
+      }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/50">

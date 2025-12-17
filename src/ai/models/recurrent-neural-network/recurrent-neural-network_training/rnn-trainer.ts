@@ -5,8 +5,8 @@
 import type { TrainingBatch } from "../../shared/modelTypes"
 
 export class RNNTrainer {
-  train(data: unknown): void {
-    console.log('Training recurrent-neural-network...');
+  train(data: any): void {
+    console.log("Training recurrent-neural-network...");
   }
 }
 

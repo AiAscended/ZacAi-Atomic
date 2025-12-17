@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import { splitSentences } from "./grammar_utils"
+import { splitSentences } from "./grammar_utils";
 
 /**
  * Parse text for grammatical structure
@@ -14,19 +14,28 @@ import { splitSentences } from "./grammar_utils"
  * - Identifies basic clause structure
  */
 export const grammarParser = (text: string) => {
-  const sentences = splitSentences(text)
+  const sentences = splitSentences(text);
   const analysis = sentences.map((s) => {
-    const trimmed = s.trim()
-    const isQuestion = trimmed.endsWith("?")
-    const isExclamation = trimmed.endsWith("!")
-    const isImperative = /^[A-Z][a-z]+/.test(trimmed) && !isQuestion && trimmed.split(" ").length < 8
+    const trimmed = s.trim();
+    const isQuestion = trimmed.endsWith("?");
+    const isExclamation = trimmed.endsWith("!");
+    const isImperative =
+      /^[A-Z][a-z]+/.test(trimmed) &&
+      !isQuestion &&
+      trimmed.split(" ").length < 8;
 
     return {
       text: trimmed,
-      type: isQuestion ? "interrogative" : isExclamation ? "exclamatory" : isImperative ? "imperative" : "declarative",
+      type: isQuestion
+        ? "interrogative"
+        : isExclamation
+          ? "exclamatory"
+          : isImperative
+            ? "imperative"
+            : "declarative",
       wordCount: trimmed.split(/\s+/).length,
     };
-  })
+  });
 
-  return { sentences: analysis, count: sentences.length }
-}
+  return { sentences: analysis, count: sentences.length };
+};

@@ -5,8 +5,8 @@
 import type { TrainingBatch } from "../../shared/modelTypes"
 
 export class DIFFUSIONTrainer {
-  train(data: unknown): void {
-    console.log('Training diffusion-model...');
+  train(data: any): void {
+    console.log("Training diffusion-model...");
   }
 }
 

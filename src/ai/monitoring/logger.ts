@@ -17,33 +17,38 @@ export enum LogLevel {
 type LogContext = Record<string, unknown> | Array<unknown> | string | number | boolean | null | undefined
 
 export interface LogEntry {
-  timestamp: Date
-  level: LogLevel
-  module: string
-  message: string
-  data?: unknown
+  timestamp: Date;
+  level: LogLevel;
+  module: string;
+  message: string;
+  data?: unknown;
 }
 
 /**
  * Centralized logger for AI system
  */
 class Logger {
-  private logs: LogEntry[] = []
-  private maxLogs = 1000
-  private minLevel: LogLevel = LogLevel.INFO
+  private logs: LogEntry[] = [];
+  private maxLogs = 1000;
+  private minLevel: LogLevel = LogLevel.INFO;
 
   /**
    * Set minimum log level
    */
   setLevel(level: LogLevel): void {
-    this.minLevel = level
+    this.minLevel = level;
   }
 
   /**
    * Log a message
    */
-  private log(level: LogLevel, module: string, message: string, data?: unknown): void {
-    if (level < this.minLevel) return
+  private log(
+    level: LogLevel,
+    module: string,
+    message: string,
+    data?: unknown,
+  ): void {
+    if (level < this.minLevel) return;
 
     const entry: LogEntry = {
       timestamp: new Date(),
@@ -51,54 +56,54 @@ class Logger {
       module,
       message,
       data,
-    }
+    };
 
-    this.logs.push(entry)
+    this.logs.push(entry);
 
     // Keep only recent logs
     if (this.logs.length > this.maxLogs) {
-      this.logs.shift()
+      this.logs.shift();
     }
 
     // Console output
-    const levelName = LogLevel[level]
-    const prefix = `[${entry.timestamp.toISOString()}] [${levelName}] [${module}]`
+    const levelName = LogLevel[level];
+    const prefix = `[${entry.timestamp.toISOString()}] [${levelName}] [${module}]`;
 
     switch (level) {
       case LogLevel.DEBUG:
-        console.debug(prefix, message, data || "")
-        break
+        console.debug(prefix, message, data || "");
+        break;
       case LogLevel.INFO:
-        console.info(prefix, message, data || "")
-        break
+        console.info(prefix, message, data || "");
+        break;
       case LogLevel.WARN:
-        console.warn(prefix, message, data || "")
-        break
+        console.warn(prefix, message, data || "");
+        break;
       case LogLevel.ERROR:
       case LogLevel.CRITICAL:
-        console.error(prefix, message, data || "")
-        break
+        console.error(prefix, message, data || "");
+        break;
     }
   }
 
   debug(module: string, message: string, data?: unknown): void {
-    this.log(LogLevel.DEBUG, module, message, data)
+    this.log(LogLevel.DEBUG, module, message, data);
   }
 
   info(module: string, message: string, data?: unknown): void {
-    this.log(LogLevel.INFO, module, message, data)
+    this.log(LogLevel.INFO, module, message, data);
   }
 
   warn(module: string, message: string, data?: unknown): void {
-    this.log(LogLevel.WARN, module, message, data)
+    this.log(LogLevel.WARN, module, message, data);
   }
 
   error(module: string, message: string, data?: unknown): void {
-    this.log(LogLevel.ERROR, module, message, data)
+    this.log(LogLevel.ERROR, module, message, data);
   }
 
   critical(module: string, message: string, data?: unknown): void {
-    this.log(LogLevel.CRITICAL, module, message, data)
+    this.log(LogLevel.CRITICAL, module, message, data);
   }
 
   /**
@@ -106,32 +111,32 @@ class Logger {
    */
   getLogs(count?: number): LogEntry[] {
     if (count) {
-      return this.logs.slice(-count)
+      return this.logs.slice(-count);
     }
-    return [...this.logs]
+    return [...this.logs];
   }
 
   /**
    * Get logs by module
    */
   getLogsByModule(module: string): LogEntry[] {
-    return this.logs.filter((log) => log.module === module)
+    return this.logs.filter((log) => log.module === module);
   }
 
   /**
    * Get logs by level
    */
   getLogsByLevel(level: LogLevel): LogEntry[] {
-    return this.logs.filter((log) => log.level === level)
+    return this.logs.filter((log) => log.level === level);
   }
 
   /**
    * Clear all logs
    */
   clear(): void {
-    this.logs = []
+    this.logs = [];
   }
 }
 
 // Singleton instance
-export const logger = new Logger()
+export const logger = new Logger();

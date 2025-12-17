@@ -13,7 +13,7 @@ export async function searchRepos(
   installationId: number,
   query: string,
   perPage = 30,
-  page = 1
+  page = 1,
 ) {
   const token = await getInstallationAccessToken(installationId);
   const response = await request("GET /search/repositories", {

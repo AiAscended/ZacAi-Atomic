@@ -3,10 +3,7 @@
  * Purpose: Minimal translator stub (passthrough for MVP or simple mapping)
  */
 
-export const translate = async (text: string, targetLang = 'en') => {
-  // Stub: echo result while making it clear what language was requested
-  if (targetLang !== 'en') {
-    console.log(`[translator] passthrough mode for target language: ${targetLang}`);
-  }
+export const translate = async (text: string, _targetLang = "en") => {
+  // In a prod system we'd call a translation API; here return the original for MVP
   return text;
 };

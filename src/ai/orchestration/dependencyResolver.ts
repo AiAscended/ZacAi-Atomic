@@ -3,13 +3,12 @@
  * Purpose: Lightweight dependency resolver that ensures declared dependencies are available.
  */
 
-import { getSystemRegistry } from "./system";
+import { listModules } from "./moduleRegistry";
 
-export const resolveDependencies = async (
-  names: string[]
-): Promise<{ missing: string[]; resolved: string[] }> => {
-  const registry = await getSystemRegistry();
-  const available = collectModuleNames(registry);
+export const resolveDependencies = (
+  names: string[],
+): { missing: string[]; resolved: string[] } => {
+  const available = new Set(listModules().map((m) => m.name));
   const resolved: string[] = [];
   const missing: string[] = [];
 

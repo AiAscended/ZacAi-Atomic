@@ -10,6 +10,7 @@ export class SGD {
   }
 
   step(params: number[], grads: number[]) {
-    for (let i = 0; i < params.length; i++) params[i] -= this.lr * (grads[i] || 0);
+    for (let i = 0; i < params.length; i++)
+      params[i] -= this.lr * (grads[i] || 0);
   }
 }
