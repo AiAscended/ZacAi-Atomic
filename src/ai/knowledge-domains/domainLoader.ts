@@ -155,10 +155,8 @@ export async function loadAllDomains(): Promise<void> {
 /**
  * Get domain API by name
  */
-type DomainAPIExports = Record<string, unknown>
-
-export function getDomainAPI(name: string): DomainAPIExports | undefined {
-  const apis: Record<string, DomainAPIExports> = {
+export function getDomainAPI(name: string): unknown {
+  const apis: Record<string, any> = {
     english: englishAPI,
     mathematics: mathematicsAPI,
     typescript: typescriptAPI,

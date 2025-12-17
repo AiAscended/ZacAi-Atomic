@@ -6,12 +6,12 @@
  * Features: Save conversations, folder management, cross-chat memory retrieval
  */
 
-const fs = require('fs');
-const path = require('path');
-const logger = require('./systemActivityLogger.cjs');
+import fs from 'fs';
+import path from 'path';
+import logger from './systemActivityLogger.cjs';
 
 const ROOT_DIR = path.resolve(__dirname, '..');
-const CHAT_HISTORY_DIR = path.join(ROOT_DIR, 'data', 'chat-history');
+const CHAT_HISTORY_DIR = path.join(ROOT_DIR, 'src', 'ai', 'data', 'chat-history');
 
 // ============================================================================
 // Chat History Manager
@@ -57,7 +57,11 @@ class ChatHistoryManager {
     };
 
     this.saveChat(chat);
-    try { logger.logEvent('chat_create', `Created chat ${chat.id}`, { userId: this.userId, title }); } catch (e) {}
+    try {
+      logger.logEvent('chat_create', `Created chat ${chat.id}`, { userId: this.userId, title });
+    } catch (error) {
+      console.error('[ChatHistoryManager] Failed to log chat_create', error);
+    }
     return chat;
   }
 
@@ -76,7 +80,11 @@ class ChatHistoryManager {
     chat.metadata.messageCount = chat.messages.length;
 
     fs.writeFileSync(filePath, JSON.stringify(chat, null, 2), 'utf-8');
-    try { logger.logEvent('chat_save', `Saved chat ${chat.id}`, { userId: this.userId, messageCount: chat.messages.length }); } catch (e) {}
+    try {
+      logger.logEvent('chat_save', `Saved chat ${chat.id}`, { userId: this.userId, messageCount: chat.messages.length });
+    } catch (error) {
+      console.error('[ChatHistoryManager] Failed to log chat_save', error);
+    }
   }
 
   /**
@@ -126,7 +134,9 @@ class ChatHistoryManager {
         role: messageWithMeta.role,
         domain: messageWithMeta.domain || null,
       });
-    } catch (e) {}
+    } catch (error) {
+      console.error('[ChatHistoryManager] Failed to log chat_message', error);
+    }
     return messageWithMeta;
   }
 
@@ -254,7 +264,7 @@ class ChatHistoryManager {
           });
         }
       } catch (error) {
-        // Skip invalid files
+        console.error('[ChatHistoryManager] Failed to search chat file', filePath, error);
       }
     });
 

@@ -34,11 +34,6 @@ export const getEnglishTokenById = (id: number): string | undefined => {
 
 export const englishTokenCount = () => englishTokenMap.size;
 
-const englishTokenExports = {
-  englishTokenMap,
-  getEnglishTokenId,
-  getEnglishTokenById,
-  englishTokenCount,
-};
+const english_tokenMap_bundle = { englishTokenMap, getEnglishTokenId, getEnglishTokenById, englishTokenCount };
 
-export default englishTokenExports;
+export default english_tokenMap_bundle;

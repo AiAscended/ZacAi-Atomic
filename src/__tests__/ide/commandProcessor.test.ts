@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { CommandProcessor } from '@/lib/ide/commandProcessor';
-import { VirtualFileSystem } from '@/lib/ide/virtualFileSystem';
+import { CommandProcessor } from '@/ide/commandProcessor';
+import { VirtualFileSystem } from '@/ide/virtualFileSystem';
 
 describe('CommandProcessor', () => {
   let processor: CommandProcessor;

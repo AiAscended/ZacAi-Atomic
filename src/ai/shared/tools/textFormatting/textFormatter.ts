@@ -5,14 +5,8 @@
 
 export function cleanText(text: string): string {
   if (!text) return ""
-
-  return text
-    .replace(/\r\n/g, "\n")
-    .replace(/[ \t]+\n/g, "\n")
-    .replace(/\t/g, " ")
-    .replace(/[ ]{2,}/g, " ")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim()
+  // Basic cleanup: trim, normalize whitespace
+  return text.replace(/\s+/g, " ").trim();
 }
 
 export function summarizeText(text: string, maxLength = 4000): string {

@@ -499,8 +499,8 @@ export async function getModule(moduleId: string): Promise<ModuleManifest | null
  */
 export async function isModuleEnabled(moduleId: string): Promise<boolean> {
   const registry = await getUnifiedRegistry();
-  const registryEntry = registry.modules[moduleId];
-  return registryEntry?.enabled || false;
+  const moduleInfo = registry.modules[moduleId];
+  return moduleInfo?.enabled || false;
 }
 
 /**

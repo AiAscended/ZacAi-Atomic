@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 
 interface TrainingStatus {
   isTraining: boolean;
-  currentTraining?: {
+  currentTraining: {
     mode: string;
     timestamp: string;
     duration: number;
@@ -18,8 +18,8 @@ interface TrainingStatus {
 
 interface TrainingHistoryItem {
   id: string;
+  status: 'completed' | 'failed' | 'running';
   timestamp: string;
-  status: 'running' | 'completed' | 'failed';
   mode: string;
   duration: number;
 }
@@ -27,12 +27,6 @@ interface TrainingHistoryItem {
 interface TrainingSettings {
   schedule: string;
   confidenceThreshold: number;
-}
-
-interface TrainingResponse<T> {
-  success: boolean;
-  data: T;
-  error?: string;
 }
 
 export default function TrainingDashboard() {

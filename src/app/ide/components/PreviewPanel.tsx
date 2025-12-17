@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, ExternalLink, Smartphone, Tablet, Monitor, AlertCircle } from 'lucide-react';
-import { codeExecutor } from '@/lib/ide/codeExecutor';
-import { useEditorStore } from '@/lib/ide/editorStore';
-import { useFileSystem } from '@/lib/ide/useFileSystem';
+import { codeExecutor } from '@/ide/codeExecutor';
+import { useEditorStore } from '@/ide/editorStore';
+import type { EditorTab } from '@/ide/editorStore';
+import { useFileSystem } from '@/ide/useFileSystem';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 type DeviceSize = 'mobile' | 'tablet' | 'desktop';
@@ -16,7 +17,216 @@ interface ConsoleMessage {
   timestamp: number;
 }
 
-const getDefaultPreview = () => `
+export function PreviewPanel() {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [deviceSize, setDeviceSize] = useState<DeviceSize>('desktop');
+  const [previewContent, setPreviewContent] = useState('');
+  const [consoleMessages, setConsoleMessages] = useState<ConsoleMessage[]>([]);
+  const [showConsole, setShowConsole] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const { openFiles, activeFileId } = useEditorStore();
+  const { fs } = useFileSystem();
+
+  // Auto-refresh when active file changes
+  useEffect(() => {
+    handleRefresh();
+  }, [activeFileId]);
+
+  // Listen for console messages from iframe
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'console') {
+        setConsoleMessages((prev) => [
+          ...prev,
+          {
+            type: event.data.level,
+            message: event.data.args.join(' '),
+            timestamp: Date.now(),
+          },
+        ]);
+        setShowConsole(true);
+      } else if (event.data.type === 'error') {
+        setConsoleMessages((prev) => [
+          ...prev,
+          {
+            type: 'error',
+            message: `${event.data.message} (Line: ${event.data.line}, Col: ${event.data.col})`,
+            timestamp: Date.now(),
+          },
+        ]);
+        setShowConsole(true);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    setConsoleMessages([]);
+    
+    try {
+      // Get active file
+  const activeFile = openFiles.find((f: EditorTab) => f.id === activeFileId);
+      
+      if (!activeFile) {
+        // Show default preview
+        setPreviewContent(getDefaultPreview());
+        return;
+      }
+
+      const filePath = activeFile.path;
+      const extension = filePath.split('.').pop()?.toLowerCase();
+
+      if (extension === 'html') {
+        // HTML file - load as is with linked resources
+        await generateHTMLPreview(filePath);
+      } else if (extension === 'js' || extension === 'ts') {
+        // JavaScript/TypeScript - execute and show results
+        await generateJSPreview(activeFile.content);
+      } else if (extension === 'css') {
+        // CSS - create a demo HTML with the styles
+        await generateCSSPreview(activeFile.content);
+      } else if (['jsx', 'tsx'].includes(extension || '')) {
+        // React components - show message about future support
+        setPreviewContent(getReactPreview());
+      } else {
+        // Unsupported - show default
+        setPreviewContent(getDefaultPreview());
+      }
+    } catch (error) {
+      console.error('Preview error:', error);
+      setPreviewContent(getErrorPreview(String(error)));
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const generateHTMLPreview = async (filePath: string) => {
+    if (!fs) return;
+    
+    try {
+      const htmlContent = await fs.read(filePath);
+      if (htmlContent === null) {
+        setPreviewContent(getErrorPreview('Failed to load HTML content.'));
+        return;
+      }
+      
+      // Try to load referenced CSS and JS files
+      const dirPath = filePath.split('/').slice(0, -1).join('/');
+      
+      // Simple parsing for linked resources
+      let processedHTML = htmlContent;
+      
+      // Find and inline CSS
+      const cssMatches = htmlContent.match(/<link[^>]*href=["']([^"']+\.css)["'][^>]*>/g);
+      if (cssMatches) {
+        for (const match of cssMatches) {
+          const hrefMatch = match.match(/href=["']([^"']+)["']/);
+          if (hrefMatch) {
+            const cssPath = `${dirPath}/${hrefMatch[1]}`;
+            try {
+              const cssContent = await fs.read(cssPath);
+              if (cssContent) {
+                processedHTML = processedHTML.replace(
+                  match,
+                  `<style>${cssContent}</style>`
+                );
+              }
+            } catch {
+              // CSS file not found, leave as is
+            }
+          }
+        }
+      }
+      
+      setPreviewContent(processedHTML);
+    } catch (error) {
+      setPreviewContent(getErrorPreview(`Failed to load HTML: ${error}`));
+    }
+  };
+
+  const generateJSPreview = async (jsCode: string) => {
+    const html = `
+      <div style="font-family: 'Courier New', monospace; padding: 20px;">
+        <h2>JavaScript Output</h2>
+        <div id="output" style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 10px;">
+          <p style="color: #666;">Executing...</p>
+        </div>
+      </div>
+    `;
+    
+    const js = `
+      try {
+        const output = document.getElementById('output');
+        output.innerHTML = '';
+        
+        // Capture console.log output
+        const originalLog = console.log;
+        const logs = [];
+        console.log = function(...args) {
+          logs.push(args.map(arg => {
+            if (typeof arg === 'object') {
+              try { return JSON.stringify(arg, null, 2); }
+              catch { return String(arg); }
+            }
+            return String(arg);
+          }).join(' '));
+          originalLog.apply(console, args);
+        };
+        
+        // Execute user code
+        ${jsCode}
+        
+        // Display logs
+        if (logs.length > 0) {
+          output.innerHTML = '<pre style="margin: 0;">' + logs.join('\\n') + '</pre>';
+        } else {
+          output.innerHTML = '<p style="color: #666; margin: 0;">No output</p>';
+        }
+        
+        console.log = originalLog;
+      } catch (error) {
+        document.getElementById('output').innerHTML = 
+          '<p style="color: #d32f2f; margin: 0;">Error: ' + error.message + '</p>';
+      }
+    `;
+    
+    const preview = await codeExecutor.executePreview(html, '', js);
+    setPreviewContent(preview);
+  };
+
+  const generateCSSPreview = async (cssCode: string) => {
+    const html = `
+      <div class="demo-container">
+        <h1>CSS Preview</h1>
+        <p class="text-content">This is a sample paragraph to demonstrate the CSS styles.</p>
+        <button class="demo-button">Sample Button</button>
+        <div class="demo-box">Sample Box</div>
+        <ul class="demo-list">
+          <li>List Item 1</li>
+          <li>List Item 2</li>
+          <li>List Item 3</li>
+        </ul>
+      </div>
+    `;
+    
+    const css = `
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        padding: 20px;
+        margin: 0;
+      }
+      ${cssCode}
+    `;
+    
+    const preview = await codeExecutor.executePreview(html, css, '');
+    setPreviewContent(preview);
+  };
+
+  const getDefaultPreview = () => {
+    return `
       <!DOCTYPE html>
       <html lang="en">
       <head>
@@ -82,8 +292,10 @@ const getDefaultPreview = () => `
       </body>
       </html>
     `;
+  };
 
-const getReactPreview = () => `
+  const getReactPreview = () => {
+    return `
       <!DOCTYPE html>
       <html lang="en">
       <head>
@@ -110,7 +322,8 @@ const getReactPreview = () => `
         <div class="info-box">
           <h2>⚛️ React Component Preview</h2>
           <p>React component rendering will be available in future updates.</p>
-          <p>For now, you can:</n+          <ul>
+          <p>For now, you can:</p>
+          <ul>
             <li>Test individual HTML/CSS/JS files</li>
             <li>Use the AI assistant to convert React to vanilla JS</li>
             <li>Build components in a separate HTML file</li>
@@ -119,8 +332,10 @@ const getReactPreview = () => `
       </body>
       </html>
     `;
+  };
 
-const getErrorPreview = (error: string) => `
+  const getErrorPreview = (error: string) => {
+    return `
       <!DOCTYPE html>
       <html lang="en">
       <head>
@@ -132,6 +347,7 @@ const getErrorPreview = (error: string) => `
             font-family: system-ui, -apple-system, sans-serif;
             padding: 2rem;
             margin: 0;
+          }
           .error-box {
             background: #ffebee;
             border-left: 4px solid #f44336;
@@ -156,203 +372,7 @@ const getErrorPreview = (error: string) => `
       </body>
       </html>
     `;
-
-export function PreviewPanel() {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [deviceSize, setDeviceSize] = useState<DeviceSize>('desktop');
-  const [previewContent, setPreviewContent] = useState('');
-  const [consoleMessages, setConsoleMessages] = useState<ConsoleMessage[]>([]);
-  const [showConsole, setShowConsole] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const { tabs, activeTabId, getTab } = useEditorStore();
-  const { readFile } = useFileSystem();
-  const getActiveFile = useCallback(() => (
-    activeTabId ? getTab(activeTabId) : undefined
-  ), [activeTabId, getTab]);
-
-  // Listen for console messages from iframe
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'console') {
-        setConsoleMessages((prev) => [
-          ...prev,
-          {
-            type: event.data.level,
-            message: event.data.args.join(' '),
-            timestamp: Date.now(),
-          },
-        ]);
-        setShowConsole(true);
-      } else if (event.data.type === 'error') {
-        setConsoleMessages((prev) => [
-          ...prev,
-          {
-            type: 'error',
-            message: `${event.data.message} (Line: ${event.data.line}, Col: ${event.data.col})`,
-            timestamp: Date.now(),
-          },
-        ]);
-        setShowConsole(true);
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  const readFileContent = useCallback(async (path: string) => {
-    const file = await readFile(path);
-    if (!file) {
-      throw new Error(`File not found: ${path}`);
-    }
-    return file.content;
-  }, [readFile]);
-
-  const generateHTMLPreview = useCallback(async (filePath: string, htmlContent: string) => {
-    try {
-      const dirPath = filePath.split('/').slice(0, -1).join('/');
-      let processedHTML = htmlContent;
-      const cssMatches = htmlContent.match(/<link[^>]*href=["']([^"']+\.css)["'][^>]*>/g);
-      if (cssMatches) {
-        for (const match of cssMatches) {
-          const hrefMatch = match.match(/href=["']([^"']+)["']/);
-          if (hrefMatch) {
-            const cssPath = `${dirPath ? dirPath : ''}/${hrefMatch[1]}`.replace(/\/+/g, '/');
-            try {
-              const cssContent = await readFileContent(cssPath);
-              processedHTML = processedHTML.replace(
-                match,
-                `<style>${cssContent}</style>`
-              );
-            } catch {
-              // CSS file not found, leave as is
-            }
-          }
-        }
-      }
-      
-      setPreviewContent(processedHTML);
-    } catch (error) {
-      setPreviewContent(getErrorPreview(`Failed to load HTML: ${error}`));
-    }
-  }, [readFileContent]);
-
-  const generateJSPreview = useCallback(async (jsCode: string) => {
-    const html = `
-      <div style="font-family: 'Courier New', monospace; padding: 20px;">
-        <h2>JavaScript Output</h2>
-        <div id="output" style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 10px;">
-          <p style="color: #666;">Executing...</p>
-        </div>
-      </div>
-    `;
-    
-    const js = `
-      try {
-        const output = document.getElementById('output');
-        output.innerHTML = '';
-        
-        // Capture console.log output
-        const originalLog = console.log;
-        const logs = [];
-        console.log = function(...args) {
-          logs.push(args.map(arg => {
-            if (typeof arg === 'object') {
-              try { return JSON.stringify(arg, null, 2); }
-              catch { return String(arg); }
-            }
-            return String(arg);
-          }).join(' '));
-          originalLog.apply(console, args);
-        };
-        
-        // Execute user code
-        ${jsCode}
-        
-        // Display logs
-        if (logs.length > 0) {
-          output.innerHTML = '<pre style="margin: 0;">' + logs.join('\\n') + '</pre>';
-        } else {
-          output.innerHTML = '<p style="color: #666; margin: 0;">No output</p>';
-        }
-        
-        console.log = originalLog;
-      } catch (error) {
-        document.getElementById('output').innerHTML = 
-          '<p style="color: #d32f2f; margin: 0;">Error: ' + error.message + '</p>';
-      }
-    `;
-    
-    const preview = await codeExecutor.executePreview(html, '', js);
-    setPreviewContent(preview);
-  }, []);
-
-  const generateCSSPreview = useCallback(async (cssCode: string) => {
-    const html = `
-      <div class="demo-container">
-        <h1>CSS Preview</h1>
-        <p class="text-content">This is a sample paragraph to demonstrate the CSS styles.</p>
-        <button class="demo-button">Sample Button</button>
-        <div class="demo-box">Sample Box</div>
-        <ul class="demo-list">
-          <li>List Item 1</li>
-          <li>List Item 2</li>
-          <li>List Item 3</li>
-        </ul>
-      </div>
-    `;
-    
-    const css = `
-      body {
-        font-family: system-ui, -apple-system, sans-serif;
-        padding: 20px;
-        margin: 0;
-      }
-      ${cssCode}
-    `;
-    
-    const preview = await codeExecutor.executePreview(html, css, '');
-    setPreviewContent(preview);
-  }, []);
-
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    setConsoleMessages([]);
-    
-    try {
-      const activeFile = getActiveFile();
-      
-      if (!activeFile) {
-        setPreviewContent(getDefaultPreview());
-        return;
-      }
-
-      const filePath = activeFile.path;
-      const extension = filePath.split('.').pop()?.toLowerCase();
-
-      if (extension === 'html') {
-        await generateHTMLPreview(filePath, activeFile.content);
-      } else if (extension === 'js' || extension === 'ts') {
-        await generateJSPreview(activeFile.content);
-      } else if (extension === 'css') {
-        await generateCSSPreview(activeFile.content);
-      } else if (['jsx', 'tsx'].includes(extension || '')) {
-        setPreviewContent(getReactPreview());
-      } else {
-        setPreviewContent(getDefaultPreview());
-      }
-    } catch (error) {
-      console.error('Preview error:', error);
-      setPreviewContent(getErrorPreview(String(error)));
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, [generateCSSPreview, generateHTMLPreview, generateJSPreview, getActiveFile]);
-
-  // Auto-refresh when active file changes
-  useEffect(() => {
-    void handleRefresh();
-  }, [handleRefresh, tabs]);
+  };
 
   const getDeviceDimensions = () => {
     switch (deviceSize) {

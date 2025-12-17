@@ -63,15 +63,10 @@ export default function UsersPage() {
   })
   const { toast } = useToast()
 
-  const getErrorMessage = (error: unknown, fallback: string) => {
-    if (error instanceof Error) return error.message
-    if (typeof error === "string") return error
-    return fallback
-  }
-
   // Load users
   const loadUsers = useCallback(async () => {
     try {
+      setLoading(true)
       const response = await fetch("/api/admin/settings/users")
       const result = await response.json()
       if (result.success) {
@@ -83,7 +78,8 @@ export default function UsersPage() {
           variant: "destructive",
         })
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("[Users] Load error", err)
       toast({
         title: "Error",
         description: getErrorMessage(error, "Failed to connect to API"),
@@ -95,7 +91,7 @@ export default function UsersPage() {
   }, [toast])
 
   useEffect(() => {
-    loadUsers()
+    void loadUsers()
   }, [loadUsers])
 
   const handleAddUser = async () => {
@@ -131,7 +127,8 @@ export default function UsersPage() {
           variant: "destructive",
         })
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("[Users] Create error", err)
       toast({
         title: "Error",
         description: getErrorMessage(error, "Failed to create user"),
@@ -170,7 +167,8 @@ export default function UsersPage() {
           variant: "destructive",
         })
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("[Users] Update error", err)
       toast({
         title: "Error",
         description: getErrorMessage(error, "Failed to update user"),
@@ -203,7 +201,8 @@ export default function UsersPage() {
           variant: "destructive",
         })
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("[Users] Delete error", err)
       toast({
         title: "Error",
         description: getErrorMessage(error, "Failed to delete user"),
@@ -351,7 +350,7 @@ export default function UsersPage() {
               <Label htmlFor="add-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: UserRole) => setFormData({ ...formData, role: value })}
+                onValueChange={(value: "admin" | "user" | "system") => setFormData({ ...formData, role: value })}
               >
                 <SelectTrigger id="add-role">
                   <SelectValue />
@@ -408,7 +407,7 @@ export default function UsersPage() {
               <Label htmlFor="edit-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: UserRole) => setFormData({ ...formData, role: value })}
+                onValueChange={(value: "admin" | "user" | "system") => setFormData({ ...formData, role: value })}
               >
                 <SelectTrigger id="edit-role">
                   <SelectValue />

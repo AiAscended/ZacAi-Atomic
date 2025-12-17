@@ -16,7 +16,7 @@ All admin settings now **persist across page refreshes** with real-time save con
 
 **Features**:
 - Singleton pattern for centralized access
-- JSON file storage in `/data/settings/` directory
+- JSON file storage in `src/ai/data/settings/` directory
 - Automatic directory creation
 - TypeScript strict typing throughout
 - Default value fallbacks
@@ -70,7 +70,7 @@ UserSettings {
 
 **Storage Files**:
 ```
-/data/settings/
+src/ai/data/settings/
   ├── system.json       (System-wide settings)
   ├── domains.json      (All 23 domain configurations)
   ├── models.json       (All 13 model configurations)
@@ -219,7 +219,8 @@ UserSettings {
          ▼
 ┌─────────────────┐
 │  JSON File      │
-│ /data/settings/ │
+│ src/ai/data/    │
+│     settings/   │
 └────────┬────────┘
          │
          ▼
@@ -289,7 +290,7 @@ Page Mount → API GET → settingsStore.getXSettings() → readJSON() → Popul
 
 ### 1. Verify Settings Directory
 ```bash
-mkdir -p /data/settings
+mkdir -p src/ai/data/settings
 ```
 
 ### 2. Test System Settings
@@ -414,13 +415,13 @@ const response = await fetch('/api/admin/settings/users', {
 
 ### Common Issues
 **Issue**: Settings not persisting  
-**Fix**: Check `/data/settings/` directory permissions
+**Fix**: Check `src/ai/data/settings/` directory permissions
 
 **Issue**: API 500 errors  
 **Fix**: Check server logs, verify JSON file syntax
 
 **Issue**: Settings reset on deploy  
-**Fix**: Ensure `/data/settings/` is not in `.gitignore` for dev, use volume mounts in production
+**Fix**: Ensure `src/ai/data/settings/` is not in `.gitignore` for dev, use volume mounts in production
 
 ---
 

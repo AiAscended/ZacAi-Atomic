@@ -17,9 +17,9 @@ export type VisualizationMetadata = {
 }
 
 export class DataStructuresVisualizer {
-  visualize(structure: SupportedStructure): {
-    visualization: string
-    metadata: VisualizationMetadata
+  visualize(_structure: unknown, type: string): {
+    visualization: string;
+    metadata: Record<string, any>;
   } {
     switch (structure.type) {
       case 'array':

@@ -247,27 +247,18 @@ export function validateAdminSettings(data: unknown) {
 // Secret Redaction Utility
 // ============================================================================
 
-type SecretBearingRecord = Record<string, unknown>;
-
-export function redactSecrets<T extends SecretBearingRecord>(obj: T): T {
-  const redacted: SecretBearingRecord = { ...obj };
+export function redactSecrets<T extends Record<string, unknown>>(obj: T): T {
+  const redacted: Record<string, unknown> = {};
   const secretKeys = ["privateKey", "webhookSecret", "apiKey", "secret", "password", "token"];
 
-  for (const key of Object.keys(redacted)) {
-    const value = redacted[key];
+  for (const key of Object.keys(obj)) {
     if (secretKeys.some(sk => key.toLowerCase().includes(sk.toLowerCase()))) {
       redacted[key] = "***REDACTED***";
-      continue;
-    }
-
-    if (Array.isArray(value)) {
-      redacted[key] = value.map(item =>
-        typeof item === "object" && item !== null ? redactSecrets(item as SecretBearingRecord) : item
-      );
-    } else if (typeof value === "object" && value !== null) {
-      redacted[key] = redactSecrets(value as SecretBearingRecord);
+    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+      redacted[key] = redactSecrets(obj[key] as Record<string, unknown>);
+    } else {
+      redacted[key] = obj[key];
     }
   }
-
   return redacted as T;
 }

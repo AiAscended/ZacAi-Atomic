@@ -89,8 +89,8 @@ Click "Save Settings"
 PUT /api/admin/settings/domains with domainName="react"
   ↓
 settingsStore.saveDomainSettings("react", settings)
-  ↓
-Write to /data/settings/domains.json
+   ↓
+Write to src/ai/data/settings/domains.json
   ↓
 Success toast: "Domain settings saved successfully!"
   ↓
@@ -188,12 +188,12 @@ Page refresh → settings persist ✅
 **Data Flow**:
 ```
 Frontend UI ↔ API Route ↔ settingsStore ↔ JSON Files
-                                           (/data/settings/)
+                                           (src/ai/data/settings/)
 ```
 
 **Files Created**:
 ```
-/data/settings/
+src/ai/data/settings/
 ├── system.json      (System-wide config)
 ├── domains.json     (All 29 domain configs)
 ├── models.json      (All 13 model configs)
@@ -369,7 +369,7 @@ src/ai/data/[domain]/
 
 3. **Consolidate Orchestrators** (3 hours)
    - Keep mainOrchestrator.ts only
-   - Deprecate aiOrchestrator-v2, simpleOrchestrator, unifiedOrchestratorIntegration
+   - Deprecate aiOrchestrator-v2, simpleOrchestrator (unifiedOrchestratorIntegration removed 2025-11-11)
 
 4. **Add Rate Limiting** (2 hours)
    - Implement rate limiting middleware

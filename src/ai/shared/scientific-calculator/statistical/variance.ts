@@ -20,7 +20,7 @@ type VarianceArgs = [boolean, ...number[]] | number[]
 
 export function variance(...numbers: number[]): number
 export function variance(sample: boolean, ...numbers: number[]): number
-export function variance(...args: VarianceArgs): number {
+export function variance(...args: (number | boolean)[]): number {
   let sample = false
   let numbers: number[]
 

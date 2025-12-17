@@ -15,25 +15,11 @@ export const buildInternetSearchTokenMap = () => {
   return tokenToId
 }
 
-export const internetSearchTokenMap = buildInternetSearchTokenMap()
-
-export const getInternetSearchTokenId = (token: string): number | undefined =>
-  internetSearchTokenMap.get(token)
-
-export const getInternetSearchTokenById = (id: number): string | undefined => {
-  for (const [token, tokenId] of internetSearchTokenMap.entries()) {
-    if (tokenId === id) return token
-  }
-  return undefined
-}
-
-export const internetSearchTokenCount = () => internetSearchTokenMap.size
-
-const internetSearchTokenExports = {
-  internetSearchTokenMap,
+const internet_search_tokenMap_bundle = {
   getInternetSearchTokenId,
   getInternetSearchTokenById,
   internetSearchTokenCount,
-}
+  internetSearchTokenMap,
+};
 
-export default internetSearchTokenExports
+export default internet_search_tokenMap_bundle;

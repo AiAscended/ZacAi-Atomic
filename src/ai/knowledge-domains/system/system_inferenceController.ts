@@ -3,45 +3,21 @@
  * Handles system-level operations, configuration, time/date, location, and management queries
  */
 
-import { DOMAIN_NAME } from './system_constants';
+import { DOMAIN_NAME } from "./system_constants"
 
-interface SystemInferenceMetadata {
-  timestamp?: string;
-  inferenceMethod?: 'system_time' | 'system_location' | 'system_overview';
-  systemFunction: boolean;
+type SystemMetadata = {
+  timestamp?: string
+  inferenceMethod?: string
+  systemFunction?: boolean
 }
 
-interface SystemInferenceResponse {
-  response: string;
-  confidence: number;
-  sources: string[];
-  domain: string;
-  metadata: SystemInferenceMetadata;
-}
-
-export const systemRunInference = async (
-  input: string
-): Promise<SystemInferenceResponse> => {
+export const systemRunInference = async (input: string, _context?: unknown) => {
   const lowerInput = input.toLowerCase();
   
   let responseText = '';
   let confidence = 0.7;
   const sources: string[] = [];
-  const metadata: SystemInferenceMetadata = { systemFunction: true };
-
-  const referencesHybridPipeline =
-    lowerInput.includes('zacai') ||
-    lowerInput.includes('hybrid ai') ||
-    lowerInput.includes('hybrid pipeline') ||
-    lowerInput.includes('pipeline') ||
-    lowerInput.includes('orchestrator') ||
-    lowerInput.includes('orchestration') ||
-    lowerInput.includes('domain router') ||
-    lowerInput.includes('inference flow') ||
-    lowerInput.includes('embeddings') ||
-    lowerInput.includes('tokenizer') ||
-    lowerInput.includes('seed') ||
-    lowerInput.includes('weights');
+  const metadata: SystemMetadata = {};
 
   // Handle time/date queries - return actual system time/date
   if (

@@ -5,18 +5,24 @@ import { Search, FileIcon, FileCode } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useFileSystem } from '@/lib/ide/useFileSystem';
-import { useEditorStore } from '@/lib/ide/editorStore';
-import type { IDEFile } from '@/lib/ide/virtualFileSystem';
+import { useFileSystem } from '@/ide/useFileSystem';
+import { useEditorStore } from '@/ide/editorStore';
+
 interface QuickOpenProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+interface FileSearchResult {
+  path: string;
+  content: string;
+  language: string;
+}
+
 export function QuickOpen({ open, onOpenChange }: QuickOpenProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [results, setResults] = useState<IDEFile[]>([]);
+  const [results, setResults] = useState<FileSearchResult[]>([]);
   const { searchFiles } = useFileSystem();
   const { openFile } = useEditorStore();
 
@@ -59,7 +65,7 @@ export function QuickOpen({ open, onOpenChange }: QuickOpenProps) {
     }
   };
 
-  const handleSelectFile = async (file: IDEFile) => {
+  const handleSelectFile = async (file: FileSearchResult) => {
     try {
       const fileName = file.path.split('/').pop() || file.path;
       openFile(file.path, fileName, file.content, file.language);

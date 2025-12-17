@@ -7,7 +7,7 @@
  */
 
 export const normalizeText = (text: string): string => {
-  return text.trim().replace(/\s+/g, " ").toLowerCase()
+  return text.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
 export const detectGitPatterns = (code: string) => {

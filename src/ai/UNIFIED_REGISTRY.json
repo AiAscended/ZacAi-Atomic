@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "lastScanned": "2025-11-29T11:20:33.825Z",
+  "lastScanned": "2025-11-26T03:06:22.632Z",
   "modules": {
     "code-transformer": {
       "moduleId": "code-transformer",
@@ -24,8 +24,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.760Z",
-        "discoveredAt": "2025-11-29T11:20:33.760Z"
+        "lastUpdated": "2025-11-26T03:06:22.326Z",
+        "discoveredAt": "2025-11-26T03:06:22.326Z"
       }
     },
     "convolutional-neural-network": {
@@ -51,8 +51,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.764Z",
-        "discoveredAt": "2025-11-29T11:20:33.764Z"
+        "lastUpdated": "2025-11-26T03:06:22.373Z",
+        "discoveredAt": "2025-11-26T03:06:22.373Z"
       }
     },
     "diffusion-model": {
@@ -78,8 +78,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.767Z",
-        "discoveredAt": "2025-11-29T11:20:33.767Z"
+        "lastUpdated": "2025-11-26T03:06:22.401Z",
+        "discoveredAt": "2025-11-26T03:06:22.401Z"
       }
     },
     "generative-adversarial-network": {
@@ -104,8 +104,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.771Z",
-        "discoveredAt": "2025-11-29T11:20:33.771Z"
+        "lastUpdated": "2025-11-26T03:06:22.428Z",
+        "discoveredAt": "2025-11-26T03:06:22.428Z"
       }
     },
     "graph-neural-network": {
@@ -130,8 +130,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.775Z",
-        "discoveredAt": "2025-11-29T11:20:33.775Z"
+        "lastUpdated": "2025-11-26T03:06:22.440Z",
+        "discoveredAt": "2025-11-26T03:06:22.440Z"
       }
     },
     "multi-modal-fusion": {
@@ -156,8 +156,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.778Z",
-        "discoveredAt": "2025-11-29T11:20:33.778Z"
+        "lastUpdated": "2025-11-26T03:06:22.463Z",
+        "discoveredAt": "2025-11-26T03:06:22.463Z"
       }
     },
     "neuro-symbolic-reasoning": {
@@ -182,8 +182,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.781Z",
-        "discoveredAt": "2025-11-29T11:20:33.781Z"
+        "lastUpdated": "2025-11-26T03:06:22.482Z",
+        "discoveredAt": "2025-11-26T03:06:22.482Z"
       }
     },
     "recurrent-neural-network": {
@@ -208,8 +208,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.784Z",
-        "discoveredAt": "2025-11-29T11:20:33.784Z"
+        "lastUpdated": "2025-11-26T03:06:22.499Z",
+        "discoveredAt": "2025-11-26T03:06:22.499Z"
       }
     },
     "speech-to-text": {
@@ -234,8 +234,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.786Z",
-        "discoveredAt": "2025-11-29T11:20:33.786Z"
+        "lastUpdated": "2025-11-26T03:06:22.516Z",
+        "discoveredAt": "2025-11-26T03:06:22.516Z"
       }
     },
     "text-to-speech": {
@@ -260,8 +260,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.789Z",
-        "discoveredAt": "2025-11-29T11:20:33.789Z"
+        "lastUpdated": "2025-11-26T03:06:22.530Z",
+        "discoveredAt": "2025-11-26T03:06:22.530Z"
       }
     },
     "unified-transformer-llm": {
@@ -288,8 +288,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.792Z",
-        "discoveredAt": "2025-11-29T11:20:33.792Z"
+        "lastUpdated": "2025-11-26T03:06:22.539Z",
+        "discoveredAt": "2025-11-26T03:06:22.539Z"
       }
     },
     "vision-transformer": {
@@ -315,8 +315,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.794Z",
-        "discoveredAt": "2025-11-29T11:20:33.794Z"
+        "lastUpdated": "2025-11-26T03:06:22.555Z",
+        "discoveredAt": "2025-11-26T03:06:22.555Z"
       }
     },
     "wavenet-audio-model": {
@@ -341,8 +341,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.797Z",
-        "discoveredAt": "2025-11-29T11:20:33.797Z"
+        "lastUpdated": "2025-11-26T03:06:22.567Z",
+        "discoveredAt": "2025-11-26T03:06:22.567Z"
       }
     },
     "algorithms": {
@@ -372,8 +372,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.798Z",
-        "discoveredAt": "2025-11-29T11:20:33.798Z"
+        "lastUpdated": "2025-11-26T03:06:22.569Z",
+        "discoveredAt": "2025-11-26T03:06:22.569Z"
       }
     },
     "code_review": {
@@ -403,8 +403,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.799Z",
-        "discoveredAt": "2025-11-29T11:20:33.799Z"
+        "lastUpdated": "2025-11-26T03:06:22.571Z",
+        "discoveredAt": "2025-11-26T03:06:22.571Z"
       }
     },
     "data_integrity": {
@@ -430,8 +430,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.800Z",
-        "discoveredAt": "2025-11-29T11:20:33.800Z"
+        "lastUpdated": "2025-11-26T03:06:22.572Z",
+        "discoveredAt": "2025-11-26T03:06:22.572Z"
       }
     },
     "data_structures": {
@@ -461,8 +461,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.801Z",
-        "discoveredAt": "2025-11-29T11:20:33.801Z"
+        "lastUpdated": "2025-11-26T03:06:22.574Z",
+        "discoveredAt": "2025-11-26T03:06:22.574Z"
       }
     },
     "documentation": {
@@ -492,8 +492,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.802Z",
-        "discoveredAt": "2025-11-29T11:20:33.802Z"
+        "lastUpdated": "2025-11-26T03:06:22.577Z",
+        "discoveredAt": "2025-11-26T03:06:22.577Z"
       }
     },
     "english": {
@@ -523,8 +523,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.803Z",
-        "discoveredAt": "2025-11-29T11:20:33.803Z"
+        "lastUpdated": "2025-11-26T03:06:22.579Z",
+        "discoveredAt": "2025-11-26T03:06:22.579Z"
       }
     },
     "environment": {
@@ -554,8 +554,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.804Z",
-        "discoveredAt": "2025-11-29T11:20:33.804Z"
+        "lastUpdated": "2025-11-26T03:06:22.580Z",
+        "discoveredAt": "2025-11-26T03:06:22.580Z"
       }
     },
     "error_detection": {
@@ -585,8 +585,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.805Z",
-        "discoveredAt": "2025-11-29T11:20:33.805Z"
+        "lastUpdated": "2025-11-26T03:06:22.583Z",
+        "discoveredAt": "2025-11-26T03:06:22.583Z"
       }
     },
     "general_knowledge": {
@@ -616,8 +616,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.806Z",
-        "discoveredAt": "2025-11-29T11:20:33.806Z"
+        "lastUpdated": "2025-11-26T03:06:22.584Z",
+        "discoveredAt": "2025-11-26T03:06:22.584Z"
       }
     },
     "grammar": {
@@ -647,8 +647,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.811Z",
-        "discoveredAt": "2025-11-29T11:20:33.811Z"
+        "lastUpdated": "2025-11-26T03:06:22.589Z",
+        "discoveredAt": "2025-11-26T03:06:22.589Z"
       }
     },
     "internet_search": {
@@ -677,8 +677,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.812Z",
-        "discoveredAt": "2025-11-29T11:20:33.812Z"
+        "lastUpdated": "2025-11-26T03:06:22.591Z",
+        "discoveredAt": "2025-11-26T03:06:22.591Z"
       }
     },
     "mathematics": {
@@ -708,8 +708,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.813Z",
-        "discoveredAt": "2025-11-29T11:20:33.813Z"
+        "lastUpdated": "2025-11-26T03:06:22.593Z",
+        "discoveredAt": "2025-11-26T03:06:22.593Z"
       }
     },
     "nextjs": {
@@ -738,8 +738,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.814Z",
-        "discoveredAt": "2025-11-29T11:20:33.814Z"
+        "lastUpdated": "2025-11-26T03:06:22.597Z",
+        "discoveredAt": "2025-11-26T03:06:22.597Z"
       }
     },
     "observability": {
@@ -765,8 +765,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.815Z",
-        "discoveredAt": "2025-11-29T11:20:33.815Z"
+        "lastUpdated": "2025-11-26T03:06:22.599Z",
+        "discoveredAt": "2025-11-26T03:06:22.599Z"
       }
     },
     "programming": {
@@ -796,8 +796,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.817Z",
-        "discoveredAt": "2025-11-29T11:20:33.817Z"
+        "lastUpdated": "2025-11-26T03:06:22.609Z",
+        "discoveredAt": "2025-11-26T03:06:22.609Z"
       }
     },
     "react": {
@@ -826,8 +826,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.818Z",
-        "discoveredAt": "2025-11-29T11:20:33.818Z"
+        "lastUpdated": "2025-11-26T03:06:22.610Z",
+        "discoveredAt": "2025-11-26T03:06:22.610Z"
       }
     },
     "repair": {
@@ -853,8 +853,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.819Z",
-        "discoveredAt": "2025-11-29T11:20:33.819Z"
+        "lastUpdated": "2025-11-26T03:06:22.612Z",
+        "discoveredAt": "2025-11-26T03:06:22.612Z"
       }
     },
     "science": {
@@ -884,8 +884,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.820Z",
-        "discoveredAt": "2025-11-29T11:20:33.820Z"
+        "lastUpdated": "2025-11-26T03:06:22.613Z",
+        "discoveredAt": "2025-11-26T03:06:22.613Z"
       }
     },
     "security": {
@@ -915,8 +915,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.821Z",
-        "discoveredAt": "2025-11-29T11:20:33.821Z"
+        "lastUpdated": "2025-11-26T03:06:22.615Z",
+        "discoveredAt": "2025-11-26T03:06:22.615Z"
       }
     },
     "system": {
@@ -943,8 +943,8 @@
       },
       "metadata": {
         "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.821Z",
-        "discoveredAt": "2025-11-29T11:20:33.821Z"
+        "lastUpdated": "2025-11-26T03:06:22.624Z",
+        "discoveredAt": "2025-11-26T03:06:22.624Z"
       }
     },
     "testing": {
@@ -974,8 +974,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.823Z",
-        "discoveredAt": "2025-11-29T11:20:33.823Z"
+        "lastUpdated": "2025-11-26T03:06:22.626Z",
+        "discoveredAt": "2025-11-26T03:06:22.626Z"
       }
     },
     "typescript": {
@@ -1005,30 +1005,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.824Z",
-        "discoveredAt": "2025-11-29T11:20:33.824Z"
-      }
-    },
-    "utils": {
-      "moduleId": "utils",
-      "moduleType": "domain",
-      "displayName": "Utils",
-      "version": "1.0.0",
-      "description": "Utils domain",
-      "enabled": false,
-      "structure": {
-        "hasSeedsFolder": false,
-        "hasWeightsFolder": false,
-        "hasTokenizer": false,
-        "hasInferenceEngine": false,
-        "hasTrainingPipeline": false,
-        "hasIntegrationAPI": false
-      },
-      "paths": {},
-      "metadata": {
-        "hasLearnedData": false,
-        "lastUpdated": "2025-11-29T11:20:33.824Z",
-        "discoveredAt": "2025-11-29T11:20:33.824Z"
+        "lastUpdated": "2025-11-26T03:06:22.630Z",
+        "discoveredAt": "2025-11-26T03:06:22.630Z"
       }
     },
     "version_control": {
@@ -1058,8 +1036,8 @@
       },
       "metadata": {
         "hasLearnedData": true,
-        "lastUpdated": "2025-11-29T11:20:33.825Z",
-        "discoveredAt": "2025-11-29T11:20:33.825Z"
+        "lastUpdated": "2025-11-26T03:06:22.632Z",
+        "discoveredAt": "2025-11-26T03:06:22.632Z"
       }
     }
   },
@@ -1093,7 +1071,7 @@
   ],
   "stats": {
     "totalModels": 13,
-    "totalDomains": 24,
+    "totalDomains": 23,
     "enabledModels": 1,
     "enabledDomains": 23
   }

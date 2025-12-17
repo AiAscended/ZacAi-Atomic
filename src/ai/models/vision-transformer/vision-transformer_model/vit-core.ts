@@ -5,14 +5,15 @@
 import type { ModelConfig, ModelPayload } from "../../shared/modelTypes"
 
 export class VITModel {
-  private readonly config: ModelConfig
-
-  constructor(config: ModelConfig = {}) {
-    this.config = config
+  private config: unknown;
+  
+  constructor(config: unknown) {
+    this.config = config;
   }
-
-  forward(input: ModelPayload): ModelPayload {
-    return { ...input, ...this.config }
+  
+  forward(input: unknown): unknown {
+    // Model forward pass implementation
+    return input;
   }
 }
 

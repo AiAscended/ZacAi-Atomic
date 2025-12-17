@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     const data: { repositories: GitHubRepo[] } = await response.json();
 
     // Transform to our format
-    const formatted = data.repositories.map((repo) => ({
+    const formatted = data.repositories.map((repo: Record<string, unknown>) => ({
       id: repo.id,
       name: repo.name,
       fullName: repo.full_name,

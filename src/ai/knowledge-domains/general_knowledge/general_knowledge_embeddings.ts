@@ -55,10 +55,6 @@ export const persistGeneralWeights = (weights: GeneralSeedWeights): PersistResul
   }
 }
 
-const generalEmbeddingExports = {
-  getGeneralEmbedding,
-  getGeneralEmbeddingsForTokens,
-  persistGeneralWeights,
-}
+const general_knowledge_embeddings_bundle = { getGeneralEmbedding, getGeneralEmbeddingsForTokens, persistGeneralWeights };
 
-export default generalEmbeddingExports
+export default general_knowledge_embeddings_bundle;

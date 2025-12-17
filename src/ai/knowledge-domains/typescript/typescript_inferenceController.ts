@@ -20,8 +20,21 @@ import {
 } from "../utils/embeddingUtils"
 import { TYPESCRIPT_DOMAIN } from "./typescript_constants"
 
+interface TypeScriptPretrainedWeights {
+  vocabulary?: Record<string, number>
+  thresholds?: {
+    token_match_weight: number
+    semantic_weight: number
+  }
+}
+
 interface InferenceContext {
-  tokens?: string[]
+  tokens: string[]
+  inferenceResults?: unknown
+  sentiment?: unknown
+  slots?: unknown
+  userProfile?: unknown
+  dialogueState?: unknown
 }
 
 type CodeContext =
@@ -73,6 +86,8 @@ const THRESHOLDS = normalizeThresholds(pretrainedConfig.thresholds, seedConfig.t
 
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
+  const weightsConfig = pretrainedWeights as unknown as TypeScriptPretrainedWeights
+  const vocabulary = weightsConfig.vocabulary ?? {}
 
   let tokenScore = 0
   let matchCount = 0
@@ -109,7 +124,11 @@ function calculateConfidence(tokens: string[], input: string): number {
   semanticScore = Math.min(semanticScore / 2, 1.0)
 
   // Combine scores using weights from pretrained config
-  const finalConfidence = avgTokenScore * THRESHOLDS.tokenMatchWeight + semanticScore * THRESHOLDS.semanticWeight
+  const thresholds = weightsConfig.thresholds ?? {
+    token_match_weight: 0.6,
+    semantic_weight: 0.4,
+  }
+  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
 
   if (lowerInput.match(/\b(code|example|file|entry|main|index)\b/)) {
     return Math.min(finalConfidence + 0.2, 1.0)
@@ -632,7 +651,7 @@ function binarySearch<T>(
 }
 
 // Memoization decorator
-function memoize<T extends (...args: any[]) => any>(fn: T): T {
+function memoize<T extends (...args: unknown[]) => any>(fn: T): T {
   const cache = new Map<string, ReturnType<T>>();
   
   return ((...args: Parameters<T>) => {

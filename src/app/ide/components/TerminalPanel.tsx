@@ -6,11 +6,9 @@ import { FitAddon } from 'xterm-addon-fit';
 import { WebLinksAddon } from 'xterm-addon-web-links';
 import 'xterm/css/xterm.css';
 import { Button } from '@/components/ui/button';
-import { X, Plus } from 'lucide-react';
-import { CommandProcessor } from '@/lib/ide/commandProcessor';
-import type { CommandFileSystem, CommandFileSystemEntry } from '@/lib/ide/commandProcessor';
-import { vfs } from '@/lib/ide/virtualFileSystem';
-import type { IDEFile } from '@/lib/ide/virtualFileSystem';
+import { X, Plus, Trash2 } from 'lucide-react';
+import { CommandProcessor } from '@/ide/commandProcessor';
+import { useFileSystem } from '@/ide/useFileSystem';
 
 interface TerminalSession {
   id: string;
@@ -27,11 +25,10 @@ export function TerminalPanel() {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const sessionsRef = useRef<TerminalSession[]>([]);
   const fitAddonRef = useRef<FitAddon | null>(null);
+  const { fs } = useFileSystem();
 
-  const commandFs = useMemo(() => createCommandFileSystem(), []);
-
-  const createSession = useCallback((title: string, index: number) => {
-    if (!terminalRef.current) return null;
+  const createSession = (title: string, index: number) => {
+    if (!terminalRef.current || !fs) return null;
 
     const terminal = new XTerm({
       cursorBlink: true,
@@ -73,7 +70,7 @@ export function TerminalPanel() {
     terminal.open(terminalRef.current);
     fitAddon.fit();
 
-    const commandProcessor = new CommandProcessor(commandFs);
+    const commandProcessor = new CommandProcessor(fs);
     const sessionId = `session-${Date.now()}-${index}`;
 
     // Welcome message
@@ -181,14 +178,10 @@ export function TerminalPanel() {
     });
 
     return session;
-  }, [commandFs]);
+  };
 
   useEffect(() => {
-    sessionsRef.current = sessions;
-  }, [sessions]);
-
-  useEffect(() => {
-    if (!terminalRef.current) return;
+    if (!terminalRef.current || !fs) return;
 
     const session = createSession('Terminal 1', 0);
     if (session) {
@@ -209,9 +202,9 @@ export function TerminalPanel() {
 
     return () => {
       resizeObserver.disconnect();
-      sessionsRef.current.forEach((s) => s.terminal.dispose());
+      sessions.forEach((s) => s.terminal.dispose());
     };
-  }, [createSession]);
+  }, [fs]);
 
   const addSession = () => {
     const newSession = createSession(`Terminal ${sessions.length + 1}`, sessions.length);
@@ -223,19 +216,14 @@ export function TerminalPanel() {
 
   const closeSession = (sessionId: string) => {
     const session = sessions.find((s) => s.id === sessionId);
-    if (!session) return;
-
-    session.terminal.dispose();
-    const newSessions = sessions.filter((s) => s.id !== sessionId);
-    setSessions(newSessions);
-
-    if (newSessions.length === 0) {
-      setActiveSessionId(null);
-      return;
-    }
-
-    if (activeSessionId === sessionId) {
-      setActiveSessionId(newSessions[0].id);
+    if (session) {
+      session.terminal.dispose();
+      const newSessions = sessions.filter((s) => s.id !== sessionId);
+      setSessions(newSessions);
+      
+      if (activeSessionId === sessionId && newSessions.length > 0) {
+        setActiveSessionId(newSessions[0].id);
+      }
     }
   };
 

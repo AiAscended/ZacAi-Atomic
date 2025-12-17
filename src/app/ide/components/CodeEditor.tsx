@@ -3,28 +3,29 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Editor, { OnMount } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
-import { useEditorStore } from '@/lib/ide/editorStore';
-import { useFileSystem } from '@/lib/ide/useFileSystem';
+import { useEditorStore } from '@/ide/editorStore';
+import type { EditorTab } from '@/ide/editorStore';
+import { useFileSystem } from '@/ide/useFileSystem';
 import { Button } from '@/components/ui/button';
-import { X, FileCode } from 'lucide-react';
+import { X, Save, MoreVertical, Copy, FileCode } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function CodeEditor() {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof monaco | null>(null);
-  const {
-    tabs,
-    activeTabId,
-    closeTab,
-    setActiveTab,
-    updateTabContent,
-    markTabDirty,
-    getTab,
+  const { 
+    openFiles, 
+    activeFileId, 
+    closeFile, 
+    setActiveFile, 
+    updateFileContent,
+    saveFile,
+    getFileById 
   } = useEditorStore();
-  const { writeFile } = useFileSystem();
+  const { fs } = useFileSystem();
   const [theme, setTheme] = useState<'vs-dark' | 'light'>('vs-dark');
 
-  const activeFile = activeTabId ? getTab(activeTabId) : undefined;
+  const activeFile = getFileById(activeFileId);
 
   const handleEditorDidMount: OnMount = (editor, monacoInstance) => {
     editorRef.current = editor;
@@ -91,54 +92,75 @@ export function CodeEditor() {
     
     languages.forEach((lang) => {
       monacoInstance.languages.registerCompletionItemProvider(lang, {
-        provideCompletionItems: (model, position) => {
-          const word = model.getWordUntilPosition(position);
-          const range = new monacoInstance.Range(
-            position.lineNumber,
-            word.startColumn,
-            position.lineNumber,
-            word.endColumn
-          );
-
-          const baseSuggestions = [
+        provideCompletionItems: (model, position, _context, _token) => {
+          const suggestions = [
             {
               label: 'log',
               kind: monacoInstance.languages.CompletionItemKind.Snippet,
               insertText: "console.log('${1}');",
+              insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Console log',
+              range: new monacoInstance.Range(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column
+              ),
             },
             {
               label: 'func',
               kind: monacoInstance.languages.CompletionItemKind.Snippet,
               insertText: 'function ${1:name}(${2:params}) {\n\t${3}\n}',
+              insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Function declaration',
+              range: new monacoInstance.Range(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column
+              ),
             },
             {
               label: 'arrow',
               kind: monacoInstance.languages.CompletionItemKind.Snippet,
               insertText: 'const ${1:name} = (${2:params}) => {\n\t${3}\n};',
+              insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Arrow function',
+              range: new monacoInstance.Range(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column
+              ),
             },
             {
               label: 'async',
               kind: monacoInstance.languages.CompletionItemKind.Snippet,
               insertText: 'async function ${1:name}(${2:params}) {\n\t${3}\n}',
+              insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Async function',
+              range: new monacoInstance.Range(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column
+              ),
             },
             {
               label: 'try',
               kind: monacoInstance.languages.CompletionItemKind.Snippet,
               insertText: 'try {\n\t${1}\n} catch (error) {\n\t${2:console.error(error);}\n}',
+              insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Try-catch block',
+              range: new monacoInstance.Range(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column
+              ),
             },
           ];
-
-          const suggestions = baseSuggestions.map((suggestion) => ({
-            ...suggestion,
-            range,
-            insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          }));
-
+          
           return { suggestions };
         },
       });
@@ -183,46 +205,41 @@ export function CodeEditor() {
   };
 
   const handleSave = async () => {
-    if (!activeFile) return;
-    try {
-      await writeFile(activeFile.path, activeFile.content);
-      markTabDirty(activeFile.id, false);
-    } catch (error) {
-      console.error('Failed to save file:', error);
+    if (activeFileId && fs) {
+      await saveFile(activeFileId, fs);
     }
   };
 
   const handleChange = (value: string | undefined) => {
-    if (value !== undefined && activeFile) {
-      updateTabContent(activeFile.id, value);
+    if (value !== undefined && activeFileId) {
+      updateFileContent(activeFileId, value);
     }
   };
 
   const handleCloseTab = (fileId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    closeTab(fileId);
+    closeFile(fileId);
   };
 
   // Update editor content when active file changes
   useEffect(() => {
-    if (!editorRef.current || !activeFile) {
-      return;
-    }
-
-    const currentModel = editorRef.current.getModel();
-    if (currentModel) {
-      const currentValue = currentModel.getValue();
-      if (currentValue !== activeFile.content) {
-        editorRef.current.setValue(activeFile.content);
+    if (editorRef.current && activeFile) {
+      const currentModel = editorRef.current.getModel();
+      if (currentModel) {
+        const currentValue = currentModel.getValue();
+        if (currentValue !== activeFile.content) {
+          editorRef.current.setValue(activeFile.content);
+        }
       }
 
-      if (monacoRef.current) {
+      // Update language
+      if (monacoRef.current && currentModel) {
         monacoRef.current.editor.setModelLanguage(currentModel, activeFile.language);
       }
     }
-  }, [activeFile]);
+  }, [activeFile?.id, activeFile?.content, activeFile?.language]);
 
-  if (tabs.length === 0) {
+  if (openFiles.length === 0) {
     return (
       <div className="h-full w-full flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
@@ -242,16 +259,16 @@ export function CodeEditor() {
     <div className="h-full w-full flex flex-col bg-background">
       {/* Tabs */}
       <div className="flex items-center bg-muted/30 border-b overflow-x-auto">
-        {tabs.map((file) => (
+  {openFiles.map((file: EditorTab) => (
           <div
             key={file.id}
             className={cn(
               'flex items-center gap-2 px-4 py-2 border-r cursor-pointer transition-colors group',
-              file.id === activeTabId
+              file.id === activeFileId
                 ? 'bg-background text-foreground'
                 : 'hover:bg-muted/50 text-muted-foreground'
             )}
-            onClick={() => setActiveTab(file.id)}
+            onClick={() => setActiveFile(file.id)}
           >
             <span className="text-sm font-medium truncate max-w-[150px]">
               {file.path.split('/').pop()}

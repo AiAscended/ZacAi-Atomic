@@ -16,3 +16,7 @@ export function normalizeAudioFeatures(payload: ModelPayload): ModelPayload {
 	return normalized;
 }
 
+export const sttUtils = { sttUtility }
+
+
+export default sttUtils;

@@ -4,10 +4,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Bot, User, Code2, FileCode, Bug, Sparkles, Copy, FileDown, Check } from 'lucide-react';
-import { aiAssistant, type IDEContext } from '@/lib/ide/aiAssistant';
-import { useEditorStore } from '@/lib/ide/editorStore';
-import { useFileSystem } from '@/lib/ide/useFileSystem';
+import { Send, Bot, User, Code2, FileCode, Bug, Sparkles, Copy, FileDown, Play, Check } from 'lucide-react';
+import { aiAssistant, type IDEContext } from '@/ide/aiAssistant';
+import { useEditorStore } from '@/ide/editorStore';
+import type { EditorTab } from '@/ide/editorStore';
+import { useFileSystem } from '@/ide/useFileSystem';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-tomorrow.css';
 import 'prismjs/components/prism-javascript';
@@ -32,10 +33,10 @@ interface Message {
 }
 
 const quickActions = [
-  { icon: Code2, label: 'Explain Code', action: 'explain' },
-  { icon: FileCode, label: 'Generate Code', action: 'generate' },
-  { icon: Bug, label: 'Fix Bug', action: 'fix' },
-  { icon: Sparkles, label: 'Optimize', action: 'optimize' },
+  { icon: Code2, label: 'Explain Code', action: 'explain' as const },
+  { icon: FileCode, label: 'Generate Code', action: 'generate' as const },
+  { icon: Bug, label: 'Fix Bug', action: 'fix' as const },
+  { icon: Sparkles, label: 'Optimize', action: 'optimize' as const },
 ];
 
 export function AIChatPanel() {
@@ -52,13 +53,8 @@ export function AIChatPanel() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const {
-    tabs,
-    activeTabId,
-    getTab,
-    updateTabContent,
-  } = useEditorStore();
-  const { fileTree, writeFile } = useFileSystem();
+  const { openFiles, activeFileId, getFileById, updateFileContent } = useEditorStore();
+  const { fs, fileTree } = useFileSystem();
 
   // Initialize AI assistant
   useEffect(() => {
@@ -81,7 +77,7 @@ export function AIChatPanel() {
 
   // Build IDE context
   const getIDEContext = (): IDEContext => {
-    const activeFile = activeTabId ? getTab(activeTabId) : undefined;
+    const activeFile = getFileById(activeFileId);
     const projectFiles = fileTree.map((node) => node.path);
 
     return {
@@ -92,7 +88,7 @@ export function AIChatPanel() {
             language: activeFile.language,
           }
         : undefined,
-      openFiles: tabs.map((file) => ({
+      openFiles: openFiles.map((file: EditorTab) => ({
         path: file.path,
         content: file.content,
         language: file.language,
@@ -142,8 +138,10 @@ export function AIChatPanel() {
     }
   };
 
-  const handleQuickAction = async (action: string) => {
-    const activeFile = activeTabId ? getTab(activeTabId) : undefined;
+  const handleQuickAction = async (
+    action: (typeof quickActions)[number]['action']
+  ) => {
+    const activeFile = getFileById(activeFileId);
     
     if (!activeFile) {
       setInput(`${action} code for: `);
@@ -200,20 +198,22 @@ export function AIChatPanel() {
   };
 
   const handleInsertCode = async (code: string, filename?: string) => {
+    if (!fs) return;
+
     if (filename) {
       // Create new file
       try {
         const path = `/${filename}`;
-        await writeFile(path, code);
+        await fs.write(path, code);
         // The file system hook will refresh the tree
       } catch (error) {
         console.error('Failed to create file:', error);
       }
-    } else if (activeTabId) {
+    } else if (activeFileId) {
       // Insert into active file
-      const activeFile = getTab(activeTabId);
+      const activeFile = getFileById(activeFileId);
       if (activeFile) {
-        updateTabContent(activeFile.id, code);
+        updateFileContent(activeFileId, code);
       }
     }
   };

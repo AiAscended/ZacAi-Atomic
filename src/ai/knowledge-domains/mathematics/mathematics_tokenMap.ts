@@ -35,11 +35,11 @@ export const getMathematicsTokenById = (id: number): string | undefined => {
 
 export const mathematicsTokenCount = () => mathematicsTokenMap.size
 
-const mathematicsTokenExports = {
+const mathematics_tokenMap_bundle = {
   mathematicsTokenMap,
   getMathematicsTokenId,
   getMathematicsTokenById,
   mathematicsTokenCount,
-}
+};
 
-export default mathematicsTokenExports
+export default mathematics_tokenMap_bundle;

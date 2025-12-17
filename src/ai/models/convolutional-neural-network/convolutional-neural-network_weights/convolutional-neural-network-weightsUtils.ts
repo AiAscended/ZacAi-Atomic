@@ -2,13 +2,10 @@
  * Convolutional-neural-network - Weights Utilities
  */
 
-import { WeightDictionary } from '../../shared/modelTypes';
-
-export function loadWeights(path: string): WeightDictionary {
-  console.log('[cnn-weights] Loading weights from path', path);
-  return {
-    path,
-    loadedAt: Date.now(),
-  };
+export function loadWeights(path: string): unknown {
+  return {};
 }
 
+const convolutional_neural_network_weightsUtils_bundle = { loadWeights };
+
+export default convolutional_neural_network_weightsUtils_bundle;

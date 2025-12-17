@@ -16,9 +16,7 @@ export interface TrainingResult {
   message: string
 }
 
-export type NextjsTrainingSample = Record<string, unknown>
-
-export async function nextjsRunTrainingEpoch(samples: NextjsTrainingSample[]): Promise<TrainingResult> {
+export async function nextjsRunTrainingEpoch(samples: unknown[]): Promise<TrainingResult> {
   try {
     console.log(`[Next.js Domain] Starting training with ${samples.length} samples`)
 

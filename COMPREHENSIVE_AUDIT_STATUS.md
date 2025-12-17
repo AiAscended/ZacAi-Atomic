@@ -53,7 +53,7 @@ The ZacAi-Atomic hybrid AI system has undergone systematic production readiness 
 - **Status**: RESOLVED
 
 #### 1.3 User Management System ✅
-- **Database**: JSON file at data/settings/users.json
+- **Database**: JSON file at src/ai/data/settings/users.json
 - **Default Users**:
   - AiAscended (admin role) - Human operator
   - Zac (system role) - AI agent
@@ -69,10 +69,10 @@ The ZacAi-Atomic hybrid AI system has undergone systematic production readiness 
 
 #### Settings Files ✅
 All required settings files created and functional:
-- ✅ `data/settings/system.json` - System configuration
-- ✅ `data/settings/domains.json` - 6 domains configured (react, typescript, nextjs, programming, mathematics, english)
-- ✅ `data/settings/models.json` - 3 models configured (orchestrator, intent-classifier, domain-router)
-- ✅ `data/settings/users.json` - 2 default users
+- ✅ `src/ai/data/settings/system.json` - System configuration
+- ✅ `src/ai/data/settings/domains.json` - 6 domains configured (react, typescript, nextjs, programming, mathematics, english)
+- ✅ `src/ai/data/settings/models.json` - 3 models configured (orchestrator, intent-classifier, domain-router)
+- ✅ `src/ai/data/settings/users.json` - 2 default users
 
 #### Admin Pages Testing 🔄
 **Status**: PENDING

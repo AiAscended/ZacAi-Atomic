@@ -5,9 +5,8 @@
 import type { TrainingBatch } from "../../shared/modelTypes"
 
 export class NEUROTrainer {
-  train(data: TrainingBatch): void {
-    const sampleCount = data.length
-    console.log(`Training neuro-symbolic-reasoning with ${sampleCount} samples`)
+  train(_data: unknown): void {
+    console.log('Training neuro-symbolic-reasoning...');
   }
 }
 

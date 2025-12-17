@@ -21,7 +21,7 @@ export interface LogEntry {
   level: LogLevel
   module: string
   message: string
-  data?: LogContext
+  data?: unknown
 }
 
 /**
@@ -42,7 +42,7 @@ class Logger {
   /**
    * Log a message
    */
-  private log(level: LogLevel, module: string, message: string, data?: LogContext): void {
+  private log(level: LogLevel, module: string, message: string, data?: unknown): void {
     if (level < this.minLevel) return
 
     const entry: LogEntry = {
@@ -81,23 +81,23 @@ class Logger {
     }
   }
 
-  debug(module: string, message: string, data?: LogContext): void {
+  debug(module: string, message: string, data?: unknown): void {
     this.log(LogLevel.DEBUG, module, message, data)
   }
 
-  info(module: string, message: string, data?: LogContext): void {
+  info(module: string, message: string, data?: unknown): void {
     this.log(LogLevel.INFO, module, message, data)
   }
 
-  warn(module: string, message: string, data?: LogContext): void {
+  warn(module: string, message: string, data?: unknown): void {
     this.log(LogLevel.WARN, module, message, data)
   }
 
-  error(module: string, message: string, data?: LogContext): void {
+  error(module: string, message: string, data?: unknown): void {
     this.log(LogLevel.ERROR, module, message, data)
   }
 
-  critical(module: string, message: string, data?: LogContext): void {
+  critical(module: string, message: string, data?: unknown): void {
     this.log(LogLevel.CRITICAL, module, message, data)
   }
 

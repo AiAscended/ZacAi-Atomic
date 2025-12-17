@@ -5,8 +5,8 @@
 import type { ModelPayload } from "../../shared/modelTypes"
 
 export class MULTIMODALLayer {
-  forward(input: ModelPayload): ModelPayload {
-    return input
+  forward(input: unknown): unknown {
+    return input;
   }
 }
 

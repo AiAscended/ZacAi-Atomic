@@ -10,7 +10,7 @@ const DOMAIN_ROOT = path.join(process.cwd(), "src", "ai", "knowledge-domains", D
 const resolveDomainPath = (suffix: string) => path.join(DOMAIN_ROOT, `${DOMAIN_NAME}_${suffix}`)
 
 // TODO: Use internetSearchQuery for additional context-aware search
-/* const internetSearchQuery = async (input: string, context?: any) => {
+/* const internetSearchQuery = async (input: string, context?: unknown) => {
   const searchResults = context?.searchResults || []
 
   if (searchResults.length > 0) {

@@ -14,6 +14,21 @@ import { seedRegistry, type SeedEntry } from '../seeds/seedRegistry';
 import { cosineSimilarity } from '@/ai/models/unified-transformer-llm/unified-transformer-llm_model/llm-utilities';
 import { l2Normalize } from '@/ai/embedding/embeddingNormalizer';
 
+export interface SeedData {
+  word?: string;
+  concept?: string;
+  term?: string;
+  priority?: number;
+  category?: string;
+  definitions?: { meaning: string; example: string }[];
+  definition?: string;
+  bestPractice?: string;
+  examples?: string[];
+  relatedConcepts?: string[];
+  related?: string[];
+  language?: string;
+}
+
 export interface SemanticInferenceResult {
   response: string;
   confidence: number;
@@ -28,34 +43,91 @@ export interface SemanticInferenceResult {
   };
 }
 
-type SemanticContext = {
-  referenceText?: string;
-  conversationSnippet?: string;
-  [key: string]: unknown;
-};
+type RawSeedRecord = Record<string, unknown>;
 
-interface SeedDefinition {
-  meaning: string;
-  example?: string;
+function toStringOrUndefined(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim().length > 0 ? value : undefined;
 }
 
-interface SeedFullData {
-  word?: string;
-  concept?: string;
-  term?: string;
-  definitions?: SeedDefinition[];
-  definition?: string;
-  bestPractice?: string;
-  examples?: string[];
-  priority?: number;
-  category?: string;
-  language?: string;
-  relatedConcepts?: string[];
-  related?: string[];
-  [key: string]: unknown;
+function toNumberOrUndefined(value: unknown): number | undefined {
+  return typeof value === 'number' ? value : undefined;
 }
 
-type SeedEntryWithData = SeedEntry & { fullData?: SeedFullData };
+function toStringArray(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const normalized = value
+    .map((item) => (typeof item === 'string' ? item : undefined))
+    .filter((item): item is string => Boolean(item));
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+function normalizeExampleValue(value: unknown): string | null {
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (value && typeof value === 'object') {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function toExamplesArray(record: RawSeedRecord): string[] | undefined {
+  const candidate = record.examples ?? record.example;
+  if (!candidate) return undefined;
+
+  if (Array.isArray(candidate)) {
+    const normalized = candidate
+      .map((item) => normalizeExampleValue(item))
+      .filter((item): item is string => Boolean(item));
+    return normalized.length > 0 ? normalized : undefined;
+  }
+
+  const single = normalizeExampleValue(candidate);
+  return single ? [single] : undefined;
+}
+
+function toDefinitionsArray(value: unknown): SeedData['definitions'] {
+  if (!Array.isArray(value)) return undefined;
+  const definitions = value
+    .map((item) => {
+      if (!item || typeof item !== 'object') return undefined;
+      const entry = item as RawSeedRecord;
+      const meaning = toStringOrUndefined(entry.meaning);
+      const example = toStringOrUndefined(entry.example);
+      if (!meaning) return undefined;
+      return {
+        meaning,
+        example: example ?? '',
+      };
+    })
+    .filter((item): item is { meaning: string; example: string } => Boolean(item));
+  return definitions.length > 0 ? definitions : undefined;
+}
+
+function normalizeSeedData(raw: RawSeedRecord): SeedData {
+  return {
+    word: toStringOrUndefined(raw.word),
+    concept: toStringOrUndefined(raw.concept),
+    term: toStringOrUndefined(raw.term),
+    priority: toNumberOrUndefined(raw.priority ?? raw.frequency_rank),
+    category: toStringOrUndefined(raw.category),
+    definitions: toDefinitionsArray(raw.definitions),
+    definition: toStringOrUndefined(raw.definition),
+    bestPractice: toStringOrUndefined(raw.bestPractice),
+    examples: toExamplesArray(raw),
+    relatedConcepts: toStringArray(raw.relatedConcepts),
+    related: toStringArray(raw.related),
+    language: toStringOrUndefined(raw.language),
+  };
+}
+
+function looksLikeCodeSnippet(example: string): boolean {
+  return /\b(function|const|let|class|import|=>)\b|[{};]/.test(example);
+}
 
 /**
  * Generate simple embedding from text (basic implementation)
@@ -113,10 +185,10 @@ function computeSemanticScore(query: string, anchorText: string): number {
 export async function performSemanticInference(
   query: string,
   domain: string,
-  context?: SemanticContext
+  context?: unknown
 ): Promise<SemanticInferenceResult> {
   const keyTerms = extractKeyTerms(query);
-  const matchedSeeds: SeedEntryWithData[] = [];
+  const matchedSeeds: SeedData[] = [];
   const codeExamples: string[] = [];
 
   console.log(`[SemanticInference] Analyzing query for ${domain}: "${query.substring(0, 50)}..."`);
@@ -125,23 +197,19 @@ export async function performSemanticInference(
   // Step 1: Look up seeds for key terms in the registry
   for (const term of keyTerms) {
     try {
-      const seed = seedRegistry.lookup(term, domain) as SeedEntryWithData | null;
-      if (seed?.fullData) {
-        matchedSeeds.push(seed);
+      const seed = await seedRegistry.lookup(term, domain);
+      if (seed?.fullData && typeof seed.fullData === 'object') {
+        const normalized = normalizeSeedData(seed.fullData as RawSeedRecord);
+        matchedSeeds.push(normalized);
         console.log(`[SemanticInference] Found seed for "${term}":`, {
-          concept: seed.fullData.word || seed.fullData.concept,
-          priority: seed.fullData.priority,
-          category: seed.fullData.category,
+          concept: normalized.word || normalized.concept,
+          priority: normalized.priority,
+          category: normalized.category,
         });
-
-        seed.fullData.examples?.forEach((example: string) => {
-          if (
-            example.includes('{') ||
-            example.includes('function') ||
-            example.includes('const') ||
-            example.includes('import')
-          ) {
-            codeExamples.push(example);
+        
+        normalized.examples?.forEach((ex) => {
+          if (looksLikeCodeSnippet(ex)) {
+            codeExamples.push(ex);
           }
         });
       }
@@ -154,40 +222,44 @@ export async function performSemanticInference(
     let response = '';
     const concepts: string[] = [];
     const sources: string[] = [];
-
-    matchedSeeds.sort((a, b) => (a.priority || 999) - (b.priority || 999));
-
+    
+    // Sort by priority (lower priority = more important)
+  matchedSeeds.sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999));
+    
+    // Build response from seed data
     matchedSeeds.forEach(seed => {
-      const seedData = seed.fullData;
-      const concept =
-        seedData?.word ||
-        seedData?.concept ||
-        seedData?.term ||
-        seed.word ||
-        seed.concept ||
-        seed.term ||
-        'Concept';
-      concepts.push(concept);
-      sources.push(`${domain} seed: ${concept}`);
-
-      if (seedData?.definitions && seedData.definitions.length > 0) {
-        response += `**${concept}**: ${seedData.definitions[0].meaning}\n\n`;
-      } else if (seedData?.definition) {
-        response += `**${concept}**: ${seedData.definition}\n\n`;
-      }
-
-      if (seedData?.definitions && seedData.definitions.length > 0 && seedData.definitions[0].example) {
-        response += `*Example*: ${seedData.definitions[0].example}\n\n`;
-      }
-
-      if (seedData?.bestPractice) {
-        response += `💡 *Best Practice*: ${seedData.bestPractice}\n\n`;
+      const concept = seed.word || seed.concept || seed.term;
+      if (concept) {
+        concepts.push(concept);
+        sources.push(`${domain} seed: ${concept}`);
+        
+        // Add definition
+        if (seed.definitions && seed.definitions.length > 0) {
+          response += `**${concept}**: ${seed.definitions[0].meaning}\n\n`;
+        } else if (seed.definition) {
+          response += `**${concept}**: ${seed.definition}\n\n`;
+        }
+        
+        // Add example
+        if (
+          seed.definitions &&
+          seed.definitions.length > 0 &&
+          seed.definitions[0].example
+        ) {
+          response += `*Example*: ${seed.definitions[0].example}\n\n`;
+        }
+        
+        // Add best practice if available
+        if (seed.bestPractice) {
+          response += `💡 *Best Practice*: ${seed.bestPractice}\n\n`;
+        }
       }
     });
-
-    const avgPriority = matchedSeeds.reduce((sum, seed) => sum + (seed.priority || 50), 0) / matchedSeeds.length;
-    const confidence = Math.min(0.95, Math.max(0.4, 1 - avgPriority / 100));
-
+    
+    // Calculate confidence based on number of matches and their priority
+  const avgPriority = matchedSeeds.reduce((sum, s) => sum + (s.priority ?? 50), 0) / matchedSeeds.length;
+    const confidence = Math.min(0.95, Math.max(0.4, 1.0 - (avgPriority / 100)));
+    
     return {
       response: response.trim(),
       confidence,
@@ -231,18 +303,20 @@ export async function searchCodeExamples(
 
   for (const keyword of keywords) {
     try {
-      const seed = seedRegistry.lookup(keyword, domain) as SeedEntryWithData | null;
-      const seedData = seed?.fullData;
-      seedData?.examples?.forEach((example: string) => {
-        if (example.includes('{') || example.includes('function') || example.includes('const')) {
-          examples.push({
-            code: example,
-            concept: seedData.word || seedData.concept || keyword,
-            language: seedData.language || 'typescript',
-          });
-        }
-      });
-    } catch {
+      const seed = await seedRegistry.lookup(keyword, domain);
+      if (seed?.fullData && typeof seed.fullData === 'object') {
+        const normalized = normalizeSeedData(seed.fullData as RawSeedRecord);
+        normalized.examples?.forEach((ex) => {
+          if (looksLikeCodeSnippet(ex)) {
+            examples.push({
+              code: ex,
+              concept: normalized.word || normalized.concept || keyword,
+              language: normalized.language || 'typescript',
+            });
+          }
+        });
+      }
+    } catch (error) {
       // Seed not found, continue
     }
   }
@@ -258,9 +332,10 @@ export async function getRelatedConcepts(
   domain: string
 ): Promise<string[]> {
   try {
-    const seed = seedRegistry.lookup(term, domain) as SeedEntryWithData | null;
-    if (seed?.fullData) {
-      return seed.fullData.relatedConcepts || seed.fullData.related || [];
+    const seed = await seedRegistry.lookup(term, domain);
+    if (seed?.fullData && typeof seed.fullData === 'object') {
+      const normalized = normalizeSeedData(seed.fullData as RawSeedRecord);
+      return normalized.relatedConcepts || normalized.related || [];
     }
   } catch {
     // Seed not found

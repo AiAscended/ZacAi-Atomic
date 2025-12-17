@@ -65,7 +65,7 @@ async function loadSeedData(): Promise<ObservabilitySeedConcept[]> {
     const files = await fs.readdir(SEEDS_DIR)
     const jsonFiles = files.filter((file) => file.endsWith(".json"))
     
-    const allConcepts: ObservabilitySeedConcept[] = []
+    const allConcepts: unknown[] = [];
     for (const file of jsonFiles) {
       const filePath = path.join(SEEDS_DIR, file)
       const content = await fs.readFile(filePath, "utf-8")

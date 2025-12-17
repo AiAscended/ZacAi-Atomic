@@ -59,9 +59,14 @@ export async function lookupAndLearn(
   domain: string,
   term: string,
   context: string
-): Promise<LookupAndLearnResult> {
+): Promise<{
+  found: boolean;
+  fromExisting: boolean;
+  data: LearnedItem | unknown;
+  source: 'seed' | 'learned' | 'url-lookup';
+}> {
   // 1. Check if already in seed vocabulary
-  const seedData = lookupSeed(term, domain);
+  const seedData = await lookupSeed(term, domain);
   if (seedData) {
     return {
       found: true,
@@ -85,7 +90,7 @@ export async function lookupAndLearn(
   // 3. Perform URL lookup (simulated - you'd integrate with actual URL lookup)
   const urlLookupResult = await performURLLookup(domain, term);
 
-  if (urlLookupResult.found && urlLookupResult.data) {
+  if (urlLookupResult.found && isUrlLookupData(urlLookupResult.data)) {
     // Learn the new term
     const learned = learningMemory.learnItem(
       sessionId,
@@ -126,7 +131,7 @@ export async function lookupAndLearn(
 async function performURLLookup(
   domain: string,
   term: string
-): Promise<UrlLookupResult> {
+): Promise<{ found: boolean; data?: unknown }> {
   // This would integrate with your actual URL lookup tools
   // For now, return a simulated response
   
@@ -145,11 +150,13 @@ async function performURLLookup(
 /**
  * Determine category based on term and data
  */
-function determineCategory(term: string, data: UrlLookupPayload | null): LearnedItem['category'] {
+function determineCategory(term: string, data: unknown): LearnedItem['category'] {
   if (term.match(/[+\-*/=]/)) return 'equation';
-  if (data?.type === 'concept') return 'concept';
-  if (data?.type === 'fact') return 'fact';
-  if (data?.type === 'procedure') return 'procedure';
+  if (isUrlLookupData(data)) {
+    if (data.type === 'concept') return 'concept';
+    if (data.type === 'fact') return 'fact';
+    if (data.type === 'procedure') return 'procedure';
+  }
   return 'vocabulary';
 }
 
@@ -182,7 +189,7 @@ export async function extractAndLearnFromInput(
           `Extracted from user input: "${userInput}"`
         );
 
-        if (result.found && !result.fromExisting) {
+        if (result.found && !result.fromExisting && isLearnedItem(result.data)) {
           learned.push(result.data);
         }
       }
@@ -190,6 +197,15 @@ export async function extractAndLearnFromInput(
   }
 
   return learned;
+}
+
+function isLearnedItem(value: unknown): value is LearnedItem {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as LearnedItem).term === 'string' &&
+    typeof (value as LearnedItem).domain === 'string'
+  );
 }
 
 /**
@@ -430,5 +446,30 @@ export function learnFromSearch(
       verified: false,
       learnedFrom: 'search',
     }
+  );
+}
+
+// ============================================================================
+// Type Definitions
+// ============================================================================
+
+interface UrlLookupData {
+  definition: string;
+  source: string;
+  examples: string[];
+  related: string[];
+  type?: 'concept' | 'fact' | 'procedure';
+}
+
+function isUrlLookupData(data: unknown): data is UrlLookupData {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+  const d = data as UrlLookupData;
+  return (
+    typeof d.definition === 'string' &&
+    typeof d.source === 'string' &&
+    Array.isArray(d.examples) &&
+    Array.isArray(d.related)
   );
 }

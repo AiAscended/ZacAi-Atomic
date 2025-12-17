@@ -9,16 +9,13 @@ import React from 'react';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { useIDELayoutStore } from '@/stores/ideLayoutStore';
 import { PanelContainer } from './PanelContainer';
-import { Button } from '@/components/ui/button';
-import { Layout, Maximize, Code, Terminal, MessageSquare, FolderTree } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { FileExplorer } from './FileExplorer';
+import { CodeEditor } from './CodeEditor';
+import { PreviewPanel } from './PreviewPanel';
+import { TerminalPanel } from './TerminalPanel';
+import { AIChatPanel } from './AIChatPanel';
+import { IDEToolbar } from './IDEToolbar';
+import { useLayoutStore } from '@/ide/layoutStore';
 
 interface IDELayoutProps {
   fileExplorer?: React.ReactNode;

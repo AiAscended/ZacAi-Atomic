@@ -56,7 +56,7 @@ export interface DomainURLConfig {
 
 export interface URLLookupResult {
   success: boolean;
-  data?: LookupData;
+  data?: unknown;
   source?: string;
   cached: boolean;
   timestamp: string;
@@ -68,8 +68,8 @@ export interface URLLookupResult {
 // ============================================================================
 
 export class URLLookupTool {
-  private cache: Map<string, CacheEntry> = new Map();
-  private rateLimiters: Map<string, RateLimiterState> = new Map();
+  private cache: Map<string, { data: unknown; timestamp: number; ttl: number }> = new Map();
+  private rateLimiters: Map<string, { count: number; resetTime: number }> = new Map();
   
   /**
    * Lookup URL with domain-specific configuration
@@ -210,7 +210,7 @@ export class URLLookupTool {
     source: URLSource,
     query: string,
     timeout?: number
-  ): Promise<LookupData> {
+  ): Promise<unknown> {
     const controller = new AbortController();
     const timeoutId = setTimeout(
       () => controller.abort(),
@@ -289,7 +289,7 @@ export class URLLookupTool {
   /**
    * Get from cache
    */
-  private getFromCache(domainId: string, query: string): LookupData | null {
+  private getFromCache(domainId: string, query: string): unknown | null {
     const key = `${domainId}:${query}`;
     const cached = this.cache.get(key);
     
@@ -307,7 +307,7 @@ export class URLLookupTool {
   /**
    * Add to cache
    */
-  private addToCache(domainId: string, query: string, data: LookupData, ttl: number): void {
+  private addToCache(domainId: string, query: string, data: unknown, ttl: number): void {
     const key = `${domainId}:${query}`;
     this.cache.set(key, {
       data,

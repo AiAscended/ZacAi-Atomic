@@ -14,11 +14,11 @@ export const typescriptTokenCount = () => tokenToId.size;
 
 export const typescriptTokenMap = tokenToId;
 
-const tokenMapApi = {
+const typescript_tokenMap_bundle = {
   getTypescriptTokenId,
   getTypescriptTokenById,
   typescriptTokenCount,
   typescriptTokenMap,
 };
 
-export default tokenMapApi;
+export default typescript_tokenMap_bundle;

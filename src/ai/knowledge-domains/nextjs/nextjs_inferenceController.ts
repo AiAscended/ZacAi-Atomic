@@ -25,13 +25,8 @@ export interface NextjsInferenceResult {
   }
 }
 
-export type NextjsInferenceContext = Record<string, unknown>
-
-export async function nextjsRunInference(
-  input: string,
-  context?: NextjsInferenceContext,
-): Promise<NextjsInferenceResult | null> {
-  console.log(`[NextJS] Running REAL AI inference with seed data for: "${input.substring(0, 50)}..."`)
+export async function nextjsRunInference(input: string, context?: unknown): Promise<NextjsInferenceResult | null> {
+  console.log(`[NextJS] Running REAL AI inference with seed data for: "${input.substring(0, 50)}..."`);
   
   try {
     // Use semantic inference helper to query seed registry

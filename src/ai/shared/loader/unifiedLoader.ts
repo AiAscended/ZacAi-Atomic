@@ -119,7 +119,12 @@ export class UnifiedLoader {
       } else {
         console.warn(`[UnifiedLoader] No importer registered for ${manifest.moduleType}: ${moduleId}`);
       }
-
+      
+      if (modulePath) {
+        const loadedModule = await import(modulePath);
+        loaded.instance = loadedModule.default || loadedModule;
+      }
+      
       loaded.status = "ready";
       console.log(`✅ Loaded ${manifest.moduleType}: ${manifest.displayName}`);
     } catch (error) {

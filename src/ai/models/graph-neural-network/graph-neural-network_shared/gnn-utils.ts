@@ -16,3 +16,7 @@ export function normalizeGraphFeatures(payload: ModelPayload): ModelPayload {
 	return normalized;
 }
 
+export const gnnBundle = { gnnUtility }
+
+
+export default gnnBundle;

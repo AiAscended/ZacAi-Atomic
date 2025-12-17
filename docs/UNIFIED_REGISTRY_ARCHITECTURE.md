@@ -157,24 +157,25 @@ class UnifiedScanner {
 Filesystem Change → Scanner detects → Validates structure → Updates registry
 ```
 
-### 2. Orchestrator Integration
+### 2. Orchestrator Integration (planned)
 ```typescript
-// Initialize AI system
-const orchestrator = getUnifiedOrchestrator();
+import { MainOrchestrator } from "@/ai/orchestration/mainOrchestrator";
+import { initializeAISystem } from "@/ai/shared/loader/unifiedLoader";
+
+// Load enabled modules from the unified registry
+await initializeAISystem();
+
+// Main orchestrator remains the single entry point
+const orchestrator = MainOrchestrator.getInstance();
 await orchestrator.initialize();
 
-// Automatically loads from unified registry:
-// ✓ Discovers all enabled models
-// ✓ Discovers all enabled domains
-// ✓ Validates structure
-// ✓ Loads instances
-
-// Process request
-const response = await orchestrator.processRequest({
-  query: "Calculate 2+2",
-  // Orchestrator automatically routes to best module
-});
+// Future work: main orchestrator will consult unified loader outputs
+// to route requests instead of the retired UnifiedOrchestrator wrapper.
+const response = await orchestrator.processPrompt("Calculate 2+2", "session-id");
 ```
+
+> ℹ️ The previous `UnifiedOrchestratorIntegration` helper has been removed.
+> When the main orchestrator adopts the unified loader, document the bridge here.
 
 ### 3. Intelligent Routing
 The orchestrator uses the registry to:
@@ -241,29 +242,22 @@ const all = loader.getAllLoadedModules();
 const { models, domains, stats } = loader.getModulesForOrchestrator();
 ```
 
-### Orchestrator API
+### Orchestrator API (integration target)
 ```typescript
-const orchestrator = getUnifiedOrchestrator();
+import { MainOrchestrator } from "@/ai/orchestration/mainOrchestrator";
+import { initializeAISystem, getUnifiedLoader } from "@/ai/shared/loader/unifiedLoader";
 
-// Initialize
+await initializeAISystem();
+
+const orchestrator = MainOrchestrator.getInstance();
 await orchestrator.initialize();
 
-// Process request
-const response = await orchestrator.processRequest({
-  query: "Your question",
-  preferredModel: "llm",      // Optional
-  preferredDomain: "physics",  // Optional
-});
+// Current behaviour still relies on legacy registries internally.
+// Bridge loader + orchestrator once routing consumes unified manifests.
+const response = await orchestrator.processPrompt("Your question", "session-id");
 
-// Get available
-const models = orchestrator.getAvailableModels();
-const domains = orchestrator.getAvailableDomains();
-
-// Hot-reload
-await orchestrator.reloadModule("llm");
-
-// Status
-const status = await orchestrator.getStatus();
+// Runtime module metadata remains available through the loader itself
+const { models, domains } = getUnifiedLoader().getModulesForOrchestrator();
 ```
 
 ---
@@ -285,7 +279,7 @@ import { getDomainRegistry } from "@/ai/knowledge-domains/domainScanner";
 
 // New way
 import { getUnifiedRegistry } from "@/ai/shared/registry/unifiedRegistry";
-import { getUnifiedOrchestrator } from "@/ai/orchestration/unifiedOrchestratorIntegration";
+import { initializeAISystem, getUnifiedLoader } from "@/ai/shared/loader/unifiedLoader";
 ```
 
 ### Step 3: Initialize
@@ -296,17 +290,18 @@ await modelLoader.loadAllModels();
 await modelLoader.loadAllDomains();
 
 // New way
-const orchestrator = getUnifiedOrchestrator();
-await orchestrator.initialize();
+await initializeAISystem();
+const loader = getUnifiedLoader();
 ```
 
 ### Step 4: Process Requests
 ```typescript
-// New orchestrator handles everything
-const response = await orchestrator.processRequest({
-  query: "Your query here"
-});
+// Inspect modules and feed into MainOrchestrator or other pipelines
+const { models, domains } = loader.getModulesForOrchestrator();
+console.log(models.map(m => m.manifest.displayName));
 ```
+
+> Note: MainOrchestrator integration with the unified loader is underway. Until the adapter is finalized, consume loader outputs directly for diagnostics or bespoke orchestration flows.
 
 ---
 

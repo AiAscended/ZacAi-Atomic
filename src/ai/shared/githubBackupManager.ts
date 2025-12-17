@@ -380,7 +380,7 @@ export class GitHubBackupManager {
   /**
    * Get backup statistics
    */
-  async getStatistics(): Promise<BackupStatistics> {
+  async getStatistics(): Promise<unknown> {
     if (!this.config) await this.initialize();
 
     const config = this.config;

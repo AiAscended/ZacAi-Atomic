@@ -19,5 +19,5 @@ export const testingParser = (code: string) => {
     assertionCount,
     hasSetup: /beforeEach|beforeAll|setup/i.test(code),
     hasTeardown: /afterEach|afterAll|teardown/i.test(code),
-  }
+  };
 }

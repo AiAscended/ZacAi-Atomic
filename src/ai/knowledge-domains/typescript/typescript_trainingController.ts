@@ -12,35 +12,31 @@ import {
   type TypescriptLearnedData,
 } from "./typescript_learnedDataManager"
 
-export interface TypescriptTrainingSample {
-  input: unknown
-  output: unknown
+type TrainingSample = {
+  input?: string
+  output?: string
+  [key: string]: unknown
 }
 
-export interface TypescriptTrainingMetrics {
-  loss: number
-  accuracy: number
-}
-
-const addInteraction = (
-  learned: TypescriptLearnedData,
-  sample: TypescriptTrainingSample,
-): void => {
-  learned.interactions.push({
-    input: sample.input,
-    output: sample.output,
-    timestamp: Date.now(),
-  })
+type LearnedData = {
+  interactions?: Array<{ input: string; output: string; timestamp: number }>
+  [key: string]: unknown
 }
 
 export async function typescriptRunTrainingEpoch(
-  samples: TypescriptTrainingSample[],
-): Promise<TypescriptTrainingMetrics> {
-  const learned = await loadTypescriptLearnedData()
+  samples: TrainingSample[],
+): Promise<{ loss: number; accuracy: number }> {
+  const learned = (await loadTypescriptLearnedData()) as LearnedData
 
   for (const sample of samples) {
-    if (sample.input === undefined || sample.output === undefined) {
-      continue
+    if (typeof sample.input === "string" && typeof sample.output === "string") {
+      const interactions = Array.isArray(learned.interactions) ? learned.interactions : []
+      interactions.push({
+        input: sample.input,
+        output: sample.output,
+        timestamp: Date.now(),
+      })
+      learned.interactions = interactions
     }
     addInteraction(learned, sample)
   }

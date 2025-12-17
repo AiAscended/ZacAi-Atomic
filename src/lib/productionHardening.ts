@@ -115,7 +115,7 @@ export interface ValidationError {
   value?: unknown;
 }
 
-export function validateChatInput(input: unknown): { valid: boolean; errors: ValidationError[] } {
+export function validateChatInput(input: Record<string, unknown>): { valid: boolean; errors: ValidationError[] } {
   const errors: ValidationError[] = [];
   
   if (typeof input !== 'object' || input === null) {
@@ -172,7 +172,7 @@ export function sanitizeHtml(input: string): string {
     .replace(/\//g, '&#x2F;');
 }
 
-export function sanitizeInput<T>(input: T): T {
+export function sanitizeInput(input: unknown): unknown {
   if (typeof input === 'string') {
     return sanitizeHtml(input) as T;
   }
@@ -182,9 +182,11 @@ export function sanitizeInput<T>(input: T): T {
   }
   
   if (typeof input === 'object' && input !== null) {
-    const entries = Object.entries(input as Record<string, unknown>)
-      .map(([key, value]) => [key, sanitizeInput(value)] as const);
-    return Object.fromEntries(entries) as T;
+    const sanitized: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(input)) {
+      sanitized[key] = sanitizeInput(value);
+    }
+    return sanitized;
   }
   
   return input;
@@ -266,17 +268,10 @@ export function getClientIp(request: NextRequest): string {
   if (realIp) {
     return realIp;
   }
-
-  const forwardedHeader = request.headers.get('forwarded');
-  if (forwardedHeader) {
-    const match = forwardedHeader.match(/for="?([^;,"]+)/i);
-    if (match && match[1]) {
-      return match[1];
-    }
-  }
-
-  // Fallback to host information (may be localhost in dev)
-  return request.nextUrl.hostname || 'unknown';
+  
+  // Fallback to connection IP
+  // Use 'x-forwarded-for' header or fallback to a generic string
+  return request.headers.get('x-forwarded-for') || 'unknown';
 }
 
 // ============================================================================
@@ -291,13 +286,11 @@ export interface MiddlewareConfig {
   trackErrors?: boolean;
 }
 
-type RouteHandler<TContext> = (req: NextRequest, context: TContext) => Promise<NextResponse>;
-
-export function withHardening<TContext = Record<string, unknown>>(
-  handler: RouteHandler<TContext>,
+export function withHardening(
+  handler: (req: NextRequest, context: unknown) => Promise<NextResponse>,
   config: MiddlewareConfig = {}
 ) {
-  return async (req: NextRequest, context: TContext) => {
+  return async (req: NextRequest, context: unknown) => {
     const requestId = generateRequestId();
     const clientIp = getClientIp(req);
     const startTime = Date.now();
@@ -342,7 +335,7 @@ export function withHardening<TContext = Record<string, unknown>>(
               { status: 400 }
             );
           }
-        } catch {
+  } catch {
           return NextResponse.json(
             { error: 'Invalid JSON payload' },
             { status: 400 }

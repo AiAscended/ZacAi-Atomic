@@ -16,3 +16,7 @@ export function synthesizePhonemes(payload: ModelPayload): ModelPayload {
 	return annotated;
 }
 
+export const ttsUtils = { ttsUtility }
+
+
+export default ttsUtils;

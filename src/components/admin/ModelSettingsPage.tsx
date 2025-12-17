@@ -159,7 +159,6 @@ export function ModelSettingsPage({
           Last updated: {new Date(settings.updatedAt).toLocaleString()}
         </div>
       </div>
-
       {error && (
         <Card className="p-4 bg-destructive/10 border-destructive">
           <div className="flex items-center gap-2 text-destructive">
@@ -168,7 +167,6 @@ export function ModelSettingsPage({
           </div>
         </Card>
       )}
-
       {showSuccess && (
         <Card className="p-4 bg-green-500/10 border-green-500">
           <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
@@ -177,7 +175,6 @@ export function ModelSettingsPage({
           </div>
         </Card>
       )}
-
       <Tabs defaultValue="settings" className="space-y-4">
         <TabsList>
           <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -316,7 +313,6 @@ export function ModelSettingsPage({
           </Card>
         </TabsContent>
       </Tabs>
-
       <div className="flex gap-3">
         <Button 
           onClick={saveSettings} 
@@ -346,5 +342,5 @@ export function ModelSettingsPage({
         </Button>
       </div>
     </div>
-  )
+  );
 }

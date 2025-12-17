@@ -70,7 +70,7 @@ export default function HomePage() {
   // Initialize AI session with backend
   useEffect(() => {
     async function initializeSession() {
-      setSystemStatus("Connecting to AI system...")
+  setSystemStatus("Connecting to AI system...")
       try {
         const res = await fetch("/api/chat", {
           method: "POST",

@@ -18,3 +18,6 @@ export function sanitizeCodeSnippet(payload: ModelPayload): ModelPayload {
 	return result;
 }
 
+export const codeBundle = { codeUtility }
+
+export default codeBundle

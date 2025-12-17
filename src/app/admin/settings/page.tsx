@@ -52,6 +52,38 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
+  const getDefaultSettings = function (): SystemSettings {
+    return {
+      general: {
+        systemName: 'ZacAi-Atomic',
+        version: '0.0.2',
+        environment: 'production',
+        maintenanceMode: false,
+      },
+      ai: {
+        maxTokens: 2048,
+        temperature: 0.7,
+        topP: 0.9,
+        frequencyPenalty: 0.0,
+        presencePenalty: 0.0,
+        streamingEnabled: true,
+      },
+      security: {
+        rateLimitEnabled: true,
+        rateLimitPerMinute: 60,
+        corsEnabled: true,
+        csrfProtection: true,
+        healthCheckEnabled: true,
+      },
+      storage: {
+        chatHistoryEnabled: true,
+        chatHistoryRetentionDays: 90,
+        activityLogEnabled: true,
+        activityLogRetentionDays: 30,
+      },
+    };
+  };
+
   const loadSettings = useCallback(async () => {
     setLoading(true);
     try {
@@ -73,38 +105,8 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => {
-    loadSettings();
+    void loadSettings();
   }, [loadSettings]);
-
-  const getDefaultSettings = (): SystemSettings => ({
-    general: {
-      systemName: 'ZacAi-Atomic',
-      version: '0.0.2',
-      environment: 'production',
-      maintenanceMode: false,
-    },
-    ai: {
-      maxTokens: 2048,
-      temperature: 0.7,
-      topP: 0.9,
-      frequencyPenalty: 0.0,
-      presencePenalty: 0.0,
-      streamingEnabled: true,
-    },
-    security: {
-      rateLimitEnabled: true,
-      rateLimitPerMinute: 60,
-      corsEnabled: true,
-      csrfProtection: true,
-      healthCheckEnabled: true,
-    },
-    storage: {
-      chatHistoryEnabled: true,
-      chatHistoryRetentionDays: 90,
-      activityLogEnabled: true,
-      activityLogRetentionDays: 30,
-    },
-  });
 
   const saveSettings = async () => {
     if (!settings) return;
@@ -126,8 +128,7 @@ export default function SettingsPage() {
         throw new Error('Failed to save settings');
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error('Failed to save settings:', message);
+      console.error('[System Settings] Save error', error)
       toast({
         title: 'Error',
         description: `Failed to save settings. ${message}`,
@@ -138,11 +139,7 @@ export default function SettingsPage() {
     }
   };
 
-  const updateSetting = <T extends keyof SystemSettings, K extends keyof SystemSettings[T]>(
-    category: T,
-    key: K,
-    value: SystemSettings[T][K]
-  ) => {
+  const updateSetting = (category: keyof SystemSettings, key: string, value: unknown) => {
     if (!settings) return;
     setSettings({
       ...settings,

@@ -21,7 +21,7 @@ export async function GET() {
     return addSecurityHeaders(response);
     
   } catch (error) {
-    console.error('[Health API] GET error:', error);
+    console.error('Health check failed', error)
     const response = NextResponse.json(
       {
         status: 'unhealthy',
