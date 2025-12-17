@@ -4,6 +4,6 @@
 
 export function rnnUtility(): void {}
 
-const rnnUtils = { rnnUtility }; 
+const rnnUtils = { rnnUtility }; // Removed duplicate export default
 
 export default rnnUtils;

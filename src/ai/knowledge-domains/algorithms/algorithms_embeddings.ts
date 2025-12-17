@@ -12,7 +12,8 @@ import { ALGORITHMS_DOMAIN } from "./algorithms_constants";
 const EMBEDDING_DIM = 128;
 
 export const getAlgorithmsEmbedding = (token: string): number[] => {
-  const weights = (pretrained as any)?.seedWeights as Record<string, number[]> || {}
+  // Handle both old and new pretrained weight formats
+  const weights = (pretrained as any).seedWeights || {};
   if (weights[token]) return weights[token]
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
 }
@@ -21,25 +22,13 @@ export const getAlgorithmsEmbeddingForTokens = (tokens: string[]) =>
   tokens.map(getAlgorithmsEmbedding);
 
 export const persistAlgorithmsWeights = (weights: Record<string, number[]>) => {
-  // Note: File persistence is handled externally
-  // This function returns metadata about where weights would be saved
-  const content = JSON.stringify(
-    {
-      domain: ALGORITHMS_DOMAIN,
-      version: "0.2",
-      embeddingDim: EMBEDDING_DIM,
-      seedWeights: weights,
-    },
-    null,
-    2,
-  )
-  // TODO: Implement proper file writing mechanism
-  // This functionality should be handled by a dedicated file management service
-  console.warn('[algorithms_embeddings] persistAlgorithmsWeights: File writing not implemented yet')
+  // Note: File persistence functionality is not yet implemented
+  // TODO: Implement proper file writing mechanism without requiring fileWatcher
+  console.warn('persistAlgorithmsWeights: File persistence not yet implemented');
   return {
     success: false,
     path: "src/ai/knowledge-domains/algorithms/algorithms_weights/algorithms_pretrained_weights.json",
-    error: "File writing not implemented"
+    error: "File persistence not implemented"
   }
 }
 

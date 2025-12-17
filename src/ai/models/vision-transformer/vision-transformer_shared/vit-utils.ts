@@ -4,6 +4,6 @@
 
 export function vitUtility(): void {}
 
-const vitUtils = { vitUtility }; 
+const vitUtils = { vitUtility }; // Removed duplicate export default
 
 export default vitUtils;

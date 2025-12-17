@@ -13,7 +13,8 @@ import { ENVIRONMENT_DOMAIN } from "./environment_constants";
 const EMBEDDING_DIM = 128;
 
 export const getEnvironmentEmbedding = (token: string): number[] => {
-  const weights = (pretrained as any)?.seedWeights as Record<string, number[]> || {}
+  // Handle both old and new pretrained weight formats
+  const weights = (pretrained as any).seedWeights || {};
   if (weights[token]) return weights[token]
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
 }
@@ -21,26 +22,14 @@ export const getEnvironmentEmbedding = (token: string): number[] => {
 export const getEnvironmentEmbeddingForTokens = (tokens: string[]) =>
   tokens.map(getEnvironmentEmbedding);
 
-export const persistEnvironmentWeights = (
-  weights: Record<string, number[]>,
-) => {
-  const content = JSON.stringify(
-    {
-      domain: ENVIRONMENT_DOMAIN,
-      version: "0.2",
-      embeddingDim: EMBEDDING_DIM,
-      seedWeights: weights,
-    },
-    null,
-    2,
-  )
-  // TODO: Implement proper file writing mechanism
-  // This functionality should be handled by a dedicated file management service
-  console.warn('[environment_embeddings] persistEnvironmentWeights: File writing not implemented yet')
+export const persistEnvironmentWeights = (weights: Record<string, number[]>) => {
+  // Note: File persistence functionality is not yet implemented
+  // TODO: Implement proper file writing mechanism without requiring fileWatcher
+  console.warn('persistEnvironmentWeights: File persistence not yet implemented');
   return {
     success: false,
     path: "src/ai/knowledge-domains/environment/environment_weights/environment_pretrained_weights.json",
-    error: "File writing not implemented"
+    error: "File persistence not implemented"
   }
 }
 

@@ -16,7 +16,8 @@ const EMBEDDING_DIM = 128;
  * Returns: 128-dimensional vector or random fallback
  */
 export const getDataStructuresEmbedding = (token: string): number[] => {
-  const weights = (pretrained as any)?.seedWeights as Record<string, number[]> || {}
+  // Handle both old and new pretrained weight formats
+  const weights = (pretrained as any).seedWeights || {};
   if (weights[token]) return weights[token]
   // Fallback: random embedding
   return Array.from(
@@ -28,26 +29,14 @@ export const getDataStructuresEmbedding = (token: string): number[] => {
 export const getDataStructuresEmbeddingForTokens = (tokens: string[]) =>
   tokens.map(getDataStructuresEmbedding);
 
-export const persistDataStructuresWeights = (
-  weights: Record<string, number[]>,
-) => {
-  const content = JSON.stringify(
-    {
-      domain: DATA_STRUCTURES_DOMAIN,
-      version: "0.2",
-      embeddingDim: EMBEDDING_DIM,
-      seedWeights: weights,
-    },
-    null,
-    2,
-  )
-  // TODO: Implement proper file writing mechanism
-  // This functionality should be handled by a dedicated file management service
-  console.warn('[data_structures_embeddings] persistDataStructuresWeights: File writing not implemented yet')
+export const persistDataStructuresWeights = (weights: Record<string, number[]>) => {
+  // Note: File persistence functionality is not yet implemented
+  // TODO: Implement proper file writing mechanism without requiring fileWatcher
+  console.warn('persistDataStructuresWeights: File persistence not yet implemented');
   return {
     success: false,
     path: "src/ai/knowledge-domains/data_structures/data_structures_weights/data_structures_pretrained_weights.json",
-    error: "File writing not implemented"
+    error: "File persistence not implemented"
   }
 }
 

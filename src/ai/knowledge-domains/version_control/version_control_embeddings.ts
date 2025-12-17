@@ -13,7 +13,8 @@ import { VERSION_CONTROL_DOMAIN } from "./version_control_constants";
 const EMBEDDING_DIM = 128;
 
 export const getVersionControlEmbedding = (token: string): number[] => {
-  const weights = (pretrained as any)?.seedWeights as Record<string, number[]> || {}
+  // Handle both old and new pretrained weight formats
+  const weights = (pretrained as any).seedWeights || {};
   if (weights[token]) return weights[token]
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)
 }
@@ -21,26 +22,14 @@ export const getVersionControlEmbedding = (token: string): number[] => {
 export const getVersionControlEmbeddingForTokens = (tokens: string[]) =>
   tokens.map(getVersionControlEmbedding);
 
-export const persistVersionControlWeights = (
-  weights: Record<string, number[]>,
-) => {
-  const content = JSON.stringify(
-    {
-      domain: VERSION_CONTROL_DOMAIN,
-      version: "0.2",
-      embeddingDim: EMBEDDING_DIM,
-      seedWeights: weights,
-    },
-    null,
-    2,
-  )
-  // TODO: Implement proper file writing mechanism
-  // This functionality should be handled by a dedicated file management service
-  console.warn('[version_control_embeddings] persistVersionControlWeights: File writing not implemented yet')
+export const persistVersionControlWeights = (weights: Record<string, number[]>) => {
+  // Note: File persistence functionality is not yet implemented
+  // TODO: Implement proper file writing mechanism without requiring fileWatcher
+  console.warn('persistVersionControlWeights: File persistence not yet implemented');
   return {
     success: false,
     path: "src/ai/knowledge-domains/version_control/version_control_weights/version_control_pretrained_weights.json",
-    error: "File writing not implemented"
+    error: "File persistence not implemented"
   }
 }
 

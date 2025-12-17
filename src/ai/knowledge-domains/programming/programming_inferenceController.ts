@@ -226,8 +226,8 @@ export async function programmingRunInference(
         intent: semanticAnalysis.intent,
         complexity: semanticAnalysis.complexity,
         parseType: parseResult.type,
-      },
-    };
+      } as any,
+    }
   } catch (error) {
     console.error("[Programming Domain] Inference error:", error);
     return null;

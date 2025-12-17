@@ -165,15 +165,8 @@ export const mathematicsRunInference = async (
   const tk = mathematicsTokenizer(input);
   const sem = mathematicsSemanticAnalyzer(input);
 
-  const contextTokens = (_context && typeof _context === 'object' && 'tokens' in _context) 
-    ? (_context as { tokens: string[] }).tokens 
-    : undefined;
-  const contextInferenceResults = (_context && typeof _context === 'object' && 'inferenceResults' in _context) 
-    ? (_context as { inferenceResults: any }).inferenceResults 
-    : undefined;
-    
-  const inferenceResults = contextInferenceResults
-  const tokens = contextTokens || []
+  const inferenceResults = (_context as any)?.inferenceResults
+  const tokens = (_context as any)?.tokens || []
 
   const domainInferenceResult = Array.isArray(inferenceResults)
     ? inferenceResults.find((r) => r.domain === "mathematics")

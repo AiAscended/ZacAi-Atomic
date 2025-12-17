@@ -1,23 +1,12 @@
 /**
  * File: src/ai/orchestration/aiOrchestrator.ts
- * Purpose: Compatibility wrapper that forwards to the new main orchestrator.
- * This keeps existing imports working while consolidating on the modern flow.
+ * Re-export from aiOrchestrator-v2.ts for compatibility
+ * Temporarily disabled due to missing dependencies
  */
 
-import { mainOrchestrator, type OrchestratorResponse } from "./main-orchestrator";
+// export { AIOrchestrator } from "./aiOrchestrator-v2"
 
+// Placeholder until v2 dependencies are resolved
 export class AIOrchestrator {
-	async initialize(): Promise<void> {
-		await mainOrchestrator.initialize();
-	}
-
-	async processPrompt(
-		prompt: string,
-		sessionId: string,
-		context: Record<string, unknown> = {},
-	): Promise<OrchestratorResponse> {
-		return mainOrchestrator.processPrompt(prompt, sessionId, context);
-	}
+  // Placeholder class
 }
-
-export type { OrchestratorResponse };

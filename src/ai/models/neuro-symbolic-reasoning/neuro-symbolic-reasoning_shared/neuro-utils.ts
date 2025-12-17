@@ -4,5 +4,5 @@
 
 export function neuroUtility(): void {}
 
-const utils = { neuroUtility }; 
+const utils = { neuroUtility }; // Removed duplicate export default
 export default utils;

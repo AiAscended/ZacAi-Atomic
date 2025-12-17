@@ -4,18 +4,6 @@
 
 import { ModelPayload } from '../../shared/modelTypes';
 
-export function normalizeInput(payload: ModelPayload): ModelPayload {
-	const normalized = {
-		...payload,
-		normalized: true,
-	};
-
-	console.log('[cnn-utils] Normalized payload keys', Object.keys(payload).length);
-	return normalized;
-}
-
-export const convolutionalBundle = { cnnUtility }
-
-const convolutionalBundle = { cnnUtility }; 
+const convolutionalBundle = { cnnUtility }; // Removed duplicate export default
 
 export default convolutionalBundle;
