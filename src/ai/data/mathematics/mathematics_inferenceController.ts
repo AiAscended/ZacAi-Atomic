@@ -170,76 +170,20 @@ export const mathematicsRunInference = async (input: string, context?: any) => {
   console.log("[v0] Mathematics inference - Converted:", numericInput)
 
   const hasMathKeywords = lowerInput.match(
-    /\b(math|calculate|equation|sum|multiply|add|subtract|divide|plus|minus|times|equals|mathematics|mathematical|formulas?)\b/,
+    /\b(math|calculate|equation|sum|multiply|add|subtract|divide|plus|minus|times|equals)\b/,
   )
   const hasMathSymbols = numericInput.match(/\d+\s*[+\-×x*÷/]\s*\d+/)
   const hasNumbers = lowerInput.match(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/)
   const hasDigits = numericInput.match(/\d+/)
-  const isAIMathQuery =
-    lowerInput.includes("ai") &&
-    (lowerInput.includes("equation") || lowerInput.includes("mathematics") || lowerInput.includes("computing"))
 
-  if (isAIMathQuery) {
-    const aiMathEquations = `
-**Common AI & Machine Learning Mathematical Equations:**
-
-1. **Linear Regression (Prediction)**
-   $$y = mx + b$$
-   Where: y = predicted value, m = slope, x = input, b = y-intercept
-
-2. **Mean Squared Error (Loss Function)**
-   $$MSE = \\frac{1}{n}\\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2$$
-   Measures average squared difference between predicted and actual values
-
-3. **Sigmoid Activation Function**
-   $$\\sigma(x) = \\frac{1}{1 + e^{-x}}$$
-   Used in neural networks to introduce non-linearity (outputs 0 to 1)
-
-4. **Softmax Function (Multi-class Classification)**
-   $$\\text{softmax}(x_i) = \\frac{e^{x_i}}{\\sum_{j=1}^{n}e^{x_j}}$$
-   Converts logits to probabilities
-
-5. **Cross-Entropy Loss**
-   $$L = -\\sum_{i=1}^{n}y_i\\log(\\hat{y}_i)$$
-   Measures difference between predicted and true probability distributions
-
-6. **Gradient Descent (Weight Update)**
-   $$w_{new} = w_{old} - \\alpha\\frac{\\partial L}{\\partial w}$$
-   Where: α = learning rate, L = loss function
-
-7. **Backpropagation (Chain Rule)**
-   $$\\frac{\\partial L}{\\partial w_1} = \\frac{\\partial L}{\\partial a}\\frac{\\partial a}{\\partial z}\\frac{\\partial z}{\\partial w_1}$$
-   Computes gradients for neural network training
-
-8. **ReLU Activation**
-   $$\\text{ReLU}(x) = \\max(0, x)$$
-   Simple, effective activation function
-
-9. **Euclidean Distance (Similarity)**
-   $$d(p,q) = \\sqrt{\\sum_{i=1}^{n}(p_i - q_i)^2}$$
-   Measures distance between two points
-
-10. **Cosine Similarity**
-    $$\\text{similarity} = \\frac{A \\cdot B}{||A|| \\times ||B||}$$
-    Measures angle between vectors (used in embeddings)
-
-These equations form the mathematical foundation of AI systems like neural networks, deep learning, and machine learning algorithms.
-`
-    return {
-      tokens: tk.tokens,
-      tokenCount: tk.length,
-      semantics: sem,
-      response: aiMathEquations,
-      confidence: 0.85, // High confidence for this specific query
-    }
-  }
-
+  // If no math patterns matched, return null so orchestrator uses other domains
   if (!hasMathKeywords && !hasMathSymbols && !hasNumbers && !hasDigits) {
     return null // Not a mathematics query, let other domains handle it
   }
 
   const calculations: string[] = []
 
+  // Handle "goes into" division questions
   const goesIntoPattern =
     /how\s+many\s+times\s+(?:does\s+|can\s+)?(\w+)\s+goes?\s+into\s+(?:that\s+final\s+number|(\w+))/gi
   const goesIntoMatches = Array.from(input.matchAll(goesIntoPattern))
@@ -273,6 +217,7 @@ These equations form the mathematical foundation of AI systems like neural netwo
     }
   }
 
+  // Try to use ScientificCalculator for complex expressions first
   const expressionMatch = numericInput.match(/(\d+(?:\s*[+\-×x*÷/]\s*\d+)+)/i)
   if (expressionMatch && calculations.length === 0) {
     try {
@@ -292,6 +237,7 @@ These equations form the mathematical foundation of AI systems like neural netwo
   }
 
   if (calculations.length === 0) {
+    // Chained multiplication
     const chainedMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)(?:\s*[×x*]\s*(\d+))+/gi))
     for (const match of chainedMultMatches) {
       const fullMatch = match[0]
@@ -310,6 +256,7 @@ These equations form the mathematical foundation of AI systems like neural netwo
       }
     }
 
+    // Addition with multiplication (order of operations)
     const addMultMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)(?!\s*[+×x*])/gi))
     for (const match of addMultMatches) {
       const [, num1, num2, num3] = match
@@ -322,6 +269,7 @@ These equations form the mathematical foundation of AI systems like neural netwo
       )
     }
 
+    // Simple multiplication
     const simpleMultiplyMatches = Array.from(numericInput.matchAll(/(\d+)\s*[×x*]\s*(\d+)(?!\s*[×x*])/gi))
     for (const match of simpleMultiplyMatches) {
       const [, num1, num2] = match
@@ -331,6 +279,7 @@ These equations form the mathematical foundation of AI systems like neural netwo
       }
     }
 
+    // Simple addition
     const simpleAddMatches = Array.from(numericInput.matchAll(/(\d+)\s*\+\s*(\d+)(?!\s*[×x*])/gi))
     for (const match of simpleAddMatches) {
       const [, num1, num2] = match
@@ -340,6 +289,7 @@ These equations form the mathematical foundation of AI systems like neural netwo
       }
     }
 
+    // Division
     const divisionMatches = Array.from(numericInput.matchAll(/(\d+)\s*[÷/]\s*(\d+)/gi))
     for (const match of divisionMatches) {
       const [, num1, num2] = match
@@ -353,6 +303,7 @@ These equations form the mathematical foundation of AI systems like neural netwo
       }
     }
 
+    // Power expressions (e.g., "nine times nine nine times" = 9^9)
     const powerPattern = /(\w+)\s+times\s+(\w+)\s+(\w+)\s+times/i
     const powerMatch = input.match(powerPattern)
     if (powerMatch) {
@@ -372,6 +323,7 @@ These equations form the mathematical foundation of AI systems like neural netwo
       }
     }
 
+    // Complex expressions with multiple operations
     const complexAddMultAddMatches = Array.from(
       numericInput.matchAll(/(\d+)\s*\+\s*(\d+)\s*[×x*]\s*(\d+)\s*\+\s*(\d+)/gi),
     )
@@ -389,6 +341,7 @@ These equations form the mathematical foundation of AI systems like neural netwo
     }
   }
 
+  // If we found calculations, return them all
   if (calculations.length > 0) {
     return {
       tokens: tk.tokens,
@@ -399,6 +352,7 @@ These equations form the mathematical foundation of AI systems like neural netwo
     }
   }
 
+  // Default mathematics response - only shown for math-related queries
   return {
     tokens: tk.tokens,
     tokenCount: tk.length,

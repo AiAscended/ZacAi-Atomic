@@ -1,60 +1,43 @@
 /**
  * File: src/ai/orchestration/thinkingTracker.ts
- * Purpose: Manages AI incremental thinking process tracking and events
- * for visualization of detailed reasoning and task/token processing steps.
+ * Purpose: Tracks and records the AI's thinking process during prompt processing
+ * for debugging, testing, and UI display
  *
- * This module cleanly separates reasoning/event tracking from main Orchestrator logic.
- *
- * Depends on: None
- * Used by: src/ai/orchestration/aiOrchestrator.ts, src/ai/orchestration/promptHandler.ts
+ * Dependencies: None
+ * Depended on by: src/ai/orchestration/aiOrchestrator.ts
  */
 
-interface ThinkingStep {
-  step: string // short id or step name
-  description: string // human-readable description
-  timestamp: number // time ms elapsed since process start
-  data?: Record<string, unknown> // additional debugging/context data
+export interface ThinkingStep {
+  step: string
+  description: string
+  timestamp: number
+  data?: Record<string, unknown>
 }
 
 export class ThinkingTracker {
-  private startTime: number
   private steps: ThinkingStep[] = []
+  private startTime = 0
 
-  constructor() {
-    this.startTime = Date.now()
+  public start(): void {
     this.steps = []
+    this.startTime = Date.now()
   }
 
-  /**
-   * Add a thinking step event with optional data.
-   * Records timestamp relative to start.
-   * @param step short id of step
-   * @param description human-readable description
-   * @param data any extra debugging info
-   */
-  addStep(step: string, description: string, data?: Record<string, unknown>) {
-    const now = Date.now()
+  public addStep(step: string, description: string, data?: Record<string, unknown>): void {
     this.steps.push({
       step,
       description,
-      timestamp: now - this.startTime,
+      timestamp: Date.now() - this.startTime,
       data,
     })
   }
 
-  /**
-   * Get the full array of recorded thinking steps.
-   * @returns ThinkingStep[]
-   */
-  getSteps(): ThinkingStep[] {
-    return this.steps
+  public getSteps(): ThinkingStep[] {
+    return [...this.steps]
   }
 
-  /**
-   * Reset thinking tracker to new session.
-   */
-  reset() {
-    this.startTime = Date.now()
+  public clear(): void {
     this.steps = []
+    this.startTime = 0
   }
 }

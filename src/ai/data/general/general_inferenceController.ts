@@ -1,5 +1,4 @@
-import { findSources } from "../url_lookup"
-import { scrapeURL } from "../../shared/tools/webScraper"
+import { searchSources } from "../../shared/tools/urlLookup"
 import { GENERAL_DOMAIN } from "./general_constants"
 
 const stopWords = [
@@ -164,18 +163,9 @@ export const generalRunInference = async (input: string, context?: any) => {
 
       console.log("[v0] Query keywords extracted:", queryKeywords)
 
-      responseText = `Based on general knowledge: `
-
-      // Check if query is about AI/computing
-      if (lowerInput.includes("ai") || lowerInput.includes("computing") || lowerInput.includes("algorithm")) {
-        responseText += `AI (Artificial Intelligence) computing involves using algorithms and mathematical models to enable machines to perform tasks that typically require human intelligence. This includes machine learning, neural networks, natural language processing, and computer vision. AI systems learn from data, identify patterns, and make decisions with minimal human intervention.`
-        confidence = 0.65
-        inferenceSucceeded = true
-      } else {
-        responseText += `regarding ${queryKeywords.slice(0, 3).join(", ")}: `
-        responseText += `Processing query with ${tokens.length} tokens. `
-      }
-
+      responseText = `Based on trained knowledge (confidence: ${(confidence * 100).toFixed(1)}%), `
+      responseText += `regarding ${queryKeywords.slice(0, 3).join(", ")}: `
+      responseText += `Processing query with ${tokens.length} tokens. `
       sources.push("Domain Inference (Trained Weights)")
       inferenceSucceeded = true
     } catch (error) {
@@ -183,7 +173,7 @@ export const generalRunInference = async (input: string, context?: any) => {
     }
   }
 
-  if (!inferenceSucceeded || confidence < 0.4) {
+  if (!inferenceSucceeded) {
     try {
       const queryKeywords = tokens
         .filter((t: string) => {
@@ -193,31 +183,51 @@ export const generalRunInference = async (input: string, context?: any) => {
         .slice(0, 5)
 
       const searchQuery = queryKeywords.join(" ") || input.split(" ").slice(0, 5).join(" ")
-      console.log(`[v0] ${GENERAL_DOMAIN} searching domain sources for:`, searchQuery)
+      console.log("[v0] Searching Wikipedia for:", searchQuery)
 
-      // Get all general domain sources (Wikipedia, Britannica, Stanford Encyclopedia)
-      const domainSources = findSources(GENERAL_DOMAIN)
+      const sourcesFromLookup = await searchSources("general", searchQuery)
 
-      // Let inference decide which source to use based on query
-      for (const source of domainSources) {
-        const searchUrl = source.searchPath
-          ? `${source.url}${source.searchPath}${encodeURIComponent(searchQuery)}`
-          : source.url
+      if (sourcesFromLookup && sourcesFromLookup.length > 0) {
+        // Extract the Wikipedia URL from the response
+        const wikiUrlMatch = sourcesFromLookup[0].match(/https:\/\/en\.wikipedia\.org[^\s)]+/)
+        const wikiUrl = wikiUrlMatch ? wikiUrlMatch[0] : sourcesFromLookup[0]
 
-        console.log(`[v0] ${GENERAL_DOMAIN} trying ${source.name} at: ${searchUrl}`)
+        console.log("[v0] Searching Wikipedia at:", wikiUrl)
 
-        const content = await scrapeURL(searchUrl)
+        try {
+          const response = await fetch(wikiUrl, {
+            method: "GET",
+            headers: { Accept: "text/html" },
+            redirect: "follow",
+          })
 
-        if (content && content.snippet.length > 50) {
-          responseText = content.snippet + `\n\n*Source: [${source.name}](${content.url})*`
-          sources.push(content.url)
-          confidence = Math.max(confidence, 0.65)
-          inferenceSucceeded = true
-          break // Found good content, stop searching
+          if (response.ok) {
+            const html = await response.text()
+            // Extract first paragraph from Wikipedia article
+            const paragraphMatch = html.match(/<p[^>]*>(.*?)<\/p>/s)
+
+            if (paragraphMatch) {
+              const cleanText = paragraphMatch[1]
+                .replace(/<[^>]*>/g, "")
+                .replace(/\[.*?\]/g, "")
+                .replace(/\s+/g, " ")
+                .trim()
+                .substring(0, 500)
+
+              if (cleanText.length > 50) {
+                responseText = cleanText + `\n\n*Source: Wikipedia*`
+                sources.push(wikiUrl)
+                confidence = Math.max(confidence, 0.6) // Boost confidence for successful Wikipedia lookup
+                inferenceSucceeded = true
+              }
+            }
+          }
+        } catch (fetchError) {
+          console.error("[v0] Wikipedia fetch failed:", fetchError)
         }
       }
     } catch (lookupError) {
-      console.error(`[v0] ${GENERAL_DOMAIN} URL lookup failed:`, lookupError)
+      console.error("[v0] URL lookup failed:", lookupError)
     }
   }
 
