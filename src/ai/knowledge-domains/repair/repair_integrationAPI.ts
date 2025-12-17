@@ -5,6 +5,8 @@
  * Provides automated and semi-automated repair capabilities.
  */
 
+import { domainRegistry } from '../domainRegistry';
+import { repairRunInference } from './repair_inferenceController';
 import fs from 'fs/promises';
 import path from 'path';
 
