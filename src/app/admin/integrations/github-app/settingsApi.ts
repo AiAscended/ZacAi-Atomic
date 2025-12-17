@@ -1,33 +1,33 @@
 /**
- * src/app/admin/integrations/github-app/settingsApi.ts
- * API handler for GitHub App settings GET & POST operations.
- * Now only handles appId and privateKey as these are the only required fields.
+ * app/admin/integrations/github-app/settingsApi.ts
+ * API handler for GitHub app settings GET & POST operations.
  */
 
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next"
 
 let storedSettings = {
   appId: process.env.GITHUB_APP_ID ?? "",
-  privateKey: process.env.GITHUB_APP_PRIVATE_KEY ?? "",
-};
+  clientId: process.env.GITHUB_APP_CLIENT_ID ?? "",
+  webhookSecret: process.env.GITHUB_APP_WEBHOOK_SECRET ?? "",
+}
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
-    res.status(200).json(storedSettings);
+    res.status(200).json(storedSettings)
   } else if (req.method === "POST") {
-    const { appId, privateKey } = req.body;
+    const { appId, clientId, webhookSecret } = req.body
 
-    if (!appId || !privateKey) {
-      res.status(400).json({ error: "Missing required fields: appId and privateKey." });
-      return;
+    if (!appId || !clientId || !webhookSecret) {
+      res.status(400).json({ error: "Missing required fields" })
+      return
     }
 
-    storedSettings = { appId, privateKey };
-    // TODO: implement secure persistent storage in production.
+    storedSettings = { appId, clientId, webhookSecret }
+    // TODO: implement secure persistent storage in production
 
-    res.status(200).json(storedSettings);
+    res.status(200).json(storedSettings)
   } else {
-    res.setHeader("Allow", ["GET", "POST"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    res.setHeader("Allow", ["GET", "POST"])
+    res.status(405).end(`Method ${req.method} Not Allowed`)
   }
 }

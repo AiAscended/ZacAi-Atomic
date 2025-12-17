@@ -22,16 +22,14 @@ export function detectLanguage(code: string): string {
 export function formatCode(code: string, options?: { language: string }): string {
   try {
     const parser = options?.language === "typescript" ? "typescript" : "babel"
-    const formatted = prettier.format(code, {
+    return prettier.format(code, {
       parser,
       plugins: [parserTypescript, parserBabel],
       semi: true,
       singleQuote: true,
       tabWidth: 2,
       printWidth: 80,
-    }) as unknown as string
-
-    return formatted
+    })
   } catch (err) {
     // Return unformatted code if error encountered
     return code

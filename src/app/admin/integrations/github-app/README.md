@@ -32,11 +32,11 @@ This project integrates a GitHub App with a Next.js application to allow users t
 
 Create a `.env.local` file in your project root or configure your hosting environment with these variables:
 
-\`\`\`env
+```env
 # GitHub App Credentials
 GITHUB_APP_ID=your_github_app_id_here
 GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nYOUR_PRIVATE_KEY_CONTENT\n-----END RSA PRIVATE KEY-----"
-\`\`\`
+```
 
 - Replace placeholders with your actual GitHub App credentials.
 - Do NOT commit `.env.local` or any secret keys to version control.
@@ -78,7 +78,7 @@ GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nYOUR_PRIVATE_KEY_CONTEN
 
 Sample CI Workflow:
 
-\`\`\`yaml
+```yaml
 name: CI
 
 on:
@@ -111,7 +111,7 @@ jobs:
 
       - name: Build app
         run: npm run build
-\`\`\`
+```
 
 - This workflow does not deploy, only builds and tests. Your deployment can be managed via your platform’s native methods.
 

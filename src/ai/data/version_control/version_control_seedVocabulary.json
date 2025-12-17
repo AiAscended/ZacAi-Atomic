@@ -1,0 +1,30 @@
+{
+  "vocab": [
+    "git",
+    "commit",
+    "branch",
+    "merge",
+    "pull",
+    "push",
+    "clone",
+    "fork",
+    "rebase",
+    "cherry-pick",
+    "stash",
+    "tag",
+    "remote",
+    "origin",
+    "upstream",
+    "HEAD",
+    "master",
+    "main",
+    "develop",
+    "feature",
+    "hotfix",
+    "conflict",
+    "resolve",
+    "diff",
+    "log",
+    "status"
+  ]
+}

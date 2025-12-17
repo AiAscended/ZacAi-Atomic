@@ -1,11 +1,11 @@
 /**
- * File: src/ai/knowledge-domains/internet_search/internet_search_inferenceController.ts
+ * File: src/ai/data/internet_search/internet_search_inferenceController.ts
  * Purpose: Internet search domain inference controller - uses web scraping only (NO API)
  * Depends on:
- *   - src/ai/knowledge-domains/internet_search/internet_search_tokenizer.ts
- *   - src/ai/knowledge-domains/internet_search/internet_search_semanticAnalyzer.ts
- *   - src/ai/knowledge-domains/internet_search/seeds/internet_search_seeds.json
- *   - src/ai/knowledge-domains/internet_search/weights/internet_search_pretrained_weights.json
+ *   - src/ai/data/internet_search/internet_search_tokenizer.ts
+ *   - src/ai/data/internet_search/internet_search_semanticAnalyzer.ts
+ *   - src/ai/data/internet_search/seeds/internet_search_seeds.json
+ *   - src/ai/data/internet_search/weights/internet_search_pretrained_weights.json
  *   - src/ai/data/url_lookup.ts
  *   - src/ai/shared/tools/webScraper.ts
  * Depended on by: src/ai/orchestration/aiOrchestrator.ts
@@ -14,7 +14,8 @@
 
 import { internetSearchTokenizer } from "./internet_search_tokenizer"
 import { internetSearchSemanticAnalyzer } from "./internet_search_semanticAnalyzer"
-import seeds from "./internet_search_seeds/internet_search_seeds.json"
+import pretrainedWeights from "./weights/internet_search_pretrained_weights.json"
+import seeds from "./seeds/internet_search_seeds.json"
 import { findSources } from "../url_lookup"
 import { scrapeURL } from "../../shared/tools/webScraper"
 import { INTERNET_SEARCH_DOMAIN } from "./internet_search_constants"
@@ -30,27 +31,9 @@ interface InferenceContext {
 /**
  * Calculate confidence using pretrained weights and token analysis
  */
-type SearchThresholds = {
-  tokenMatchWeight: number
-  semanticWeight: number
-}
-
-const DEFAULT_THRESHOLDS: SearchThresholds = {
-  tokenMatchWeight: 0.6,
-  semanticWeight: 0.4,
-}
-
-const getThresholds = (): SearchThresholds => {
-  const raw = (seeds as { thresholds?: Partial<SearchThresholds> }).thresholds
-  return {
-    tokenMatchWeight: raw?.tokenMatchWeight ?? DEFAULT_THRESHOLDS.tokenMatchWeight,
-    semanticWeight: raw?.semanticWeight ?? DEFAULT_THRESHOLDS.semanticWeight,
-  }
-}
-
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
-  const vocabulary = (seeds.vocabulary ?? {}) as Record<string, number>
+  const vocabulary = pretrainedWeights.vocabulary as Record<string, number>
 
   let tokenScore = 0
   let matchCount = 0
@@ -68,7 +51,7 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   // Semantic pattern matching
   let semanticScore = 0
-  const patterns = (seeds.patterns ?? []) as Array<{ pattern: string; weight: number }>
+  const patterns = seeds.patterns as Array<{ pattern: string; weight: number }>
 
   for (const patternObj of patterns) {
     if (lowerInput.includes(patternObj.pattern)) {
@@ -79,8 +62,8 @@ function calculateConfidence(tokens: string[], input: string): number {
   semanticScore = Math.min(semanticScore / 2, 1.0)
 
   // Combine scores
-  const thresholds = getThresholds()
-  const finalConfidence = avgTokenScore * thresholds.tokenMatchWeight + semanticScore * thresholds.semanticWeight
+  const thresholds = pretrainedWeights.thresholds
+  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
 
   return Math.min(finalConfidence, 1.0)
 }
@@ -88,7 +71,7 @@ function calculateConfidence(tokens: string[], input: string): number {
 /**
  * Extract search query from user input
  */
-function extractSearchQuery(input: string, _semantics: any): string {
+function extractSearchQuery(input: string, semantics: any): string {
   // Simply clean up the query by removing common prefixes
   const query = input
     .replace(/^(can you |could you |please |would you )/i, "")
@@ -103,7 +86,7 @@ function extractSearchQuery(input: string, _semantics: any): string {
  * Main inference function for internet_search domain
  * NO PRIORITY - inference decides which search engine to use
  */
-export async function internetSearchRunInference(input: string, _context?: InferenceContext): Promise<any> {
+export async function internetSearchRunInference(input: string, context?: InferenceContext): Promise<any> {
   const tokens = internetSearchTokenizer(input).tokens
   const semantics = internetSearchSemanticAnalyzer(input)
 
@@ -189,5 +172,3 @@ export async function internetSearchRunInference(input: string, _context?: Infer
     },
   }
 }
-
-export default internetSearchRunInference;

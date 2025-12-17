@@ -54,9 +54,7 @@ export function shardArray<T>(arr: T[], parts = 2): T[][] {
  * @returns Sharded model with metadata
  */
 export function shardModelLayers<T>(layers: T[], config: ShardConfig): ShardedModel<T> {
-  const { numShards } = config
-  // TODO: Implement balanceLoad feature for uneven load distribution
-  // const balanceLoad = config.balanceLoad;
+  const { numShards, balanceLoad } = config
   const layersPerShard = Math.ceil(layers.length / numShards)
 
   const shards: T[][] = []

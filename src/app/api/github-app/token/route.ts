@@ -9,7 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { generateAppJwt } from "@/ai/ai_utils/github-app-utils/auth";
+import { generateAppJwt } from "@/ai/utils/github-app/auth";
 
 export async function POST(request: NextRequest) {
   const { installationId } = await request.json();

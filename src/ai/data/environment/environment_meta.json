@@ -1,0 +1,13 @@
+{
+  "domain": "environment",
+  "version": "1.0.0",
+  "description": "Environment/DevOps domain for CI/CD, containerization, deployment, and infrastructure management",
+  "capabilities": [
+    "docker_analysis",
+    "kubernetes_config",
+    "cicd_pipelines",
+    "infrastructure_as_code",
+    "deployment_strategies"
+  ],
+  "dependencies": []
+}

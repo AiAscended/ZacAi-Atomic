@@ -7,8 +7,8 @@ import type React from "react"
  */
 
 import type { Metadata } from "next"
-import "@/styles/globals.css"
 import ClientLayout from "./client-layout"
+import "@/src/styles/globals.css"
 
 export const metadata: Metadata = {
   title: "ZacAi Atomic - Hybrid Multi-Domain AI",
@@ -17,12 +17,5 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <head />
-      <body>
-        <ClientLayout>{children}</ClientLayout>
-      </body>
-    </html>
-  )
+  return <ClientLayout>{children}</ClientLayout>
 }

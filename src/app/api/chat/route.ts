@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import { promptHandler } from "@/ai/orchestration/promptHandler"
-import { getDomainRegistry, loadAllDomains } from "@/ai/knowledge-domains"
+import "@/src/ai/data/registerAllDomains"
+import { promptHandler } from "@/src/ai/orchestration/promptHandler"
 
 // Session storage
 const sessions = new Map<string, { history: Array<{ role: string; content: string }> }>()
@@ -9,46 +9,14 @@ function generateSessionId(): string {
   return `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
 
-// Ensure domains are registered before processing any requests
-let domainsReady = false
-async function ensureDomainsReady() {
-  if (domainsReady) return
-
-  // Poll the unified system registry (max ~1 second)
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const snapshot = await getDomainRegistry(attempt > 0)
-    const enabledCount = snapshot.enabledModules.length
-    if (enabledCount > 0) {
-      await loadAllDomains()
-      console.log(`[v0] ✅ ${enabledCount} domains ready (system registry)`)
-      domainsReady = true
-      return
-    }
-    await new Promise(resolve => setTimeout(resolve, 200))
-  }
-
-  console.warn("[v0] ⚠️ Timeout waiting for domains to register via system registry")
-}
-
 export async function POST(request: Request) {
   try {
-    // Wait for domains to be ready
-    await ensureDomainsReady()
-    
     console.log("[v0] API route called")
 
     const body = await request.json()
-    const deducedAction = body.action ?? (typeof body.prompt === "string" || typeof body.message === "string" ? "chat" : undefined)
-    const action = deducedAction ?? "chat"
-    const message = typeof body.message === "string" ? body.message : typeof body.prompt === "string" ? body.prompt : undefined
-    const sessionId = typeof body.sessionId === "string" ? body.sessionId : undefined
+    console.log("[v0] Request body parsed:", { action: body.action, hasMessage: !!body.message })
 
-    console.log("[v0] Request body parsed:", {
-      action,
-      hasMessage: !!message,
-      hasPrompt: typeof body.prompt === "string",
-      sessionId,
-    })
+    const { action, message, sessionId } = body
 
     console.log("[v0] API received action:", action, "sessionId:", sessionId)
 
@@ -74,20 +42,18 @@ export async function POST(request: Request) {
 
       console.log("[v0] Initialized session:", newSessionId, "Total sessions:", sessions.size)
 
-      const snapshot = await getDomainRegistry()
-
       return NextResponse.json({
         sessionId: newSessionId,
-        domainCount: snapshot.enabledModules.length,
+        domainCount: 16,
         status: "ready",
       })
     }
 
     // Handle chat
     if (action === "chat") {
-      if (!message) {
-        console.error("[v0] Invalid message payload", body)
-        return NextResponse.json({ error: "Missing message or prompt" }, { status: 400 })
+      if (!message || typeof message !== "string") {
+        console.error("[v0] Invalid message:", message)
+        return NextResponse.json({ error: "Invalid message" }, { status: 400 })
       }
 
       console.log("[v0] Processing message:", message, "for session:", sessionId)
@@ -124,30 +90,15 @@ export async function POST(request: Request) {
           confidence: response.confidence,
           sources: response.sources || [],
           metadata: response.metadata,
-          contentBlocks: response.contentBlocks, // Include formatted content blocks
         })
       } catch (error) {
-        console.error("[v0] ❌ CRITICAL ERROR in AI processing:", error)
-        console.error("[v0] Error stack:", error instanceof Error ? error.stack : 'No stack trace')
-        console.error("[v0] Error type:", error?.constructor?.name)
-        console.error("[v0] Error message:", error instanceof Error ? error.message : String(error))
-        
-        const errorText = "Sorry, something went wrong while processing your request. Please try again or check the Admin → Errors panel for details."
+        console.error("[v0] Error in AI processing:", error)
         return NextResponse.json({
-          text: errorText,
-          domains: ["general_knowledge"],
+          text: "I'm having trouble processing your request right now. The AI system encountered an error.",
+          domains: ["general"],
           confidence: 0.5,
           sources: [],
           error: String(error),
-          errorDetails: error instanceof Error ? { message: error.message, stack: error.stack } : { raw: String(error) },
-          contentBlocks: {
-            textBlocks: [{ id: "error-1", content: errorText }],
-            codeBlocks: [],
-          },
-          metadata: {
-            thinkingSteps: [],
-            error: String(error),
-          },
         })
       }
     }
