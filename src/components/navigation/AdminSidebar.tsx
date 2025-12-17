@@ -236,9 +236,10 @@ export function AdminSidebar({ isOpen, isExpanded, onExpandToggle, onNavigate, o
     >
       <div className="flex flex-col h-full pb-4">
         {/* Header with close button */}
-        <div className="flex items-center justify-between px-3 py-4 border-b">
-          {isExpanded && <span className="font-semibold text-lg">Menu</span>}
-          <button
+        <div className="h-14 border-b flex items-center justify-end px-3">
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-accent transition-colors ml-auto"
             aria-label="Close menu"

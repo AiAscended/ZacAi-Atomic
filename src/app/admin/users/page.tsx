@@ -1,247 +1,123 @@
 "use client"
 
-/**
- * User Management Page
- * Complete CRUD interface for managing system users
- * Supports admin and system roles for self-awareness features
- */
-
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { UserPlus, Edit2, Trash2, Save, X } from "lucide-react"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/hooks/use-toast"
+import { Switch } from "@/components/ui/switch"
+import { UserPlus, Save, Check, AlertCircle } from "lucide-react"
+import { useTheme } from "next-themes"
 
-type UserRole = "admin" | "user" | "system"
-
-interface User {
-  id: string
-  name: string
+interface UserPreferences {
+  username: string
   email: string
-  role: UserRole
-  createdAt: string
-  updatedAt: string
+  darkMode: boolean
+  showThinking: boolean
+  syntaxHighlight: boolean
 }
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [currentUser, setCurrentUser] = useState<User | null>(null)
-  const [formData, setFormData] = useState<{ name: string; email: string; role: UserRole }>({ 
-    name: "", 
-    email: "", 
-    role: "user" 
+  const { setTheme } = useTheme()
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  
+  const [preferences, setPreferences] = useState<UserPreferences>({
+    username: "admin",
+    email: "admin@zacai.local",
+    darkMode: true,
+    showThinking: true,
+    syntaxHighlight: true,
   })
-  const { toast } = useToast()
 
-  // Load users
-  const loadUsers = useCallback(async () => {
+  useEffect(() => {
+    loadUserPreferences()
+  }, [])
+
+  const loadUserPreferences = async () => {
     try {
       setLoading(true)
-      const response = await fetch("/api/admin/settings/users")
-      const result = await response.json()
-      if (result.success) {
-        setUsers(result.data || [])
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to load users",
-          variant: "destructive",
-        })
+      const response = await fetch('/api/admin/settings/users')
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success && result.data) {
+          // API returns array of users, get the admin user
+          const users = Array.isArray(result.data) ? result.data : [result.data]
+          const adminUser = users.find(u => u.id === 'admin' || u.role === 'admin')
+          
+          if (adminUser && adminUser.preferences) {
+            setPreferences({
+              username: adminUser.name || 'admin',
+              email: adminUser.email || 'admin@zacai.local',
+              darkMode: adminUser.preferences.darkMode ?? true,
+              showThinking: adminUser.preferences.showThinking ?? true,
+              syntaxHighlight: adminUser.preferences.syntaxHighlight ?? true,
+            })
+            setTheme(adminUser.preferences.darkMode ? "dark" : "light")
+          }
+        }
       }
     } catch (err) {
-      console.error("[Users] Load error", err)
-      toast({
-        title: "Error",
-        description: getErrorMessage(error, "Failed to connect to API"),
-        variant: "destructive",
-      })
+      console.error('[User Settings] Load error:', err)
     } finally {
       setLoading(false)
     }
-  }, [toast])
-
-  useEffect(() => {
-    void loadUsers()
-  }, [loadUsers])
-
-  const handleAddUser = async () => {
-    if (!formData.name || !formData.email) {
-      toast({
-        title: "Validation Error",
-        description: "Name and email are required",
-        variant: "destructive",
-      })
-      return
-    }
-
-    try {
-      const response = await fetch("/api/admin/settings/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-      const result = await response.json()
-      
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: "User created successfully",
-        })
-        setIsAddModalOpen(false)
-        setFormData({ name: "", email: "", role: "user" })
-        loadUsers()
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to create user",
-          variant: "destructive",
-        })
-      }
-    } catch (err) {
-      console.error("[Users] Create error", err)
-      toast({
-        title: "Error",
-        description: getErrorMessage(error, "Failed to create user"),
-        variant: "destructive",
-      })
-    }
   }
 
-  const handleEditUser = async () => {
-    if (!currentUser) return
-
+  const saveUserPreferences = async () => {
     try {
-      const response = await fetch("/api/admin/settings/users", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+      setSaving(true)
+      setError(null)
+      setShowSuccess(false)
+      
+      const response = await fetch('/api/admin/settings/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...currentUser,
-          ...formData,
-          updatedAt: new Date().toISOString(),
-        }),
+          id: 'admin',
+          name: preferences.username,
+          email: preferences.email,
+          role: 'admin',
+          preferences: {
+            darkMode: preferences.darkMode,
+            showThinking: preferences.showThinking,
+            syntaxHighlight: preferences.syntaxHighlight,
+          }
+        })
       })
+      
       const result = await response.json()
       
       if (result.success) {
-        toast({
-          title: "Success",
-          description: "User updated successfully",
-        })
-        setIsEditModalOpen(false)
-        setCurrentUser(null)
-        loadUsers()
+        setShowSuccess(true)
+        setTimeout(() => setShowSuccess(false), 3000)
+        
+        // Apply theme change
+        setTheme(preferences.darkMode ? "dark" : "light")
       } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to update user",
-          variant: "destructive",
-        })
+        setError(result.error || 'Failed to save settings')
       }
     } catch (err) {
-      console.error("[Users] Update error", err)
-      toast({
-        title: "Error",
-        description: getErrorMessage(error, "Failed to update user"),
-        variant: "destructive",
-      })
+      setError('Network error saving settings')
+      console.error('[User Settings] Save error:', err)
+    } finally {
+      setSaving(false)
     }
   }
 
-  const handleDeleteUser = async () => {
-    if (!currentUser) return
-
-    try {
-      const response = await fetch(`/api/admin/settings/users?id=${currentUser.id}`, {
-        method: "DELETE",
-      })
-      const result = await response.json()
-      
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: "User deleted successfully",
-        })
-        setIsDeleteModalOpen(false)
-        setCurrentUser(null)
-        loadUsers()
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to delete user",
-          variant: "destructive",
-        })
-      }
-    } catch (err) {
-      console.error("[Users] Delete error", err)
-      toast({
-        title: "Error",
-        description: getErrorMessage(error, "Failed to delete user"),
-        variant: "destructive",
-      })
-    }
-  }
-
-  const openEditModal = (user: User) => {
-    setCurrentUser(user)
-    setFormData({ name: user.name, email: user.email, role: user.role })
-    setIsEditModalOpen(true)
-  }
-
-  const openDeleteModal = (user: User) => {
-    setCurrentUser(user)
-    setIsDeleteModalOpen(true)
-  }
-
-  const getRoleBadgeVariant = (role: string) => {
-    switch (role) {
-      case "admin": return "default"
-      case "system": return "secondary"
-      default: return "outline"
-    }
-  }
-
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case "admin": return "👤"
-      case "system": return "🤖"
-      default: return "👥"
-    }
+  const handleDarkModeToggle = (checked: boolean) => {
+    setPreferences({ ...preferences, darkMode: checked })
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-muted-foreground">Loading users...</div>
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Loading user settings...</p>
+        </div>
       </div>
     )
   }
@@ -261,198 +137,94 @@ export default function UsersPage() {
         </Button>
       </div>
 
-      <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
-                  No users found. Create your first user to get started.
-                </TableCell>
-              </TableRow>
-            ) : (
-              users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Badge variant={getRoleBadgeVariant(user.role)}>
-                      {getRoleIcon(user.role)} {user.role}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => openEditModal(user)}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => openDeleteModal(user)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+      {error && (
+        <Card className="p-4 bg-destructive/10 border-destructive">
+          <div className="flex items-center gap-2 text-destructive">
+            <AlertCircle className="h-5 w-5" />
+            <p>{error}</p>
+          </div>
+        </Card>
+      )}
+
+      {showSuccess && (
+        <Card className="p-4 bg-green-500/10 border-green-500">
+          <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+            <Check className="h-5 w-5" />
+            <p>User settings saved successfully!</p>
+          </div>
+        </Card>
+      )}
+
+      <Card className="p-6">
+        <h2 className="text-xl font-semibold mb-4">User Preferences</h2>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="username">Username</Label>
+            <Input 
+              id="username" 
+              value={preferences.username}
+              onChange={(e) => setPreferences({ ...preferences, username: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input 
+              id="email" 
+              type="email" 
+              value={preferences.email}
+              onChange={(e) => setPreferences({ ...preferences, email: e.target.value })}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Dark Mode</Label>
+              <p className="text-sm text-muted-foreground">Enable dark theme</p>
+            </div>
+            <Switch 
+              checked={preferences.darkMode}
+              onCheckedChange={handleDarkModeToggle}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Show Thinking Process</Label>
+              <p className="text-sm text-muted-foreground">Display AI reasoning steps</p>
+            </div>
+            <Switch 
+              checked={preferences.showThinking}
+              onCheckedChange={(checked) => setPreferences({ ...preferences, showThinking: checked })}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Code Syntax Highlighting</Label>
+              <p className="text-sm text-muted-foreground">Highlight code in responses</p>
+            </div>
+            <Switch 
+              checked={preferences.syntaxHighlight}
+              onCheckedChange={(checked) => setPreferences({ ...preferences, syntaxHighlight: checked })}
+            />
+          </div>
+        </div>
       </Card>
 
-      {/* Add User Modal */}
-      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New User</DialogTitle>
-            <DialogDescription>
-              Create a new user account. Use role &quot;system&quot; for AI self-awareness.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="add-name">Name</Label>
-              <Input
-                id="add-name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Enter user name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="add-email">Email</Label>
-              <Input
-                id="add-email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="user@example.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="add-role">Role</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value: "admin" | "user" | "system") => setFormData({ ...formData, role: value })}
-              >
-                <SelectTrigger id="add-role">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">👥 User</SelectItem>
-                  <SelectItem value="admin">👤 Admin</SelectItem>
-                  <SelectItem value="system">🤖 System</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
-              <X className="h-4 w-4 mr-2" />
-              Cancel
-            </Button>
-            <Button onClick={handleAddUser}>
-              <Save className="h-4 w-4 mr-2" />
-              Create User
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit User Modal */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>
-              Update user information and role
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-name">Name</Label>
-              <Input
-                id="edit-name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-email">Email</Label>
-              <Input
-                id="edit-email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-role">Role</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value: "admin" | "user" | "system") => setFormData({ ...formData, role: value })}
-              >
-                <SelectTrigger id="edit-role">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">👥 User</SelectItem>
-                  <SelectItem value="admin">👤 Admin</SelectItem>
-                  <SelectItem value="system">🤖 System</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
-              <X className="h-4 w-4 mr-2" />
-              Cancel
-            </Button>
-            <Button onClick={handleEditUser}>
-              <Save className="h-4 w-4 mr-2" />
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Confirmation Modal */}
-      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete User</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete user &quot;{currentUser?.name}&quot;? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteUser}>
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete User
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <Button 
+        onClick={saveUserPreferences}
+        disabled={saving}
+        className="flex items-center gap-2"
+      >
+        {saving ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            Saving...
+          </>
+        ) : (
+          <>
+            <Save className="h-4 w-4" />
+            Save User Settings
+          </>
+        )}
+      </Button>
     </div>
   )
 }
