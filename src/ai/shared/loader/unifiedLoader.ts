@@ -118,8 +118,8 @@ export class UnifiedLoader {
       }
       
       if (modulePath) {
-        const importedModule = await import(modulePath);
-        loaded.instance = importedModule.default || importedModule;
+        const module = await import(modulePath);
+        loaded.instance = module.default || module;
       }
       
       loaded.status = "ready";

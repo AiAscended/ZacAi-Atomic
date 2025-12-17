@@ -14,35 +14,22 @@ export const dynamic = "force-dynamic";
 /**
  * GET /api/admin/github-app/settings
  * Returns non-sensitive GitHub App configuration
- * Auto-populates from environment variables if settings store is empty
  */
 export async function GET() {
   try {
     const settings = await settingsStore.getGitHubApp();
     
-    // Auto-populate from environment variables if not set in store
-    // This enables seamless Codespaces integration where secrets are pre-configured
-    const appId = settings.appId || process.env.GITHUB_APP_ID || "";
-    const clientId = settings.clientId || process.env.GITHUB_APP_CLIENT_ID || "";
-    const webhookUrl = settings.webhookUrl || process.env.GITHUB_APP_WEBHOOK_URL || "";
-    
-    // Indicate if credentials are loaded from environment
-    const isAutoPopulated = !settings.appId && !!process.env.GITHUB_APP_ID;
-    
     // Redact sensitive information
     const safeSettings = {
-      appId,
-      clientId,
+      appId: settings.appId,
+      clientId: settings.clientId,
       installations: settings.installations,
-      webhookUrl,
+      webhookUrl: settings.webhookUrl,
       enableAutoCommit: settings.enableAutoCommit,
       enablePRCreation: settings.enablePRCreation,
       enableIssueSync: settings.enableIssueSync,
       defaultBranch: settings.defaultBranch,
       commitMessagePrefix: settings.commitMessagePrefix,
-      isAutoPopulated, // Flag to show in UI
-      hasPrivateKey: !!process.env.GITHUB_APP_PRIVATE_KEY,
-      hasWebhookSecret: !!process.env.GITHUB_APP_WEBHOOK_SECRET,
       // Don't send: webhookSecret, privateKey
     };
 

@@ -24,15 +24,6 @@ export async function readFile(
     ref,
     headers: { authorization: `token ${token}` },
   });
-  
-  // Type guard: ensure we're dealing with a file, not a directory or array
-  if (Array.isArray(response.data)) {
-    throw new Error(`Path ${path} is a directory, not a file`);
-  }
-  if (!('content' in response.data)) {
-    throw new Error(`No content found for ${path}`);
-  }
-  
   return Buffer.from(response.data.content, "base64").toString("utf-8");
 }
 
@@ -86,12 +77,6 @@ export async function getFileSha(
       ref,
       headers: { authorization: `token ${token}` },
     });
-    
-    // Type guard: ensure we're dealing with a file, not a directory or array
-    if (Array.isArray(response.data)) {
-      throw new Error(`Path ${path} is a directory, not a file`);
-    }
-    
     return response.data.sha;
   } catch (error: any) {
     if (error.status === 404) return null;

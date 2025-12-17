@@ -1,70 +1,49 @@
-import type { ModuleManifest } from "../orchestration/system";
-import {
-  getSystemRegistry,
-  rebuildRegistry,
-  getModulesByCategory,
-  getModuleManifest,
-} from "../orchestration/system/systemRegistry";
-import {
-  getAllLoadedSystemModules,
-  getLoadedSystemModule,
-  getReadySystemModules,
-  getSystemLoaderStats,
-  loadCategoryModules,
-  loadSystemModule,
-} from "../orchestration/system/systemLoader";
-import type { LoadedSystemModule } from "../orchestration/system/systemLoader";
-import type { ModuleCategory } from "../orchestration/system/types";
+/**
+ * File: src/ai/knowledge-domains/index.ts
+ * Purpose: Convenience API for domain registry and loading
+ * 
+ * Usage in orchestrator:
+ * import { loadAllDomains, getReadyDomains, getDomain } from "@/ai/knowledge-domains";
+ */
 
-const DOMAIN_CATEGORY: ModuleCategory = "domain";
-
-interface DomainRegistrySnapshot {
-  version: string;
-  lastScanned: string;
-  moduleType: ModuleCategory;
-  modules: Record<string, ModuleManifest>;
-  enabledModules: string[];
-  totalModules: number;
-}
+import { domainScannerConfig } from "./config";
+import { getRegistry, scanAndUpdate } from "../shared/registry/moduleRegistry";
+import { 
+  getLoader, 
+  loadAllModules, 
+  loadModule, 
+  getLoadedModule,
+  getAllLoadedModules,
+  getReadyModules 
+} from "../shared/registry/moduleLoader";
+import type { ModuleRegistry, ModuleManifest } from "../shared/registry/moduleRegistry";
+import type { LoadedModule } from "../shared/registry/moduleLoader";
 
 // ============================================================================
-// Registry APIs (single source of truth)
+// Registry APIs
 // ============================================================================
 
-export async function getDomainRegistry(forceRefresh = false): Promise<DomainRegistrySnapshot> {
-  const registry = await getSystemRegistry(forceRefresh);
-  const modules = registry.modules[DOMAIN_CATEGORY] ?? {};
-  const enabledModules = Object.values(modules)
-    .filter(manifest => manifest.enabled)
-    .map(manifest => manifest.id);
-
-  return {
-    version: registry.version,
-    lastScanned: registry.generatedAt,
-    moduleType: DOMAIN_CATEGORY,
-    modules,
-    enabledModules,
-    totalModules: Object.keys(modules).length,
-  };
+export async function getDomainRegistry(forceRefresh = false): Promise<ModuleRegistry> {
+  return await getRegistry(domainScannerConfig, forceRefresh);
 }
 
-export async function scanDomains(): Promise<ModuleManifest[]> {
-  const registry = await rebuildRegistry();
-  const modules = registry.modules[DOMAIN_CATEGORY] ?? {};
-  return Object.values(modules);
+export async function scanDomains(): Promise<ModuleRegistry> {
+  return await scanAndUpdate(domainScannerConfig);
 }
 
 export async function getEnabledDomains(): Promise<ModuleManifest[]> {
-  return await getModulesByCategory(DOMAIN_CATEGORY, { onlyEnabled: true });
+  const registry = await getDomainRegistry();
+  return registry.enabledModains.map(id => registry.modules[id]).filter(Boolean);
 }
 
 export async function getDomain(domainId: string): Promise<ModuleManifest | null> {
-  return await getModuleManifest(DOMAIN_CATEGORY, domainId);
+  const registry = await getDomainRegistry();
+  return registry.modules[domainId] || null;
 }
 
 export async function isDomainEnabled(domainId: string): Promise<boolean> {
-  const manifest = await getModuleManifest(DOMAIN_CATEGORY, domainId);
-  return Boolean(manifest?.enabled);
+  const registry = await getDomainRegistry();
+  return registry.enabledModules.includes(domainId);
 }
 
 // ============================================================================
@@ -72,33 +51,38 @@ export async function isDomainEnabled(domainId: string): Promise<boolean> {
 // ============================================================================
 
 export async function loadAllDomains(): Promise<void> {
-  await loadCategoryModules(DOMAIN_CATEGORY);
+  await loadAllModules(domainScannerConfig);
 }
 
-export async function loadDomain(domainId: string): Promise<LoadedSystemModule> {
-  return await loadSystemModule(DOMAIN_CATEGORY, domainId);
+export async function loadDomain(domainId: string): Promise<LoadedModule> {
+  return await loadModule(domainScannerConfig, domainId);
 }
 
-export function getLoadedDomain(domainId: string): LoadedSystemModule | null {
-  return getLoadedSystemModule(DOMAIN_CATEGORY, domainId);
+export function getLoadedDomain(domainId: string): LoadedModule | null {
+  return getLoadedModule(domainScannerConfig, domainId);
 }
 
-export function getAllLoadedDomains(): LoadedSystemModule[] {
-  return getAllLoadedSystemModules(DOMAIN_CATEGORY);
+export function getAllLoadedDomains(): LoadedModule[] {
+  return getAllLoadedModules(domainScannerConfig);
 }
 
-export function getReadyDomains(): LoadedSystemModule[] {
-  return getReadySystemModules(DOMAIN_CATEGORY);
+export function getReadyDomains(): LoadedModule[] {
+  return getReadyModules(domainScannerConfig);
 }
 
-export async function reloadDomain(domainId: string): Promise<LoadedSystemModule> {
-  return await loadSystemModule(DOMAIN_CATEGORY, domainId, { forceReload: true, forceRefresh: true });
+export async function reloadDomain(domainId: string): Promise<LoadedModule> {
+  const loader = getLoader(domainScannerConfig);
+  return await loader.reload(domainId);
 }
 
 export function getDomainLoaderStats() {
-  return getSystemLoaderStats();
+  const loader = getLoader(domainScannerConfig);
+  return loader.getStats();
 }
 
-export type DomainManifest = ModuleManifest;
-export type DomainRegistry = DomainRegistrySnapshot;
-export type LoadedDomain = LoadedSystemModule;
+// ============================================================================
+// Type Exports
+// ============================================================================
+
+export type { ModuleManifest as DomainManifest, ModuleRegistry as DomainRegistry };
+export type { LoadedModule as LoadedDomain };
