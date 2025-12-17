@@ -6,12 +6,12 @@
  * 
  * Integration:
  * - Called by: mainOrchestrator.ts
- * - Uses: domainRegistry, keyword matching, intent classification
+ * - Uses: system registry, keyword matching, intent classification
  * - Returns: List of domain names to query
  */
 
 import { logger } from "./logger"
-import { listDomains, getDomain } from "../knowledge-domains/domainRegistry"
+import { getEnabledDomains } from "../knowledge-domains"
 
 export interface DomainRoutingCriteria {
   keywords: string[]
@@ -274,13 +274,13 @@ export class DomainRouter {
   /**
    * Route request to appropriate domains
    */
-  public route(criteria: DomainRoutingCriteria): RoutedDomain[] {
+  public async route(criteria: DomainRoutingCriteria): Promise<RoutedDomain[]> {
     const routedDomains: RoutedDomain[] = []
 
     logger.info("DomainRouter", "Routing to domains", { criteria })
 
     // Get all available domains from registry
-    const availableDomains = listDomains()
+    const availableDomains = (await getEnabledDomains()).map((domain) => domain.id)
 
     // Score each domain based on keyword matches
     for (const domainName of availableDomains) {

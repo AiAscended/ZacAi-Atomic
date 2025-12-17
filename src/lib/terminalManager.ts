@@ -4,9 +4,10 @@
  * Features: Spawn bash shells, manage WebSocket connections, cleanup on disconnect
  */
 
-import { Server as WebSocketServer, WebSocket } from 'ws';
-import * as pty from 'node-pty';
-import { logEvent } from './systemActivityLogger';
+import type { IncomingMessage, Server as HTTPServer } from "http"
+import WebSocket, { WebSocketServer } from "ws"
+import * as pty from "node-pty"
+import { logEvent } from "./systemActivityLogger.cjs"
 
 export interface TerminalSession {
   id: string;
@@ -14,32 +15,37 @@ export interface TerminalSession {
   ws: WebSocket;
   userId?: string;
   created: Date;
+  isClosed: boolean;
 }
+
+type TerminalMessage =
+  | { type: "input"; data: string }
+  | { type: "resize"; cols?: number; rows?: number }
 
 class TerminalManager {
   private sessions: Map<string, TerminalSession> = new Map();
   private wss: WebSocketServer | null = null;
 
-  initialize(server: any) {
-    this.wss = new WebSocketServer({ 
+  initialize(server: HTTPServer) {
+    this.wss = new WebSocketServer({
       server,
-      path: '/api/admin/dev-console/terminal'
+      path: "/api/admin/dev-console/terminal",
     });
 
-    this.wss.on('connection', this.handleConnection.bind(this));
+    this.wss.on("connection", this.handleConnection.bind(this));
     
-    logEvent('terminal_manager.initialized', {
-      path: '/api/admin/dev-console/terminal'
+    logEvent("terminal_manager.initialized", {
+      path: "/api/admin/dev-console/terminal"
     });
   }
 
-  private handleConnection(ws: WebSocket, request: any) {
+  private handleConnection(ws: WebSocket, request: IncomingMessage) {
     const sessionId = this.generateSessionId();
     
     // TODO: Extract user from request/session
-    const userId = 'admin'; // Placeholder
+    const userId = "admin"; // Placeholder
 
-    logEvent('terminal_manager.connection_opened', {
+    logEvent("terminal_manager.connection_opened", {
       sessionId,
       userId,
       ip: request.socket.remoteAddress,
@@ -47,18 +53,18 @@ class TerminalManager {
 
     try {
       // Get shell and working directory
-      const shell = process.env.SHELL || 'bash';
+      const shell = process.env.SHELL || "bash";
       const cwd = process.env.ZACAI_CODE_ROOT || process.cwd();
 
       // Spawn PTY
       const ptyProcess = pty.spawn(shell, [], {
-        name: 'xterm-256color',
+        name: "xterm-256color",
         cols: 80,
         rows: 24,
         cwd,
         env: {
           ...process.env,
-          TERM: 'xterm-256color',
+          TERM: "xterm-256color",
         },
       });
 
@@ -68,23 +74,25 @@ class TerminalManager {
         ws,
         userId,
         created: new Date(),
+        isClosed: false,
       };
 
       this.sessions.set(sessionId, session);
 
       // Send session ID to client
-      ws.send(JSON.stringify({ type: 'session_id', id: sessionId }));
+      ws.send(JSON.stringify({ type: "session_id", id: sessionId }));
 
       // Forward PTY output to WebSocket
       ptyProcess.onData((data: string) => {
         if (ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ type: 'output', data }));
+          ws.send(JSON.stringify({ type: "output", data }));
         }
       });
 
       // Handle PTY exit
       ptyProcess.onExit(({ exitCode, signal }) => {
-        logEvent('terminal_manager.pty_exited', {
+        session.isClosed = true;
+        logEvent("terminal_manager.pty_exited", {
           sessionId,
           exitCode,
           signal,
@@ -92,7 +100,7 @@ class TerminalManager {
         
         if (ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify({ 
-            type: 'exit', 
+            type: "exit", 
             exitCode, 
             signal 
           }));
@@ -103,29 +111,32 @@ class TerminalManager {
       });
 
       // Handle WebSocket messages (stdin)
-      ws.on('message', (message: Buffer) => {
+      ws.on("message", (message: WebSocket.RawData) => {
         try {
-          const data = JSON.parse(message.toString());
-          
-          if (data.type === 'input') {
+          const data = JSON.parse(message.toString()) as Partial<TerminalMessage>;
+
+          if (data.type === "input" && typeof data.data === "string") {
             ptyProcess.write(data.data);
-          } else if (data.type === 'resize') {
-            ptyProcess.resize(data.cols || 80, data.rows || 24);
+          } else if (data.type === "resize") {
+            const cols = typeof data.cols === "number" ? data.cols : 80;
+            const rows = typeof data.rows === "number" ? data.rows : 24;
+            ptyProcess.resize(cols, rows);
           }
         } catch (error) {
-          console.error('[TerminalManager] Error handling message:', error);
+          console.error("[TerminalManager] Error handling message:", error);
         }
       });
 
       // Handle WebSocket close
-      ws.on('close', () => {
-        logEvent('terminal_manager.connection_closed', {
+      ws.on("close", () => {
+        logEvent("terminal_manager.connection_closed", {
           sessionId,
           userId,
         });
         
         // Kill PTY if still running
-        if (!ptyProcess.killed) {
+        if (!session.isClosed) {
+          session.isClosed = true;
           ptyProcess.kill();
         }
         
@@ -133,31 +144,33 @@ class TerminalManager {
       });
 
       // Handle WebSocket errors
-      ws.on('error', (error) => {
-        console.error('[TerminalManager] WebSocket error:', error);
-        logEvent('terminal_manager.websocket_error', {
+      ws.on("error", (error: Error) => {
+        console.error("[TerminalManager] WebSocket error:", error);
+        logEvent("terminal_manager.websocket_error", {
           sessionId,
           error: error.message,
         });
       });
 
     } catch (error) {
-      console.error('[TerminalManager] Error spawning terminal:', error);
+      console.error("[TerminalManager] Error spawning terminal:", error);
       
-      logEvent('terminal_manager.spawn_error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+      logEvent("terminal_manager.spawn_error", {
+        error: error instanceof Error ? error.message : "Unknown error",
       });
 
-      ws.send(JSON.stringify({ 
-        type: 'error', 
-        message: 'Failed to spawn terminal' 
-      }));
-      ws.close();
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ 
+          type: "error", 
+          message: "Failed to spawn terminal" 
+        }));
+        ws.close();
+      }
     }
   }
 
   private generateSessionId(): string {
-    return `term-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `term-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
   }
 
   getSession(sessionId: string): TerminalSession | undefined {
@@ -175,7 +188,8 @@ class TerminalManager {
       return false;
     }
 
-    if (!session.pty.killed) {
+    if (!session.isClosed) {
+      session.isClosed = true;
       session.pty.kill();
     }
 
@@ -185,7 +199,7 @@ class TerminalManager {
 
     this.sessions.delete(sessionId);
 
-    logEvent('terminal_manager.session_closed', {
+    logEvent("terminal_manager.session_closed", {
       sessionId,
       userId: session.userId,
     });
@@ -194,8 +208,10 @@ class TerminalManager {
   }
 
   cleanup() {
+    const openSessions = this.sessions.size;
+
     // Close all sessions
-    for (const [sessionId, session] of this.sessions.entries()) {
+    for (const sessionId of Array.from(this.sessions.keys())) {
       this.closeSession(sessionId);
     }
 
@@ -205,8 +221,8 @@ class TerminalManager {
       this.wss = null;
     }
 
-    logEvent('terminal_manager.cleaned_up', {
-      sessionsClosed: this.sessions.size,
+    logEvent("terminal_manager.cleaned_up", {
+      sessionsClosed: openSessions,
     });
   }
 }

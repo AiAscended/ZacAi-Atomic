@@ -22,11 +22,11 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "scan": "node scripts/scan-ai-modules.js",
-    "scan:models": "node scripts/scan-models.js",
-    "scan:domains": "node scripts/scan-domains.js",
+    "scan": "tsx scripts/scan-ai-modules.js",
+    "scan:models": "tsx scripts/scan-models.js",
+    "scan:domains": "tsx scripts/scan-domains.js",
     "scan:all": "npm run scan:models && npm run scan:domains",
-    "scan:unified": "node scripts/scan-ai-modules.js"
+    "scan:unified": "tsx scripts/scan-ai-modules.js"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.8.0-rc.2",
@@ -60,10 +60,12 @@
     "@radix-ui/react-toggle": "^1.1.1",
     "@radix-ui/react-toggle-group": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.6",
+    "@supabase/supabase-js": "^2.45.0",
     "@vercel/analytics": "^1.4.1",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/addon-web-links": "^0.11.0",
     "@xterm/xterm": "^5.5.0",
+    "chokidar": "^3.6.0",
     "ci": "^2.3.0",
     "cinp": "^1.1.6",
     "class-variance-authority": "^0.7.1",

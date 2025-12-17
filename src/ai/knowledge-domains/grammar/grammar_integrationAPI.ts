@@ -8,7 +8,6 @@
 
 import path from 'path'
 
-import { domainRegistry } from '../domainRegistry'
 import { GRAMMAR_DOMAIN } from "./grammar_constants"
 import { loadGrammarSeedVocabulary } from "./grammar_vocabularyManager"
 import { grammarRunInference } from "./grammar_inferenceController"
@@ -20,17 +19,6 @@ const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DO
 export const grammarInit = async () => {
   await loadGrammarSeedVocabulary()
 
-  domainRegistry.registerDomain({
-  name: GRAMMAR_DOMAIN,
-  displayName: 'Grammar',
-  description: 'Grammar rules, syntax analysis, and language structure',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
 }
 
 void grammarInit()

@@ -16,7 +16,7 @@ const EMBEDDING_DIM = 128
  * Returns: 128-dimensional vector or random fallback
  */
 export const getDataStructuresEmbedding = (token: string): number[] => {
-  const weights = pretrained.seedWeights as Record<string, number[]>
+  const weights = (pretrained as { seedWeights?: Record<string, number[]> }).seedWeights ?? {}
   if (weights[token]) return weights[token]
   // Fallback: random embedding
   return Array.from({ length: EMBEDDING_DIM }, () => Math.random() * 0.1 - 0.05)

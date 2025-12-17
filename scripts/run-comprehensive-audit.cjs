@@ -186,11 +186,11 @@ async function phase4_fileSystem() {
   let total = 0;
 
   const requiredPaths = [
-    { path: 'data/settings', type: 'dir', desc: 'Settings directory' },
-    { path: 'data/settings/system.json', type: 'file', desc: 'System settings' },
-    { path: 'data/settings/domains.json', type: 'file', desc: 'Domain settings' },
-    { path: 'data/settings/models.json', type: 'file', desc: 'Model settings' },
-    { path: 'data/settings/users.json', type: 'file', desc: 'Users data' },
+    { path: 'src/ai/data/settings', type: 'dir', desc: 'Settings directory' },
+    { path: 'src/ai/data/settings/system.json', type: 'file', desc: 'System settings' },
+    { path: 'src/ai/data/settings/domains.json', type: 'file', desc: 'Domain settings' },
+    { path: 'src/ai/data/settings/models.json', type: 'file', desc: 'Model settings' },
+    { path: 'src/ai/data/settings/users.json', type: 'file', desc: 'Users data' },
     { path: 'src/ai/orchestration/mainOrchestrator.ts', type: 'file', desc: 'Main orchestrator' },
     { path: 'src/app/api/chat/route.ts', type: 'file', desc: 'Chat API' },
     { path: 'src/app/api/chat-history/route.ts', type: 'file', desc: 'Chat history API' },

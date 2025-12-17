@@ -8,7 +8,6 @@
 
 import path from 'path'
 
-import { domainRegistry } from '../domainRegistry'
 import { REACT_DOMAIN } from "./react_constants"
 import { loadReactSeedVocabulary } from "./react_vocabularyManager"
 import { reactRunInference } from "./react_inferenceController"
@@ -20,17 +19,6 @@ const DOMAIN_DIR = path.join(process.cwd(), 'src', 'ai', 'knowledge-domains', DO
 export const reactInit = async () => {
   await loadReactSeedVocabulary()
 
-  domainRegistry.registerDomain({
-  name: REACT_DOMAIN,
-  displayName: 'React',
-  description: 'React framework, hooks, components, and state management',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
 }
 
 // Auto-initialize when imported

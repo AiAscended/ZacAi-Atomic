@@ -24,6 +24,7 @@ import {
   MessageSquare,
   X,
   Terminal,
+  Sparkles,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -80,6 +81,12 @@ const menuItems: MenuItem[] = [
     label: "AI Models",
     icon: Brain,
     path: "/admin/models",
+  },
+  {
+    id: "hco",
+    label: "Hybrid HCO",
+    icon: Sparkles,
+    path: "/admin/orchestrator",
   },
   {
     id: "training-pipelines",

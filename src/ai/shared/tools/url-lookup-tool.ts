@@ -172,7 +172,7 @@ export class URLLookupTool {
    * Sort sources by priority and preferred source
    */
   private getSortedSources(config: DomainURLConfig, preferredSource?: string): URLSource[] {
-    let sources = [...config.sources];
+    const sources = [...config.sources];
     
     // Move preferred source to front
     if (preferredSource) {

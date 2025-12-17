@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  hco-workers:
+    image: node:20-bullseye
+    container_name: zacai-hco-workers
+    working_dir: /app
+    command: bash -c "npm install && npm run dev"
+    volumes:
+      - ..:/app
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - GPU_WORKERS=${GPU_WORKERS:-4}
+      - HAPPINESS_THRESHOLD=${HAPPINESS_THRESHOLD:-1.5}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 4
+              capabilities: [gpu]
+    runtime: nvidia

@@ -1,4 +1,4 @@
-# ZacAi-Hybrid-LLM v0.0.2
+# ZacAi-Hybrid-LLM v0.0.5
 
 **Advanced Hybrid AI System with Knowledge Domains, Memory Management, and Learning Capabilities**
 
@@ -6,7 +6,7 @@
 
 ## 🚀 Overview
 
-ZacAi-Hybrid-LLM v0.0.2 is a comprehensive AI orchestration system built with Next.js 15.5.6 and TypeScript. It combines traditional neural network approaches with knowledge-based reasoning, featuring a unique hybrid architecture that mimics human cognition.
+ZacAi-Hybrid-LLM v0.0.5 is a comprehensive AI orchestration system built with Next.js 15.5.6 and TypeScript. It combines traditional neural network approaches with knowledge-based reasoning, featuring a unique hybrid architecture that mimics human cognition.
 
 ### Key Features
 
@@ -18,6 +18,21 @@ ZacAi-Hybrid-LLM v0.0.2 is a comprehensive AI orchestration system built with Ne
 - ✅ **Date-Stamped Training** - Automated weight versioning with training run timestamps
 - ✅ **GitHub Backup Integration** - Automated backup to multiple repository types
 - ✅ **Complete Separation of Concerns** - Every component fully isolated with proper prefixing
+- ✅ **Hybrid Cognitive Orchestrator (HCO) Routing** - Enterprise multi-agent reasoning with admin controls
+- ✅ **Speech Interface Toggle** - Server-side `/api/hco/speech` STT/TTS gateway plus IDE push-to-talk UI
+- ✅ **Live Hybrid Config API** - `/api/hco/config` streams orchestrator routing + speech policies to clients
+
+### Hybrid Cognitive Orchestrator (HCO)
+
+The new [zacai-hco](zacai-hco/README.md) module houses the 7-agent Piaget/Vygotsky reasoning pipeline, Supabase-backed memory store, and deployment assets (Vercel + GPU workers). Phase 1 scaffolding is available now; future phases will wire the orchestrator into the main `src/ai/orchestration/mainOrchestrator.ts`, enable STT/TTS loops, and expose admin toggles for critical reasoning mode.
+
+#### Phase 3 Enterprise Updates (Current)
+
+- **Mainline Integration:** `mainOrchestrator` now routes through the HCO pipeline using admin-tuned strategies, confidence thresholds, and trigger words.
+- **Admin Controls:** `/admin/orchestrator` surfaces hybrid routing, speech, and audit toggles backed by `/api/admin/settings/orchestrator`.
+- **Speech Stack:** `/api/hco/config` exposes live policy plus speech metadata, and `/api/hco/speech` centralizes STT/TTS execution through `speechGateway` with audit-safe redaction.
+- **IDE Experience:** `AIChatPanel` features push-to-talk capture, automatic transcript insertion or sending, reply auto-play, and cached TTS playback tied to admin policies.
+- **Observability Ready:** Each speech call returns trace identifiers for downstream logging, while audit preferences enforce transcript retention windows.
 
 ---
 
@@ -368,8 +383,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 📞 Contact
 
 - **Author:** AiAscended
-- **Repository:** [ZacAi-Hybrid-LLM-v0.0.2](https://github.com/AiAscended/ZacAi-Hybrid-LLM-v0.0.2)
-- **Issues:** [GitHub Issues](https://github.com/AiAscended/ZacAi-Hybrid-LLM-v0.0.2/issues)
+- **Repository:** [ZacAi-Atomic](https://github.com/AiAscended/ZacAi-Atomic)
+- **Issues:** [GitHub Issues](https://github.com/AiAscended/ZacAi-Atomic/issues)
 
 ---
 
@@ -379,4 +394,4 @@ If you find this project useful, please consider giving it a star!
 
 ---
 
-**Built with ❤️ by AiAscended | Version 0.0.2 | Last Updated: November 2, 2025**
+**Built with ❤️ by AiAscended | Version 0.0.5 | Last Updated: December 13, 2025**
