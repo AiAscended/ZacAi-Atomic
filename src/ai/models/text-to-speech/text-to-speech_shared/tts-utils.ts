@@ -18,5 +18,6 @@ export function synthesizePhonemes(payload: ModelPayload): ModelPayload {
 
 export const ttsUtils = { ttsUtility }
 
+const ttsUtils = { ttsUtility }; 
 
 export default ttsUtils;

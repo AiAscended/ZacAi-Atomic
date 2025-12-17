@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import meta from "./typescript_seeds/typescript_meta.json";
-import { TYPESCRIPT_DOMAIN } from "./typescript_constants";
+import meta from "./typescript_seeds/typescript_meta.json"
+import { TYPESCRIPT_DOMAIN } from "./typescript_constants"
 
 export const getDomainMeta = () => ({ ...meta, name: TYPESCRIPT_DOMAIN });

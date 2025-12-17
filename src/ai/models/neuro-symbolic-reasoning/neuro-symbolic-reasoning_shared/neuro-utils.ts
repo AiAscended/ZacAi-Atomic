@@ -4,6 +4,5 @@
 
 export function neuroUtility(): void {}
 
-export const utils = { neuroUtility }
-
+const utils = { neuroUtility }; 
 export default utils;

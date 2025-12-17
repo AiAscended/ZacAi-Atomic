@@ -6,7 +6,7 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import meta from "./environment_seeds/environment_meta.json";
-import { ENVIRONMENT_DOMAIN } from "./environment_constants";
+import meta from "./environment_seeds/environment_meta.json"
+import { ENVIRONMENT_DOMAIN } from "./environment_constants"
 
 export const getDomainMeta = () => ({ ...meta, name: ENVIRONMENT_DOMAIN });

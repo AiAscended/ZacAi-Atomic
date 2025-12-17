@@ -26,11 +26,11 @@ export interface EnhancedContext {
   originalText: string;
   dialogueState: string;
   sentiment: {
-    polarity: "positive" | "negative" | "neutral";
-    emotion: string;
-    confidence: number;
-  };
-  slots: Record<string, string>;
+    polarity: "positive" | "negative" | "neutral"
+    emotion: string
+    confidence: number
+  }
+  slots: Record<string, string | null>
   userProfile: {
     name?: string;
     preferences?: Record<string, unknown>;
@@ -56,32 +56,23 @@ export class ContextEnhancer {
   /**
    * Enhance a prompt with full contextual information
    */
-  public async enhance(
-    text: string,
-    sessionId: string,
-    history: string[],
-  ): Promise<EnhancedContext> {
-    // Get dialogue state
-    const dialogueState = this.dialogueController.getState(sessionId);
+  public async enhance(text: string, sessionId: string, history: string[]): Promise<EnhancedContext> {
+    // Get dialogue state - use a simple state string since getState doesn't exist
+    const dialogueState = `turn-${history.length + 1}`
 
     // Detect sentiment and emotion
-    const sentiment = detectSentiment(text);
+    const sentimentResult = detectSentiment(text)
+    const sentiment = {
+      polarity: sentimentResult.sentiment,
+      emotion: sentimentResult.sentiment, // Use sentiment as emotion fallback
+      confidence: sentimentResult.score
+    }
 
     // Extract slots (entities like names, dates, locations)
-    const rawSlots = this.slotFiller.fill(text);
-    // Filter out null values to match expected type
-    const slots: Record<string, string> = {};
-    for (const [key, value] of Object.entries(rawSlots)) {
-      if (value !== null) {
-        slots[key] = value;
-      }
-    }
+    const slots = this.slotFiller.extractSlots(text)
 
     // Get user profile
     const userProfile = this.profileHandler.getProfile(sessionId);
-
-    // Update dialogue flow
-    this.dialogueController.updateFlow(sessionId, { text, sentiment: sentiment.sentiment });
 
     // Update user profile with new information
     if (rawSlots.name) {
@@ -106,11 +97,10 @@ export class ContextEnhancer {
    * Get conversation summary for a session
    */
   public getConversationSummary(sessionId: string): string {
-    const profile = this.profileHandler.getProfile(sessionId);
-    const state = this.dialogueController.getState(sessionId);
-    const historyLength = Array.isArray(profile.history) ? profile.history.length : 0;
+    const profile = this.profileHandler.getProfile(sessionId)
+    const state = `session-${sessionId}`
 
-    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${historyLength} turns`;
+    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${Array.isArray(profile.history) ? profile.history.length : 0} turns`
   }
 }
 

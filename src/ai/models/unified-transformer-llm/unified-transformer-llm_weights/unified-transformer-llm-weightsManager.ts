@@ -3,9 +3,9 @@
  * Handles saving, loading, and managing model weights for persistence and training
  */
 
-import { promises as fs } from "fs";
-import * as path from "path";
-import type { LLMModelConfig } from "../unified-transformer-llm_config/llm-modelConfig";
+import { promises as fs } from 'fs';
+import * as path from 'path';
+import type { LLMModelConfig } from '../unified-transformer-llm_config/llm-modelConfig';
 
 export interface ModelWeights {
   // Embedding weights

@@ -4,7 +4,6 @@
 
 export function diffusionUtility(): void {}
 
-export const diffusionBundle = { diffusionUtility }
-
+const diffusionBundle = { diffusionUtility }; 
 
 export default diffusionBundle;

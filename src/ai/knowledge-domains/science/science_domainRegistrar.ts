@@ -6,8 +6,8 @@
  * Creator: Vercel v0 Coding Assistant
  */
 
-import meta from "./science_seeds/science_meta.json";
-import { SCIENCE_DOMAIN } from "./science_constants";
+import meta from "./science_seeds/science_meta.json"
+import { SCIENCE_DOMAIN } from "./science_constants"
 
 export const getDomainMeta = () => ({ ...meta, name: SCIENCE_DOMAIN });
 

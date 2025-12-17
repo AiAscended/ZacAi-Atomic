@@ -54,8 +54,8 @@ export class DomainRegistry extends EventEmitter {
     this.domains.set(metadata.name, metadata);
 
     // Index all modules for quick lookup
-    for (const moduleItem of metadata.modules) {
-      this.moduleIndex.set(`${metadata.name}:${moduleItem.name}`, moduleItem);
+    for (const mod of metadata.modules) {
+      this.moduleIndex.set(`${metadata.name}:${mod.name}`, mod)
     }
 
     this.emit("domain:registered", metadata);
@@ -97,10 +97,8 @@ export class DomainRegistry extends EventEmitter {
    * Resolve module dependencies
    */
   resolveDependencies(moduleName: string): ModuleMetadata[] {
-    const moduleItem = Array.from(this.moduleIndex.values()).find(
-      (m) => m.name === moduleName,
-    );
-    if (!moduleItem) return [];
+    const mod = Array.from(this.moduleIndex.values()).find((m) => m.name === moduleName)
+    if (!mod) return []
 
     const resolved: ModuleMetadata[] = [];
     const visited = new Set<string>();
@@ -120,8 +118,8 @@ export class DomainRegistry extends EventEmitter {
       }
     };
 
-    resolve(moduleItem.dependencies);
-    return resolved;
+    resolve(mod.dependencies)
+    return resolved
   }
 
   /**
@@ -245,4 +243,18 @@ export class DomainRegistry extends EventEmitter {
 }
 
 // Singleton instance - the ONLY registry in the system
-export const domainRegistry = new DomainRegistry();
+export const domainRegistry = new DomainRegistry()
+
+/**
+ * Helper function to list all domains
+ */
+export const listDomains = (): DomainMetadata[] => {
+  return domainRegistry.getAllDomains()
+}
+
+/**
+ * Helper function to get a domain by name
+ */
+export const getDomain = (name: string): DomainMetadata | undefined => {
+  return domainRegistry.getDomain(name)
+}

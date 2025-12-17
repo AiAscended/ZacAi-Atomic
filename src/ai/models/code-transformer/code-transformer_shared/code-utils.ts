@@ -4,9 +4,7 @@
 
 import type { ModelPayload } from '../../shared/modelTypes';
 
-export function sanitizeCodeSnippet(payload: ModelPayload): ModelPayload {
-	const snippet = (payload.snippet as string | undefined) ?? '';
-	const sanitized = snippet.trim().replace(/\s+/g, ' ');
+const codeBundle = { codeUtility }; 
 
 	const result = {
 		...payload,

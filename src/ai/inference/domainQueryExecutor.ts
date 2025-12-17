@@ -199,45 +199,39 @@ export class DomainQueryExecutor {
   private async loadDomainInference(domainName: string): Promise<any> {
     try {
       // Try to load domain-specific inference function
-      const moduleItem = await import(
+      const domainModule = await import(
         `../knowledge-domains/${domainName}/${domainName}_inferenceController`
       );
 
       // Try common export patterns (most domains use these)
       // Pattern 1: {domainName}RunInference
-      if (moduleItem[`${domainName}RunInference`]) {
-        return moduleItem[`${domainName}RunInference`];
+      if (domainModule[`${domainName}RunInference`]) {
+        return domainModule[`${domainName}RunInference`];
       }
 
       // Pattern 2: generalRunInference (for general_knowledge)
-      if (
-        domainName === "general_knowledge" &&
-        moduleItem.generalRunInference
-      ) {
-        return moduleItem.generalRunInference;
+      if (domainName === 'general_knowledge' && domainModule.generalRunInference) {
+        return domainModule.generalRunInference;
       }
 
       // Pattern 3: default export
-      if (moduleItem.default) {
-        return moduleItem.default;
+      if (domainModule.default) {
+        return domainModule.default;
       }
 
       // Pattern 4: runInference
-      if (moduleItem.runInference) {
-        return moduleItem.runInference;
+      if (domainModule.runInference) {
+        return domainModule.runInference;
       }
 
       // Pattern 5: infer
-      if (moduleItem.infer) {
-        return moduleItem.infer;
+      if (domainModule.infer) {
+        return domainModule.infer;
       }
 
       // Log available exports for debugging
-      console.log(
-        `[DomainQueryExecutor] Available exports for ${domainName}:`,
-        Object.keys(moduleItem),
-      );
-
+      console.log(`[DomainQueryExecutor] Available exports for ${domainName}:`, Object.keys(domainModule));
+      
       return null;
     } catch (error) {
       diagnostics?.attempts.push({

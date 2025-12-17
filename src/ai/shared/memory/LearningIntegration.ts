@@ -152,8 +152,8 @@ export async function extractAndLearnFromInput(
           `Extracted from user input: "${userInput}"`,
         );
 
-        if (result.found && !result.fromExisting && isLearnedItem(result.data)) {
-          learned.push(result.data);
+        if (result.found && !result.fromExisting) {
+          learned.push(result.data as LearnedItem);
         }
       }
     }

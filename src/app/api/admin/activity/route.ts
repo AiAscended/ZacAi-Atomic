@@ -3,22 +3,20 @@
  * Provides read access to system activity logs
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { readEvents } from "@/lib/systemActivityLogger.cjs";
-import {
-  addSecurityHeaders,
-  generateRequestId,
-} from "@/lib/productionHardening";
+import { NextRequest, NextResponse } from 'next/server';
+// @ts-ignore - CommonJS module
+const activityLogger = require('@/lib/systemActivityLogger.cjs');
+import { addSecurityHeaders, generateRequestId } from '@/lib/productionHardening';
 
 export async function GET(request: NextRequest) {
   const requestId = generateRequestId();
 
   try {
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get("limit") || "100", 10);
-
-    const events = readEvents(Math.min(limit, 1000)); // Cap at 1000 for safety
-
+    const limit = parseInt(searchParams.get('limit') || '100', 10);
+    
+    const events = activityLogger.readEvents(Math.min(limit, 1000)); // Cap at 1000 for safety
+    
     const response = NextResponse.json({
       events,
       count: events.length,
