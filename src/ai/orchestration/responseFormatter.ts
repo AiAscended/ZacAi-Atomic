@@ -49,37 +49,30 @@ export async function formatResponse(rawResponse: string): Promise<FormattedResp
   const languages = new Set<string>()
   const orderedSegments: OrderedSegment[] = []
 
-  const codeBlockRegex = /```([^\n]*)?\n([\s\S]*?)```/g
-  let match: RegExpExecArray | null
-  let lastIndex = 0
-  let textBlockCount = 0
-  let codeBlockCount = 0
-
-  const appendTextBlock = (segment: string) => {
-    const processed = buildTextBlock(segment)
-    if (!processed) {
-      return
-    }
-
-    const block: TextBlock = {
-      id: `text-${textBlockCount++}`,
-      ...processed,
-    }
-
-    textBlocks.push(block)
-    orderedSegments.push({ kind: "text", content: block.content })
-  }
+  // Fixed regex to properly match code blocks with 3 backticks
+  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g
+  let match,
+    lastIndex = 0,
+    blockId = 0
 
   while ((match = codeBlockRegex.exec(rawResponse)) !== null) {
     if (match.index > lastIndex) {
       appendTextBlock(rawResponse.substring(lastIndex, match.index))
     }
 
-    const detectedLanguage = match[1]?.trim()
-    const codeBody = match[2] ?? ""
-    const language = detectedLanguage || detectLanguage(codeBody)
-    const normalizedLanguage = normalizeLanguage(language)
-    const formattedCode = await formatCode(codeBody.trimEnd(), { language: normalizedLanguage })
+    const language = match[1] || detectLanguage(match[2])
+    const code = match[2].trim()
+    
+    // Format code, fallback to original if formatting fails
+    let formattedCode = code
+    try {
+  const formatted = await formatCode(code, { language })
+      if (formatted && typeof formatted === 'string') {
+        formattedCode = formatted
+      }
+    } catch (error) {
+      console.warn('[ResponseFormatter] Code formatting failed, using original:', error)
+    }
 
     languages.add(normalizedLanguage)
     const codeBlock: CodeBlock = {

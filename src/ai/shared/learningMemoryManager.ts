@@ -38,12 +38,12 @@ export interface SessionMemory {
   sessionId: string;
   userId?: string;
   userName?: string;
-  userPreferences?: MetadataRecord;
+  userPreferences?: Record<string, unknown>;
   conversationHistory: ConversationTurn[];
   learnedConcepts: string[]; // IDs of concepts learned in this session
   createdAt: string;
   lastActive: string;
-  metadata: MetadataRecord;
+  metadata: Record<string, unknown>;
 }
 
 export interface ConversationTurn {
@@ -70,15 +70,7 @@ export interface ArchiveEntry {
   originalPath: string;
   archivedAt: string;
   reason: string;
-  metadata: MetadataRecord;
-}
-
-export interface LearningMemoryStats {
-  activeSessions: number;
-  totalSessionFiles: number;
-  totalLearnedConcepts: number;
-  conceptsByDomain: Record<string, number>;
-  archivedFiles: number;
+  metadata: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -520,8 +512,8 @@ export class LearningMemoryManager {
   /**
    * Get statistics
    */
-  async getStatistics(): Promise<LearningMemoryStats> {
-    const stats: LearningMemoryStats = {
+  async getStatistics(): Promise<unknown> {
+    const stats = {
       activeSessions: this.activeSessions.size,
       totalSessionFiles: 0,
       totalLearnedConcepts: 0,

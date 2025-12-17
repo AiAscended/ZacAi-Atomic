@@ -8,11 +8,7 @@ export interface TrainingResult {
   message: string
 }
 
-export type ProgrammingTrainingSample = Record<string, unknown>
-
-export async function programmingRunTrainingEpoch(
-  samples: ProgrammingTrainingSample[],
-): Promise<TrainingResult> {
+export async function programmingRunTrainingEpoch(_samples: unknown[]): Promise<TrainingResult> {
   try {
     await loadProgrammingModelWeights()
     const interactions = getLearnedInteractions()

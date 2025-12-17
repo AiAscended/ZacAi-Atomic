@@ -23,7 +23,7 @@ async function loadSeedData(): Promise<DataIntegrityConcept[]> {
     const files = await fs.readdir(SEEDS_DIR);
     const jsonFiles = files.filter(f => f.endsWith('.json'));
     
-    const allConcepts: DataIntegrityConcept[] = [];
+    const allConcepts: unknown[] = [];
     for (const file of jsonFiles) {
       const filePath = path.join(SEEDS_DIR, file);
       const content = await fs.readFile(filePath, 'utf-8');

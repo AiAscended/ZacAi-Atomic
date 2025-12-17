@@ -49,4 +49,6 @@ const englishEmbeddingExports = {
   persistEnglishWeights,
 };
 
-export default englishEmbeddingExports;
+const english_embeddings_bundle = { getEnglishEmbedding, getEnglishEmbeddingForTokens, persistEnglishWeights };
+
+export default english_embeddings_bundle;

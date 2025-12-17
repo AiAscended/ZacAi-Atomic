@@ -5,11 +5,8 @@
 import type { TrainingBatch } from '../../shared/modelTypes';
 
 export class GANTrainer {
-  train(batch: TrainingBatch): void {
-    const sampleCount = batch.length;
-    const labeledSamples = batch.filter(example => example.target).length;
-
-    console.log('[GANTrainer] Training batch received', { sampleCount, labeledSamples });
+  train(data: unknown): void {
+    console.log('Training generative-adversarial-network...');
   }
 }
 

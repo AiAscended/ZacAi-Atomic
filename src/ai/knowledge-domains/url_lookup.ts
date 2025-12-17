@@ -19,4 +19,6 @@ export const findSources = (domain?: string) => {
 };
 const urlLookupApi = { registerSource, findSources };
 
-export default urlLookupApi;
+const url_lookup_bundle = { registerSource, findSources };
+
+export default url_lookup_bundle;

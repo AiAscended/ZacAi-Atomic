@@ -12,8 +12,19 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { github } from '@/lib/ide/githubIntegration';
+import { github } from '@/ide/githubIntegration';
 import { useToast } from '@/hooks/use-toast';
+
+interface GitHubRepo {
+  id: React.Key;
+  fullName: string;
+  description: string | null;
+  language: string;
+  stars: number;
+  forks: number;
+  owner: string;
+  name: string;
+}
 
 interface GitHubBrowserProps {
   open: boolean;
@@ -25,7 +36,7 @@ type RepoList = Awaited<ReturnType<typeof github.listRepositories>>;
 type GitHubRepository = RepoList extends Array<infer Item> ? Item : never;
 
 export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowserProps) {
-  const [repos, setRepos] = useState<GitHubRepository[]>([]);
+  const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [token, setToken] = useState('');
@@ -82,6 +93,22 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
     }
   };
 
+  const loadRepositories = async () => {
+    setLoading(true);
+    try {
+      const data = await github.listRepositories();
+      setRepos(data as GitHubRepo[]);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to load repositories',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
       void loadRepositories();
@@ -91,7 +118,7 @@ export function GitHubBrowser({ open, onOpenChange, onCloneRepo }: GitHubBrowser
     setLoading(true);
     try {
       const data = await github.searchRepositories(searchQuery);
-      setRepos(data as GitHubRepository[]);
+      setRepos(data as GitHubRepo[]);
     } catch (error) {
       console.error('GitHub search failed:', error);
       toast({

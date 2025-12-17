@@ -11,7 +11,7 @@ interface GitHubFile {
   path: string;
   content: string;
   sha: string;
-  type: 'file' | 'dir';
+  type: 'file' | 'dir' | 'symlink' | 'submodule';
 }
 
 type RepoContentItem = {
@@ -92,27 +92,39 @@ class GitHubIntegration {
       ref,
     });
 
-    const contentData = data as RepoContentResponse;
-
-    if (!Array.isArray(contentData)) {
-      // Single file
+    if ('content' in data && !Array.isArray(data)) {
+      // Single file with content
       return [
         {
-          path: contentData.path,
-          content: typeof contentData.content === 'string' ? atob(contentData.content) : '',
-          sha: contentData.sha,
-          type: contentData.type === 'dir' ? 'dir' : 'file',
+          path: data.path,
+          content: atob(data.content),
+          sha: data.sha,
+          type: 'file',
         },
       ];
     }
 
-    // Directory listing
-    return contentData.map((item) => ({
-      path: item.path,
-      content: '',
-      sha: item.sha,
-      type: item.type === 'dir' ? 'dir' : 'file',
-    }));
+    if (Array.isArray(data)) {
+      // Directory listing
+      return data.map((item) => ({
+        path: item.path,
+        content: '',
+        sha: item.sha,
+        type: item.type,
+      }));
+    }
+
+    if (!Array.isArray(data)) {
+        // Handles cases like submodules or files without content property
+        return [{
+            path: data.path,
+            content: '',
+            sha: data.sha,
+            type: data.type,
+        }];
+    }
+
+    return [];
   }
 
   async getFileContent(
@@ -130,14 +142,8 @@ class GitHubIntegration {
       ref,
     });
 
-    const contentData = data as RepoContentResponse;
-
-    if (Array.isArray(contentData)) {
-      throw new Error('Path is a directory, not a file');
-    }
-
-    if (typeof contentData.content !== 'string') {
-      throw new Error('File has no content');
+    if (Array.isArray(data) || !('content' in data)) {
+      throw new Error('Path is a directory or does not have content.');
     }
 
     return atob(contentData.content);
@@ -160,15 +166,22 @@ class GitHubIntegration {
     await vfs.clearAll();
     await vfs.createDirectory(`/${repo}`);
 
+    if (!tree.tree) {
+        console.warn('Repository tree is empty.');
+        return `/${repo}`;
+    }
+
     // Download and create all files
     for (const item of tree.tree) {
+      if (!item.path) continue; // Skip items without a path
+
       if (item.type === 'tree') {
         // Directory
         await vfs.createDirectory(`/${repo}/${item.path}`);
       } else if (item.type === 'blob') {
         // File
         try {
-          const content = await this.getFileContent(owner, repo, item.path!, branch);
+          const content = await this.getFileContent(owner, repo, item.path, branch);
           await vfs.createFile(`/${repo}/${item.path}`, content);
         } catch (error) {
           console.error(`Failed to download file: ${item.path}`, error);
@@ -276,7 +289,7 @@ class GitHubIntegration {
     return data.map((commit) => ({
       sha: commit.sha,
       message: commit.commit.message,
-      author: commit.commit.author?.name,
+      author: commit.commit.author?.name ?? 'Unknown',
       date: commit.commit.author?.date,
       url: commit.html_url,
     }));
@@ -323,7 +336,7 @@ class GitHubIntegration {
       id: repo.id,
       name: repo.name,
       fullName: repo.full_name,
-      owner: repo.owner?.login ?? 'unknown',
+      owner: repo.owner?.login ?? 'Unknown',
       description: repo.description,
       language: repo.language,
       stars: repo.stargazers_count,

@@ -7,17 +7,15 @@
  * - Model settings (all 13 AI models)
  * - User preferences
  * - Training configurations
- *
- * Storage: JSON files in /data/settings/ directory
+ * 
+ * Storage: JSON files in src/ai/data/settings/ directory
  * Future: Migrate to PostgreSQL/MongoDB for production
  */
 
 import * as fs from 'fs'
 import * as path from 'path'
 
-const SETTINGS_DIR = path.join(process.cwd(), 'data', 'settings')
-
-type SerializableValue = string | number | boolean | null | SerializableValue[] | { [key: string]: SerializableValue }
+const SETTINGS_DIR = path.join(process.cwd(), 'src', 'ai', 'data', 'settings');
 
 // Ensure settings directory exists
 if (!fs.existsSync(SETTINGS_DIR)) {
@@ -51,9 +49,9 @@ export interface DomainSettings {
 }
 
 export interface ModelSettings {
-  enabled: boolean
-  type: string
-  parameters: Record<string, SerializableValue>
+  enabled: boolean;
+  type: string;
+  parameters: Record<string, unknown>;
   performance: {
     maxLatency: number
     cacheEnabled: boolean
@@ -62,28 +60,13 @@ export interface ModelSettings {
 }
 
 export interface UserSettings {
-  id: string
-  name: string
-  email: string
-  role: 'admin' | 'user' | 'system'
-  preferences: Record<string, SerializableValue>
-  createdAt: string
-  updatedAt: string
-}
-
-const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
-  systemName: 'ZacAi-Atomic',
-  timezone: 'America/New_York',
-  location: 'United States',
-  maxConcurrentRequests: 10,
-  requestTimeout: 30000,
-  enableLogging: true,
-  logLevel: 'info',
-  theme: 'system',
-  updatedAt: new Date().toISOString(),
-  autoResolveErrors: false,
-  errorRecoveryStrategy: 'self-heal',
-  maxAutoResolveAttempts: 1,
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user' | 'system';
+  preferences: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
 }
 
 class SettingsStore {

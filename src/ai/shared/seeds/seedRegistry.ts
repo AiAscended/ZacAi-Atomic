@@ -18,51 +18,11 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-type SeedExample =
-  | string
-  | {
-      code?: string;
-      example?: string;
-      description?: string;
-      [key: string]: unknown;
-    };
-
-export interface SeedRawEntry {
-  word?: string;
-  concept?: string;
-  term?: string;
-  name?: string;
-  id?: string | number;
-  category?: string;
-  priority?: number;
-  frequency_rank?: number;
-  tags?: string[];
-  synonyms?: string[];
-  relatedConcepts?: string[];
-  definition?: string;
-  description?: string;
-  explanation?: string;
-  examples?: SeedExample[] | SeedExample;
-  example?: SeedExample;
-  related?: string[];
-  [key: string]: unknown;
-}
-
-type SeedFilePayload =
-  | SeedRawEntry[]
-  | {
-      concepts?: SeedRawEntry[];
-      words?: SeedRawEntry[];
-      terms?: SeedRawEntry[];
-      [key: string]: unknown;
-    };
-
-interface SeedRegistryStats {
-  totalEntries: number;
-  totalDomains: number;
-  totalFiles: number;
-  loadedAt: Date | null;
-  loadTimeMs: number;
+function stripJsonComments(content: string): string {
+  return content
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('//'))
+    .join('\n');
 }
 
 /**
@@ -89,7 +49,7 @@ export interface SeedEntry {
   filePath: string;
   
   // Full entry data (loaded on demand)
-  fullData?: SeedRawEntry;
+  fullData?: Record<string, unknown>;
 }
 
 /**
@@ -244,9 +204,30 @@ class SeedRegistryManager {
         fileIdMap.set(jsonFile, fileId);
         
         const filePath = path.join(seedPath, jsonFile);
-        const content = await fs.readFile(filePath, 'utf-8');
-        const data = JSON.parse(content) as SeedFilePayload;
-        const entries = this.extractEntriesFromFile(data);
+        const rawContent = await fs.readFile(filePath, 'utf-8');
+        const content = stripJsonComments(rawContent);
+
+        let data: unknown;
+        try {
+          data = JSON.parse(content);
+        } catch (parseError) {
+          console.warn(`[SeedRegistry] Skipping invalid JSON file ${filePath}:`, parseError);
+          continue;
+        }
+        
+        // Handle different seed formats
+        let entries: unknown[] = [];
+        if (isRecordWithArray(data, 'concepts')) {
+          entries = data.concepts;
+        } else if (isRecordWithArray(data, 'words')) {
+          entries = data.words;
+        } else if (isRecordWithArray(data, 'terms')) {
+          entries = data.terms.map((term) => (typeof term === 'string' ? { term } : term));
+        } else if (isRecordWithArray(data, 'vocabulary')) {
+          entries = data.vocabulary.map((word) => (typeof word === 'string' ? { word } : word));
+        } else if (Array.isArray(data)) {
+          entries = data;
+        }
         
         // Index each entry
         entries.forEach((entry, entryId) => {
@@ -265,8 +246,7 @@ class SeedRegistryManager {
       
     } catch (error) {
       // Domain might not have seeds yet - that's ok
-      const err = error as NodeJS.ErrnoException;
-      if (err?.code !== 'ENOENT') {
+      if ((error as { code: string }).code !== 'ENOENT') {
         console.warn(`[SeedRegistry] Error loading ${domainName} seeds:`, error);
       }
     }
@@ -313,20 +293,21 @@ class SeedRegistryManager {
    * Index a single seed entry
    */
   private indexEntry(
-    entry: SeedRawEntry,
+    entry: unknown,
     domainName: string,
     domainId: number,
     fileId: number,
     entryId: number,
     filePath: string
   ): void {
-    const candidateKeys = this.collectKeyCandidates(entry);
-    if (candidateKeys.length === 0) {
-      return;
-    }
+    if (!isSeedEntryData(entry)) return;
 
-    const registryKey = this.buildRegistryKey(domainName, fileId, entryId);
-
+    // Extract key (word, concept, or term)
+    const key = (entry.word || entry.concept || entry.term || entry.name || entry.id || '').toLowerCase();
+    
+    if (!key) return;  // Skip entries without identifiable key
+    
+    // Create seed entry
     const seedEntry: SeedEntry = {
       domainId,
       fileId,
@@ -344,7 +325,7 @@ class SeedRegistryManager {
           : undefined,
       tags: entry.tags || [],
       filePath,
-      fullData: entry,
+      fullData: entry as Record<string, unknown>
     };
 
     this.entries.set(registryKey, seedEntry);
@@ -655,6 +636,10 @@ class SeedRegistryManager {
   }
 }
 
+function isRecordWithArray<T extends string>(value: unknown, key: T): value is Record<T, unknown[]> {
+  return typeof value === 'object' && value !== null && Array.isArray((value as Record<string, unknown[]>)[key]);
+}
+
 // Singleton instance
 export const seedRegistry = SeedRegistryManager.getInstance();
 
@@ -663,4 +648,23 @@ if (process.env.NODE_ENV !== 'test') {
   seedRegistry.loadAllSeeds().catch(err => 
     console.error('[SeedRegistry] Auto-load failed:', err)
   );
+}
+
+/**
+ * Seed entry data interface and type guard
+ */
+interface SeedEntryData {
+  word?: string;
+  concept?: string;
+  term?: string;
+  name?: string;
+  id?: string;
+  category?: string;
+  priority?: number;
+  frequency_rank?: number;
+  tags?: string[];
+}
+
+function isSeedEntryData(data: unknown): data is SeedEntryData {
+  return typeof data === 'object' && data !== null;
 }

@@ -225,7 +225,7 @@ export class ResultsAggregator {
     return text
       .split(/[.!?]+/)
       .map((s) => s.trim())
-      .filter((s) => s.length > 0)
+      .filter((s) => s.length > 0);
   }
 
   /**

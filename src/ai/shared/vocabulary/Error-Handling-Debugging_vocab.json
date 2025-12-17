@@ -20,7 +20,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Errors are detected and handled to prevent crashes."[2][3][6][7]
+      "notes": "Errors are detected and handled to prevent crashes."
     },
     {
       "priority": 2,
@@ -42,7 +42,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "The term originated from early computer history."[5]
+      "notes": "The term originated from early computer history."
     },
     {
       "priority": 3,
@@ -64,7 +64,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Languages use try-catch or similar constructs."[2][7]
+      "notes": "Languages use try-catch or similar constructs."
     },
     {
       "priority": 4,
@@ -86,7 +86,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Improves software robustness and user experience."[2][7]
+      "notes": "Improves software robustness and user experience."
     },
     {
       "priority": 5,
@@ -174,7 +174,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Structured logging improves automated analysis."[2]
+      "notes": "Structured logging improves automated analysis."
     },
     {
       "priority": 9,
@@ -196,7 +196,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Essential for root cause analysis."[3][5]
+      "notes": "Essential for root cause analysis."
     },
     {
       "priority": 10,
@@ -218,7 +218,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Breakpoints help isolate bugs during development."[1][3]
+      "notes": "Breakpoints help isolate bugs during development."
     },
     {
       "priority": 11,
@@ -240,7 +240,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Most IDEs include built-in debuggers."[1][3][4]
+      "notes": "Most IDEs include built-in debuggers."
     },
     {
       "priority": 12,
@@ -416,7 +416,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Defect removal improves software reliability."[1][3]
+      "notes": "Defect removal improves software reliability."
     },
     {
       "priority": 20,
@@ -438,7 +438,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Reliability is measured by time between failures."[1][3][6]
+      "notes": "Reliability is measured by time between failures."
     },
     {
       "priority": 21,
@@ -460,7 +460,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Regression testing is critical for reliability."[1][3]
+      "notes": "Regression testing is critical for reliability."
     },
     {
       "priority": 22,
@@ -482,7 +482,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Measured as a percentage of statements or branches."[1][3]
+      "notes": "Measured as a percentage of statements or branches."
     },
     {
       "priority": 23,
@@ -504,7 +504,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Unit testing is a best practice for reliability."[1][3]
+      "notes": "Unit testing is a best practice for reliability."
     },
     {
       "priority": 24,
@@ -526,7 +526,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Integration tests increase system reliability."[1][3]
+      "notes": "Integration tests increase system reliability."
     },
     {
       "priority": 25,
@@ -548,7 +548,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "Ensures software meets stakeholder needs."[1][3]
+      "notes": "Ensures software meets stakeholder needs."
     },
     {
       "priority": 26,
@@ -570,7 +570,7 @@
       "image_url_online": "",
       "level": "B2",
       "language": "en",
-      "notes": "System testing is essential for reliability."[1][3]
+      "notes": "System testing is essential for reliability."
     },
     {
       "priority": 27,
@@ -592,7 +592,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Test plans improve process consistency."[1][3]
+      "notes": "Test plans improve process consistency."
     },
     {
       "priority": 28,
@@ -614,7 +614,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Well-designed test cases find more defects."[1][3]
+      "notes": "Well-designed test cases find more defects."
     },
     {
       "priority": 29,
@@ -636,7 +636,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Efficient for large input spaces."[3]
+      "notes": "Efficient for large input spaces."
     },
     {
       "priority": 30,
@@ -658,7 +658,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Used for chaos testing and SRE."[2][8]
+      "notes": "Used for chaos testing and SRE."
     },
     {
       "priority": 31,
@@ -680,7 +680,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Improves preparedness for real-world failures."[2][8]
+      "notes": "Improves preparedness for real-world failures."
     },
     {
       "priority": 32,
@@ -702,7 +702,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Resilience is measured by recovery time and impact."[1][2][8]
+      "notes": "Resilience is measured by recovery time and impact."
     },
     {
       "priority": 33,
@@ -724,7 +724,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "MTBF is a key reliability engineering metric."[1][3][6]
+      "notes": "MTBF is a key reliability engineering metric."
     },
     {
       "priority": 34,
@@ -746,7 +746,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Used as a software reliability indicator."[1]
+      "notes": "Used as a software reliability indicator."
     },
     {
       "priority": 35,
@@ -768,7 +768,7 @@
       "image_url_online": "",
       "level": "C1",
       "language": "en",
-      "notes": "Key aspect of system reliability engineering."[1][3]
+      "notes": "Key aspect of system reliability engineering."
     },
     {
       "priority": 36,
@@ -790,7 +790,7 @@
       "image_url_online": "",
       "level": "C2",
       "language": "en",
-      "notes": "Combines software and hardware reliability practices."[1][2][3][4][5][6][7][8][9]
+      "notes": "Combines software and hardware reliability practices."
     }
   ]
 }

@@ -5,7 +5,12 @@
 
 import { DOMAIN_NAME } from './repair_constants';
 
-type RepairGuidanceType = 'general' | 'debugging' | 'follow_up';
+export const repairRunInference = async (input: string, _context?: unknown) => {
+  const lowerInput = input.toLowerCase();
+  
+  let responseText = '';
+  let confidence = 0.7;
+  const sources: string[] = [];
 
 interface RepairInferenceMetadata {
   matchedKeywords: string[];

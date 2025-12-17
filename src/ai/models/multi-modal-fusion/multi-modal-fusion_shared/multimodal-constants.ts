@@ -4,6 +4,7 @@
 
 export const MULTIMODAL_VERSION = "1.0.0"
 
-const MULTIMODAL_CONSTANTS = { MULTIMODAL_VERSION }
+export const multimodalBundle = { MULTIMODAL_VERSION }
 
-export default MULTIMODAL_CONSTANTS
+
+export default multimodalBundle;

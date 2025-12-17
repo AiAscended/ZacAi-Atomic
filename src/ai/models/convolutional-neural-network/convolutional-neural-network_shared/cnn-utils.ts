@@ -14,3 +14,7 @@ export function normalizeInput(payload: ModelPayload): ModelPayload {
 	return normalized;
 }
 
+export const convolutionalBundle = { cnnUtility }
+
+
+export default convolutionalBundle;

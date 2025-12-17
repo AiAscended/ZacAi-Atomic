@@ -78,7 +78,7 @@ export default function SystemPage() {
   }, [setTheme, theme])
 
   useEffect(() => {
-    loadSettings()
+    void loadSettings()
   }, [loadSettings])
 
   const saveSettings = async () => {

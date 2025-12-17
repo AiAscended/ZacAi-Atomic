@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { VirtualFileSystem } from '@/lib/ide/virtualFileSystem';
+import { VirtualFileSystem } from '@/ide/virtualFileSystem';
 
 describe('VirtualFileSystem', () => {
   let fs: VirtualFileSystem;

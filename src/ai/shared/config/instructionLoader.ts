@@ -58,16 +58,11 @@ export interface InstructionSet {
     rule: string;
     priority: number;
   }>;
-  seeds?: Record<string, unknown>;
-  weights?: Record<string, unknown>;
   tools?: Record<string, unknown>;
-  url_lookup?: Record<string, unknown>;
-  url_lookup_config?: Record<string, unknown>;
   inference?: Record<string, unknown>;
   training?: Record<string, unknown>;
   pipeline?: Record<string, unknown>;
   tokenizer?: Record<string, unknown>;
-  admin_config?: AdminConfig;
   [key: string]: unknown;
 }
 
@@ -97,7 +92,7 @@ export interface BaseTokens {
 // ============================================================================
 
 export class InstructionLoader {
-  private cache: Map<string, CacheEntry<unknown>> = new Map();
+  private cache: Map<string, { data: unknown; timestamp: number }> = new Map();
   private cacheTTL = 300000; // 5 minutes
   
   /**
@@ -210,7 +205,7 @@ export class InstructionLoader {
     moduleId: string,
     filename: string
   ): Promise<unknown | null> {
-    const baseDir = moduleType === "domain"
+    const baseDir = moduleType === "domain" 
       ? "knowledge-domains"
       : moduleType === "model"
       ? "models"
@@ -266,7 +261,7 @@ export class InstructionLoader {
   /**
    * Load YAML file
    */
-  private async loadYAML<T = InstructionSet>(filePath: string): Promise<T | null> {
+  private async loadYAML<T = unknown>(filePath: string): Promise<T | null> {
     // Check cache first
     const cached = this.getFromCache(filePath);
     if (cached) return cached as T;
@@ -288,7 +283,7 @@ export class InstructionLoader {
   /**
    * Load JSON file
    */
-  private async loadJSON<T = Record<string, unknown>>(filePath: string): Promise<T | null> {
+  private async loadJSON<T = unknown>(filePath: string): Promise<T | null> {
     // Check cache first
     const cached = this.getFromCache(filePath);
     if (cached) return cached as T;
@@ -310,7 +305,7 @@ export class InstructionLoader {
   /**
    * Load XML file (basic parsing)
    */
-  private async loadXML(filePath: string): Promise<Record<string, string> | null> {
+  private async loadXML(filePath: string): Promise<unknown | null> {
     // Check cache first
     const cached = this.getFromCache<Record<string, string>>(filePath);
     if (cached) return cached;
@@ -347,8 +342,8 @@ export class InstructionLoader {
   /**
    * Get from cache
    */
-  private getFromCache<T>(key: string): T | null {
-    const cached = this.cache.get(key) as CacheEntry<T> | undefined;
+  private getFromCache(key: string): unknown | null {
+    const cached = this.cache.get(key);
     
     if (!cached) return null;
     
@@ -364,7 +359,7 @@ export class InstructionLoader {
   /**
    * Add to cache
    */
-  private addToCache<T>(key: string, data: T): void {
+  private addToCache(key: string, data: unknown): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
@@ -381,7 +376,7 @@ export class InstructionLoader {
   /**
    * Get instruction field (helper)
    */
-  getInstructionField<T = unknown>(instructions: InstructionSet, fieldPath: string): T | null {
+  getInstructionField(instructions: InstructionSet, fieldPath: string): unknown {
     const parts = fieldPath.split(".");
     let current: unknown = instructions;
     

@@ -23,5 +23,5 @@ export const splitSentences = (text: string): string[] => {
   return text
     .split(/[.!?]+/)
     .map((s) => s.trim())
-    .filter(Boolean)
+    .filter(Boolean);
 }

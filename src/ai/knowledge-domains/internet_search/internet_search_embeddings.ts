@@ -56,10 +56,6 @@ export const persistInternetSearchWeights = (weights: InternetSearchSeedWeights)
   }
 }
 
-const internetSearchEmbeddingExports = {
-  getInternetSearchEmbedding,
-  getInternetSearchEmbeddingForTokens,
-  persistInternetSearchWeights,
-}
+const internet_search_embeddings_bundle = { getInternetSearchEmbedding, persistInternetSearchWeights };
 
-export default internetSearchEmbeddingExports
+export default internet_search_embeddings_bundle;

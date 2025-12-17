@@ -9,24 +9,19 @@ import { LLMDecoder } from '../unified-transformer-llm_model/llm-decoder';
 import { LLMOutputHead } from '../unified-transformer-llm_model/llm-outputHead';
 import type { LLMModelConfig } from '../unified-transformer-llm_config/llm-modelConfig';
 
-type DecoderLayerWeights = ReturnType<LLMDecoder['getLayerWeights']>;
-type OutputHeadWeights = ReturnType<LLMOutputHead['getWeights']>;
-
-interface LLMWeightsMetadata {
-  config: LLMModelConfig;
-  trainedEpochs: number;
-  trainedSteps: number;
-  timestamp: string;
-}
-
-export interface LLMWeightsSnapshot {
-  embeddings: number[][];
-  decoderLayers: DecoderLayerWeights;
-  outputHead: OutputHeadWeights;
-}
-
-export interface LLMWeightsExport extends LLMWeightsSnapshot {
-  metadata: LLMWeightsMetadata;
+export interface LLMLayerWeights {
+  Wq: number[][][];
+  Wk: number[][][];
+  Wv: number[][][];
+  Wo: number[][];
+  W1: number[][];
+  b1: number[];
+  W2: number[][];
+  b2: number[];
+  gamma1: number[];
+  beta1: number[];
+  gamma2: number[];
+  beta2: number[];
 }
 
 export class LLMInferenceEngine {
@@ -216,7 +211,11 @@ export class LLMInferenceEngine {
   /**
    * Load weights into model
    */
-  loadWeights(weights: LLMWeightsSnapshot): void {
+  loadWeights(weights: {
+    embeddings: number[][];
+    decoderLayers: LLMLayerWeights[];
+    outputHead: { W: number[][], b: number[] };
+  }): void {
     this.embedding.setEmbeddings(weights.embeddings);
     this.decoder.setLayerWeights(weights.decoderLayers);
     this.outputHead.setWeights(weights.outputHead);

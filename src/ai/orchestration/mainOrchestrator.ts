@@ -22,6 +22,7 @@
 import { ThinkingTracker } from "./thinkingTracker"
 import { PromptProcessor } from "../input_processing/promptProcessor"
 import { DomainQueryExecutor } from "../inference/domainQueryExecutor"
+import type { DomainQueryResult } from "../inference/domainQueryExecutor"
 import { ResponseSynthesizer } from "../output_generation/responseSynthesizer"
 import { formatResponse } from "./responseFormatter"
 import { tokenManager } from "./tokenManager"
@@ -57,6 +58,17 @@ import {
   initializeAISystem,
   type LoadedModule,
 } from "../shared/loader/unifiedLoader"
+
+// Unified loader + registry access for module health and auto-recovery
+import {
+  initializeAISystem,
+  getUnifiedLoader,
+  type LoadedModule,
+  type UnifiedLoader,
+} from "../shared/loader/unifiedLoader"
+
+// System activity logging for diagnostics
+import { logEvent } from "../../lib/systemActivityLogger"
 
 /**
  * Main Orchestrator Response Interface
@@ -127,13 +139,8 @@ export class MainOrchestrator {
   private llmInferenceEngine: LLMInferenceEngine | null = null
   private llmWeightsManager = new LLMWeightsManager()
   private learningMetricsTracker: LearningMetricsTracker
-  private moduleLoader = getUnifiedLoader()
-  private tokenManager = tokenManager
-  private moduleInventory: ModuleInventorySnapshot = {
-    models: [],
-    domains: [],
-    stats: { totalLoaded: 0, readyModels: 0, readyDomains: 0 },
-  }
+  private moduleLoader: UnifiedLoader
+  private moduleHealthSnapshot: ReturnType<UnifiedLoader["getModulesForOrchestrator"]> | null = null
   
   private initialized: boolean = false
   private availableDomains: string[] = []
@@ -150,6 +157,45 @@ export class MainOrchestrator {
     this.domainQueryExecutor = new DomainQueryExecutor()
     this.responseSynthesizer = new ResponseSynthesizer()
     this.learningMetricsTracker = new LearningMetricsTracker()
+    this.moduleLoader = getUnifiedLoader()
+  }
+
+  private captureModuleHealthSnapshot(phase: string): ReturnType<UnifiedLoader["getModulesForOrchestrator"]> | null {
+    try {
+      const snapshot = this.moduleLoader.getModulesForOrchestrator()
+      this.moduleHealthSnapshot = snapshot
+      logEvent("orchestrator.module_health_snapshot", {
+        phase,
+        stats: snapshot.stats,
+      })
+      return snapshot
+    } catch (error) {
+      logger.info("Failed to capture module health snapshot", { phase, error })
+      return null
+    }
+  }
+
+  private getModuleAlerts(): Array<{
+    id: string
+    displayName: string
+    status: LoadedModule["status"]
+    errorMessage?: string
+    loadedAt: string
+  }> {
+    return this.moduleLoader
+      .getAllLoadedModules()
+      .filter(module => module.status !== "ready")
+      .map(module => ({
+        id: module.manifest.moduleId,
+        displayName: module.manifest.displayName,
+        status: module.status,
+        errorMessage: module.errorMessage,
+        loadedAt: module.loadedAt,
+      }))
+  }
+
+  private genericFailureMessage(): string {
+    return "Sorry something went wrong please try again."
   }
 
   private refreshModuleInventory(): void {
@@ -244,13 +290,37 @@ export class MainOrchestrator {
       this.config = await settingsStore.getOrchestrator()
       logger.info("Orchestrator configuration loaded", { config: this.config })
 
-      // Step 1: Initialize unified loader inventory
-      this.thinkingTracker.addStep("init_module_loader", "Loading unified module registry")
-      try {
-        await initializeAISystem()
-        this.refreshModuleInventory()
-      } catch (loaderError) {
-        logger.warn("Unified loader initialization failed", { error: loaderError })
+      // Step 0.5: Initialize unified loader and refresh module health
+      this.thinkingTracker.addStep("init_unified_loader", "Initializing unified AI modules")
+      await initializeAISystem()
+      this.captureModuleHealthSnapshot("post_loader_init")
+      
+      // Step 1: Initialize LLM
+      this.thinkingTracker.addStep("init_llm", "Initializing Unified Transformer LLM")
+      // Use default LLM config with actual vocabulary size from vocabularyManager
+      const { vocabularyManager } = await import('../shared/vocabulary/vocabularyManager')
+      const actualVocabSize = vocabularyManager.getVocabSize()
+      
+      const llmConfig = {
+        modelType: 'decoder-only' as const,
+        numLayers: 6, // Reduced for smaller vocab
+        numHeads: 8, // Reduced for efficiency
+        hiddenSize: 512, // Aligned with smaller vocab
+        embeddingDim: 512, // Same as hiddenSize
+        hiddenDim: 2048, // 4x hiddenSize (FFN hidden dimension)
+        ffnSize: 2048,
+        vocabSize: actualVocabSize, // Use actual vocabulary size (436 tokens)
+        maxSequenceLength: 512, // Reduced for efficiency
+        batchSize: 16, // Smaller batch for faster inference
+        learningRate: 0.0001,
+        warmupSteps: 1000,
+        maxSteps: 50000,
+        dropoutRate: 0.1,
+        attentionDropout: 0.1,
+        padTokenId: 0,
+        bosTokenId: 1,
+        eosTokenId: 2,
+        unkTokenId: 3,
       }
       
       this.thinkingTracker.addStep("init_llm", "Initializing Unified Transformer LLM")
@@ -317,11 +387,7 @@ export class MainOrchestrator {
       await this.initialize()
     }
 
-    const runtimeContext: OrchestratorRuntimeContext = {
-      ...(_context ?? {}),
-      sessionId,
-      rawPrompt: prompt,
-    }
+    this.captureModuleHealthSnapshot("pre_prompt")
 
     const processingStartTime = Date.now()
     this.thinkingTracker.reset()
@@ -356,7 +422,7 @@ export class MainOrchestrator {
               domains: ['mathematics'],
               confidence: 1.0,
               sources: ['Scientific Calculator'],
-              contentBlocks: await formatResponse(rendered),
+              contentBlocks: await formatResponse(`The result is: ${result.value}${result.steps ? '\n\nCalculation steps:\n' + result.steps.join('\n') : ''}`),
             }
           }
         } catch (error) {
@@ -411,8 +477,9 @@ export class MainOrchestrator {
       // Use parallel inference if enabled in config
       const enableParallel = this.config?.enableParallelInference ?? true
       const domainResults = enableParallel
-        ? await this.queryKnowledgeDomainsParallel(limitedDomains, subtasks, runtimeContext)
-        : await this.queryKnowledgeDomains(limitedDomains, subtasks, runtimeContext)
+        ? await this.queryKnowledgeDomainsParallel(limitedDomains, subtasks)
+        : await this.queryKnowledgeDomains(limitedDomains, subtasks)
+      this.captureModuleHealthSnapshot("post_domain_queries")
       
       logger.info("Domain queries completed", {
         domainsQueried: domainResults.length,
@@ -491,12 +558,25 @@ export class MainOrchestrator {
       // INTELLIGENT FALLBACK HIERARCHY
       // ============================================
       if (!llmSuccess) {
-        console.log("[MainOrchestrator] Primary LLM inference unavailable, invoking fallback synthesizer...")
-        this.thinkingTracker.addStep("orchestrator_reasoning", "Generating best-effort fallback response")
-
-        llmResponse = this.generateFallbackResponse(cleanedPrompt, limitedDomains, domainResults)
-        if (!llmResponse.trim()) {
-          throw new Error("Fallback inference returned an empty response")
+        console.log("[MainOrchestrator] LLM unavailable, using orchestrator reasoning...")
+        this.thinkingTracker.addStep("orchestrator_reasoning", "Orchestrator generating fallback response")
+        
+        // Check what resources are available
+        const hasDomainResponses = domainResults.some(result => result.response && result.response.trim().length > 0)
+        const hasValidDomains = limitedDomains && limitedDomains.length > 0
+        
+        if (hasDomainResponses) {
+          // FALLBACK LEVEL 1: Use domain results to construct response
+          console.log("[MainOrchestrator] Constructing response from domain results...")
+          llmResponse = this.constructDomainBasedResponse(cleanedPrompt, limitedDomains, domainResults)
+        } else if (hasValidDomains) {
+          // FALLBACK LEVEL 2: Explain which domains would handle this, but no results yet
+          console.log("[MainOrchestrator] Domains identified but no results, explaining to user...")
+          llmResponse = this.explainDomainRouting(cleanedPrompt, limitedDomains, domainResults, llmError)
+        } else {
+          // FALLBACK LEVEL 3: Orchestrator reasoning about system state
+          console.log("[MainOrchestrator] No domains or results, analyzing system state...")
+          llmResponse = this.analyzeSystemState(cleanedPrompt, llmError)
         }
 
         logger.warn("LLM fallback engaged", {
@@ -518,7 +598,10 @@ export class MainOrchestrator {
       try {
         synthesizedResponse = this.responseSynthesizer.synthesize({
           llmOutput: llmResponse,
-          domainOutputs: domainResults,
+          domainOutputs: domainResults.map(result => ({
+            domain: result.domain,
+            result: result.response || '',
+          })),
           originalPrompt: prompt,
         })
         console.log("[MainOrchestrator] Synthesis completed, text length:", synthesizedResponse.text.length)
@@ -531,6 +614,53 @@ export class MainOrchestrator {
           metadata: { combinedDomains: [], responseLength: 0 }
         }
       }
+
+      const failureNarrative = this.buildFailureNarrative({
+        prompt: cleanedPrompt,
+        domainResults,
+        candidateDomains: limitedDomains,
+        llmError,
+      })
+
+      let finalResponseText = (synthesizedResponse.text || "").trim()
+      let fallbackApplied = false
+
+      if (!finalResponseText && failureNarrative) {
+        finalResponseText = failureNarrative
+        fallbackApplied = true
+      } else if (!finalResponseText) {
+        finalResponseText = this.genericFailureMessage()
+        fallbackApplied = true
+      } else if (synthesizedResponse.confidence < 0.35 && failureNarrative) {
+        finalResponseText = `${finalResponseText}\n\n---\n${failureNarrative}`
+        fallbackApplied = true
+      }
+
+      if (!finalResponseText.trim()) {
+        finalResponseText = this.genericFailureMessage()
+        fallbackApplied = true
+      }
+
+      let finalConfidence = synthesizedResponse.confidence
+      const hasReliableDomainResponse = domainResults.some(
+        result => result.response && result.response.trim().length > 0 && result.confidence >= 0.5
+      )
+
+      if (fallbackApplied && !llmSuccess && !hasReliableDomainResponse) {
+        finalConfidence = Math.min(finalConfidence, 0.3)
+      }
+
+      if (finalResponseText === this.genericFailureMessage()) {
+        finalConfidence = Math.min(finalConfidence, 0.2)
+      }
+
+      if (fallbackApplied) {
+        logEvent("orchestrator.fallback_applied", {
+          fallbackNarrativeUsed: Boolean(failureNarrative),
+          llmSuccess,
+          domainsAttempted: limitedDomains,
+        })
+      }
       
       // ============================================
       // STEP 6: RESPONSE FORMATTING
@@ -540,14 +670,14 @@ export class MainOrchestrator {
       
       let formattedResponse
       try {
-        formattedResponse = await formatResponse(synthesizedResponse.text)
+        formattedResponse = await formatResponse(finalResponseText)
         console.log("[MainOrchestrator] Formatting completed, blocks:", 
           formattedResponse.textBlocks.length, "text,", 
           formattedResponse.codeBlocks.length, "code")
       } catch (formatError) {
         console.error("[MainOrchestrator] Formatting error:", formatError)
         formattedResponse = {
-          textBlocks: [{ id: "text-1", content: synthesizedResponse.text }],
+          textBlocks: [{ id: "text-1", content: finalResponseText }],
           codeBlocks: []
         }
       }
@@ -575,8 +705,8 @@ export class MainOrchestrator {
       const metrics: InferenceMetrics = {
         prompt,
         preprocessedPrompt: cleanedPrompt,
-        response: synthesizedResponse.text,
-        confidence: synthesizedResponse.confidence,
+        response: finalResponseText,
+        confidence: finalConfidence,
         domains: relevantDomains,
         modelsUsed: this.availableModels,
         processingTime,
@@ -592,29 +722,45 @@ export class MainOrchestrator {
 
       // Record enhanced metrics for system self-awareness and admin dashboard
       enhancedMetricsCollector.recordInference({
-        confidence: synthesizedResponse.confidence,
+        confidence: Math.max(finalConfidence, 0),
         latency: processingTime,
         success: true,
         domain: relevantDomains[0], // Primary domain
         model: llmResponse ? 'unified-transformer-llm' : 'domain-inference',
-        tokensGenerated: outputTokens,
+        tokensGenerated: finalResponseText ? finalResponseText.length : 0,
       })
 
       // ============================================
       // RETURN COMPLETE RESPONSE
       // ============================================
+      const domainDiagnostics = domainResults.map(result => ({
+        domain: result.domain,
+        status: result.status ?? (result.error ? 'error' : 'ready'),
+        confidence: result.confidence,
+        error: result.error,
+        notes: result.diagnostics?.notes,
+        suggestions: result.diagnostics?.suggestions,
+        attempts: result.diagnostics?.attempts,
+      }))
+
+      const moduleSnapshot = this.captureModuleHealthSnapshot("pre_return")
+      const moduleAlerts = this.getModuleAlerts()
+
       return {
-        text: synthesizedResponse.text,
+        text: finalResponseText,
         metadata: {
           thinkingSteps: this.thinkingTracker.getSteps(),
           processingTime,
-          tokensUsed: tokenUsage?.totalTokens ?? 0,
-          modelsInvoked: this.availableModels,
+          tokensUsed: 0, // TODO: Implement token counting
+          modelsInvoked: llmSuccess ? ['unified-transformer-llm'] : [],
           domainsQueried: relevantDomains,
-          tokenUsage: tokenUsage ?? undefined,
+          domainDiagnostics,
+          moduleHealth: moduleSnapshot?.stats,
+          moduleAlerts,
+          fallbackApplied,
         },
         domains: relevantDomains,
-        confidence: synthesizedResponse.confidence,
+        confidence: Math.max(finalConfidence, 0),
         sources: synthesizedResponse.sources || [],
         contentBlocks: {
           textBlocks: formattedResponse.textBlocks,
@@ -790,44 +936,47 @@ export class MainOrchestrator {
    */
   private async queryKnowledgeDomains(
     domains: string[],
-    subtasks: string[],
-    context?: OrchestratorRuntimeContext
-  ): Promise<Array<{ domain: string; result: string; confidence: number }>> {
-    const results: Array<{ domain: string; result: string; confidence: number }> = []
-    
-    // Combine subtasks into single query
+    subtasks: string[]
+  ): Promise<DomainQueryResult[]> {
+    const results: DomainQueryResult[] = []
     const query = subtasks.join(' ')
     const domainTimeoutMs = this.getDomainInferenceTimeoutMs()
 
     for (const domainName of domains) {
       try {
         const domain = domainRegistry.getDomain(domainName)
-        if (domain && domain.enabled) {
-          // Use new domain-specific inference
-          const domainContext = {
-            ...(context ?? {}),
-            subtasks,
-            query,
-            activeDomain: domainName,
-            mode: 'sequential',
+        if (!domain || !domain.enabled) {
+          const disabledResult = await this.domainQueryExecutor.queryDomainsByName([domainName], query)
+          if (disabledResult.length > 0) {
+            results.push(disabledResult[0])
           }
-          const domainResults = await this.domainQueryExecutor.queryDomainsByName(
-            [domainName],
-            query,
-            { parallel: false, timeoutMs: domainTimeoutMs, context: domainContext }
-          )
-          
-          // Lowered threshold from 0.3 to 0.01 for testing - accept all responses
-          if (domainResults.length > 0 && domainResults[0].confidence > 0.01) {
-            results.push({ 
-              domain: domainName, 
-              result: domainResults[0].response || 'No result',
-              confidence: domainResults[0].confidence,
-            })
-          }
+          continue
+        }
+
+        const domainResults = await this.domainQueryExecutor.queryDomainsByName([domainName], query)
+        if (domainResults.length > 0) {
+          results.push(domainResults[0])
         }
       } catch (error) {
         logger.info(`Domain query failed: ${domainName}`, { error })
+        results.push({
+          domain: domainName,
+          response: '',
+          confidence: 0,
+          error: error instanceof Error ? error.message : String(error),
+          diagnostics: {
+            attempts: [
+              {
+                action: 'query_domain',
+                outcome: 'failure',
+                timestamp: Date.now(),
+                detail: error instanceof Error ? error.message : String(error),
+              },
+            ],
+            notes: 'Exception generated while querying domain.',
+          },
+          status: 'error',
+        })
       }
     }
 
@@ -839,35 +988,11 @@ export class MainOrchestrator {
    */
   private async queryKnowledgeDomainsParallel(
     domains: string[],
-    subtasks: string[],
-    context?: OrchestratorRuntimeContext
-  ): Promise<Array<{ domain: string; result: string; confidence: number }>> {
-    // Combine subtasks into single query
+    subtasks: string[]
+  ): Promise<DomainQueryResult[]> {
     const query = subtasks.join(' ')
-    const domainTimeoutMs = this.getDomainInferenceTimeoutMs()
-    const domainContext = {
-      ...(context ?? {}),
-      subtasks,
-      query,
-      requestedDomains: domains,
-      mode: 'parallel',
-    }
-    
-    // Query all domains in parallel
-    const domainResults = await this.domainQueryExecutor.queryDomainsByName(domains, query, {
-      parallel: true,
-      timeoutMs: domainTimeoutMs,
-      context: domainContext,
-    })
-    
-    // Filter and format results (lowered threshold from 0.3 to 0.01 for testing)
+    const domainResults = await this.domainQueryExecutor.queryDomainsByName(domains, query)
     return domainResults
-      .filter(result => result.confidence > 0.01 && !result.error)
-      .map(result => ({
-        domain: result.domain,
-        result: result.response || 'No result',
-        confidence: result.confidence,
-      }))
   }
 
   /**
@@ -1078,15 +1203,59 @@ export class MainOrchestrator {
     domainResults: Array<{ domain: string; result: string; confidence: number }>
   ): string {
     console.log("[Orchestrator Reasoning] Building response from domain results...")
-
-    const ordered = [...domainResults].sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
-    const insightLines = ordered.map((result, index) => {
-      const confidencePct = Math.round((result.confidence ?? 0) * 100)
-      return `${index + 1}. ${result.result} (source: ${result.domain}, confidence: ${confidencePct}%)`
-    })
-
-    if (insightLines.length === 0) {
-      return this.buildHeuristicInference(prompt, domains)
+    
+    // Analyze domain results
+    const highConfidenceResults = domainResults.filter(d => d.confidence > 0.7)
+    const hasUsefulResults = highConfidenceResults.length > 0
+    
+    if (hasUsefulResults) {
+      // Build response from high-confidence domain outputs
+      let response = `Based on analysis from my ${domains.join(', ')} domains:\n\n`
+      
+      for (const result of highConfidenceResults) {
+        response += `**${result.domain}**: ${result.result}\n\n`
+      }
+      
+      // Add code examples for code-related domains
+      const codeDomains = ['react', 'nextjs', 'typescript', 'javascript', 'programming']
+      const hasCodeDomain = domains.some(d => codeDomains.includes(d.toLowerCase()))
+      const isCodeQuestion = prompt.toLowerCase().match(/(write|create|show|example|code|function|component)/i)
+      
+      console.log("[Code Generation Check]", { 
+        domains, 
+        hasCodeDomain, 
+        isCodeQuestion: !!isCodeQuestion,
+        prompt: prompt.substring(0, 50)
+      })
+      
+      if (hasCodeDomain && isCodeQuestion) {
+        const codeExample = this.generateCodeExample(prompt, domains)
+        console.log("[Code Generation] Adding code example, length:", codeExample.length)
+        response += codeExample
+      }
+      
+      response += `\n*Note: My language model is still training, so I'm providing direct domain analysis. Once fully trained, I'll synthesize these insights more naturally.*`
+      
+      return response
+    } else {
+      // Low confidence results - but still try to help
+      let response = `I understand you're asking about: "${prompt}"\n\n`
+      response += `Based on my ${domains.join(', ')} domains:\n\n`
+      
+      for (const result of domainResults) {
+        response += `**${result.domain}**: ${result.result}\n\n`
+      }
+      
+      // Add code examples for code-related questions even with low confidence
+      const codeDomains = ['react', 'nextjs', 'typescript', 'javascript', 'programming']
+      const hasCodeDomain = domains.some(d => codeDomains.includes(d.toLowerCase()))
+      const isCodeQuestion = prompt.toLowerCase().match(/(write|create|show|example|code|function|component)/i)
+      
+      if (hasCodeDomain && isCodeQuestion) {
+        response += this.generateCodeExample(prompt, domains)
+      }
+      
+      return response
     }
 
     return [
@@ -1165,6 +1334,56 @@ export class MainOrchestrator {
     })
   }
   
+  /**
+   * Generate code examples based on prompt and domains
+   */
+  private generateCodeExample(prompt: string, domains: string[]): string {
+    const lowerPrompt = prompt.toLowerCase()
+    
+    // React component examples
+    if (domains.includes('react') && lowerPrompt.match(/component|react/i)) {
+      return `\nHere's a simple React component example:\n\n` +
+        '```jsx\n' +
+        'function HelloWorld() {\n' +
+        '  return (\n' +
+        '    <div className="container">\n' +
+        '      <h1>Hello World!</h1>\n' +
+        '      <p>Welcome to React</p>\n' +
+        '    </div>\n' +
+        '  );\n' +
+        '}\n\n' +
+        'export default HelloWorld;\n' +
+        '```\n\n'
+    }
+    
+    // JavaScript function examples
+    if (lowerPrompt.match(/function|javascript|hello world/i)) {
+      return `\nHere's a simple JavaScript example:\n\n` +
+        '```javascript\n' +
+        'function helloWorld() {\n' +
+        '  console.log("Hello, World!");\n' +
+        '  return "Hello, World!";\n' +
+        '}\n\n' +
+        '// Usage\n' +
+        'helloWorld();\n' +
+        '```\n\n'
+    }
+    
+    // TypeScript examples
+    if (domains.includes('typescript') || lowerPrompt.match(/typescript/i)) {
+      return `\nHere's a TypeScript example:\n\n` +
+        '```typescript\n' +
+        'function greet(name: string): string {\n' +
+        '  return `Hello, ${name}!`;\n' +
+        '}\n\n' +
+        'const message: string = greet("World");\n' +
+        'console.log(message);\n' +
+        '```\n\n'
+    }
+    
+    return ''
+  }
+
   /**
    * Export metrics for training
    */

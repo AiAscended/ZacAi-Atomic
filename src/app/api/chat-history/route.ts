@@ -14,7 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import { promises as fs } from 'fs';
 
-const CHAT_HISTORY_DIR = path.join(process.cwd(), 'data', 'chat-history');
+const CHAT_HISTORY_DIR = path.join(process.cwd(), 'src', 'ai', 'data', 'chat-history');
 
 type ArbitraryRecord = Record<string, unknown>;
 
@@ -151,28 +151,24 @@ async function loadChat(userId: string, chatId: string, folder?: string | null):
   return chat;
 }
 
-async function saveChat(userId: string, chat: ChatHistory) {
-  const filePath = await getChatFilePath(userId, chat.id, chat.folder);
+async function saveChat(userId: string, chat: Record<string, unknown>) {
+  const filePath = await getChatFilePath(userId, chat.id as string, chat.folder as string | null);
   const dirPath = path.dirname(filePath);
   
   await fs.mkdir(dirPath, { recursive: true });
   
-  chat.metadata.updatedAt = new Date().toISOString();
-  chat.metadata.messageCount = chat.messages.length;
+  (chat.metadata as Record<string, unknown>).updatedAt = new Date().toISOString();
+  (chat.metadata as Record<string, unknown>).messageCount = (chat.messages as unknown[]).length;
   
   await fs.writeFile(filePath, JSON.stringify(chat, null, 2), 'utf-8');
 }
 
-async function listChats(userId: string, options: ChatListOptions = {}) {
-  const {
-    folder = null,
-    sortBy = 'lastAccessed',
-    order = 'desc',
-  }: ChatListOptions = options;
+async function listChats(userId: string, options: Record<string, unknown> = {}) {
+  const { folder = null, sortBy = 'lastAccessed', order = 'desc' } = options;
   const userDir = await ensureUserDirectory(userId);
-  const searchDir = folder ? path.join(userDir, folder) : userDir;
+  const searchDir = folder ? path.join(userDir, folder as string) : userDir;
   
-  const chats: ChatSummary[] = [];
+  const chats: Record<string, unknown>[] = [];
   
   try {
     const files = await getAllChatFiles(searchDir);
@@ -180,18 +176,18 @@ async function listChats(userId: string, options: ChatListOptions = {}) {
     for (const filePath of files) {
       try {
         const data = await fs.readFile(filePath, 'utf-8');
-        const chat = JSON.parse(data) as ChatHistory;
+        const chat: Record<string, unknown> = JSON.parse(data);
         
         chats.push({
           id: chat.id,
           title: chat.title,
           folder: chat.folder,
-          messageCount: chat.metadata.messageCount,
-          createdAt: chat.metadata.createdAt,
-          updatedAt: chat.metadata.updatedAt,
-          lastAccessed: chat.metadata.lastAccessed,
-          domains: chat.metadata.domains,
-          preview: chat.messages[chat.messages.length - 1]?.content?.substring(0, 100) || '',
+          messageCount: (chat.metadata as Record<string, unknown>).messageCount,
+          createdAt: (chat.metadata as Record<string, unknown>).createdAt,
+          updatedAt: (chat.metadata as Record<string, unknown>).updatedAt,
+          lastAccessed: (chat.metadata as Record<string, unknown>).lastAccessed,
+          domains: (chat.metadata as Record<string, unknown>).domains,
+          preview: ((chat.messages as Record<string, unknown>[])[(chat.messages as Record<string, unknown>[]).length - 1]?.content as string)?.substring(0, 100) || '',
         });
       } catch (error) {
         console.error('Error loading chat:', filePath, error);
@@ -206,16 +202,9 @@ async function listChats(userId: string, options: ChatListOptions = {}) {
   const sortField: SortField = sortBy ?? 'lastAccessed';
   const sortOrder: SortOrder = order ?? 'desc';
   chats.sort((a, b) => {
-    const aVal = a[sortField];
-    const bVal = b[sortField];
-    if (typeof aVal === 'number' && typeof bVal === 'number') {
-      return sortOrder === 'desc' ? bVal - aVal : aVal - bVal;
-    }
-    const aString = aVal?.toString() ?? '';
-    const bString = bVal?.toString() ?? '';
-    return sortOrder === 'desc'
-      ? bString.localeCompare(aString)
-      : aString.localeCompare(bString);
+    const aVal = a[sortBy as string] as string;
+    const bVal = b[sortBy as string] as string;
+    return order === 'desc' ? (bVal > aVal ? 1 : -1) : (aVal > bVal ? 1 : -1);
   });
   
   return chats;
@@ -231,7 +220,7 @@ async function getAllChatFiles(dir: string): Promise<string[]> {
       const fullPath = path.join(dir, entry.name);
       
       if (entry.isDirectory()) {
-        files.push(...await getAllChatFiles(fullPath));
+        files.push(...(await getAllChatFiles(fullPath)));
       } else if (entry.name.endsWith('.json') && entry.name.startsWith('chat-')) {
         files.push(fullPath);
       }
@@ -269,7 +258,7 @@ export async function GET(request: NextRequest) {
   } catch (error: unknown) {
     console.error('[Chat History API] GET error:', error);
     return NextResponse.json(
-      { success: false, error: getErrorMessage(error) },
+      { success: false, error: (error as Error).message },
       { status: 500 }
     );
   }
@@ -305,7 +294,7 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     console.error('[Chat History API] POST error:', error);
     return NextResponse.json(
-      { success: false, error: getErrorMessage(error) },
+      { success: false, error: (error as Error).message },
       { status: 500 }
     );
   }
@@ -332,21 +321,21 @@ export async function PUT(request: NextRequest) {
           ...payload,
           id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
           timestamp: new Date().toISOString(),
-        } as ChatMessage;
-        chat.messages.push(messageWithMeta);
+        };
+        (chat.messages as unknown[]).push(messageWithMeta);
         
-        const domain = typeof payload.domain === 'string' ? payload.domain : undefined;
-        if (domain && !chat.metadata.domains.includes(domain)) {
-          chat.metadata.domains.push(domain);
+        if (data.domain && !(chat.metadata as { domains: string[] }).domains.includes(data.domain)) {
+          (chat.metadata as { domains: string[] }).domains.push(data.domain);
         }
         break;
       }
       case 'updateTitle': {
         chat.title = body.data.title;
         break;
-      }
-      case 'moveToFolder': {
-        const oldPath = await getChatFilePath(userId, chatId, chat.folder);
+        
+      case 'moveToFolder':
+        // Delete old file
+        const oldPath = await getChatFilePath(userId, chatId, chat.folder as string | null);
         try {
           await fs.unlink(oldPath);
         } catch {
@@ -368,7 +357,7 @@ export async function PUT(request: NextRequest) {
   } catch (error: unknown) {
     console.error('[Chat History API] PUT error:', error);
     return NextResponse.json(
-      { success: false, error: getErrorMessage(error) },
+      { success: false, error: (error as Error).message },
       { status: 500 }
     );
   }
@@ -395,7 +384,7 @@ export async function DELETE(request: NextRequest) {
   } catch (error: unknown) {
     console.error('[Chat History API] DELETE error:', error);
     return NextResponse.json(
-      { success: false, error: getErrorMessage(error) },
+      { success: false, error: (error as Error).message },
       { status: 500 }
     );
   }

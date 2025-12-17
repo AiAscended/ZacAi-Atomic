@@ -2,16 +2,10 @@
  * Graph-neural-network - Weights Utilities
  */
 
-import type { WeightDictionary } from '../../shared/modelTypes';
-
-export function loadWeights(path: string): WeightDictionary {
-  const metadata = {
-    path,
-    loadedAt: Date.now(),
-    checksum: path.length,
-  };
-
-  console.log('[gnn-weights] Loading weights', metadata);
-  return metadata;
+export function loadWeights(path: string): unknown {
+  return {};
 }
 
+const graph_neural_network_weightsUtils_bundle = { loadWeights };
+
+export default graph_neural_network_weightsUtils_bundle;

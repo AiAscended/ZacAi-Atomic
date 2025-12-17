@@ -67,3 +67,15 @@ export function normalize(vector: number[]): number[] {
 export function clip(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
+
+const llmUtilities = {
+  matMul,
+  add,
+  transpose,
+  dropout,
+  cosineSimilarity,
+  normalize,
+  clip,
+};
+
+export default llmUtilities;

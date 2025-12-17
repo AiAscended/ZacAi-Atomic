@@ -1,7 +1,22 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 
-interface IDEFile {
+let indexedDBReady: Promise<void> | null = null;
+
+async function ensureIndexedDB(): Promise<void> {
+  if (typeof indexedDB !== 'undefined') {
+    return;
+  }
+
+  if (!indexedDBReady) {
+    indexedDBReady = import('fake-indexeddb/auto').then(() => undefined);
+  }
+
+  await indexedDBReady;
+}
+
+interface IDEFileRecord {
   path: string;
+  name?: string;
   content: string;
   type: 'file' | 'directory';
   language: string;
@@ -14,18 +29,26 @@ interface IDEFile {
 interface FileSystemDB extends DBSchema {
   files: {
     key: string;
-    value: IDEFile;
+    value: IDEFileRecord;
     indexes: { 'by-parent': string; 'by-type': string };
   };
 }
+
+export type IDEFile = IDEFileRecord & { name: string };
 
 export class VirtualFileSystem {
   private db: IDBPDatabase<FileSystemDB> | null = null;
   private dbName = 'zacai-ide-fs';
   private dbVersion = 1;
 
+  async initialize(): Promise<void> {
+    await this.init();
+  }
+
   async init() {
     if (this.db) return this.db;
+
+    await ensureIndexedDB();
 
     this.db = await openDB<FileSystemDB>(this.dbName, this.dbVersion, {
       upgrade(db) {
@@ -50,9 +73,10 @@ export class VirtualFileSystem {
 
   private async initializeSampleStructure() {
     const now = Date.now();
-    const sampleFiles: IDEFile[] = [
+    const sampleFiles: IDEFileRecord[] = [
       {
         path: '/',
+        name: '/',
         content: '',
         type: 'directory',
         language: '',
@@ -63,6 +87,7 @@ export class VirtualFileSystem {
       },
       {
         path: '/src',
+        name: 'src',
         content: '',
         type: 'directory',
         language: '',
@@ -73,6 +98,7 @@ export class VirtualFileSystem {
       },
       {
         path: '/src/app.tsx',
+        name: 'app.tsx',
         content: `import React from 'react';
 
 function App() {
@@ -94,6 +120,7 @@ export default App;`,
       },
       {
         path: '/src/index.tsx',
+        name: 'index.tsx',
         content: `import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './app';
@@ -117,6 +144,7 @@ root.render(
       },
       {
         path: '/src/styles.css',
+        name: 'styles.css',
         content: `* {
   margin: 0;
   padding: 0;
@@ -142,6 +170,7 @@ body {
       },
       {
         path: '/package.json',
+        name: 'package.json',
         content: `{
   "name": "zacai-project",
   "version": "1.0.0",
@@ -166,6 +195,7 @@ body {
       },
       {
         path: '/README.md',
+        name: 'README.md',
         content: `# ZacAi Project
 
 This project was created with ZacAi IDE.
@@ -200,15 +230,22 @@ Happy coding!`,
 
   async readFile(path: string): Promise<IDEFile | undefined> {
     await this.init();
-    return this.db!.get('files', path);
+    const file = await this.db!.get('files', path);
+    return this.toIDEFile(file);
+  }
+
+  async read(path: string): Promise<string | null> {
+    const file = await this.readFile(path);
+    return file?.content ?? null;
   }
 
   async writeFile(path: string, content: string): Promise<void> {
     await this.init();
-    const existing = await this.readFile(path);
-    
-    const file: IDEFile = {
+    const existing = await this.db!.get('files', path);
+
+    const file: IDEFileRecord = {
       path,
+      name: this.getNameFromPath(path),
       content,
       type: 'file',
       language: this.getLanguageFromPath(path),
@@ -221,13 +258,18 @@ Happy coding!`,
     await this.db!.put('files', file);
   }
 
+  async write(path: string, content: string): Promise<void> {
+    await this.writeFile(path, content);
+  }
+
   async createFile(path: string, content: string = ''): Promise<void> {
     await this.init();
-    const existing = await this.readFile(path);
+    const existing = await this.db!.get('files', path);
     if (existing) throw new Error(`File already exists: ${path}`);
 
-    const file: IDEFile = {
+    const file: IDEFileRecord = {
       path,
+      name: this.getNameFromPath(path),
       content,
       type: 'file',
       language: this.getLanguageFromPath(path),
@@ -240,13 +282,19 @@ Happy coding!`,
     await this.db!.add('files', file);
   }
 
+  async exists(path: string): Promise<boolean> {
+    const file = await this.readFile(path);
+    return Boolean(file);
+  }
+
   async createDirectory(path: string): Promise<void> {
     await this.init();
-    const existing = await this.readFile(path);
+    const existing = await this.db!.get('files', path);
     if (existing) throw new Error(`Directory already exists: ${path}`);
 
-    const directory: IDEFile = {
+    const directory: IDEFileRecord = {
       path,
+      name: this.getNameFromPath(path),
       content: '',
       type: 'directory',
       language: '',
@@ -259,9 +307,13 @@ Happy coding!`,
     await this.db!.add('files', directory);
   }
 
+  async mkdir(path: string): Promise<void> {
+    await this.createDirectory(path);
+  }
+
   async deleteFile(path: string): Promise<void> {
     await this.init();
-    const file = await this.readFile(path);
+    const file = await this.db!.get('files', path);
     if (!file) throw new Error(`File not found: ${path}`);
 
     if (file.type === 'directory') {
@@ -277,12 +329,13 @@ Happy coding!`,
 
   async renameFile(oldPath: string, newPath: string): Promise<void> {
     await this.init();
-    const file = await this.readFile(oldPath);
+    const file = await this.db!.get('files', oldPath);
     if (!file) throw new Error(`File not found: ${oldPath}`);
 
-    const newFile: IDEFile = {
+    const newFile: IDEFileRecord = {
       ...file,
       path: newPath,
+      name: this.getNameFromPath(newPath),
       parent: this.getParentPath(newPath),
       updatedAt: Date.now(),
     };
@@ -303,15 +356,20 @@ Happy coding!`,
   async listDirectory(path: string): Promise<IDEFile[]> {
     await this.init();
     const allFiles = await this.db!.getAllFromIndex('files', 'by-parent', path);
-    return allFiles;
+    return allFiles.map((file) => this.toIDEFile(file)).filter((file): file is IDEFile => Boolean(file));
+  }
+
+  async list(path: string): Promise<IDEFile[]> {
+    return this.listDirectory(path);
   }
 
   async getDirectoryTree(rootPath: string = '/'): Promise<IDEFile[]> {
     await this.init();
     const allFiles = await this.db!.getAll('files');
-    return allFiles.filter(
-      (file) => file.path.startsWith(rootPath) || file.path === rootPath
-    );
+    return allFiles
+      .filter((file) => file.path.startsWith(rootPath) || file.path === rootPath)
+      .map((file) => this.toIDEFile(file))
+      .filter((file): file is IDEFile => Boolean(file));
   }
 
   async searchFiles(query: string): Promise<IDEFile[]> {
@@ -319,14 +377,18 @@ Happy coding!`,
     const allFiles = await this.db!.getAll('files');
     const lowerQuery = query.toLowerCase();
     
-    return allFiles.filter((file) => {
-      const fileName = file.path.split('/').pop() || '';
-      return (
-        file.type === 'file' &&
-        (fileName.toLowerCase().includes(lowerQuery) ||
-          file.content.toLowerCase().includes(lowerQuery))
-      );
-    });
+    return allFiles
+      .filter((file) => {
+        const record = this.toIDEFile(file);
+        if (!record) return false;
+        return (
+          record.type === 'file' &&
+          (record.name.toLowerCase().includes(lowerQuery) ||
+            record.content.toLowerCase().includes(lowerQuery))
+        );
+      })
+      .map((file) => this.toIDEFile(file))
+      .filter((file): file is IDEFile => Boolean(file));
   }
 
   async clearAll(): Promise<void> {
@@ -367,42 +429,36 @@ Happy coding!`,
     return parts.length > 0 ? '/' + parts.join('/') : '/';
   }
 
-  // ---------------------------------------------------------------------------
-  // Convenience helpers (used by tests + app code)
-  // ---------------------------------------------------------------------------
-
-  async read(path: string): Promise<string | null> {
-    const file = await this.readFile(path);
-    return file?.content ?? null;
+  detectLanguage(path: string): string {
+    return this.getLanguageFromPath(path);
   }
 
-  async write(path: string, content: string): Promise<void> {
-    await this.writeFile(path, content);
+  private getNameFromPath(path: string): string {
+    if (path === '/') {
+      return '/';
+    }
+    const parts = path.split('/').filter(Boolean);
+    return parts.pop() || '/';
   }
 
-  async exists(path: string): Promise<boolean> {
-    const file = await this.readFile(path);
-    return Boolean(file);
-  }
+  private toIDEFile(file: IDEFileRecord | undefined): IDEFile | undefined {
+    if (!file) return undefined;
+    if (file.name && file.name.length > 0) {
+      return file as IDEFile;
+    }
 
-  async mkdir(path: string): Promise<void> {
-    await this.createDirectory(path);
-  }
+    const normalized: IDEFileRecord = {
+      ...file,
+      name: this.getNameFromPath(file.path),
+    };
 
-  async list(path: string): Promise<Array<{ name: string; path: string; type: IDEFile['type']; language: string }>> {
-    const entries = await this.listDirectory(path);
-    return entries.map((entry) => ({
-      name: entry.path.split('/').pop() || '',
-      path: entry.path,
-      type: entry.type,
-      language: entry.language,
-    }));
-  }
+    // Persist the normalized name for future reads
+    this.db?.put('files', normalized).catch(() => {
+      // Ignore normalization write errors
+    });
 
-  detectLanguage(filename: string): string {
-    return this.getLanguageFromPath(filename);
+    return normalized as IDEFile;
   }
 }
 
 export const vfs = new VirtualFileSystem();
-export type { IDEFile };

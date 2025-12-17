@@ -62,13 +62,22 @@ const stopWords = [
   "your",
 ]
 
-export const generalRunInference = async (input: string, context: GeneralInferenceContext = {}) => {
-  const tokens = context.tokens ?? []
-  const embeddings = context.embeddings ?? []
-  const inferenceResults = context.inferenceResults
-  const sentiment = context.sentiment
+type GeneralInferenceContext = {
+  tokens?: string[]
+  embeddings?: unknown
+  inferenceResults?: unknown
+  sentiment?: { sentiment?: string; confidence?: number }
+  userProfile?: Record<string, unknown>
+}
+
+export const generalRunInference = async (input: string, _context: GeneralInferenceContext = {}) => {
+  const tokens = Array.isArray(_context.tokens) ? _context.tokens : []
+  const embeddingsRaw = _context.embeddings
+  const embeddings = Array.isArray(embeddingsRaw) ? embeddingsRaw : []
+  const inferenceResults = _context.inferenceResults
+  const sentiment = _context.sentiment
   // TODO: Use userProfile for personalized responses
-  // const userProfile = _context?.userProfile || {}
+  // const userProfile = _context.userProfile || {}
 
   const domainInferenceResult = Array.isArray(inferenceResults)
     ? inferenceResults.find((r) => r.domain === GENERAL_DOMAIN)
@@ -177,7 +186,7 @@ export const generalRunInference = async (input: string, context: GeneralInferen
       const queryKeywords = tokens
         .filter((t: string) => {
           const token = t.toLowerCase()
-          return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token)
+          return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token);
         })
         .slice(0, 5)
 
@@ -207,7 +216,7 @@ export const generalRunInference = async (input: string, context: GeneralInferen
       const queryKeywords = tokens
         .filter((t: string) => {
           const token = t.toLowerCase()
-          return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token)
+          return !stopWords.includes(token) && token.length > 2 && !/^\d+$/.test(token);
         })
         .slice(0, 5)
 

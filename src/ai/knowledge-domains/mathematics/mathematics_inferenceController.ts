@@ -2,25 +2,9 @@ import { mathematicsTokenizer } from "./mathematics_tokenizer"
 import { mathematicsSemanticAnalyzer } from "./mathematics_semanticAnalyzer"
 import { calculator } from "../../shared/tools/shared-ScientificCalculator"
 
-type MathematicsTokenizerResult = ReturnType<typeof mathematicsTokenizer>
-type MathematicsSemanticAnalysis = ReturnType<typeof mathematicsSemanticAnalyzer>
-
-interface UpstreamInferenceResult {
-  domain?: string
-  confidence?: number
-}
-
-interface MathematicsInferenceContext {
+type MathematicsInferenceContext = {
+  inferenceResults?: unknown
   tokens?: string[]
-  inferenceResults?: UpstreamInferenceResult | UpstreamInferenceResult[]
-}
-
-interface MathematicsInferenceResponse {
-  tokens: MathematicsTokenizerResult["tokens"]
-  tokenCount: number
-  semantics: MathematicsSemanticAnalysis
-  response: string
-  confidence: number
 }
 
 const wordToNumber: Record<string, number> = {
@@ -171,15 +155,19 @@ function convertWordsToNumbers(input: string): string {
   return converted.trim()
 }
 
-export const mathematicsRunInference = async (
-  input: string,
-  context?: MathematicsInferenceContext,
-): Promise<MathematicsInferenceResponse | null> => {
+export const mathematicsRunInference = async (input: string, _context: MathematicsInferenceContext = {}) => {
   const tk = mathematicsTokenizer(input)
   const tokens = tk.tokens
   const sem = mathematicsSemanticAnalyzer(input)
 
-  const confidence = resolveContextConfidence(context?.inferenceResults) ?? 0.05
+  const inferenceResults = _context.inferenceResults
+  const tokens = Array.isArray(_context.tokens) ? _context.tokens : []
+
+  const domainInferenceResult = Array.isArray(inferenceResults)
+    ? inferenceResults.find((r) => r.domain === "mathematics")
+    : inferenceResults
+
+  const confidence = domainInferenceResult?.confidence || 0.05
 
   const numericInput = convertWordsToNumbers(input)
   const lowerInput = numericInput.toLowerCase()

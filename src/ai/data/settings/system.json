@@ -1,11 +1,11 @@
 {
   "systemName": "ZacAi-Atomic",
   "timezone": "Australia/Sydney",
-  "location": "Brisbane",
+  "location": "Brisbane, Queensland, Australia ",
   "maxConcurrentRequests": 10,
   "requestTimeout": 30000,
   "enableLogging": true,
   "logLevel": "info",
-  "theme": "system",
-  "updatedAt": "2025-12-06T01:59:58.300Z"
+  "theme": "dark",
+  "updatedAt": "2025-11-05T22:39:10.280Z"
 }

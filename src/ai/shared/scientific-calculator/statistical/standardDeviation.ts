@@ -20,7 +20,7 @@ type StdDevArgs = [boolean, ...number[]] | number[]
 
 export function stdDev(...numbers: number[]): number
 export function stdDev(sample: boolean, ...numbers: number[]): number
-export function stdDev(...args: StdDevArgs): number {
+export function stdDev(...args: (number | boolean)[]): number {
   let sample = false
   let numbers: number[]
 

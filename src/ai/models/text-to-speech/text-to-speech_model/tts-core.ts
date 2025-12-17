@@ -5,18 +5,15 @@
 import type { ModelConfig, ModelPayload } from '../../shared/modelTypes';
 
 export class TTSModel {
-  private readonly config: ModelConfig;
-
-  constructor(config: ModelConfig = {}) {
+  private config: unknown;
+  
+  constructor(config: unknown) {
     this.config = config;
   }
-
-  forward(input: ModelPayload): ModelPayload {
-    return {
-      ...input,
-      configuration: this.config,
-      lastRun: Date.now(),
-    };
+  
+  forward(input: unknown): unknown {
+    // Model forward pass implementation
+    return input;
   }
 }
 

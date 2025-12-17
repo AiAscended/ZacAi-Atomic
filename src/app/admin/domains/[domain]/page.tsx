@@ -97,42 +97,8 @@ export default function DomainSettingsPage() {
   }, [domain])
 
   useEffect(() => {
-    loadSettings()
+    void loadSettings()
   }, [loadSettings])
-
-  useEffect(() => {
-    let isMounted = true
-    async function loadMetadata() {
-      setMetadataLoading(true)
-      setMetadataError(null)
-      try {
-        const response = await fetch(`/api/admin/domains/${domain}/metadata`)
-        const result = await response.json()
-
-        if (!response.ok || !result?.success) {
-          throw new Error(result?.error || "Unable to load domain metadata")
-        }
-
-        if (isMounted) {
-          setMetadata(result.data as DomainMetadataPayload)
-        }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err)
-        if (isMounted) {
-          setMetadataError(message)
-        }
-      } finally {
-        if (isMounted) {
-          setMetadataLoading(false)
-        }
-      }
-    }
-
-    loadMetadata()
-    return () => {
-      isMounted = false
-    }
-  }, [domain])
 
   const saveSettings = async () => {
     try {

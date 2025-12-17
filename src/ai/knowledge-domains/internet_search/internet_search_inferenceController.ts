@@ -40,41 +40,28 @@ interface InternetSearchPretrainedWeights {
 }
 
 interface InferenceContext {
-  tokens?: string[]
-  inferenceResults?: Record<string, unknown>
-  sentiment?: string
-  slots?: Record<string, string>
-  userProfile?: {
-    preferredEngine?: string
-  }
+  tokens: string[]
+  inferenceResults?: unknown
+  sentiment?: unknown
+  slots?: unknown
+  userProfile?: unknown
 }
 
-interface SearchResult {
+type SearchResult = {
   title: string
   snippet: string
   url: string
   source: string
 }
 
-interface InternetSearchInferenceMetadata {
-  tokensUsed: number
-  semanticAnalysis: SemanticAnalysis
-  searchQuery: string
-  resultCount: number
-  method: "url_lookup_scraping" | "inference_only"
-  preferredEngine?: string
+type ThresholdWeights = {
+  token_match_weight: number
+  semantic_weight: number
 }
 
-interface InternetSearchInferenceResponse {
-  response: string | null
-  confidence: number
-  domain: string
-  sources: string[]
-  error?: {
-    code: string
-    message: string
-  }
-  metadata: InternetSearchInferenceMetadata
+const DEFAULT_THRESHOLDS: ThresholdWeights = {
+  token_match_weight: 0.6,
+  semantic_weight: 0.4,
 }
 
 /**
@@ -88,6 +75,8 @@ const PATTERNS = SEEDS.patterns ?? []
 
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
+  const vocabulary = (seeds as { vocabulary?: Record<string, number> }).vocabulary ?? {}
+  const thresholds = (pretrainedWeights as { thresholds?: ThresholdWeights }).thresholds ?? DEFAULT_THRESHOLDS
 
   let tokenScore = 0
   let matchCount = 0
@@ -105,7 +94,9 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   // Semantic pattern matching
   let semanticScore = 0
-  for (const patternObj of PATTERNS) {
+  const patterns = (seeds as { patterns?: Array<{ pattern: string; weight: number }> }).patterns ?? []
+
+  for (const patternObj of patterns) {
     if (lowerInput.includes(patternObj.pattern)) {
       semanticScore += patternObj.weight
     }
@@ -113,8 +104,7 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   semanticScore = Math.min(semanticScore / 2, 1.0)
 
-  // Combine scores
-  const finalConfidence = avgTokenScore * THRESHOLDS.tokenMatchWeight + semanticScore * THRESHOLDS.semanticWeight
+  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
 
   return Math.min(finalConfidence, 1.0)
 }
@@ -122,7 +112,7 @@ function calculateConfidence(tokens: string[], input: string): number {
 /**
  * Extract search query from user input
  */
-function extractSearchQuery(input: string, semantics: SemanticAnalysis): string {
+function extractSearchQuery(input: string, _semantics: unknown): string {
   // Simply clean up the query by removing common prefixes
   let query = input
     .replace(/^(can you |could you |please |would you )/i, "")
@@ -178,10 +168,7 @@ export async function internetSearchRunInference(
   const searchQuery = extractSearchQuery(input, semantics)
   console.log(`[v0] ${INTERNET_SEARCH_DOMAIN} extracted query:`, searchQuery)
 
-  const searchEngines = prioritizeSearchEngines(
-    findSources(INTERNET_SEARCH_DOMAIN),
-    context?.userProfile?.preferredEngine,
-  )
+  const searchEngines = findSources(INTERNET_SEARCH_DOMAIN)
   const results: SearchResult[] = []
 
   for (const engine of searchEngines) {

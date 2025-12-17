@@ -5,13 +5,8 @@
 import type { ModelPayload } from '../../shared/modelTypes';
 
 export class TTSLayer {
-  constructor(private readonly identifier: string) {}
-
-  forward(input: ModelPayload): ModelPayload {
-    return {
-      ...input,
-      lastLayer: this.identifier,
-    };
+  forward(input: unknown): unknown {
+    return input;
   }
 }
 

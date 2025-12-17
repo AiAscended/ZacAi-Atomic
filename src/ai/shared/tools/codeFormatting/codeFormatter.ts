@@ -4,8 +4,9 @@
  */
 
 import prettier from "prettier/standalone"
-import parserTypescript from "prettier/parser-typescript"
-import parserBabel from "prettier/parser-babel"
+import babelPlugin from "prettier/plugins/babel"
+import estreePlugin from "prettier/plugins/estree"
+import typescriptPlugin from "prettier/plugins/typescript"
 
 export function detectLanguage(code: string): string {
   // Simple heuristic based on common keywords
@@ -24,7 +25,7 @@ export async function formatCode(code: string, options?: { language: string }): 
     const parser = options?.language === "typescript" ? "typescript" : "babel"
     return await prettier.format(code, {
       parser,
-      plugins: [parserTypescript, parserBabel],
+      plugins: [babelPlugin, estreePlugin, typescriptPlugin],
       semi: true,
       singleQuote: true,
       tabWidth: 2,

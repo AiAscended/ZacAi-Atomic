@@ -2,6 +2,7 @@
  * Seed Default Users Script
  * Creates default users: AiAscended (admin) and Zac (system)
  * Run: node scripts/seed-default-users.cjs
+ * Storage: src/ai/data/settings/users.json
  */
 
 const fs = require('fs');

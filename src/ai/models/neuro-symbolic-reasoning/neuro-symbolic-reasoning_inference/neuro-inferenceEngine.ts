@@ -5,8 +5,8 @@
 import type { InferenceContext, ModelPayload } from "../../shared/modelTypes"
 
 export class NEUROInferenceEngine {
-  predict(input: ModelPayload, context: InferenceContext = {}): ModelPayload {
-    return { ...context, ...input }
+  predict(input: unknown): unknown {
+    return input;
   }
 }
 

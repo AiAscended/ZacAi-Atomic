@@ -133,9 +133,9 @@ const parseSeedFile = async (filePath: string): Promise<RepairSeedEntry[]> => {
 export const loadSeedData = async (): Promise<RepairSeedEntry[]> => {
   try {
     const files = await fs.readdir(SEEDS_DIR);
-    const jsonFiles = files.filter((file) => file.endsWith('.json'));
-
-    const seedEntries: RepairSeedEntry[] = [];
+    const jsonFiles = files.filter(f => f.endsWith('.json'));
+    
+    const allConcepts: unknown[] = [];
     for (const file of jsonFiles) {
       const filePath = path.join(SEEDS_DIR, file);
       const entries = await parseSeedFile(filePath);

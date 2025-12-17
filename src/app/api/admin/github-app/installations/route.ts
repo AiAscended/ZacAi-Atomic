@@ -13,13 +13,6 @@ export const dynamic = "force-dynamic";
  * GET /api/admin/github-app/installations
  * List all installations of the GitHub App
  */
-type GitHubInstallation = {
-  id: number;
-  account: { login: string; type: string };
-  created_at: string;
-  permissions?: Record<string, string>;
-};
-
 export async function GET() {
   try {
     // Get JWT token from internal endpoint
@@ -58,10 +51,10 @@ export async function GET() {
     const installations: GitHubInstallation[] = await response.json();
 
     // Transform to our format
-    const formatted = installations.map((install) => ({
-      installationId: install.id.toString(),
-      accountLogin: install.account.login,
-      accountType: install.account.type,
+    const formatted = installations.map((install: Record<string, unknown>) => ({
+      installationId: (install.id as number).toString(),
+      accountLogin: (install.account as Record<string, unknown>).login,
+      accountType: (install.account as Record<string, unknown>).type,
       installedAt: install.created_at,
       repositories: [], // Will be populated on-demand
       permissions: install.permissions || {},

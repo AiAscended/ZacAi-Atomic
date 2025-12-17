@@ -25,11 +25,15 @@ export interface WeightMetadata {
   date_stamp?: string;
   training_run?: number;
   description: string;
-  architecture: JsonRecord;
-  weights: JsonRecord;
+  architecture: Record<string, unknown>;
+  weights: Record<string, unknown>;
   capabilities: string[];
-  performance: PerformanceMetrics;
-  metadata: JsonRecord;
+  performance: {
+    accuracy: number;
+    f1_score: number;
+    [key: string]: unknown;
+  };
+  metadata: Record<string, unknown>;
 }
 
 export interface WeightEntry {

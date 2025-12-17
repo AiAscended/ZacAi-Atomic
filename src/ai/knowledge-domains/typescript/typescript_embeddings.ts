@@ -48,10 +48,10 @@ export const persistTypeScriptWeights = (weights: Record<string, number[]>) => {
   }
 };
 
-const typescriptEmbeddingApi = {
+const typescript_embeddings_bundle = {
   getTypescriptEmbedding,
   getTypescriptEmbeddingsForTokens,
   persistTypeScriptWeights,
 };
 
-export default typescriptEmbeddingApi;
+export default typescript_embeddings_bundle;

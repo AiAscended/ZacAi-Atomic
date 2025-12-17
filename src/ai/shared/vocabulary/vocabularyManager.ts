@@ -43,10 +43,24 @@ export class VocabularyManager {
    * Load base vocabulary from JSON
    */
   private loadBaseVocabulary(): void {
-    for (const category of VOCAB_CATEGORY_KEYS) {
-      const categoryEntries = baseVocabularyData[category]
-      for (const token of Object.keys(categoryEntries)) {
-        this.registerToken(token, categoryEntries[token])
+    const vocab = baseVocabulary as Record<string, unknown>;
+    
+    // Load all token categories
+    const categories = [
+      'special_tokens',
+      'system_tokens',
+      'common_words',
+      'ai_domain_terms',
+      'programming_terms',
+      'mathematics_terms'
+    ]
+    
+    for (const category of categories) {
+      if (vocab[category]) {
+        for (const [token, id] of Object.entries(vocab[category])) {
+          this.vocabulary.set(token.toLowerCase(), id as number)
+          this.reverseVocabulary.set(id as number, token.toLowerCase())
+        }
       }
     }
     

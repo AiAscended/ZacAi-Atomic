@@ -47,7 +47,7 @@ async function loadSeedData(): Promise<SystemSeedEntry[]> {
     const files = await fs.readdir(DOMAIN_DIR);
     const jsonFiles = files.filter(f => f.endsWith('.json'));
     
-    const allConcepts: SystemSeedEntry[] = [];
+    const allConcepts: unknown[] = [];
     for (const file of jsonFiles) {
       const filePath = path.join(DOMAIN_DIR, file);
       const content = await fs.readFile(filePath, 'utf-8');

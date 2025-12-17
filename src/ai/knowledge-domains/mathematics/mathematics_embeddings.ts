@@ -60,10 +60,10 @@ export const persistMathematicsWeights = (weights: MathematicsSeedWeights): Pers
   }
 }
 
-const mathematicsEmbeddingExports = {
+const mathematics_embeddings_bundle = {
   getMathematicsEmbedding,
   getMathematicsEmbeddingForTokens,
   persistMathematicsWeights,
-}
+};
 
-export default mathematicsEmbeddingExports
+export default mathematics_embeddings_bundle;

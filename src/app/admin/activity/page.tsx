@@ -21,7 +21,7 @@ interface ActivityEvent {
   ts: string;
   type: string;
   message: string;
-  meta?: ActivityEventMeta;
+  meta?: Record<string, unknown>;
 }
 
 export default function ActivityPage() {
