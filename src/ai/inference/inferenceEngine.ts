@@ -105,9 +105,7 @@ export class InferenceEngine {
    * Run inference on input tokens
    */
   public async infer(input: InferenceInput): Promise<InferenceOutput> {
-    const { tokens, domain } = input
-    // TODO: Use context for context-aware inference
-    // const context = input.context;
+    const { tokens, domain, context } = input
 
     // Check cache
     const cacheKey = `${domain}:${tokens.join(",")}`
@@ -139,17 +137,22 @@ export class InferenceEngine {
       }
     }
 
-    // Step 1: Generate embeddings (with positional encoding already applied in embedTokens)
-    const embeddings = this.embedTokens(tokens)
+    // Step 1: Generate embeddings
+    const embeddings = await this.embedTokens(tokens)
 
-    // Step 2: Forward pass through transformer layers
-    let hiddenStates = embeddings
+    // Step 2: Add positional encoding
+    const posEncoded = embeddings.map((vec, i) =>
+      vec.map((val, j) => val + (embeddings.length > i && embeddings[i].length > j ? positionalEncoding(i, j) : 0)),
+    )
+
+    // Step 3: Forward pass through transformer layers
+    let hiddenStates = posEncoded
     const allAttentionWeights: number[][][] = []
 
     for (let layer = 0; layer < this.config.numLayers; layer++) {
       const attentionOutput = scaledDotProductAttention(hiddenStates, hiddenStates, hiddenStates)
 
-      allAttentionWeights.push(attentionOutput)
+      allAttentionWeights.push([attentionOutput])
 
       const attended = this.addAndNorm(hiddenStates, attentionOutput)
 

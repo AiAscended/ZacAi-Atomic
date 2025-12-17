@@ -1,0 +1,10 @@
+{
+  "notes": ["Initial version_control domain setup"],
+  "concepts": {
+    "branching": "Creating parallel development lines",
+    "merging": "Combining changes from different branches",
+    "rebasing": "Reapplying commits on top of another base",
+    "conflicts": "Resolving competing changes",
+    "workflows": "Git flow, GitHub flow, GitLab flow"
+  }
+}

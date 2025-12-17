@@ -26,12 +26,12 @@ export interface RetrievedKnowledge {
 }
 
 export class KnowledgeRetriever {
-  private cache: typeof DocumentCache
+  private cache: DocumentCache
   private retriever: DocumentRetrieverRanker
   private kbLoader: LocalKBLoader
 
   constructor() {
-    this.cache = DocumentCache
+    this.cache = new DocumentCache(1000)
     this.retriever = new DocumentRetrieverRanker()
     this.kbLoader = new LocalKBLoader()
   }
@@ -45,7 +45,7 @@ export class KnowledgeRetriever {
     }
 
     // Step 1: Check cache
-    const cached = this.cache.get<{ content: string }>(query)
+    const cached = this.cache.get(query)
     if (cached) {
       results.cacheHits++
       results.documents.push({
@@ -57,26 +57,14 @@ export class KnowledgeRetriever {
 
     // Step 2: Load from local knowledge base
     for (const domain of domains) {
-      const kbDocs = await this.kbLoader.load(domain)
-      if (kbDocs.length === 0) {
-        continue
-      }
-
-      const rankedDocs = this.retriever.rank(query, kbDocs)
-      results.documents.push(
-        ...rankedDocs.map(({ doc, score }) => ({
-          content: doc.text,
-          source: `kb:${domain}`,
-          relevance: score,
-        })),
-      )
+      const kbDocs = await this.kbLoader.load(domain, query)
+      results.documents.push(...kbDocs.map((doc) => ({ ...doc, source: `kb:${domain}` })))
     }
 
     // Step 3: Retrieve and rank documents
     if (results.documents.length > 0) {
-      results.documents = results.documents
-        .sort((a, b) => b.relevance - a.relevance)
-        .slice(0, 5)
+      const ranked = this.retriever.rank(query, results.documents)
+      results.documents = ranked.slice(0, 5)
     }
 
     if (useWeb) {

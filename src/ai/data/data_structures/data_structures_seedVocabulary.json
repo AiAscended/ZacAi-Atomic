@@ -1,0 +1,33 @@
+{
+  "vocab": [
+    "array",
+    "list",
+    "stack",
+    "queue",
+    "tree",
+    "graph",
+    "hash",
+    "map",
+    "set",
+    "linked",
+    "binary",
+    "heap",
+    "trie",
+    "node",
+    "edge",
+    "vertex",
+    "pointer",
+    "index",
+    "key",
+    "value",
+    "insert",
+    "delete",
+    "search",
+    "traverse",
+    "sort",
+    "complexity",
+    "O(n)",
+    "O(log n)",
+    "O(1)"
+  ]
+}

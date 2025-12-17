@@ -1,0 +1,15 @@
+{
+  "domain": "programming",
+  "references": [
+    {
+      "title": "MDN Web Docs",
+      "url": "https://developer.mozilla.org",
+      "topics": ["javascript", "web-apis", "html", "css"]
+    },
+    {
+      "title": "Stack Overflow",
+      "url": "https://stackoverflow.com",
+      "topics": ["programming", "debugging", "best-practices"]
+    }
+  ]
+}

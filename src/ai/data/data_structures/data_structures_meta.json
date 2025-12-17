@@ -1,0 +1,13 @@
+{
+  "domain": "data_structures",
+  "version": "1.0.0",
+  "description": "Data structures domain for arrays, trees, graphs, hash tables, and algorithm complexity analysis",
+  "capabilities": [
+    "array_analysis",
+    "tree_traversal",
+    "graph_algorithms",
+    "hash_table_operations",
+    "complexity_analysis"
+  ],
+  "dependencies": []
+}

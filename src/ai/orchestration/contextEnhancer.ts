@@ -15,9 +15,9 @@
  */
 
 import { DialogueFlowController } from "../context_management/dialogueFlowController"
-import { detectSentiment, type SentimentResult } from "../context_management/sentimentEmotionDetector"
+import { detectSentiment } from "../context_management/sentimentEmotionDetector"
 import { SlotFiller } from "../context_management/slotFiller"
-import { UserProfileHandler, type UserProfile } from "../context_management/userProfileHandler"
+import { UserProfileHandler } from "../context_management/userProfileHandler"
 
 /**
  * Enhanced context with all metadata
@@ -25,9 +25,17 @@ import { UserProfileHandler, type UserProfile } from "../context_management/user
 export interface EnhancedContext {
   originalText: string
   dialogueState: string
-  sentiment: SentimentResult
-  slots: Record<string, string | null>
-  userProfile: UserProfile
+  sentiment: {
+    polarity: "positive" | "negative" | "neutral"
+    emotion: string
+    confidence: number
+  }
+  slots: Record<string, string>
+  userProfile: {
+    name?: string
+    preferences?: Record<string, unknown>
+    history?: string[]
+  }
   conversationTurn: number
 }
 
@@ -56,7 +64,7 @@ export class ContextEnhancer {
     const sentiment = detectSentiment(text)
 
     // Extract slots (entities like names, dates, locations)
-    const slots = this.slotFiller.extractSlots(text)
+    const slots = this.slotFiller.fill(text)
 
     // Get user profile
     const userProfile = this.profileHandler.getProfile(sessionId)
@@ -85,9 +93,8 @@ export class ContextEnhancer {
   public getConversationSummary(sessionId: string): string {
     const profile = this.profileHandler.getProfile(sessionId)
     const state = this.dialogueController.getState(sessionId)
-    const historyLength = Array.isArray(profile.history) ? profile.history.length : 0
 
-    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${historyLength} turns`
+    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${profile.history?.length || 0} turns`
   }
 }
 

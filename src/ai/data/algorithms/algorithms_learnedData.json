@@ -1,0 +1,10 @@
+{
+  "notes": ["Initial algorithms domain setup"],
+  "concepts": {
+    "sorting": "Organizing data in specific order",
+    "searching": "Finding elements in data structures",
+    "dynamicProgramming": "Breaking problems into overlapping subproblems",
+    "greedy": "Making locally optimal choices",
+    "divideConquer": "Breaking problems into smaller subproblems"
+  }
+}

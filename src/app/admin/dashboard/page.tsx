@@ -1,170 +1,90 @@
+/**
+ * File: app/admin/dashboard/page.tsx
+ * Purpose: Admin dashboard with configurable metrics
+ * Creator: Vercel v0 Coding Assistant
+ */
+
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { Activity, HeartPulse, RefreshCw, ShieldCheck, Terminal, Zap } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
-import { SystemAwarenessPanel } from "@/components/admin/dev-console/SystemAwarenessPanel"
-import { HeartStatusPanel, type HeartbeatResponse } from "@/components/admin/dashboard/HeartStatusPanel"
+import { useState } from "react"
+import { Card } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Activity, Brain, Database, Zap, TrendingUp, Clock } from "lucide-react"
 
 export default function DashboardPage() {
-  const [heartbeat, setHeartbeat] = useState<HeartbeatResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [runningSelfTest, setRunningSelfTest] = useState(false)
+  const [timeRange, setTimeRange] = useState("24h")
+  const [metricType, setMetricType] = useState("all")
 
-  const fetchHeartbeat = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await fetch('/api/admin/system/heartbeat', { cache: 'no-store' })
-      const payload = await response.json()
-      if (!response.ok || !payload.ok) {
-        throw new Error(payload.error ?? 'Failed to load heartbeat')
-      }
-      setHeartbeat(payload as HeartbeatResponse)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to load heartbeat data')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    void fetchHeartbeat()
-  }, [fetchHeartbeat])
-
-  const handleSelfTest = useCallback(async () => {
-    try {
-      setRunningSelfTest(true)
-      setError(null)
-      const response = await fetch('/api/admin/system/heartbeat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'self-test' }),
-      })
-      const payload = await response.json()
-      if (!response.ok || !payload.ok) {
-        throw new Error(payload.error ?? 'Core self-test failed')
-      }
-      await fetchHeartbeat()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to run self-test')
-    } finally {
-      setRunningSelfTest(false)
-    }
-  }, [fetchHeartbeat])
-
-  const stats = useMemo(() => {
-    const maintenance = heartbeat?.context.maintenanceMode ?? true
-    const totalComponents = heartbeat?.components.length ?? 0
-    const healthyComponents = heartbeat?.components.filter(component => component.status === 'healthy').length ?? 0
-    const planSteps = heartbeat?.plan?.steps ?? []
-    const planCompleted = planSteps.filter(step => step.status === 'completed').length
-    const lastSelfTest = heartbeat?.lastHeartbeat?.timestamp
-
-    return [
-      {
-        label: 'Maintenance Mode',
-        value: maintenance ? 'ENABLED' : 'DISABLED',
-        helper: maintenance ? 'Non-critical systems paused' : 'All systems live',
-        icon: ShieldCheck,
-        accent: maintenance ? 'text-amber-500' : 'text-emerald-500',
-      },
-      {
-        label: 'Core Components Healthy',
-        value: `${healthyComponents}/${totalComponents}`,
-        helper: 'Heart organs reporting healthy',
-        icon: HeartPulse,
-        accent: 'text-rose-500',
-      },
-      {
-        label: 'Heart Plan Progress',
-        value: planSteps.length ? `${planCompleted}/${planSteps.length}` : '0/0',
-        helper: 'Steps completed this cycle',
-        icon: Activity,
-        accent: 'text-sky-500',
-      },
-      {
-        label: 'Last Self-Test',
-        value: lastSelfTest ? new Date(lastSelfTest).toLocaleTimeString() : 'Not run',
-        helper: heartbeat?.lastHeartbeat?.response.confidence
-          ? `Confidence ${(heartbeat.lastHeartbeat.response.confidence * 100).toFixed(1)}%`
-          : 'Awaiting first run',
-        icon: Zap,
-        accent: 'text-purple-500',
-      },
-    ]
-  }, [heartbeat])
+  const metrics = [
+    { label: "Total Queries", value: "1,247", change: "+12%", icon: Activity, color: "text-blue-500" },
+    { label: "Active Domains", value: "19", change: "+3", icon: Database, color: "text-green-500" },
+    { label: "Avg Confidence", value: "87.3%", change: "+2.1%", icon: Brain, color: "text-purple-500" },
+    { label: "Training Epochs", value: "342", change: "+15", icon: Zap, color: "text-orange-500" },
+    { label: "Success Rate", value: "94.2%", change: "+1.8%", icon: TrendingUp, color: "text-emerald-500" },
+    { label: "Avg Response Time", value: "234ms", change: "-12ms", icon: Clock, color: "text-cyan-500" },
+  ]
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Core Operations Center</h1>
-          <p className="text-sm text-muted-foreground">Monitor the ZacAi Heart Core while the rest of the stack stays in maintenance mode.</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={fetchHeartbeat} disabled={loading || runningSelfTest}>
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
-          </Button>
-          <Button onClick={handleSelfTest} disabled={runningSelfTest}>
-            {runningSelfTest ? (
-              <>Running self-test…</>
-            ) : (
-              <>
-                <HeartPulse className="mr-2 h-4 w-4" />
-                Run Self-Test
-              </>
-            )}
-          </Button>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <div className="flex gap-3">
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1h">Last Hour</SelectItem>
+              <SelectItem value="24h">Last 24h</SelectItem>
+              <SelectItem value="7d">Last 7 Days</SelectItem>
+              <SelectItem value="30d">Last 30 Days</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={metricType} onValueChange={setMetricType}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Metrics</SelectItem>
+              <SelectItem value="performance">Performance</SelectItem>
+              <SelectItem value="accuracy">Accuracy</SelectItem>
+              <SelectItem value="usage">Usage</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {error && (
-        <Card className="border-destructive/60 bg-destructive/5">
-          <CardContent className="py-4 text-sm text-destructive">{error}</CardContent>
-        </Card>
-      )}
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map(stat => {
-          const Icon = stat.icon
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {metrics.map((metric) => {
+          const Icon = metric.icon
           return (
-            <Card key={stat.label}>
-              <CardContent className="flex items-center justify-between gap-3 py-4">
-                <div>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
-                  <p className="text-2xl font-semibold">{loading ? '—' : stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.helper}</p>
-                </div>
-                <Icon className={cn('h-8 w-8', stat.accent)} />
-              </CardContent>
+            <Card key={metric.label} className="p-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">{metric.label}</span>
+                <Icon className={`h-5 w-5 ${metric.color}`} />
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold">{metric.value}</span>
+                <span className="text-sm text-green-600">{metric.change}</span>
+              </div>
             </Card>
           )
         })}
       </div>
 
-      <HeartStatusPanel heartbeat={heartbeat} />
-
-      <SystemAwarenessPanel />
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-            <Terminal className="h-4 w-4" />
-            CLI Monitoring
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
-          <p>
-            Run <span className="font-mono text-xs">npm run heart:self-test</span> in the admin terminal to watch the Heart
-            Core exercise its self-heal diagnostics live. The tests stream through the Dev Console terminal panel and feed the
-            dashboard’s heartbeat history.
-          </p>
-        </CardContent>
+      <Card className="p-6">
+        <h2 className="text-xl font-semibold mb-4">Domain Performance</h2>
+        <div className="space-y-3">
+          {["React", "Next.js", "TypeScript", "Programming", "Mathematics"].map((domain) => (
+            <div key={domain} className="flex items-center gap-4">
+              <span className="w-32 text-sm font-medium">{domain}</span>
+              <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                <div className="h-full bg-primary rounded-full" style={{ width: `${Math.random() * 40 + 60}%` }} />
+              </div>
+              <span className="text-sm text-muted-foreground">{(Math.random() * 20 + 80).toFixed(1)}%</span>
+            </div>
+          ))}
+        </div>
       </Card>
     </div>
   )

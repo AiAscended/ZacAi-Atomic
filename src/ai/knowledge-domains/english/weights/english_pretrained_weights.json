@@ -1,0 +1,45 @@
+{
+  "domain": "english",
+  "version": "1.0.0",
+  "vocabulary": {
+    "definition": 0.95,
+    "define": 0.9,
+    "meaning": 0.85,
+    "synonym": 0.9,
+    "antonym": 0.85,
+    "word": 0.8,
+    "language": 0.75,
+    "grammar": 0.7,
+    "sentence": 0.7,
+    "example": 0.65,
+    "molecular": 0.8,
+    "atomic": 0.8,
+    "structure": 0.75,
+    "explain": 0.7,
+    "what": 0.5,
+    "is": 0.3,
+    "the": 0.2,
+    "tell": 0.4,
+    "about": 0.4,
+    "use": 0.5,
+    "in": 0.3,
+    "a": 0.2,
+    "english": 0.85,
+    "vocabulary": 0.75,
+    "lexicon": 0.7,
+    "thesaurus": 0.8,
+    "dictionary": 0.85
+  },
+  "thresholds": {
+    "min_confidence": 0.01,
+    "token_match_weight": 0.4,
+    "semantic_weight": 0.6
+  },
+  "neural_network": {
+    "input_size": 128,
+    "hidden_layers": [64, 32],
+    "output_size": 1,
+    "activation": "relu",
+    "learning_rate": 0.001
+  }
+}

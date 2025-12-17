@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "domain": "error_detection",
+  "errorTypes": [
+    "Syntax Error",
+    "Runtime Error",
+    "Type Error",
+    "Reference Error",
+    "Null Pointer Exception",
+    "Undefined Variable",
+    "Stack Overflow",
+    "Memory Leak",
+    "Race Condition",
+    "Deadlock"
+  ]
+}

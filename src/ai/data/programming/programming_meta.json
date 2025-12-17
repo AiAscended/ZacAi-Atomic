@@ -1,0 +1,15 @@
+{
+  "domain": "programming",
+  "version": "1.0.0",
+  "description": "General programming concepts and best practices across languages",
+  "capabilities": [
+    "concept_explanation",
+    "syntax_help",
+    "debugging_assistance",
+    "best_practices",
+    "design_patterns",
+    "algorithm_guidance"
+  ],
+  "dependencies": ["general"],
+  "files": ["src/ai/data/programming/*"]
+}

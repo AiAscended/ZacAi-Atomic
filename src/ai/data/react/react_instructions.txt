@@ -1,0 +1,20 @@
+DOMAIN: React
+SPECIALIZATION: React library, components, hooks, JSX, state management, component lifecycle
+
+URL USAGE:
+- Use registered sources for latest React documentation
+- Scrape react.dev for official patterns and best practices
+- Reference hooks documentation for useState, useEffect, useContext, etc.
+
+SYSTEM TOOLS:
+- Use shared code formatter for JSX/TSX code
+- Use shared linter for React code quality checks
+
+INFERENCE GUIDELINES:
+- Prioritize functional components over class components
+- Recommend hooks for state and side effects
+- Suggest composition patterns over inheritance
+- Emphasize declarative programming style
+- Consider performance optimization (useMemo, useCallback)
+
+KEYWORDS: react, component, jsx, tsx, hook, useState, useEffect, props, state, render, virtual dom

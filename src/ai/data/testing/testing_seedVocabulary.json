@@ -1,0 +1,5 @@
+{
+  "version": "1.0",
+  "domain": "testing",
+  "frameworks": ["Jest", "Mocha", "Jasmine", "Vitest", "Testing Library", "Cypress", "Playwright", "Puppeteer"]
+}

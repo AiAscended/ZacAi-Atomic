@@ -3,18 +3,11 @@
  * Purpose: Small in-memory user profile store for session-level personalization.
  */
 
-export interface UserProfile {
-  name?: string
-  preferences?: Record<string, unknown>
-  history?: string[]
-  [key: string]: unknown
-}
+const profiles = new Map<string, Record<string, unknown>>()
 
-const profiles = new Map<string, UserProfile>()
+export const getProfile = (userId: string) => profiles.get(userId) ?? {}
 
-export const getProfile = (userId: string): UserProfile => profiles.get(userId) ?? {}
-
-export const setProfile = (userId: string, data: UserProfile) => {
+export const setProfile = (userId: string, data: Record<string, unknown>) => {
   const existing = profiles.get(userId) ?? {}
   profiles.set(userId, { ...existing, ...data })
 }
@@ -22,18 +15,18 @@ export const setProfile = (userId: string, data: UserProfile) => {
 export const clearProfile = (userId: string) => profiles.delete(userId)
 
 export class UserProfileHandler {
-  private profiles: Map<string, UserProfile> = new Map()
+  private profiles: Map<string, Record<string, unknown>> = new Map()
 
-  getProfile(userId: string): UserProfile {
+  getProfile(userId: string): Record<string, unknown> {
     return this.profiles.get(userId) ?? {}
   }
 
-  setProfile(userId: string, data: UserProfile): void {
+  setProfile(userId: string, data: Record<string, unknown>): void {
     const existing = this.profiles.get(userId) ?? {}
     this.profiles.set(userId, { ...existing, ...data })
   }
 
-  updateProfile(userId: string, updates: Partial<UserProfile>): void {
+  updateProfile(userId: string, updates: Record<string, unknown>): void {
     const existing = this.getProfile(userId)
     this.setProfile(userId, { ...existing, ...updates })
   }
@@ -46,7 +39,7 @@ export class UserProfileHandler {
     return this.profiles.has(userId)
   }
 
-  getAllProfiles(): Map<string, UserProfile> {
+  getAllProfiles(): Map<string, Record<string, unknown>> {
     return new Map(this.profiles)
   }
 

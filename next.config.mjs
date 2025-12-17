@@ -1,61 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Production-grade: Enable strict mode for better error detection
-  reactStrictMode: true,
-  
-  // Docker standalone output for containerized deployment
-  output: 'standalone',
-  
-  // Keep TypeScript and ESLint checks enabled for production quality
-  // Remove ignoreBuildErrors and ignoreDuringBuilds for production
   eslint: {
-    // Temporarily ignore during builds to allow deployment
     ignoreDuringBuilds: true,
-    dirs: ['src'], // Run ESLint on src directory
   },
   typescript: {
-    // Temporarily ignore build errors to test the build
     ignoreBuildErrors: true,
   },
-  
-  // Image optimization
   images: {
-    // Enable optimization for production
-    unoptimized: false,
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
-    formats: ['image/avif', 'image/webp'],
+    unoptimized: true,
   },
-  
-  // Experimental features
-  experimental: {
-    // Enable optimized package imports
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    externalDir: true,
-  },
-  
-  // Webpack configuration
   webpack: (config, { isServer }) => {
-    // Resolve TypeScript path aliases in webpack
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': '/workspaces/ZacAi-Atomic/src',
-      '@/components': '/workspaces/ZacAi-Atomic/src/components',
-      '@/ui': '/workspaces/ZacAi-Atomic/src/components/ui',
-      '@/lib': '/workspaces/ZacAi-Atomic/src/lib',
-      '@/utils': '/workspaces/ZacAi-Atomic/src/utils',
-      '@/hooks': '/workspaces/ZacAi-Atomic/src/hooks',
-      '@/styles': '/workspaces/ZacAi-Atomic/src/styles',
-      '@/ai': '/workspaces/ZacAi-Atomic/src/ai',
-      '@/app': '/workspaces/ZacAi-Atomic/src/app',
-      '@hco': '/workspaces/ZacAi-Atomic/src/ai/hco/src',
-    };
-    
-    // For server-side (API routes), handle Node.js modules properly
+    // For server-side (API routes), allow Node.js modules
     if (isServer) {
       config.externals = config.externals || [];
       // Mark Node.js built-in modules as external (don't bundle them)
@@ -65,8 +20,6 @@ const nextConfig = {
         'crypto': 'commonjs crypto',
         'stream': 'commonjs stream',
         'util': 'commonjs util',
-        'child_process': 'commonjs child_process',
-        'worker_threads': 'commonjs worker_threads',
       });
     } else {
       // For client-side, provide empty mocks for Node.js modules
@@ -77,45 +30,10 @@ const nextConfig = {
         crypto: false,
         stream: false,
         util: false,
-        child_process: false,
-        worker_threads: false,
-        net: false,
-        tls: false,
-        dns: false,
       };
     }
-    
     return config;
   },
-  
-  // Output configuration
-  output: 'standalone', // For Docker/containerized deployments
-  
-  // Performance optimization
-  compress: true,
-  
-  // Security headers
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-        ],
-      },
-    ];
-  },
-};
+}
 
-export default nextConfig;
+export default nextConfig
