@@ -26,7 +26,12 @@
     "scan:models": "tsx scripts/scan-models.js",
     "scan:domains": "tsx scripts/scan-domains.js",
     "scan:all": "npm run scan:models && npm run scan:domains",
-    "scan:unified": "tsx scripts/scan-ai-modules.js"
+    "scan:unified": "tsx scripts/scan-ai-modules.js",
+    "recovery:analyze": "tsx scripts/analyze-branches.ts",
+    "recovery:consolidate": "tsx scripts/consolidate-files.ts",
+    "recovery:compare": "tsx scripts/generate-comparison-reports.ts",
+    "recovery:strategy": "tsx scripts/generate-recovery-strategy.ts",
+    "recovery:full": "tsx scripts/run-full-recovery.ts"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.8.0-rc.2",
