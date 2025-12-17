@@ -42,35 +42,12 @@ export interface SystemSettings {
 // Orchestrator Settings
 // ============================================================================
 
-export interface HCOModeSettings {
-  enabled: boolean;
-  routingStrategy: "auto" | "manual";
-  minConfidence: number;
-  enforceCriticalPath: boolean;
-  triggerWords: string[];
-  allowUserOverride: boolean;
-  speech: {
-    enabled: boolean;
-    enableSTT: boolean;
-    enableTTS: boolean;
-    defaultVoice: string;
-    availableVoices: string[];
-    preferredLanguages: string[];
-  };
-  auditLogging: {
-    enabled: boolean;
-    redactAudio: boolean;
-    retainTranscriptsInDays: number;
-  };
-}
-
 export interface OrchestratorSettings {
   domainSelectionThreshold: number;  // 0.0 - 1.0
   maxDomainsPerQuery: number;
   enableParallelInference: boolean;
   enableContextEnhancement: boolean;
   enableKnowledgeRetrieval: boolean;
-  hybridMode: HCOModeSettings;
   
   performance: {
     maxConcurrentRequests: number;
@@ -115,44 +92,6 @@ export interface DomainSettings {
     lastUpdated?: string;
     version: string;
     customVocabulary: string[];
-  };
-}
-
-// ============================================================================
-// Training Settings
-// ============================================================================
-
-export interface TrainingSettings {
-  autoTraining: {
-    enabled: boolean;
-    schedule: string; // cron expression (e.g., "0 2 * * *" for 2 AM daily)
-    minConfidenceThreshold: number; // 0.0 - 1.0
-    maxSamplesPerRun: number;
-    minSamplesRequired: number;
-  };
-  
-  pipeline: {
-    enableVocabularyUpdate: boolean;
-    enableWeightUpdate: boolean;
-    enableSeedRegeneration: boolean;
-    validationSplit: number; // 0.0 - 1.0
-    testSplit: number; // 0.0 - 1.0
-  };
-  
-  optimization: {
-    learningRate: number;
-    batchSize: number;
-    epochs: number;
-    earlyStoppingPatience: number;
-    gradientClipping: number;
-  };
-  
-  status: {
-    lastTrainingRun?: string;
-    nextScheduledRun?: string;
-    trainingInProgress: boolean;
-    lastTrainingDuration?: number; // milliseconds
-    lastTrainingSamples?: number;
   };
 }
 
@@ -335,27 +274,6 @@ export const DEFAULT_ORCHESTRATOR_SETTINGS: OrchestratorSettings = {
   enableParallelInference: true,
   enableContextEnhancement: true,
   enableKnowledgeRetrieval: true,
-  hybridMode: {
-    enabled: false,
-    routingStrategy: "auto",
-    minConfidence: 0.72,
-    enforceCriticalPath: true,
-    triggerWords: ["audit", "executive", "hco", "speech"],
-    allowUserOverride: true,
-    speech: {
-      enabled: false,
-      enableSTT: true,
-      enableTTS: true,
-      defaultVoice: "orion",
-      availableVoices: ["orion", "solara", "lumen"],
-      preferredLanguages: ["en-US"],
-    },
-    auditLogging: {
-      enabled: true,
-      redactAudio: true,
-      retainTranscriptsInDays: 30,
-    },
-  },
   performance: {
     maxConcurrentRequests: 10,
     requestTimeoutMs: 30000,

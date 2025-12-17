@@ -110,48 +110,6 @@ export class SettingsStore {
     };
   }
 
-  private normalizeOrchestratorSettings(existing?: OrchestratorSettings): OrchestratorSettings {
-    const base = existing || DEFAULT_ORCHESTRATOR_SETTINGS
-    const merged: OrchestratorSettings = {
-      ...DEFAULT_ORCHESTRATOR_SETTINGS,
-      ...base,
-      performance: {
-        ...DEFAULT_ORCHESTRATOR_SETTINGS.performance,
-        ...base.performance,
-      },
-      reasoning: {
-        ...DEFAULT_ORCHESTRATOR_SETTINGS.reasoning,
-        ...base.reasoning,
-      },
-      hybridMode: {
-        ...DEFAULT_ORCHESTRATOR_SETTINGS.hybridMode,
-        ...base.hybridMode,
-        triggerWords:
-          base.hybridMode?.triggerWords?.length && base.hybridMode.triggerWords.length > 0
-            ? base.hybridMode.triggerWords
-            : DEFAULT_ORCHESTRATOR_SETTINGS.hybridMode.triggerWords,
-        speech: {
-          ...DEFAULT_ORCHESTRATOR_SETTINGS.hybridMode.speech,
-          ...base.hybridMode?.speech,
-          availableVoices:
-            base.hybridMode?.speech?.availableVoices?.length
-              ? base.hybridMode.speech.availableVoices
-              : DEFAULT_ORCHESTRATOR_SETTINGS.hybridMode.speech.availableVoices,
-          preferredLanguages:
-            base.hybridMode?.speech?.preferredLanguages?.length
-              ? base.hybridMode.speech.preferredLanguages
-              : DEFAULT_ORCHESTRATOR_SETTINGS.hybridMode.speech.preferredLanguages,
-        },
-        auditLogging: {
-          ...DEFAULT_ORCHESTRATOR_SETTINGS.hybridMode.auditLogging,
-          ...base.hybridMode?.auditLogging,
-        },
-      },
-    }
-
-    return merged
-  }
-
   /**
    * Load settings from file or create default
    */
@@ -238,7 +196,7 @@ export class SettingsStore {
    */
   async getOrchestrator(): Promise<OrchestratorSettings> {
     const all = await this.getAll();
-    return this.normalizeOrchestratorSettings(all.orchestrator);
+    return all.orchestrator;
   }
 
   /**
@@ -248,39 +206,13 @@ export class SettingsStore {
     await this.initialize();
     if (!this.settings) throw new Error("Settings not initialized");
 
-    const current = this.normalizeOrchestratorSettings(this.settings.orchestrator)
-    const mergedHybrid = {
-      ...current.hybridMode,
-      ...updates.hybridMode,
-      triggerWords: updates.hybridMode?.triggerWords?.length
-        ? updates.hybridMode.triggerWords
-        : current.hybridMode.triggerWords,
-      speech: {
-        ...current.hybridMode.speech,
-        ...updates.hybridMode?.speech,
-      },
-      auditLogging: {
-        ...current.hybridMode.auditLogging,
-        ...updates.hybridMode?.auditLogging,
-      },
-    }
-
     this.settings.orchestrator = {
-      ...current,
+      ...this.settings.orchestrator,
       ...updates,
-      performance: {
-        ...current.performance,
-        ...updates.performance,
-      },
-      reasoning: {
-        ...current.reasoning,
-        ...updates.reasoning,
-      },
-      hybridMode: mergedHybrid,
     };
     
     await this.save();
-    return this.normalizeOrchestratorSettings(this.settings.orchestrator);
+    return this.settings.orchestrator;
   }
 
   /**

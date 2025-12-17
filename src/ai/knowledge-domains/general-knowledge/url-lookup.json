@@ -1,0 +1,42 @@
+{
+  "domainId": "general-knowledge",
+  "domainName": "General Knowledge",
+  "sources": [
+    {
+      "name": "Wikipedia",
+      "url": "https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch={query}",
+      "description": "Free encyclopedia with comprehensive general knowledge",
+      "enabled": true,
+      "priority": 1,
+      "rateLimit": {
+        "requestsPerMinute": 200,
+        "requestsPerDay": 5000
+      },
+      "timeout": 10000
+    },
+    {
+      "name": "Britannica",
+      "url": "https://www.britannica.com/search?query={query}",
+      "description": "Trusted encyclopedia and educational resource",
+      "enabled": true,
+      "priority": 2,
+      "rateLimit": {
+        "requestsPerMinute": 60,
+        "requestsPerDay": 1000
+      },
+      "timeout": 15000
+    },
+    {
+      "name": "DBpedia",
+      "url": "https://dbpedia.org/sparql?query=SELECT * WHERE { ?s ?p ?o . FILTER(CONTAINS(STR(?s), \"{query}\")) } LIMIT 10",
+      "description": "Structured knowledge from Wikipedia",
+      "enabled": true,
+      "priority": 3,
+      "timeout": 10000
+    }
+  ],
+  "defaultSource": "Wikipedia",
+  "fallbackOrder": ["Wikipedia", "Britannica", "DBpedia"],
+  "cacheEnabled": true,
+  "cacheTTL": 3600
+}
