@@ -155,7 +155,7 @@ export class ModelSelector {
   public select(criteria: ModelSelectionCriteria): SelectedModel[] {
     const selectedModels: SelectedModel[] = [];
 
-    logger.info("[ModelSelector] Selecting models", { criteria })
+    logger.info("ModelSelector: Selecting models", { criteria })
 
     // If preferred models specified, prioritize them
     if (criteria.preferredModels && criteria.preferredModels.length > 0) {
@@ -203,7 +203,7 @@ export class ModelSelector {
       return b.confidence - a.confidence;
     });
 
-    logger.info("[ModelSelector] Models selected", {
+    logger.info("ModelSelector: Models selected", {
       count: uniqueModels.length,
       models: uniqueModels.map((m) => m.name),
     });

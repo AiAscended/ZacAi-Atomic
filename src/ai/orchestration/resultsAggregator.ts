@@ -88,7 +88,7 @@ export class ResultsAggregator {
   ): AggregatedResult {
     const startTime = Date.now();
 
-    logger.info("[ResultsAggregator] Aggregating results", {
+    logger.info("ResultsAggregator: Aggregating results", {
       resultCount: results.length,
       strategy,
       sources: results.map((r) => r.source),
@@ -138,7 +138,7 @@ export class ResultsAggregator {
       },
     };
 
-    logger.info("[ResultsAggregator] Results aggregated", {
+    logger.info("ResultsAggregator: Results aggregated", {
       sourcesCount: sources.length,
       confidence: averageConfidence,
       processingTime,

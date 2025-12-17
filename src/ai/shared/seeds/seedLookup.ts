@@ -92,7 +92,11 @@ export function getDefinition(key: string, domain?: string): string | null {
   const entry = seedRegistry.lookup(key, domain);
   if (!entry?.fullData) return null;
   
-  return (entry.fullData as any)?.definition || (entry.fullData as any)?.description || (entry.fullData as any)?.explanation || null;
+  const def = entry.fullData.definition || 
+              entry.fullData.description || 
+              entry.fullData.explanation;
+  
+  return def ? String(def) : null;
 }
 
 /**
@@ -226,9 +230,10 @@ export function lookupWithContext(
   }
 
   // Get related terms
-  const relatedKeys = Array.isArray((main.fullData as any)?.related) ? (main.fullData as any).related : [];
+  const related = main.fullData?.related;
+  const relatedKeys = Array.isArray(related) ? related : [];
   for (const relKey of relatedKeys) {
-    const relSeed = seedRegistry.lookup(relKey, domain);
+    const relSeed = seedRegistry.lookup(String(relKey), domain);
     if (relSeed) {
       result.related.push(relSeed);
     }

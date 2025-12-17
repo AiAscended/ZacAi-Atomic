@@ -20,18 +20,18 @@ export function CodeEditor({
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof monaco | null>(null);
   const { 
-    openFiles, 
-    activeFileId, 
-    closeFile, 
-    setActiveFile, 
-    updateFileContent,
+    tabs, 
+    activeTabId, 
+    closeTab, 
+    setActiveTab, 
+    updateTabContent,
     saveFile,
-    getFileById 
+    getTab 
   } = useEditorStore();
-  const { fs } = useFileSystem();
+  const { writeFile } = useFileSystem();
   const [theme, setTheme] = useState<'vs-dark' | 'light'>('vs-dark');
 
-  const activeFile = getFileById(activeFileId);
+  const activeFile = getTab(activeTabId);
 
   const handleEditorDidMount: OnMount = (editor, monacoInstance) => {
     editorRef.current = editor;
@@ -98,7 +98,15 @@ export function CodeEditor({
     
     languages.forEach((lang) => {
       monacoInstance.languages.registerCompletionItemProvider(lang, {
-        provideCompletionItems: (model, position, _context, _token) => {
+        provideCompletionItems: (model, position) => {
+          const word = model.getWordUntilPosition(position);
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: word.startColumn,
+            endColumn: word.endColumn,
+          };
+          
           const suggestions = [
             {
               label: 'log',
@@ -106,12 +114,7 @@ export function CodeEditor({
               insertText: "console.log('${1}');",
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Console log',
-              range: new monacoInstance.Range(
-                position.lineNumber,
-                position.column,
-                position.lineNumber,
-                position.column
-              ),
+              range,
             },
             {
               label: 'func',
@@ -119,12 +122,7 @@ export function CodeEditor({
               insertText: 'function ${1:name}(${2:params}) {\n\t${3}\n}',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Function declaration',
-              range: new monacoInstance.Range(
-                position.lineNumber,
-                position.column,
-                position.lineNumber,
-                position.column
-              ),
+              range,
             },
             {
               label: 'arrow',
@@ -132,12 +130,7 @@ export function CodeEditor({
               insertText: 'const ${1:name} = (${2:params}) => {\n\t${3}\n};',
               insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
               documentation: 'Arrow function',
-              range: new monacoInstance.Range(
-                position.lineNumber,
-                position.column,
-                position.lineNumber,
-                position.column
-              ),
+              range,
             },
             {
               label: 'async',
@@ -211,20 +204,20 @@ export function CodeEditor({
   };
 
   const handleSave = async () => {
-    if (activeFileId && fs) {
-      await saveFile(activeFileId, fs);
+    if (activeTabId && fs) {
+      await saveFile(activeTabId, fs);
     }
   };
 
   const handleChange = (value: string | undefined) => {
-    if (value !== undefined && activeFileId) {
-      updateFileContent(activeFileId, value);
+    if (value !== undefined && activeTabId) {
+      updateTabContent(activeTabId, value);
     }
   };
 
   const handleCloseTab = (fileId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    closeFile(fileId);
+    closeTab(fileId);
   };
 
   // Update editor content when active file changes
@@ -245,7 +238,7 @@ export function CodeEditor({
     }
   }, [activeFile?.id, activeFile?.content, activeFile?.language]);
 
-  if (openFiles.length === 0) {
+  if (tabs.length === 0) {
     return (
       <div className="h-full w-full flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
@@ -265,16 +258,16 @@ export function CodeEditor({
     <div className="h-full w-full flex flex-col bg-background">
       {/* Tabs */}
       <div className="flex items-center bg-muted/30 border-b overflow-x-auto">
-  {openFiles.map((file: EditorTab) => (
+        {tabs.map((file) => (
           <div
             key={file.id}
             className={cn(
               'flex items-center gap-2 px-4 py-2 border-r cursor-pointer transition-colors group',
-              file.id === activeFileId
+              file.id === activeTabId
                 ? 'bg-background text-foreground'
                 : 'hover:bg-muted/50 text-muted-foreground'
             )}
-            onClick={() => setActiveFile(file.id)}
+            onClick={() => setActiveTab(file.id)}
           >
             <span className="text-sm font-medium truncate max-w-[150px]">
               {file.path.split('/').pop()}

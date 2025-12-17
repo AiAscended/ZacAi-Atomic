@@ -29,6 +29,7 @@ export default function AdminLayout({
       <AdminSidebar
         isOpen={isSidebarOpen}
         isExpanded={isSidebarExpanded}
+        onClose={() => setIsSidebarOpen(false)}
         onExpandToggle={() => setIsSidebarExpanded(!isSidebarExpanded)}
         onClose={() => setIsSidebarOpen(false)}
       />

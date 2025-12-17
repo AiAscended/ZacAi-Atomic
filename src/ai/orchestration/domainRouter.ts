@@ -10,8 +10,8 @@
  * - Returns: List of domain names to query
  */
 
-import { logger } from "./logger";
-import domainRegistry from "../knowledge-domains/domainRegistry";
+import { logger } from "./logger"
+import { domainRegistry } from "../knowledge-domains/domainRegistry"
 
 export interface DomainRoutingCriteria {
   keywords: string[];
@@ -284,10 +284,10 @@ export class DomainRouter {
   public route(criteria: DomainRoutingCriteria): RoutedDomain[] {
     const routedDomains: RoutedDomain[] = [];
 
-    logger.info("[DomainRouter] Routing to domains", { criteria })
+    logger.info("DomainRouter: Routing to domains", { criteria })
 
     // Get all available domains from registry
-    const availableDomains = domainRegistry.getAllDomains();
+    const availableDomains = domainRegistry.getAllDomains().map(d => d.name)
 
     // Score each domain based on keyword matches
     for (const domain of availableDomains) {
@@ -324,7 +324,7 @@ export class DomainRouter {
     // Limit to top 5 domains for performance
     const selectedDomains = routedDomains.slice(0, 5);
 
-    logger.info("[DomainRouter] Domains routed", {
+    logger.info("DomainRouter: Domains routed", {
       count: selectedDomains.length,
       domains: selectedDomains.map((d) => d.name),
     });
@@ -416,7 +416,7 @@ export class DomainRouter {
     this.domainKeywords.set(domainName, keywords);
     this.domainPriorities.set(domainName, priority);
 
-    logger.info("[DomainRouter] Added custom domain", {
+    logger.info("DomainRouter: Added custom domain", {
       domainName,
       keywordCount: keywords.length,
       priority,

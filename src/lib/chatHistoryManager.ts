@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * Chat History System Implementation
  * Complete backend + API for persistent chat history
@@ -8,7 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import logger from './systemActivityLogger.cjs';
+import logger from './systemActivityLogger';
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const CHAT_HISTORY_DIR = path.join(ROOT_DIR, 'src', 'ai', 'data', 'chat-history');

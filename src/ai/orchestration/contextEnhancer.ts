@@ -84,10 +84,10 @@ export class ContextEnhancer {
       dialogueState,
       sentiment: {
         polarity: sentiment.sentiment,
-        emotion: sentiment.sentiment, // Map sentiment to emotion as fallback
+        emotion: sentiment.emotion,
         confidence: sentiment.score,
       },
-      slots,
+      slots: slots as Record<string, string>,
       userProfile,
       conversationTurn: history.length + 1,
     };
@@ -98,9 +98,12 @@ export class ContextEnhancer {
    */
   public getConversationSummary(sessionId: string): string {
     const profile = this.profileHandler.getProfile(sessionId)
-    const state = `session-${sessionId}`
+    const state = this.dialogueController.getState(sessionId)
+    
+    const name = profile.name as string | undefined
+    const history = profile.history as string[] | undefined
 
-    return `User: ${profile.name || "Unknown"}, State: ${state}, History: ${Array.isArray(profile.history) ? profile.history.length : 0} turns`
+    return `User: ${name || "Unknown"}, State: ${state}, History: ${history?.length || 0} turns`
   }
 }
 
