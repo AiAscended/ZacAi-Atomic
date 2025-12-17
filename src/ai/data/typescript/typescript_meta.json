@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "description": "TypeScript programming language domain for code analysis, type checking, and development assistance",
+  "capabilities": ["code_analysis", "type_inference", "syntax_checking", "refactoring", "documentation"],
+  "atomicLevel": "organ",
+  "dependencies": ["english", "general"]
+}

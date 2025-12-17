@@ -1,0 +1,39 @@
+{
+  "domain": "internet_search",
+  "version": "1.0.0",
+  "vocabulary": {
+    "search": 0.95,
+    "find": 0.9,
+    "lookup": 0.85,
+    "google": 0.8,
+    "bing": 0.8,
+    "duckduckgo": 0.8,
+    "internet": 0.75,
+    "web": 0.7,
+    "query": 0.7,
+    "results": 0.65,
+    "wikipedia": 0.85,
+    "information": 0.6,
+    "who": 0.5,
+    "what": 0.5,
+    "where": 0.5,
+    "when": 0.5,
+    "why": 0.5,
+    "how": 0.5,
+    "history": 0.7,
+    "definition": 0.7,
+    "invented": 0.6
+  },
+  "thresholds": {
+    "min_confidence": 0.01,
+    "token_match_weight": 0.4,
+    "semantic_weight": 0.6
+  },
+  "neural_network": {
+    "input_size": 128,
+    "hidden_layers": [64, 32],
+    "output_size": 1,
+    "activation": "relu",
+    "learning_rate": 0.001
+  }
+}

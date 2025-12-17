@@ -1,0 +1,66 @@
+{
+  "domain": "internet_search",
+  "version": "1.0.0",
+  "vocabulary": {
+    "search": 0.95,
+    "find": 0.9,
+    "lookup": 0.85,
+    "google": 0.8,
+    "bing": 0.8,
+    "duckduckgo": 0.8,
+    "internet": 0.75,
+    "web": 0.7,
+    "query": 0.7,
+    "results": 0.65,
+    "wikipedia": 0.85,
+    "information": 0.6,
+    "who": 0.5,
+    "what": 0.5,
+    "where": 0.5,
+    "when": 0.5,
+    "why": 0.5,
+    "how": 0.5,
+    "history": 0.7,
+    "definition": 0.7,
+    "invented": 0.6,
+    "tell": 0.4,
+    "about": 0.4
+  },
+  "patterns": [
+    {
+      "pattern": "search for",
+      "weight": 0.9
+    },
+    {
+      "pattern": "find information",
+      "weight": 0.85
+    },
+    {
+      "pattern": "lookup",
+      "weight": 0.8
+    },
+    {
+      "pattern": "who invented",
+      "weight": 0.75
+    },
+    {
+      "pattern": "history of",
+      "weight": 0.75
+    },
+    {
+      "pattern": "what is",
+      "weight": 0.7
+    },
+    {
+      "pattern": "tell me about",
+      "weight": 0.7
+    }
+  ],
+  "examples": [
+    "search for programming languages history",
+    "find information about AI",
+    "lookup 99 red balloons",
+    "who invented artificial intelligence",
+    "what is the history of computers"
+  ]
+}

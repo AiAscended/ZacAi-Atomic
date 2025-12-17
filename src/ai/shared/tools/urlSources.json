@@ -4,19 +4,8 @@
       "name": "Wikipedia",
       "url": "https://en.wikipedia.org",
       "description": "General knowledge encyclopedia",
-      "searchPath": "/w/index.php?search="
-    },
-    {
-      "name": "Britannica",
-      "url": "https://www.britannica.com",
-      "description": "Encyclopedia Britannica - reliable general knowledge",
-      "searchPath": "/search?query="
-    },
-    {
-      "name": "Stanford Encyclopedia of Philosophy",
-      "url": "https://plato.stanford.edu",
-      "description": "Academic encyclopedia for philosophy and general knowledge",
-      "searchPath": "/search/searcher.py?query="
+      "searchPath": "/w/index.php?search=",
+      "apiPath": "/w/api.php?action=query&format=json&list=search&srsearch="
     }
   ],
   "mathematics": [
@@ -66,19 +55,23 @@
       "name": "Google",
       "url": "https://www.google.com",
       "description": "Google search engine",
-      "searchPath": "/search?q="
+      "searchPath": "/search?q=",
+      "apiPath": "/customsearch/v1?key=YOUR_API_KEY&cx=YOUR_CX&q="
     },
     {
       "name": "Bing",
       "url": "https://www.bing.com",
       "description": "Microsoft Bing search engine",
-      "searchPath": "/search?q="
+      "searchPath": "/search?q=",
+      "apiPath": "/v7.0/search?q="
     },
     {
       "name": "DuckDuckGo",
       "url": "https://duckduckgo.com",
       "description": "Privacy-focused search engine",
-      "searchPath": "/?q="
+      "searchPath": "/?q=",
+      "apiPath": "/?q=",
+      "format": "json"
     }
   ]
 }
