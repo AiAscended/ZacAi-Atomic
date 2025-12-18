@@ -11,9 +11,7 @@
  */
 
 import { GitHubBranchManager, createGitHubBranchManager } from './branchManager';
-import systemActivityLogger from '../systemActivityLogger.cjs';
-
-const { logEvent } = systemActivityLogger;
+import { logEvent } from '../systemActivityLogger';
 
 export interface SelfLearningConfig {
   owner: string;

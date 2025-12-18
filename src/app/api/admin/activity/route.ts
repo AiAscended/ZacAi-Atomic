@@ -7,10 +7,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readEvents } from '@/lib/systemActivityLogger';
 import { addSecurityHeaders, generateRequestId } from '@/lib/productionHardening';
 
-// CommonJS require for .cjs file
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { readEvents } = require('@/lib/systemActivityLogger.cjs');
-
 export async function GET(request: NextRequest) {
   const requestId = generateRequestId();
 
@@ -18,7 +14,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '100', 10);
     
-    const events = activityLogger.readEvents(Math.min(limit, 1000)); // Cap at 1000 for safety
+    const events = readEvents(Math.min(limit, 1000)); // Cap at 1000 for safety
     
     const response = NextResponse.json({
       events,

@@ -8,13 +8,29 @@
 
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const ROOT_DIR = path.resolve(__dirname, '..');
-const DATA_DIR = path.join(ROOT_DIR, 'ai', 'data');
+// Resolve __dirname in ESM context
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Keep logs in top-level data/ for consistency with legacy CJS logger
+const ROOT_DIR = path.resolve(__dirname, '..', '..');
+const DATA_DIR = path.join(ROOT_DIR, 'data');
 const LOG_PATH = path.join(DATA_DIR, 'system-activity.log');
 
 function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+function buildEvent(type: string, message: string | unknown, meta: Record<string, unknown>) {
+  return {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    type,
+    message,
+    meta,
+    timestamp: new Date().toISOString(),
+  };
 }
 
 export function logEvent(type: string, message: string | unknown, meta: Record<string, unknown> = {}) {

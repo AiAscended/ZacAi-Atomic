@@ -7,7 +7,7 @@
 import type { RawData, WebSocket, WebSocketServer } from 'ws';
 import type { Server } from 'http';
 import * as pty from 'node-pty';
-import { logEvent } from './systemActivityLogger.cjs';
+import { logEvent } from './systemActivityLogger';
 
 type TerminalControlMessage =
   | { type: 'input'; data: string }

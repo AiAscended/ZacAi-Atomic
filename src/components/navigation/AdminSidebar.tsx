@@ -23,6 +23,8 @@ import {
   Plug,
   MessageSquare,
   X,
+  Terminal,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -175,21 +177,12 @@ const menuItems: MenuItem[] = [
     label: "AI Models",
     icon: Brain,
     path: "/admin/models",
-    children: [
-      { id: "unified-transformer-llm", label: "Unified Transformer LLM", icon: Brain, path: "/admin/models/unified-transformer-llm" },
-      { id: "code-transformer", label: "Code Transformer", icon: Brain, path: "/admin/models/code-transformer" },
-      { id: "convolutional-neural-network", label: "Convolutional Neural Network", icon: Brain, path: "/admin/models/convolutional-neural-network" },
-      { id: "vision-transformer", label: "Vision Transformer", icon: Brain, path: "/admin/models/vision-transformer" },
-      { id: "diffusion-model", label: "Diffusion Model", icon: Brain, path: "/admin/models/diffusion-model" },
-      { id: "generative-adversarial-network", label: "Generative Adversarial Network", icon: Brain, path: "/admin/models/generative-adversarial-network" },
-      { id: "recurrent-neural-network", label: "Recurrent Neural Network", icon: Brain, path: "/admin/models/recurrent-neural-network" },
-      { id: "graph-neural-network", label: "Graph Neural Network", icon: Brain, path: "/admin/models/graph-neural-network" },
-      { id: "neuro-symbolic-reasoning", label: "Neuro-Symbolic Reasoning", icon: Brain, path: "/admin/models/neuro-symbolic-reasoning" },
-      { id: "multi-modal-fusion", label: "Multi-Modal Fusion", icon: Brain, path: "/admin/models/multi-modal-fusion" },
-      { id: "speech-to-text", label: "Speech-to-Text", icon: Brain, path: "/admin/models/speech-to-text" },
-      { id: "text-to-speech", label: "Text-to-Speech", icon: Brain, path: "/admin/models/text-to-speech" },
-      { id: "wavenet-audio-model", label: "WaveNet Audio Model", icon: Brain, path: "/admin/models/wavenet-audio-model" },
-    ],
+  },
+  {
+    id: "hco",
+    label: "Hybrid HCO",
+    icon: Sparkles,
+    path: "/admin/orchestrator",
   },
   {
     id: "training-pipelines",
@@ -213,14 +206,7 @@ const menuItems: MenuItem[] = [
     id: "integrations",
     label: "Integrations",
     icon: Plug,
-    children: [
-      {
-        id: "github-app",
-        label: "GitHub App",
-        icon: Plug,
-        path: "/admin/integrations/github-app",
-      },
-    ],
+    children: [{ id: "github-app", label: "GitHub App", icon: Plug, path: "/admin/integrations/github-app" }],
   },
   {
     id: "users",
@@ -332,27 +318,15 @@ export function AdminSidebar({
         isOpen ? (isExpanded ? "w-64" : "w-16") : "w-0 -translate-x-full",
       )}
     >
-      <div className="flex flex-col h-full pb-4">
+      <div className="flex flex-col h-full">
         {/* Header with close button */}
         <div className="h-14 border-b flex items-center justify-end px-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-accent transition-colors ml-auto"
+            className="h-8 w-8"
             aria-label="Close menu"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        
-        <nav className="flex-1 overflow-y-auto px-2 space-y-1 pt-2">{menuItems.map((item) => renderMenuItem(item))}</nav>
-        
-        {isOpen && !isExpanded && (
-          <button
-            onClick={onExpandToggle}
-            className="mx-2 p-2 rounded-lg hover:bg-accent transition-colors"
-            aria-label="Expand menu"
           >
             <X className="h-4 w-4" />
           </Button>

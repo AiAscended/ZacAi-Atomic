@@ -1,7 +1,0 @@
-{"ts":"2025-12-14T21:28:33.519Z","type":"terminal_manager.initialized","message":"{\"path\":\"/api/admin/dev-console/terminal\"}","meta":{}}
-{"ts":"2025-12-14T22:26:37.703Z","type":"terminal_manager.initialized","message":"{\"path\":\"/api/admin/dev-console/terminal\"}","meta":{}}
-{"ts":"2025-12-14T22:29:41.917Z","type":"terminal_manager.initialized","message":"{\"path\":\"/api/admin/dev-console/terminal\"}","meta":{}}
-{"ts":"2025-12-14T23:10:38.409Z","type":"terminal_manager.initialized","message":"{\"path\":\"/api/admin/dev-console/terminal\"}","meta":{}}
-{"ts":"2025-12-15T01:19:09.787Z","type":"terminal_manager.initialized","message":"{\"path\":\"/api/admin/dev-console/terminal\"}","meta":{}}
-{"ts":"2025-12-15T01:20:55.360Z","type":"terminal_manager.cleaned_up","message":"{\"sessionsClosed\":0}","meta":{}}
-{"ts":"2025-12-15T01:49:56.145Z","type":"terminal_manager.initialized","message":"{\"path\":\"/api/admin/dev-console/terminal\"}","meta":{}}

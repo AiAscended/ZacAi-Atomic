@@ -279,6 +279,11 @@ export default function EnhancedHomePage() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask me anything about React, Next.js, TypeScript, programming..."
                 disabled={!aiReady}
+                inputMode="text"
+                enterKeyHint="send"
+                autoComplete="off"
+                autoCorrect="on"
+                autoCapitalize="sentences"
                 className="flex-1 resize-none rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent p-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
                 rows={3}
                 onInput={resizeInput}
@@ -433,6 +438,11 @@ export default function EnhancedHomePage() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me anything..."
               disabled={!aiReady}
+              inputMode="text"
+              enterKeyHint="send"
+              autoComplete="off"
+              autoCorrect="on"
+              autoCapitalize="sentences"
               className="flex-1 resize-none rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
               rows={1}
               onInput={resizeInput}

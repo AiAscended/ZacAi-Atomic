@@ -14098,11 +14098,11 @@
       "extension": "ts"
     },
     {
-      "path": "src/lib/systemActivityLogger.cjs",
+      "path": "src/lib/systemActivityLogger.ts",
       "size": 1331,
       "modifiedAt": "2025-12-13T04:35:31.142Z",
       "hash": "5d2fc72af0fc3cd5af0bd3508d9d4cfa6a9550b3",
-      "extension": "cjs"
+      "extension": "ts"
     },
     {
       "path": "src/lib/terminalManager.ts",
