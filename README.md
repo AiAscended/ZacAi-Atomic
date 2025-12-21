@@ -1,4 +1,4 @@
-# ZacAi-Hybrid-LLM v0.0.5
+# ZacAi-Hybrid-LLM v0.0.9
 
 **Advanced Hybrid AI System with Knowledge Domains, Memory Management, and Learning Capabilities**
 
