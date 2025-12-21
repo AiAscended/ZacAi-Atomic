@@ -1,330 +1,201 @@
-// README intentionally left blank for new project documentation. New README will be created to reflect the current system architecture, packages, and project goals.
-│   │   │   ├── {model}_model/
-│   │   │   ├── {model}_training/
-│   │   │   ├── {model}_instructions.yml
-│   │   │   └── {model}_config.json
-│   │
-│   ├── shared/                # Shared utilities
-│   │   ├── seeds/             # Binary indexing system
-│   │   ├── memory/            # Learning & memory
-│   │   ├── weights/           # Weight management
-│   │   └── vocabulary/        # Shared vocabularies
-│   │
-│   └── orchestration/         # Main orchestrator
-│       └── mainOrchestrator.ts
+# ZacAi-Atomic: Hybrid AI System Architecture
+
+## Overview
+
+**ZacAi-Atomic** is a next-generation, bio-inspired hybrid AI platform. It unifies deterministic system control, advanced orchestration, evolutionary memory, and vibrational field coordination into a single, modular TypeScript/Next.js codebase. The project is designed for resilience, introspection, and autonomous operation, drawing direct parallels to human neuroanatomy for both conceptual clarity and engineering rigor.
+
+---
+
+## Project Vision
+
+ZacAi-Atomic aims to replace fragmented AI stacks (Python, Docker, K8s, ONNX, etc.) with a unified, WASM-ready, browser-to-GPU system. It is built for:
+- **Always-online operation** (degraded mode fallback)
+- **Self-healing and recovery** (system kernel)
+- **Modular orchestration and agent coordination** (HCO)
+- **Evolutionary, unified memory and recall** (LLeMuR)
+- **Vibrational field-based coherence** (VCFlow)
+- **Bio-inspired, symphonic design** (AiSymphony)
+
+---
+
+## Biological Inspiration: Brain Mapping
+
+ZacAi’s architecture mirrors the human brain:
+
+| Human Brain Part      | ZacAi Component                | Role/Function                                      |
+|----------------------|--------------------------------|----------------------------------------------------|
+| Brainstem            | System Kernel                  | Vital core, health, recovery, audit, boot           |
+| Spinal Cord          | Pipeline/UI Surfaces           | Signal relay, status, admin/chat UIs                |
+| Prefrontal Cortex    | HCO (Hybrid Coordination)      | Executive planning, orchestration, agent routing    |
+| Cerebrum/Lobes       | Domain Agents (VCFlow, LLeMuR) | Specialized knowledge, memory, coordination         |
+| Neural Networks      | LLeMuR + Internal Memory       | Evolutionary memory, recall, vector DB, embeddings  |
+| Synapses             | VCFlow                         | Data flow, vibrational/cellular communication       |
+
+---
+
+## Core Subsystems
+
+### 1. System Kernel (`@zacai/core`)
+- **Role:** The “brainstem” and spine of ZacAi. Provides deterministic health, audit, and recovery logic. Always answers system/status prompts, even if other modules are offline.
+- **Features:**
+  - File-based state and audit logs
+  - Health checks, recovery plans, profile switching
+  - No external dependencies; logic-only
+  - Exposed via `/api/system` and admin panels
+
+### 2. HCO (Hybrid Coordination Orchestrator)
+- **Role:** The “prefrontal cortex.” Orchestrates agent pipelines, decision-making, and multi-agent coordination.
+- **Features:**
+  - Modular pipeline fan-out and agent-to-agent communication
+  - 3-phase validation, supervisor/agent hierarchy
+  - WebSocket streams for real-time coordination
+
+### 3. LLeMuR (Large Language Evolutionary MultiModal Unified Recollection)
+- **Role:** The “memory and recall” system. Handles evolutionary memory, self-learning, and context injection for agents.
+- **Features:**
+  - In-memory recall with optional vector DB connectors
+  - Self-learning loops, YAML/XML seed evolution
+  - Middleware for agent context injection
+
+### 4. VCFlow (Vibrational Cellular Field Orchestration)
+- **Role:** The “synaptic field.” Provides vibrational, field-based overlays for coherence and harmony across modules.
+- **Features:**
+  - Non-intrusive, physics-inspired field orchestration
+  - Plug-in wrappers for any module
+  - Passive emission, resonance mapping, and fallback compatibility
+
+### 5. AiSymphony
+- **Role:** The “conductor” and symphonic architecture. Unifies all components into a circular, music-inspired pipeline.
+- **Features:**
+  - Token-free vibrational signaling (PHONYTIES)
+  - Circular symphonic pipelines (CSOPs)
+  - Unified TypeScript system, WASM-ready
+
+---
+
+## Project Structure
+
+```
+zacai-atomic/
+├─ apps/
+│  └─ web/                      # Next.js 15 frontend (App Router, chat UI, admin, metrics)
+│      ├─ app/
+│      │   ├─ page.tsx          # Chat interface (text/audio/code)
+│      │   ├─ admin/page.tsx    # Admin dashboard
+│      │   └─ metrics/page.tsx  # Real-time monitoring
+│      ├─ components/
+│      │   ├─ ChatWindow.tsx
+│      │   ├─ AgentPanel.tsx
+│      │   ├─ LogsViewer.tsx
+│      │   └─ MetricsGraph.tsx
+│      ├─ utils/
+│      │   └─ apiClient.ts
+│      └─ styles/
+│          └─ global.css
+│
+├─ packages/
+│  ├─ model-large-language/     # WASM/Rust LLM (language model)
+│  ├─ model-coding-transformer/ # WASM/Rust code transformer
+│  ├─ model-speech-to-text/     # WASM/Rust speech-to-text
+│  ├─ model-text-to-speech/     # WASM/Rust text-to-speech
+│  ├─ model-vision-transformer/ # WASM/Rust vision transformer
+│  ├─ model-graph-neural-net/   # WASM/Rust graph neural network
+│  ├─ model-convolutional-net/  # WASM/Rust CNN
+│  ├─ model-diffusion/          # WASM/Rust diffusion model
+│  ├─ model-wavenet-audio/      # WASM/Rust audio generation
+│  ├─ model-multi-modal-fusion/ # WASM/Rust multimodal fusion
+│  ├─ model-neuro-symbolic/     # WASM/Rust neuro-symbolic hybrid
+│  ├─ model-recurrent-net/      # WASM/Rust RNN
+│  ├─ model-generative-adversarial/ # WASM/Rust GAN
+│  ├─ internal-vector-db/       # WASM/Rust vector DB (memory, recall)
+│  ├─ core-system/              # System kernel, registry, recovery, audit
+│  ├─ orchestration-model/      # Orchestration reasoning model
+│  ├─ orchestration-agent/      # Orchestration agent logic
+│  ├─ hco/                      # Hybrid Coordination Orchestrator
+│  │   ├─ agent-supervisor.ts   # HCO supervisor agent
+│  │   ├─ agent-1.ts            # HCO agent 1
+│  │   ├─ agent-2.ts            # HCO agent 2
+│  │   ├─ agent-3.ts            # HCO agent 3
+│  │   ├─ agent-4.ts            # HCO agent 4
+│  │   ├─ agent-5.ts            # HCO agent 5
+│  │   ├─ agent-6.ts            # HCO agent 6
+│  │   ├─ agent-7.ts            # HCO agent 7
+│  ├─ llemur/                   # LLeMuR memory/recall system
+│  │   ├─ llemur-core.ts        # Main LLeMuR logic
+│  │   ├─ llemur-vector.ts      # Vector DB integration
+│  │   ├─ llemur-cache.ts       # In-memory recall
+│  │   ├─ llemur-hooks.ts       # Orchestrator hooks
+│  │   └─ llemur-api.ts         # API endpoints
+│  ├─ vcflow/                   # VCFlow vibrational field orchestration
+│  │   ├─ vcflow-core.ts        # Main VCFlow logic
+│  │   ├─ vcflow-hooks.ts       # Integration hooks
+│  │   └─ vcflow-api.ts         # API endpoints
+│  ├─ aisymphony/               # AiSymphony orchestration/conductor
+│  │   ├─ aisymphony-core.ts    # Main symphony logic
+│  │   └─ aisymphony-pipeline.ts# Circular pipeline logic
+│  ├─ shared/                   # Shared TS modules, utils, types
+│  │   ├─ types/
+│  │   ├─ utils/
+│  │   ├─ tensor-utils/
+│  │   ├─ memory-manager/
+│  │   └─ tokenizers/
+│
+├─ scripts/                     # Build, deploy, preprocessing, testing
+│  ├─ build_wasm.ts
+│  ├─ deploy.ts
+│  ├─ data_preprocessing.ts
+│  ├─ weight_conversion.ts
+│  └─ test_pipeline.ts
+│
+├─ infra/                       # Enterprise infra / IaC
+│  ├─ terraform/
+│  ├─ pulumi/
+│  ├─ kubernetes/
+│  └─ ci-cd/
+│
+├─ monitoring/                  # Observability & metrics
+│  ├─ prometheus/
+│  ├─ grafana/
+│  └─ logs/
+│
+├─ security/
+│  ├─ auth.ts
+│  ├─ authorization.ts
+│  ├─ pii_filters.ts
+│  └─ policy_rules.ts
+│
+├─ tests/
+│  ├─ unit/
+│  ├─ integration/
+│  └─ performance/
+│
+├─ configs/
+│  ├─ llm_config.json
+│  ├─ coding_config.json
+│  ├─ stt_config.json
+│  ├─ tts_config.json
+│  ├─ tokenizer_llm.json
+│  ├─ tokenizer_code.json
+│  ├─ tokenizer_stt.json
+│  ├─ tokenizer_tts.json
+│  └─ weights_meta.yaml
+│
+└─ data/
+    ├─ raw/
+    ├─ processed/
+    └─ embeddings/
 ```
 
----
 
-## 🌍 Knowledge Domains (23)
-
-Each domain has specialized knowledge, vocabulary, and reasoning capabilities:
-
-| Domain | Purpose | Seed Files |
-|--------|---------|------------|
-| **algorithms** | Algorithm design and analysis | 5 |
-| **code_review** | Code quality and best practices | 5 |
-| **data_integrity** | Data validation and verification | 4 |
-| **data_structures** | Data organization patterns | 5 |
-| **documentation** | Technical writing | 5 |
-| **english** | Language processing | 5 |
-| **environment** | Environment configuration | 5 |
-| **error_detection** | Bug identification | 5 |
-| **general_knowledge** | Broad knowledge base | 6 |
-| **grammar** | Grammar rules and syntax | 12 |
-| **internet_search** | Web search capabilities | 5 |
-| **mathematics** | Mathematical reasoning | 25 |
-| **nextjs** | Next.js framework | 42 |
-| **observability** | System monitoring | 5 |
-| **programming** | Programming concepts | 16 |
-| **react** | React library | 1 |
-| **repair** | System repair | 5 |
-| **science** | Scientific knowledge | 5 |
-| **security** | Security best practices | 10 |
-| **system** | System operations | 14 |
-| **testing** | Test strategies | 5 |
-| **typescript** | TypeScript language | 5 |
-| **version_control** | Git and versioning | 5 |
+### Key Best Practices
+- **Next.js App Router** for frontend/app (2026 standard)
+- **Rust → WASM** for all compute-heavy modules (models, vector DB)
+- **TypeScript** for orchestrator, kernel, agents, orchestration agent
+- **Separation of Concerns:**
+  - System Model & Agent: self-healing, recovery, kernel operations
+  - Orchestration Model & Agent: workflow, multi-agent scheduling, reasoning
+- **TurboRepo Monorepo/Workspaces:** modular caching, isolated testing, multiple deployable apps
+- **Internal Vector DB:** Rust/WASM, stable/experimental/backup branches
+- **CI/CD, Monitoring, Security, Infra:** production-grade deployment
 
 ---
-
-## 🤖 AI Models (13)
-
-Complete neural network implementations with training pipelines:
-
-1. **code-transformer** - Code generation and transformation
-2. **convolutional-neural-network** - Image processing
-3. **diffusion-model** - Generative modeling
-4. **generative-adversarial-network** - Adversarial learning
-5. **graph-neural-network** - Graph-based reasoning
-6. **multi-modal-fusion** - Cross-modal understanding
-7. **neuro-symbolic-reasoning** - Symbolic + neural hybrid
-8. **recurrent-neural-network** - Sequential data processing
-9. **speech-to-text** - Audio transcription
-10. **text-to-speech** - Speech synthesis
-11. **unified-transformer-llm** - Main language model
-12. **vision-transformer** - Vision understanding
-13. **wavenet-audio-model** - Audio generation
-
----
-
-## 📚 Key Systems
-
-### 1. Binary Indexing System
-
-Fast O(1) seed lookups with 4-byte indices:
-- Format: `[domain_id(1), file_id(1), entry_id(2)]`
-- Capacity: 4.2 billion entries (255 domains × 255 files × 65,535 entries)
-- Hash-based lookups for instant access
-
-### 2. Learning & Memory Management
-
-Real-time knowledge acquisition:
-- **Session Management** - Unique session IDs with chat history
-- **Vocabulary Learning** - Automatic capture of unknown words
-- **Date-Stamped Storage** - All learned data timestamped (DD-MM-YY format)
-- **Domain-Specific Learning** - Knowledge organized by domain/model
-
-### 3. Weight Management
-
-Comprehensive weight versioning:
-- **Unified Manifests** – Every model and domain writes to `weights-manifest.json`, recording bootstrapped, pretrained, trained, and checkpoint artifacts with provenance so the orchestrator always selects the best available snapshot.
-- **Pretrained Weights** - Basic task-specific functionality
-- **Trained Weights** - Date-stamped training runs (e.g., `_trained_weights_02-11-25.json`)
-- **Weight History** - Complete training lineage
-- **Automatic Loading** - Smart weight discovery and loading
-
-Use the migration script to register legacy weight files into their manifest:
-
-```bash
-npx tsx scripts/migrate-weight-manifests.ts
-```
-
-### 4. GitHub Backup Integration
-
-Automated backup to multiple repositories:
-- **backup** - Daily automated backups
-- **data_library** - Learned vocabulary and training data
-- **stable** - Stable releases
-- **enhanced** - Enhanced versions with new features
-- **experimental** - Experimental branches
-
----
-
-## 🔧 Installation
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-- Git
-
-### Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/AiAscended/ZacAi-Hybrid-LLM-v0.0.2.git
-cd ZacAi-Hybrid-LLM-v0.0.2
-
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-```
-
-### Environment Variables
-
-Create a `.env.local` file:
-
-```env
-# GitHub Integration (optional)
-GITHUB_TOKEN=your_github_personal_access_token
-GITHUB_BACKUP_ENABLED=true
-
-# AI Configuration
-AI_INFERENCE_ENDPOINT=http://localhost:3000/api/inference
-SEED_REGISTRY_PRELOAD=true
-```
-
----
-
-## 📖 Usage
-
-### Basic Inference
-
-```typescript
-import { mainOrchestrator } from '@/ai/orchestration/mainOrchestrator';
-
-const result = await mainOrchestrator.processPrompt(
-  "Explain how binary search works",
-  { sessionId: "user-session-123" }
-);
-
-console.log(result.response);
-```
-
-### Seed Lookup
-
-```typescript
-import { lookupSeed, searchSeeds } from '@/ai/shared/seeds/seedLookup';
-
-// Direct lookup
-const concept = lookupSeed('async', 'programming');
-
-// Search across domains
-const results = searchSeeds('neural network', { limit: 10 });
-```
-
-### Learning New Concepts
-
-```typescript
-import { learningMemoryManager } from '@/ai/shared/learningMemoryManager';
-
-// Learn from URL lookup
-await learningMemoryManager.learnFromUrlLookup({
-  term: 'quantum computing',
-  definition: 'Computing using quantum mechanical phenomena',
-  source: 'https://example.com/quantum',
-  domain: 'science'
-});
-
-// Get session history
-const history = learningMemoryManager.getSessionHistory(sessionId);
-```
-
----
-
-## 🎯 Architecture Highlights
-
-### Complete Separation of Concerns
-
-Every component is fully isolated:
-- All folders prefixed with parent name
-- All files prefixed with component name
-- No cross-domain dependencies (except through orchestrator)
-- Clear module boundaries
-
-### Naming Convention
-
-- **Domains:** `{domain}_seeds/`, `{domain}_weights/`, `{domain}_tools/`
-- **Models:** `{model}_config/`, `{model}_data/`, `{model}_inference/`
-- **Files:** `{component}_{description}_{date}.json`
-
-### Weight Versioning
-
-Training runs automatically create date-stamped weight files:
-```
-mathematics_trained_weights_02-11-25.json
-mathematics_trained_weights_15-12-25.json
-mathematics_trained_weights_03-01-26.json
-```
-
----
-
-## 📊 Statistics
-
-| Metric | Count |
-|--------|-------|
-| Knowledge Domains | 23 |
-| AI Models | 13 |
-| Seed Vocabulary Files | 220+ |
-| Total Files Created | 277+ |
-| Cleanup Operations | 262 |
-| Legacy Folders Removed | 51 |
-| Folders Renamed | 110 |
-
----
-
-## 🚀 What's New in v0.0.2
-
-### Major Features
-- ✅ Complete structural reorganization with proper prefixing
-- ✅ Learning and memory management system
-- ✅ Date-stamped weight versioning
-- ✅ GitHub backup integration
-- ✅ Binary indexing for seed lookups
-- ✅ Session-based memory with chat history
-- ✅ Real-time vocabulary acquisition
-- ✅ Automated cleanup and organization scripts
-
-### System Improvements
-- 🔧 Zero legacy folders remaining
-- 🔧 100% consistent naming conventions
-- 🔧 Complete separation of concerns
-- 🔧 Proper TypeScript types throughout
-- 🔧 Comprehensive error handling
-- 🔧 Detailed logging and monitoring
-
----
-
-## 📝 Documentation
-
-- **[System Complete](./docs/SYSTEM_COMPLETE.md)** - Full completion report
-- **[Cleanup Complete](./docs/CLEANUP_COMPLETE.md)** - Cleanup and organization
-- **[Seed System Architecture](./docs/SEED_SYSTEM_ARCHITECTURE.md)** - Binary indexing design
-- **[Quick Start](./docs/QUICKSTART.md)** - Getting started guide
-
----
-
-## 🔮 Roadmap
-
-### v0.0.3 (Planned)
-- [ ] Real-time training pipeline
-- [ ] Advanced weight pruning
-- [ ] Multi-GPU support
-- [ ] Enhanced session management
-- [ ] Web UI for system monitoring
-
-### v0.1.0 (Future)
-- [ ] Plugin system for custom domains
-- [ ] Cloud deployment support
-- [ ] API rate limiting
-- [ ] Advanced caching strategies
-- [ ] Performance optimization
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read our contributing guidelines before submitting PRs.
-
-### Development Workflow
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- Next.js team for the amazing framework
-- OpenAI for inspiration on hybrid AI systems
-- The broader AI/ML community for research and tools
-
----
-
-## 📞 Contact
-
-- **Author:** AiAscended
-- **Repository:** [ZacAi-Hybrid-LLM-v0.0.2](https://github.com/AiAscended/ZacAi-Hybrid-LLM-v0.0.2)
-- **Issues:** [GitHub Issues](https://github.com/AiAscended/ZacAi-Hybrid-LLM-v0.0.2/issues)
-
----
-
-## ⭐ Star History
-
-If you find this project useful, please consider giving it a star!
-
----
-
-**Built with ❤️ by AiAscended | Version 0.0.2 | Last Updated: November 2, 2025**
