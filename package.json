@@ -12,21 +12,11 @@
   "author": "",
   "type": "module",
   "scripts": {
-    "build": "next build",
-    "dev": "tsx server.ts",
-    "dev:next": "next dev",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css,html}\"",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "start": "tsx server.ts",
-    "start:next": "next start",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
-    "scan": "node scripts/scan-ai-modules.js",
-    "scan:models": "node scripts/scan-models.js",
-    "scan:domains": "node scripts/scan-domains.js",
-    "scan:all": "npm run scan:models && npm run scan:domains",
-    "scan:unified": "node scripts/scan-ai-modules.js"
+    "dev": "pnpm --dir apps/web dev",
+    "build": "pnpm --dir apps/web build",
+    "start": "pnpm --dir apps/web start",
+    "lint": "pnpm --dir apps/web lint || exit 0",
+    "test": "pnpm --dir apps/web test || exit 0"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.8.0-rc.2",

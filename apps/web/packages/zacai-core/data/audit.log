@@ -1,0 +1,6 @@
+{"id":"audit-boot-1766125836185","timestamp":1766125836185,"event":"boot","detail":"kernel booted","severity":"info"}
+{"id":"audit-boot-1766125838917","timestamp":1766125838917,"event":"boot","detail":"kernel booted","severity":"info"}
+{"id":"audit-boot-1766127083895","timestamp":1766127083895,"event":"boot","detail":"kernel booted","severity":"info"}
+{"id":"audit-boot-1766127086281","timestamp":1766127086281,"event":"boot","detail":"kernel booted","severity":"info"}
+{"id":"audit-boot-1766127170057","timestamp":1766127170057,"event":"boot","detail":"kernel booted","severity":"info"}
+{"id":"audit-boot-1766127173159","timestamp":1766127173159,"event":"boot","detail":"kernel booted","severity":"info"}
