@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 import { SystemKernel } from "@/../../packages/zacai-core/src/kernel/SystemKernel";
 import { ModuleRegistry } from "@/../../packages/zacai-core/src/registries/module-registry";
 import { Heartbeat } from "@/../../packages/zacai-core/src/heartbeat";
@@ -9,11 +9,12 @@ const registry = new ModuleRegistry();
 const heartbeat = new Heartbeat();
 const diagnostics = new Diagnostics(kernel, registry, heartbeat);
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function GET() {
   try {
     const result = await diagnostics.runFullDiagnostics();
-    res.status(200).json(result);
-  } catch (e) {
-    res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
+    return NextResponse.json(result);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
