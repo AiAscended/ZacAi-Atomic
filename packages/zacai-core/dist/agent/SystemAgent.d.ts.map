@@ -1,0 +1,1 @@
+{"version":3,"file":"SystemAgent.d.ts","sourceRoot":"","sources":["../../src/agent/SystemAgent.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,YAAY,EAAE,cAAc,EAAE,MAAM,mBAAmB,CAAC;AACtE,OAAO,EAAE,WAAW,EAAE,MAAM,yBAAyB,CAAC;AAEtD,qBAAa,WAAW;IACtB,OAAO,CAAC,KAAK,CAAc;gBAEf,KAAK,CAAC,EAAE,WAAW;IAIzB,OAAO,CAAC,MAAM,EAAE,YAAY,GAAG,OAAO,CAAC,cAAc,CAAC;CAG7D"}

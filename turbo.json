@@ -1,0 +1,38 @@
+{{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}  }    }      "cache": false    "dev": {    },      "outputs": []    "lint": {    },      "outputs": []      "dependsOn": ["build"],    "test": {    },      "outputs": ["dist/**"]      "dependsOn": ["^build"],    "build": {  "pipeline": {  "$schema": "https://turborepo.org/schema.json",  "$schema": "https://turborepo.org/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "dev": {
+      "cache": false
+    }
+  }
+}

@@ -1,5 +1,5 @@
-import type { SystemPrompt, SystemResponse } from "../types";
-import { SystemKernel } from "../kernel/SystemKernel";
+import type { SystemPrompt, SystemResponse } from "../types/index.js";
+import { SystemKernel } from "../kernel/SystemKernel.js";
 
 export class SystemModel {
   private kernel: SystemKernel;

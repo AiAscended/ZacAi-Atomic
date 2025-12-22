@@ -8,33 +8,20 @@
  * - Code highlighting and copy functionality
  */
 
+
 import type React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useIsClient } from "@/lib/useIsClient";
+// Utility hook to check if running on client
+// File: apps/web/src/lib/useIsClient.ts
+// export function useIsClient() { const [isClient, setIsClient] = useState(false); useEffect(() => { setIsClient(true); }, []); return isClient; }
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronDown, ChevronUp, Send, Sparkles } from "lucide-react";
 import { ResponseRenderer } from "@/components/ResponseRenderer";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant" | "error";
-  content: string;
-  contentBlocks?: {
-    textBlocks: Array<{ id: string; content: string }>;
-    codeBlocks: Array<{
-      id: string;
-      language: string;
-      code: string;
-      filename?: string;
-    }>;
-  };
-  thinkingSteps?: Array<{
-    step: string;
-    description: string;
-    timestamp: number;
-    data?: Record<string, unknown>;
-  }>;
-}
+import { useChatSettings } from "@/context/ChatSettingsContext";
+import { ChatInput } from "@/components/chat/ChatInput";
+import { Volume2 } from "lucide-react";
 
 const PROMPT_SUGGESTIONS = [
   {
@@ -66,18 +53,60 @@ const PROMPT_SUGGESTIONS = [
   },
 ];
 
-export default function EnhancedHomePage() {
+function speakText(text: string, voice: SpeechSynthesisVoice | null) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new window.SpeechSynthesisUtterance(text);
+  if (voice) utter.voice = voice;
+  window.speechSynthesis.speak(utter);
+}
+
+interface Message {
+  id: string;
+  role: "user" | "assistant" | "error";
+  content: string;
+  contentBlocks?: {
+    textBlocks: Array<{ id: string; content: string }>;
+    codeBlocks: Array<{
+      id: string;
+      language: string;
+      code: string;
+      filename?: string;
+    }>;
+  };
+  thinkingSteps?: Array<{
+    step: string;
+    description: string;
+    timestamp: number;
+    data?: Record<string, unknown>;
+  }>;
+}
+
+
+
+
+export default function ChatPage() {
+  // Remove isClient from render logic to avoid hydration mismatch
+  // State and refs
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [aiReady, setAiReady] = useState(false);
-  const [systemStatus, setSystemStatus] = useState("Initializing AI system...");
-  const [sessionId, setSessionId] = useState("");
+  const [aiReady, setAiReady] = useState(true); // Set true for now, replace with actual system status
+  const [systemStatus, setSystemStatus] = useState("AI system ready");
   const [expandedThinking, setExpandedThinking] = useState<number | null>(null);
+  const [playingMsgId, setPlayingMsgId] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  // Chat settings context
+  const { ttsEnabled, setTtsEnabled, voices, selectedVoice, setSelectedVoice } = useChatSettings();
 
+  // Scroll to bottom on new message
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isLoading]);
+
+  // Resize input
   const resizeInput = useCallback(() => {
     if (inputRef.current) {
       inputRef.current.style.height = "auto";
@@ -85,136 +114,62 @@ export default function EnhancedHomePage() {
     }
   }, []);
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
-
   useEffect(() => {
     resizeInput();
   }, [input, resizeInput]);
 
-  useEffect(() => {
-    if (aiReady && !isLoading) {
-      inputRef.current?.focus();
-    }
-  }, [aiReady, isLoading]);
-
-  useEffect(() => {
-    async function initializeSession() {
-      setSystemStatus("Connecting to AI system...");
-      try {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "initialize" }),
-        });
-        if (!res.ok)
-          throw new Error(`Failed to initialize AI system (${res.status})`);
-        const data = await res.json();
-        setSessionId(data.sessionId);
-        setAiReady(true);
-        setSystemStatus("AI system ready");
-      } catch {
-        setSystemStatus("Failed to initialize AI system");
-      }
-    }
-    initializeSession();
-  }, []);
-
-  const handleSubmit = async (promptText?: string) => {
-    const finalPrompt = promptText || input.trim();
-    if (!finalPrompt || !aiReady || isLoading) return;
-
-    const userMessage: Message = {
-      id: `user-${Date.now()}`,
-      role: "user",
-      content: finalPrompt,
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+  // Handle send
+  const handleSend = useCallback((inputText?: string) => {
+    const finalInput = inputText || input.trim();
+    if (!finalInput) return;
+    setMessages((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), role: "user", content: finalInput }
+    ]);
     setInput("");
     setIsLoading(true);
-
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "chat",
-          sessionId,
-          message: finalPrompt,
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-
-      const data = await res.json();
-
-      const assistantMessage: Message = {
-        id: `assistant-${Date.now()}`,
-        role: "assistant",
-        content: data.response || data.text || "No response",
-        contentBlocks: data.contentBlocks,
-        thinkingSteps: data.thinkingSteps,
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      const errorMessage: Message = {
-        id: `error-${Date.now()}`,
-        role: "error",
-        content: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
+    // Simulate AI response
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: `Echo: ${finalInput}`,
+          thinkingSteps: [
+            { step: "1", description: "Thinking...", timestamp: Date.now() }
+          ]
+        }
+      ]);
       setIsLoading(false);
-    }
-  };
+    }, 1200);
+  }, [input]);
 
+  // Toggle thinking steps
   const toggleThinking = (idx: number) => {
-    setExpandedThinking((current) => (current === idx ? null : idx));
+    setExpandedThinking((prev) => (prev === idx ? null : idx));
   };
 
+  // Render message content
   const renderMessageContent = (msg: Message) => {
-    if (msg.role === "assistant" && msg.contentBlocks) {
-      const hasTextBlocks =
-        msg.contentBlocks.textBlocks && msg.contentBlocks.textBlocks.length > 0;
-      const hasCodeBlocks =
-        msg.contentBlocks.codeBlocks && msg.contentBlocks.codeBlocks.length > 0;
-
-      if (hasTextBlocks || hasCodeBlocks) {
-        const textBlocks = msg.contentBlocks.textBlocks.map((block) => ({
-          ...block,
-          type: "paragraph" as const,
-        }));
-        return (
-          <ResponseRenderer
-            textBlocks={textBlocks}
-            codeBlocks={msg.contentBlocks.codeBlocks}
-          />
-        );
-      }
-
-      if (msg.content && msg.content.trim().length > 0) {
-        return <div className="whitespace-pre-wrap text-sm">{msg.content}</div>;
-      }
-
+    if (msg.contentBlocks) {
       return (
-        <div className="text-sm text-muted-foreground">
-          No response content available
-        </div>
+        <>
+          {msg.contentBlocks.textBlocks?.map((tb) => (
+            <p key={tb.id} className="mb-2 last:mb-0">{tb.content}</p>
+          ))}
+          {msg.contentBlocks.codeBlocks?.map((cb) => (
+            <pre key={cb.id} className="bg-slate-100 dark:bg-slate-800 rounded p-3 mt-2 overflow-x-auto">
+              <code>{cb.code}</code>
+            </pre>
+          ))}
+        </>
       );
     }
-    return <div className="whitespace-pre-wrap text-sm">{msg.content}</div>;
+    return <p>{msg.content}</p>;
   };
 
-  // Show initial landing page with suggestions
+  // Landing page with suggestions
   if (messages.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4">
@@ -231,12 +186,8 @@ export default function EnhancedHomePage() {
               Hybrid Multi-Domain AI Assistant
             </p>
             <div className="flex items-center justify-center gap-2 text-sm">
-              <div
-                className={`h-2 w-2 rounded-full ${aiReady ? "bg-green-500" : "bg-yellow-500"}`}
-              ></div>
-              <span className="text-slate-500 dark:text-slate-400">
-                {systemStatus}
-              </span>
+              <div className={`h-2 w-2 rounded-full ${aiReady ? "bg-green-500" : "bg-yellow-500"}`}></div>
+              <span className="text-slate-500 dark:text-slate-400">{systemStatus}</span>
             </div>
           </div>
 
@@ -246,16 +197,12 @@ export default function EnhancedHomePage() {
               <Card
                 key={idx}
                 className="p-4 cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-1 border-2 hover:border-indigo-500 dark:hover:border-indigo-400"
-                onClick={() =>
-                  !isLoading && aiReady && handleSubmit(suggestion.prompt)
-                }
+                onClick={() => !isLoading && aiReady && handleSend(suggestion.prompt)}
               >
                 <div className="space-y-2">
                   <div className="text-3xl">{suggestion.icon}</div>
                   <h3 className="font-semibold text-sm">{suggestion.title}</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
-                    {suggestion.prompt}
-                  </p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">{suggestion.prompt}</p>
                 </div>
               </Card>
             ))}
@@ -263,53 +210,23 @@ export default function EnhancedHomePage() {
 
           {/* Input Area */}
           <Card className="p-6 shadow-xl">
-            <form
-              className="flex gap-3"
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSubmit();
-              }}
-            >
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask me anything about React, Next.js, TypeScript, programming..."
-                disabled={!aiReady}
-                inputMode="text"
-                enterKeyHint="send"
-                autoComplete="off"
-                autoCorrect="on"
-                autoCapitalize="sentences"
-                className="flex-1 resize-none rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent p-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
-                rows={3}
-                onInput={resizeInput}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit();
-                  }
-                }}
-              />
-              <Button
-                type="submit"
-                disabled={!aiReady || isLoading || !input.trim()}
-                size="lg"
-                className="self-end"
-              >
-                <Send className="h-5 w-5" />
-              </Button>
-            </form>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-3 text-center">
-              Press Enter to send • Shift + Enter for new line
-            </p>
+            <ChatInput
+              placeholder="Ask me anything about React, Next.js, TypeScript, programming..."
+              onSend={handleSend}
+              disabled={!aiReady || isLoading}
+              onTTS={() => setTtsEnabled(!ttsEnabled)}
+              ttsEnabled={ttsEnabled}
+              voices={voices}
+              selectedVoice={selectedVoice}
+              setSelectedVoice={setSelectedVoice}
+            />
           </Card>
         </div>
       </div>
     );
   }
 
-  // Show chat interface once conversation starts
+  // Chat interface
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
       {/* Header */}
@@ -322,9 +239,7 @@ export default function EnhancedHomePage() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
-            <div
-              className={`h-2 w-2 rounded-full ${aiReady ? "bg-green-500" : "bg-yellow-500"}`}
-            ></div>
+            <div className={`h-2 w-2 rounded-full ${aiReady ? "bg-green-500" : "bg-yellow-500"}`}></div>
             <span className="text-xs text-slate-500">{systemStatus}</span>
           </div>
         </div>
@@ -347,12 +262,39 @@ export default function EnhancedHomePage() {
                       : "bg-red-500 text-white"
                 }`}
               >
-                <div className="text-xs font-semibold opacity-70 mb-3">
+                <div className="text-xs font-semibold opacity-70 mb-3 flex items-center gap-2">
                   {msg.role === "user"
                     ? "You"
                     : msg.role === "assistant"
                       ? "AI Assistant"
                       : "Error"}
+                  {msg.role === "assistant" && (
+                    <button
+                      className="ml-2 p-1 rounded-full hover:bg-green-100 dark:hover:bg-green-900 transition-colors"
+                      aria-label="Listen to response"
+                      onClick={() => {
+                        setPlayingMsgId(msg.id);
+                        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                          const utter = new window.SpeechSynthesisUtterance(msg.content);
+                          // Voice selection logic
+                          if (selectedVoice) utter.voice = selectedVoice;
+                          if (selectedVoice && selectedVoice.name === 'Male American (Presenter)') {
+                            const male = voices.find(v => v.lang === 'en-US' && v.name && v.name.toLowerCase().match(/(mike|john|male|dan|matt|david|paul|alex|tom)/));
+                            if (male) utter.voice = male;
+                          }
+                          if (selectedVoice && selectedVoice.name === 'Modern Robot') {
+                            const robot = voices.find(v => v.name && v.name.toLowerCase().match(/robot|synthetic|bot/));
+                            if (robot) utter.voice = robot;
+                          }
+                          window.speechSynthesis.speak(utter);
+                          utter.onend = () => setPlayingMsgId(null);
+                        }
+                      }}
+                    >
+                      <Volume2 className="w-5 h-5 text-green-600" />
+                    </button>
+                  )}
+                {/* ...existing code... */}
                 </div>
                 {renderMessageContent(msg)}
 
@@ -426,7 +368,7 @@ export default function EnhancedHomePage() {
             className="flex gap-3"
             onSubmit={(e) => {
               e.preventDefault();
-              handleSubmit();
+              handleSend();
             }}
           >
             <textarea
@@ -446,7 +388,7 @@ export default function EnhancedHomePage() {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  handleSubmit();
+                  handleSend();
                 }
               }}
             />

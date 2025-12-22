@@ -37,8 +37,3 @@ export async function GET() {
     );
   }
 }
-             return NextResponse.json({
-               status: "maintenance",
-               message: "This endpoint is in maintenance mode. Core system functions remain online.",
-               timestamp: new Date().toISOString(),
-             }, { status: 503 });

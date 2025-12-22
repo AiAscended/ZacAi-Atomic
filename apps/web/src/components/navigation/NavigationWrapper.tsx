@@ -15,28 +15,10 @@ interface NavigationWrapperProps {
 }
 
 export function NavigationWrapper({ children }: NavigationWrapperProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const toggleExpanded = () => setIsExpanded((prev) => !prev);
-
-  const isOpen = true;
-  const sidebarWidth = isExpanded ? 256 : 64;
-
+  // Only render AdminSidebar in non-admin routes; admin panel manages its own sidebar state
   return (
     <div className="relative min-h-screen">
-      <AdminSidebar
-        isOpen={isOpen}
-        isExpanded={isExpanded}
-        onExpandToggle={toggleExpanded}
-        onClose={() => {}}
-      />
-
-      {/* Main content - pushed by sidebar, no overlap */}
-      <main
-        className={cn("transition-all duration-300 ease-in-out min-h-screen")}
-        style={{ marginLeft: `${sidebarWidth}px` }}
-      >
-        {children}
-      </main>
+      {children}
     </div>
   );
 }

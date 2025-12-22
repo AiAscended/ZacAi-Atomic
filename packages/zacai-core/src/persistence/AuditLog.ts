@@ -1,6 +1,6 @@
 import { existsSync, appendFileSync, mkdirSync } from "fs";
 import { join } from "path";
-import type { AuditRecord } from "../types";
+import type { AuditRecord } from "../types/index.js";
 
 const DATA_DIR = join(process.cwd(), "packages", "zacai-core", "data");
 const AUDIT_FILE = join(DATA_DIR, "audit.log");
@@ -24,7 +24,7 @@ export class AuditLog {
     const content = require("fs").readFileSync(AUDIT_FILE, "utf-8");
     const lines = content.trim().split("\n").filter(Boolean);
     const slice = lines.slice(-limit);
-    return slice.map((line) => {
+    return slice.map((line: string) => {
       try {
         return JSON.parse(line) as AuditRecord;
       } catch {
@@ -34,7 +34,7 @@ export class AuditLog {
           event: "audit-parse-error",
           detail: line,
           severity: "warn",
-        } satisfies AuditRecord;
+        } as AuditRecord;
       }
     });
   }

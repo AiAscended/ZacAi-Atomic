@@ -130,11 +130,6 @@ export async function GET() {
       ok: true,
       generatedAt: snapshot.generatedAt,
       context: snapshot.context,
-        return NextResponse.json({
-          status: "maintenance",
-          message: "This endpoint is in maintenance mode. Core system functions remain online.",
-          timestamp: new Date().toISOString(),
-        }, { status: 503 });
       goals: snapshot.goals,
       plan: serializePlan(plan),
       lastHeartbeat,

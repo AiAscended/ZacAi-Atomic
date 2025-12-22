@@ -11,6 +11,13 @@ import { useState } from 'react';
 import { AlertTriangle, Code2, Github, Terminal } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { DiagnosticsPanel } from '@/components/admin/dev-console/DiagnosticsPanel';
+import {
+  PanelGroup,
+  Panel,
+  PanelResizeHandle,
+} from 'react-resizable-panels';
+import { useEffect } from 'react';
 
 // Dynamic imports for client-only components to avoid SSR issues
 const AdminFileTree = dynamic(() => import('@/components/admin/dev-console/AdminFileTree').then(mod => ({ default: mod.AdminFileTree })), {
@@ -33,12 +40,14 @@ const GitHubControls = dynamic(() => import('@/components/admin/dev-console/GitH
   loading: () => <div className="p-4">Loading GitHub controls...</div>
 });
 
+
 export default function DevConsolePage() {
   const [openFiles, setOpenFiles] = useState<string[]>([]);
   const [activeFile, setActiveFile] = useState<string | undefined>();
   const [activeFileContent, setActiveFileContent] = useState<string>('');
   const [terminalVisible, setTerminalVisible] = useState(true);
   const [githubVisible, setGithubVisible] = useState(false);
+  const [diagnosticsVisible, setDiagnosticsVisible] = useState(false);
 
   const handleFileSelect = (path: string) => {
     // Open file if not already open
@@ -95,9 +104,17 @@ export default function DevConsolePage() {
                 <Github className="w-4 h-4" />
                 {githubVisible ? 'Hide' : 'Show'} GitHub
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDiagnosticsVisible((prev) => !prev)}
+                className="flex items-center gap-2"
+              >
+                <AlertTriangle className="w-4 h-4" />
+                {diagnosticsVisible ? 'Hide' : 'Show'} Diagnostics
+              </Button>
             </div>
           </div>
-          
           <Alert variant="default" className="mt-4">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Admin-Only Access</AlertTitle>
@@ -109,10 +126,10 @@ export default function DevConsolePage() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* Main Content with PanelGroup (react-resizable-panels) */}
+      <PanelGroup direction="horizontal" className="flex-1 h-full">
         {/* Left Sidebar - File Tree */}
-        <div className="w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden flex flex-col">
+        <Panel minSize={15} defaultSize={20} maxSize={30} className="h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800">
           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800">
             <h2 className="text-sm font-semibold">Files</h2>
           </div>
@@ -122,45 +139,49 @@ export default function DevConsolePage() {
               selectedPath={activeFile}
             />
           </div>
-        </div>
-
-        {/* Center/Right - Editor and Terminal */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Editor */}
-          <div className={terminalVisible ? 'h-1/2' : 'flex-1'}>
-            <AdminCodeEditor
-              openFiles={openFiles}
-              activeFile={activeFile}
-              onFileClose={handleFileClose}
-              onActiveFileChange={setActiveFile}
-              onEditorChange={handleEditorChange}
-              className="h-full"
-            />
-          </div>
-
-          {/* Resizer */}
-          {terminalVisible && (
-            <div className="h-1 bg-gray-200 dark:bg-gray-800 cursor-row-resize hover:bg-blue-500 transition-colors" />
-          )}
-
-          {/* Terminal */}
-          {terminalVisible && (
-            <div className="h-1/2">
-              <AdminTerminal className="h-full" />
-            </div>
-          )}
-        </div>
-
-        {/* Right Sidebar - GitHub Controls */}
-        {githubVisible && (
-          <div className="w-96 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-y-auto">
-            <GitHubControls
-              currentFile={activeFile}
-              fileContent={activeFileContent}
-            />
-          </div>
-        )}
-      </div>
+        </Panel>
+        <PanelResizeHandle className="w-2 bg-gray-200 dark:bg-gray-800 cursor-col-resize" />
+        {/* Center/Right - Editor, Terminal, Diagnostics, GitHub */}
+        <Panel minSize={40} defaultSize={60} className="h-full">
+          <PanelGroup direction="vertical" className="h-full">
+            {/* Editor + GitHub Controls */}
+            <Panel minSize={30} defaultSize={60} className="flex h-full">
+              <div className="flex-1 h-full">
+                <AdminCodeEditor
+                  openFiles={openFiles}
+                  activeFile={activeFile}
+                  onFileClose={handleFileClose}
+                  onActiveFileChange={setActiveFile}
+                  onEditorChange={handleEditorChange}
+                  className="h-full"
+                />
+              </div>
+              {githubVisible && (
+                <div className="w-96 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-y-auto">
+                  <GitHubControls
+                    currentFile={activeFile}
+                    fileContent={activeFileContent}
+                  />
+                </div>
+              )}
+            </Panel>
+            <PanelResizeHandle className="h-2 bg-gray-200 dark:bg-gray-800 cursor-row-resize" />
+            {/* Terminal + Diagnostics */}
+            <Panel minSize={20} defaultSize={40} className="flex h-full">
+              {terminalVisible && (
+                <div className={diagnosticsVisible ? 'w-2/3' : 'w-full'} style={{ minWidth: 0 }}>
+                  <AdminTerminal className="h-full" />
+                </div>
+              )}
+              {diagnosticsVisible && (
+                <div className="w-1/3 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-y-auto">
+                  <DiagnosticsPanel />
+                </div>
+              )}
+            </Panel>
+          </PanelGroup>
+        </Panel>
+      </PanelGroup>
     </div>
   );
 }

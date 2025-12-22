@@ -31,47 +31,6 @@ export async function GET(request: NextRequest) {
     message: "This endpoint is in maintenance mode. Core system functions remain online.",
     timestamp: new Date().toISOString(),
   }, { status: 503 });
-        { error: 'Path parameter required' },
-        { status: 400 }
-      );
-    }
-
-    const fullPath = validatePath(requestedPath);
-
-    // Check if file exists
-    const stats = await fs.stat(fullPath);
-    
-    if (!stats.isFile()) {
-      return NextResponse.json(
-        { error: 'Path is not a file' },
-        { status: 400 }
-      );
-    }
-
-    // Read file contents
-    const content = await fs.readFile(fullPath, 'utf-8');
-
-    logEvent('dev_console.file_read', {
-      path: requestedPath,
-      size: stats.size,
-    });
-
-    return NextResponse.json({
-      path: requestedPath,
-      content,
-      size: stats.size,
-      modified: stats.mtime.toISOString(),
-    });
-  } catch (error) {
-    console.error('[dev-console] Error reading file:', error);
-    
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : 'Failed to read file',
-      },
-      { status: 500 }
-    );
-  }
 }
 
 // POST: Write file contents

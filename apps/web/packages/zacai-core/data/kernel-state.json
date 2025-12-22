@@ -1,7 +1,9 @@
 {
-  "lastBoot": 1766127173159,
+  "lastBoot": 1766317396991,
   "stableBranch": "main",
   "backupPath": "memory/backup",
   "activeProfile": "stable",
-  "notes": "fresh-state"
+  "notes": "fresh-state",
+  "lastHealthAt": 1766317459095,
+  "lastRecoveryPlanAt": 1766317459095
 }

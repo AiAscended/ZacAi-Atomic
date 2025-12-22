@@ -1,0 +1,24 @@
+{
+  "components": {
+    "core-model-system": {
+      "path": "packages/zacai-core/src/model/SystemModel.ts",
+      "hash": "",
+      "priority": 1
+    },
+    "core-memory": {
+      "path": "packages/zacai-core/src/memory/Memory.ts",
+      "hash": "",
+      "priority": 2
+    },
+    "orchestration-model": {
+      "path": "packages/zacai-core/src/orchestration/Orchestrator.ts",
+      "hash": "",
+      "priority": 3
+    }
+  },
+  "bootSequence": [
+    "core-model-system",
+    "core-memory",
+    "orchestration-model"
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "bootScript": "revival/system-model.ts",
+  "tests": ["integrityCheck", "inferenceReady"]
+}

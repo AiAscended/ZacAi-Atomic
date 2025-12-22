@@ -1,5 +1,5 @@
-import type { SystemPrompt, SystemResponse } from "../types";
-import { SystemModel } from "../model/SystemModel";
+import type { SystemPrompt, SystemResponse } from "../types/index.js";
+import { SystemModel } from "../model/SystemModel.js";
 
 export class SystemAgent {
   private model: SystemModel;

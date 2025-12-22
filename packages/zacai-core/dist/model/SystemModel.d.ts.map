@@ -1,0 +1,1 @@
+{"version":3,"file":"SystemModel.d.ts","sourceRoot":"","sources":["../../src/model/SystemModel.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,YAAY,EAAE,cAAc,EAAE,MAAM,mBAAmB,CAAC;AACtE,OAAO,EAAE,YAAY,EAAE,MAAM,2BAA2B,CAAC;AAEzD,qBAAa,WAAW;IACtB,OAAO,CAAC,MAAM,CAAe;gBAEjB,MAAM,CAAC,EAAE,YAAY;IAI3B,YAAY,CAAC,MAAM,EAAE,YAAY,GAAG,OAAO,CAAC,cAAc,CAAC;CA4BlE"}

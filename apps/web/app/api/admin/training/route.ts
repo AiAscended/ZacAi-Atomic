@@ -24,11 +24,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: result,
-          return NextResponse.json({
-            status: "maintenance",
-            message: "This endpoint is in maintenance mode. Core system functions remain online.",
-            timestamp: new Date().toISOString(),
-          }, { status: 503 });
         });
       }
 
@@ -59,8 +54,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: "Training operation failed",
-        details: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 },
     );

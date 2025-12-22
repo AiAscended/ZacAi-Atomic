@@ -4,9 +4,9 @@ import type {
   KernelState,
   RecoveryPlan,
   RecoveryPlanStep,
-} from "../types";
-import { StateStore } from "../persistence/StateStore";
-import { AuditLog } from "../persistence/AuditLog";
+} from "../types/index.js";
+import { StateStore } from "../persistence/StateStore.js";
+import { AuditLog } from "../persistence/AuditLog.js";
 import { existsSync } from "fs";
 import { join } from "path";
 

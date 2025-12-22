@@ -22,16 +22,18 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      <HamburgerMenu
-        isOpen={isSidebarOpen}
-        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-      />
+      {/* Show HamburgerMenu only when sidebar is closed */}
+      {!isSidebarOpen && (
+        <HamburgerMenu
+          isOpen={isSidebarOpen}
+          onToggle={() => setIsSidebarOpen(true)}
+        />
+      )}
       <AdminSidebar
         isOpen={isSidebarOpen}
         isExpanded={isSidebarExpanded}
         onClose={() => setIsSidebarOpen(false)}
         onExpandToggle={() => setIsSidebarExpanded(!isSidebarExpanded)}
-        onClose={() => setIsSidebarOpen(false)}
       />
       <main className="transition-all duration-300 p-6">{children}</main>
     </div>

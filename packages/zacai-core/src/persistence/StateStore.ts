@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
-import type { KernelState } from "../types";
+import type { KernelState } from "../types/index.js";
 
 const DATA_DIR = join(process.cwd(), "packages", "zacai-core", "data");
 const STATE_FILE = join(DATA_DIR, "kernel-state.json");

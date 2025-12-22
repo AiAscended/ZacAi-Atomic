@@ -22,11 +22,6 @@ export async function GET() {
     console.error("[System Settings API] Error:", error);
     return NextResponse.json(
       {
-        return NextResponse.json({
-          status: "maintenance",
-          message: "This endpoint is in maintenance mode. Core system functions remain online.",
-          timestamp: new Date().toISOString(),
-        }, { status: 503 });
         error: "Failed to retrieve system settings",
         details: error instanceof Error ? error.message : "Unknown error",
       },

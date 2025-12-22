@@ -9,6 +9,7 @@
 import { ReactNode, useState, useEffect } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NavigationWrapper } from "@/components/navigation/NavigationWrapper";
+import { ChatSettingsProvider } from "@/context/ChatSettingsContext";
 
 interface ClientLayoutProps {
   children: ReactNode;
@@ -32,7 +33,9 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
 
   return (
     <ThemeProvider attribute="class" defaultTheme={theme}>
-      <NavigationWrapper>{children}</NavigationWrapper>
+      <ChatSettingsProvider>
+        <NavigationWrapper>{children}</NavigationWrapper>
+      </ChatSettingsProvider>
     </ThemeProvider>
   );
 }

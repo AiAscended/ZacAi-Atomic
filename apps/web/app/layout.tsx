@@ -1,3 +1,4 @@
+"use client";
 import type React from "react";
 /**
  * File: src/app/layout.tsx
@@ -9,23 +10,39 @@ import type React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import ClientLayout from "./client-layout";
+import { useState } from "react";
+import { HamburgerMenu } from "@/components/navigation/HamburgerMenu";
+import { AdminSidebar } from "@/components/navigation/AdminSidebar";
 
-export const metadata: Metadata = {
-  title: "ZacAi Atomic - Hybrid Multi-Domain AI",
-  description: "Modular AI Assistant with 19 Knowledge Domains",
-  generator: "v0.app",
-};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
       <body>
-        <ClientLayout>{children}</ClientLayout>
+        <ClientLayout>
+          {/* Hamburger menu for sidebar (left) */}
+          <div className="fixed top-4 left-4 z-50">
+            {!isSidebarOpen && (
+              <HamburgerMenu
+                isOpen={isSidebarOpen}
+                onToggle={() => setIsSidebarOpen(true)}
+              />
+            )}
+          </div>
+          <AdminSidebar
+            isOpen={isSidebarOpen}
+            isExpanded={isSidebarExpanded}
+            onClose={() => setIsSidebarOpen(false)}
+            onExpandToggle={() => setIsSidebarExpanded(!isSidebarExpanded)}
+          />
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );
