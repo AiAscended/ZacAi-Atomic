@@ -3,7 +3,7 @@
  * Handles shell-like commands in the browser
  */
 
-import { VirtualFileSystem } from './virtualFileSystem';
+import { VirtualFileSystem, type FileSystemEntry, type IDEFile } from './virtualFileSystem';
 
 export interface CommandResult {
   output: string;
@@ -135,7 +135,7 @@ export class CommandProcessor {
     const resolvedPath = this.resolvePath(path);
 
     try {
-      const items = await this.context.fs.list(resolvedPath);
+      const items: FileSystemEntry[] = await this.context.fs.list(resolvedPath);
       
       if (items.length === 0) {
         return { output: '', exitCode: 0 };
@@ -181,8 +181,8 @@ export class CommandProcessor {
       }
 
       // Check if it's a directory
-      const items = await this.context.fs.list(resolvedPath.split('/').slice(0, -1).join('/') || '/');
-      const item = items.find((i) => i.path === resolvedPath);
+      const items: FileSystemEntry[] = await this.context.fs.list(resolvedPath.split('/').slice(0, -1).join('/') || '/');
+      const item = items.find((entry) => entry.path === resolvedPath);
       
       if (item && item.type !== 'directory') {
         return {
@@ -360,8 +360,8 @@ For more information, type: man <command>
     const buildTree = async (dirPath: string, prefix = '', isLast = true): Promise<string> => {
       let output = '';
       try {
-        const items = await this.context.fs.list(dirPath);
-        items.sort((a, b) => {
+        const items: FileSystemEntry[] = await this.context.fs.list(dirPath);
+        items.sort((a: FileSystemEntry, b: FileSystemEntry) => {
           if (a.type === 'directory' && b.type !== 'directory') return -1;
           if (a.type !== 'directory' && b.type === 'directory') return 1;
           return a.name.localeCompare(b.name);
@@ -410,8 +410,8 @@ For more information, type: man <command>
 
     const searchTerm = args[0];
     try {
-      const results = await this.context.fs.search(searchTerm);
-      const output = results.map((r) => r.path).join('\n') + (results.length > 0 ? '\n' : '');
+      const results: IDEFile[] = await this.context.fs.search(searchTerm);
+      const output = results.map((r: IDEFile) => r.path).join('\n') + (results.length > 0 ? '\n' : '');
       return { output, exitCode: 0 };
     } catch (error) {
       return {
@@ -437,7 +437,7 @@ For more information, type: man <command>
     try {
       const content = await this.context.fs.read(filePath);
       const lines = content.split('\n');
-      const matches = lines.filter((line) => line.includes(pattern));
+      const matches = lines.filter((line: string) => line.includes(pattern));
       const output = matches.join('\n') + (matches.length > 0 ? '\n' : '');
       return { output, exitCode: matches.length > 0 ? 0 : 1 };
     } catch (error) {

@@ -5,7 +5,6 @@
  * Ensures data reliability and integrity across the system.
  */
 
-import { domainRegistry } from '../domainRegistry';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -110,17 +109,7 @@ export const dataIntegrityInit = async () => {
   // Register domain files for tracking;
 
   // Register the domain with the registry
-  domainRegistry.registerDomain({
-  name: DOMAIN_NAME,
-  displayName: 'Data Integrity',
-  description: 'Data Integrity domain capabilities',
-  atomicLevel: 'molecule',
-  modules: [],
-  seedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_seeds`),
-  learnedDataPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_learned`),
-  weightsPath: path.join(DOMAIN_DIR, `${DOMAIN_NAME}_weights`),
-  enabled: true
-});
+
 };
 
 // Auto-initialize when imported

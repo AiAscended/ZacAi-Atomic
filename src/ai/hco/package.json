@@ -1,0 +1,24 @@
+{
+  "name": "zacai-hco",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/mainOrchestrator.ts",
+    "build": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "tsc --noEmit",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.2.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "tsx": "^4.7.0",
+    "vitest": "^1.6.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.5.0"
+  }
+}

@@ -6,7 +6,7 @@
  * - queryDomainsByName(domainNames, query): queries specific domains with their inference engines
  */
 
-import { domainRegistry } from '../knowledge-domains/domainRegistry';
+import { getDomain } from '../knowledge-domains';
 
 export interface DomainQueryResult {
   domain: string;
@@ -55,7 +55,7 @@ export class DomainQueryExecutor {
     query: string
   ): Promise<DomainQueryResult> {
     // Get domain from registry
-    const domain = domainRegistry.getDomain(domainName);
+    const domain = await getDomain(domainName);
     
     if (!domain || !domain.enabled) {
       return {

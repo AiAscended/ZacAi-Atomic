@@ -15,7 +15,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const SETTINGS_DIR = path.join(process.cwd(), 'data', 'settings');
+const AI_DATA_ROOT = path.join(process.cwd(), 'src', 'ai', 'data');
+const SETTINGS_DIR = path.join(AI_DATA_ROOT, 'settings');
 
 // Ensure settings directory exists
 if (!fs.existsSync(SETTINGS_DIR)) {

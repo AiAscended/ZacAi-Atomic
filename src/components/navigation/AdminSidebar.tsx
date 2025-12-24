@@ -23,6 +23,8 @@ import {
   Plug,
   MessageSquare,
   X,
+  Terminal,
+  Sparkles,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -81,6 +83,12 @@ const menuItems: MenuItem[] = [
     path: "/admin/models",
   },
   {
+    id: "hco",
+    label: "Hybrid HCO",
+    icon: Sparkles,
+    path: "/admin/orchestrator",
+  },
+  {
     id: "training-pipelines",
     label: "Training Pipelines",
     icon: Zap,
@@ -91,6 +99,12 @@ const menuItems: MenuItem[] = [
     label: "Tools Management",
     icon: Wrench,
     path: "/admin/tools",
+  },
+  {
+    id: "dev-console",
+    label: "Dev Console",
+    icon: Terminal,
+    path: "/admin/dev-console",
   },
   {
     id: "integrations",

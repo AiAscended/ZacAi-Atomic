@@ -18,15 +18,24 @@ const scoreDoc = (queryTokens: string[], doc: KBDocument) => {
   return score
 }
 
-export const retrieveAndRank = (query: string, docs: KBDocument[], topK = 5) => {
+export interface RankedDocument {
+  doc: KBDocument
+  score: number
+}
+
+export const retrieveAndRank = (query: string, docs: KBDocument[], topK = 5): RankedDocument[] => {
   const qtokens = tokenize(query)
-  const scored = docs.map((d) => ({ d, score: scoreDoc(qtokens, d) }))
+  const scored = docs.map((doc) => ({ doc, score: scoreDoc(qtokens, doc) }))
   scored.sort((a, b) => b.score - a.score)
-  return scored.slice(0, topK).map((s) => s.d)
+  return scored.slice(0, topK)
 }
 
 export class DocumentRetrieverRanker {
   retrieve(query: string, docs: KBDocument[], topK = 5): KBDocument[] {
+    return retrieveAndRank(query, docs, topK).map((entry) => entry.doc)
+  }
+
+  rank(query: string, docs: KBDocument[], topK = 5): RankedDocument[] {
     return retrieveAndRank(query, docs, topK)
   }
 }

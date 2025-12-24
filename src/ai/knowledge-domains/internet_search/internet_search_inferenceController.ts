@@ -14,7 +14,6 @@
 
 import { internetSearchTokenizer } from "./internet_search_tokenizer"
 import { internetSearchSemanticAnalyzer } from "./internet_search_semanticAnalyzer"
-import pretrainedWeights from "./internet_search_weights/internet_search_pretrained_weights.json"
 import seeds from "./internet_search_seeds/internet_search_seeds.json"
 import { findSources } from "../url_lookup"
 import { scrapeURL } from "../../shared/tools/webScraper"
@@ -31,9 +30,27 @@ interface InferenceContext {
 /**
  * Calculate confidence using pretrained weights and token analysis
  */
+type SearchThresholds = {
+  tokenMatchWeight: number
+  semanticWeight: number
+}
+
+const DEFAULT_THRESHOLDS: SearchThresholds = {
+  tokenMatchWeight: 0.6,
+  semanticWeight: 0.4,
+}
+
+const getThresholds = (): SearchThresholds => {
+  const raw = (seeds as { thresholds?: Partial<SearchThresholds> }).thresholds
+  return {
+    tokenMatchWeight: raw?.tokenMatchWeight ?? DEFAULT_THRESHOLDS.tokenMatchWeight,
+    semanticWeight: raw?.semanticWeight ?? DEFAULT_THRESHOLDS.semanticWeight,
+  }
+}
+
 function calculateConfidence(tokens: string[], input: string): number {
   const lowerInput = input.toLowerCase()
-  const vocabulary = pretrainedWeights.vocabulary as Record<string, number>
+  const vocabulary = (seeds.vocabulary ?? {}) as Record<string, number>
 
   let tokenScore = 0
   let matchCount = 0
@@ -51,7 +68,7 @@ function calculateConfidence(tokens: string[], input: string): number {
 
   // Semantic pattern matching
   let semanticScore = 0
-  const patterns = seeds.patterns as Array<{ pattern: string; weight: number }>
+  const patterns = (seeds.patterns ?? []) as Array<{ pattern: string; weight: number }>
 
   for (const patternObj of patterns) {
     if (lowerInput.includes(patternObj.pattern)) {
@@ -62,8 +79,8 @@ function calculateConfidence(tokens: string[], input: string): number {
   semanticScore = Math.min(semanticScore / 2, 1.0)
 
   // Combine scores
-  const thresholds = pretrainedWeights.thresholds
-  const finalConfidence = avgTokenScore * thresholds.token_match_weight + semanticScore * thresholds.semantic_weight
+  const thresholds = getThresholds()
+  const finalConfidence = avgTokenScore * thresholds.tokenMatchWeight + semanticScore * thresholds.semanticWeight
 
   return Math.min(finalConfidence, 1.0)
 }
