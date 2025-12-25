@@ -1,0 +1,4 @@
+rust_library(
+    name = "kernel_lib",
+    srcs = glob(["src/**/*.rs"]),
+)
