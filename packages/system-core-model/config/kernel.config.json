@@ -1,0 +1,6 @@
+{
+  "kernels": [
+    { "name": "rbf_default", "wasmUrl": "/packages/system-kernel-methods/wasm_dist/zk_kernels_bg.wasm", "type": "rbf", "params": { "sigma": 1.0 } },
+    { "name": "poly_default", "wasmUrl": "/packages/system-kernel-methods/wasm_dist/zk_kernels_bg.wasm", "type": "polynomial", "params": { "degree": 2, "coef0": 1 } }
+  ]
+}

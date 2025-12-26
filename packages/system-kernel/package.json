@@ -1,0 +1,30 @@
+{
+  "name": "@zacai/system-kernel",
+  "version": "1.0.0",
+  "description": "ZacAi System Kernel - Stateful control plane with lifecycle, scheduling, and recovery",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "kernel",
+    "system",
+    "lifecycle",
+    "scheduler",
+    "recovery",
+    "zacai"
+  ],
+  "author": "ZacAi Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  },
+  "peerDependencies": {}
+}

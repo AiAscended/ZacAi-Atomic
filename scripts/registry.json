@@ -1,1 +1,16 @@
-{"executions":[]}
+{
+  "version": "1.0.0",
+  "metadata": {
+    "createdAt": "2025-12-26T00:00:00Z",
+    "lastUpdated": "2025-12-26T00:00:00Z",
+    "systemName": "ZacAi System Core",
+    "purpose": "Comprehensive script registry with auto-detection for audit, diagnostics, and self-repair"
+  },
+  "scripts": {
+    "source": [],
+    "detected": [],
+    "vendor": []
+  },
+  "entries": []
+}
+

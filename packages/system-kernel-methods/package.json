@@ -1,0 +1,29 @@
+{
+  "name": "@zacai/system-kernel-methods",
+  "version": "1.0.0",
+  "description": "ZacAi System Kernel Methods - Pure deterministic functions for kernel operations",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "kernel",
+    "methods",
+    "deterministic",
+    "pure-functions",
+    "zacai"
+  ],
+  "author": "ZacAi Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  },
+  "peerDependencies": {}
+}
