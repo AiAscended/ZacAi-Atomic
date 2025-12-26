@@ -103,47 +103,6 @@ function getDashboardHTML() {
       margin: 10px 0;
       font-variant-numeric: tabular-nums;
     }
-
-    /* Control Panel additions */
-    .control-panel {
-      display: grid;
-      grid-template-columns: 1fr 420px;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    .terminal {
-      background: rgba(0,0,0,0.6);
-      border-radius: 8px;
-      padding: 12px;
-      min-height: 180px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.9em;
-      color: #d6ffd6;
-      overflow: auto;
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .ai-chat {
-      background: rgba(255,255,255,0.04);
-      border-radius: 8px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .ai-chat input[type="text"] {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.2);
-      color: #fff;
-    }
-
-    .toggle-row { display:flex; gap:12px; align-items:center; }
-    .toggle { cursor:pointer; padding:6px 10px; border-radius:6px; background: rgba(255,255,255,0.06); }
     
     .metric-label {
       font-size: 0.95em;
@@ -199,83 +158,33 @@ function getDashboardHTML() {
       margin-bottom: 40px;
     }
     
-          <h1>ZacAi System Core v0.0.1</h1>
-          <p class="subtitle">Enterprise Hybrid AI Platform Dashboard</p>
-          <p style="font-size: 0.9em; opacity: 0.7; margin-top: 10px;">
-            System Administrator: <a href="mailto:zacai.email@gmail.com" style="color: #81C784; text-decoration: underline;">zacai.email@gmail.com</a>
-          </p>
-          <div style="margin-top:12px; display:flex; gap:12px; justify-content:center;">
-            <div class="toggle-row">
-              <div class="toggle" id="themeToggle">Toggle Light/Dark</div>
-              <div class="toggle" id="terminalClear">Clear Terminal</div>
-            </div>
-          </div>
+    .section-title {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
     }
-          <h2 class="section-title">🔐 Compliance & Audit</h2>
+    
     .info-table {
       width: 100%;
-        <!-- Status Overview + Control Panel -->
-        <div class="section">
-          <div class="control-panel">
-            <div>
-              <h2 class="section-title"><span class="live-indicator"></span>System Status</h2>
-              <div class="grid">
-                <div class="card">
-                  <div class="card-header">System Status</div>
-                  <div class="metric-value" id="status">RUNNING</div>
-                  <div class="status-badge status-healthy" id="health-badge">HEALTHY</div>
-                </div>
-            
-                <div class="card">
-                  <div class="card-header">System Mode</div>
-                  <div class="metric-value" id="mode">RUN</div>
-                </div>
-            
-                <div class="card">
-                  <div class="card-header">Uptime</div>
-                  <div class="metric-value" id="uptime">0s</div>
-                </div>
-              </div>
-
-              <h2 class="section-title" style="margin-top:18px">Quick Actions</h2>
-              <div class="grid">
-                <div class="card">
-                  <div class="card-header">Check Health</div>
-                  <button onclick="fetchAndShow('/api/health')">Run</button>
-                </div>
-                <div class="card">
-                  <div class="card-header">Run Diagnostics</div>
-                  <button onclick="appendTerminal('Diagnostics run started...')">Start</button>
-                </div>
-                <div class="card">
-                  <div class="card-header">Compliance Snapshot</div>
-                  <button onclick="fetchAndShow('/api/compliance')">View</button>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div class="ai-chat">
-                <div style="font-weight:600;">AI Assistant</div>
-                <div id="aiOutput" style="min-height:80px; font-family:monospace; font-size:0.9em; color:#eaf7ea;">Ask the AI for suggestions...</div>
-                <input id="aiInput" type="text" placeholder="Type a command or question" />
-                <div style="display:flex; gap:8px; justify-content:space-between; align-items:center;">
-                  <div>
-                    <button onclick="sendAI()">Send</button>
-                    <button onclick="startVoice()">🎤</button>
-                    <button onclick="stopVoice()">🔈</button>
-                  </div>
-                  <div style="font-size:0.85em; opacity:0.7;">Mode: Hybrid AI</div>
-                </div>
-              </div>
-
-              <div style="margin-top:12px;">
-                <div class="terminal" id="terminal">$ Welcome to ZacAi Terminal\n</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- continue existing status overview below -->
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .info-table tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .info-table tr:last-child {
+      border-bottom: none;
+    }
+    
+    .info-table td {
+      padding: 15px 20px;
+    }
+    
     .info-table td:first-child {
       font-weight: 600;
       opacity: 0.8;
