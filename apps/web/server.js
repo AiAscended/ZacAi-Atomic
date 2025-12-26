@@ -6,6 +6,7 @@
 
 import http from 'http';
 import { URL } from 'url';
+import { recommendAction } from '../../packages/system-core-agent/lib/index.js';
 
 // Create a simple in-memory system state for demonstration
 const systemState = {
@@ -715,14 +716,14 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(diagnostics, null, 2));
   } else if (pathname === '/api/ai' && req.method === 'POST') {
-    // Mock AI reply for UI (replace with real agent integration)
+    // AI endpoint: use system-core-agent.recommendAction (safe, local mock)
     let body = '';
     req.on('data', (chunk) => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const data = JSON.parse(body || '{}');
         const prompt = data.prompt || '';
-        const reply = `Mock suggestion for: "${prompt}" — (Phase7 agent integration pending)`;
+        const reply = await recommendAction(prompt);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ reply }));
       } catch (e) {
@@ -731,15 +732,36 @@ const server = http.createServer((req, res) => {
       }
     });
   } else if (pathname === '/api/terminal' && req.method === 'POST') {
-    // Simulated terminal command runner (safe echo)
+    // Secure simulated terminal: requires Authorization header Bearer token to unlock advanced actions
+    const auth = (req.headers['authorization'] || req.headers['Authorization'] || '');
+    const token = (process.env.ADMIN_TOKEN || 'admin-secret');
+    const authorized = auth === `Bearer ${token}`;
+
     let body = '';
     req.on('data', (chunk) => { body += chunk; });
     req.on('end', () => {
       try {
         const data = JSON.parse(body || '{}');
-        const cmd = data.cmd || '';
-        // IMPORTANT: Do NOT execute arbitrary shell commands here.
-        const output = `echo: ${cmd}`;
+        const cmd = (data.cmd || '').trim();
+
+        // Safe built-in commands
+        if (cmd === 'status') {
+          const out = { status: systemState.status, uptimeMs: Date.now() - systemState.startTime, health: systemState.health };
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ output: out }));
+          return;
+        }
+
+        // If authorized, provide simulated privileged response
+        if (authorized) {
+          const output = `authorized-exec-sim: ${cmd}`;
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ output }));
+          return;
+        }
+
+        // Not authorized: echo only
+        const output = `echo: ${cmd} (unauthorized)`;
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ output }));
       } catch (e) {
