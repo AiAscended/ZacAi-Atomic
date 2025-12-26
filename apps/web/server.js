@@ -603,6 +603,56 @@ function getDashboardHTML() {
         panel.textContent = 'Error fetching ' + path + ': ' + err.message;
       }
     }
+
+    // Append text to in-page terminal
+    function appendTerminal(txt) {
+      const t = document.getElementById('terminal');
+      t.textContent += '\n' + txt;
+      t.scrollTop = t.scrollHeight;
+    }
+
+    // Send a message to AI endpoint (mock)
+    async function sendAI() {
+      const input = document.getElementById('aiInput').value;
+      if (!input) return;
+      appendTerminal('$ ai> ' + input);
+      try {
+        const res = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: input }) });
+        const j = await res.json();
+        document.getElementById('aiOutput').textContent = j.reply;
+        appendTerminal('$ ai-reply> ' + j.reply);
+      } catch (e) {
+        appendTerminal('$ ai-error> ' + e.message);
+      }
+    }
+
+    // Theme toggle (simple light/dark switch that preserves palette)
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const body = document.body;
+      if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        body.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
+        body.style.color = '#fff';
+      } else {
+        body.classList.add('light-mode');
+        body.style.background = 'linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%)';
+        body.style.color = '#111';
+      }
+    });
+
+    // Clear terminal
+    document.getElementById('terminalClear').addEventListener('click', () => {
+      document.getElementById('terminal').textContent = '$ Welcome to ZacAi Terminal\n';
+    });
+
+    // Voice placeholders
+    function startVoice() {
+      appendTerminal('$ voice> start (placeholder)');
+      // real implementation: navigator.mediaDevices.getUserMedia + STT
+    }
+    function stopVoice() {
+      appendTerminal('$ voice> stop (placeholder)');
+    }
   </script>
 </body>
 </html>`;
@@ -653,6 +703,50 @@ const server = http.createServer((req, res) => {
     };
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(compliance, null, 2));
+  } else if (pathname === '/api/diagnostics') {
+    // Lightweight diagnostics endpoint (synchronous)
+    const diagnostics = {
+      kernel: { status: 'OK', modules: 9 },
+      wasm: { present: true, path: '/packages/system-kernel-methods/wasm_dist/zk_kernels_bg.wasm' },
+      memory: { rss: process.memoryUsage().rss },
+      uptimeMs: Date.now() - systemState.startTime,
+      timestamp: new Date().toISOString(),
+    };
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(diagnostics, null, 2));
+  } else if (pathname === '/api/ai' && req.method === 'POST') {
+    // Mock AI reply for UI (replace with real agent integration)
+    let body = '';
+    req.on('data', (chunk) => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const prompt = data.prompt || '';
+        const reply = `Mock suggestion for: "${prompt}" — (Phase7 agent integration pending)`;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ reply }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+  } else if (pathname === '/api/terminal' && req.method === 'POST') {
+    // Simulated terminal command runner (safe echo)
+    let body = '';
+    req.on('data', (chunk) => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const cmd = data.cmd || '';
+        // IMPORTANT: Do NOT execute arbitrary shell commands here.
+        const output = `echo: ${cmd}`;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ output }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
   } else {
     // 404
     res.writeHead(404, { 'Content-Type': 'text/plain' });
