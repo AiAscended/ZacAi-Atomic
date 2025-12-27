@@ -2,6 +2,7 @@
   "name": "@zacai/system-core-agent",
   "version": "0.0.1",
   "description": "Scaffold for the System Core Agent (Phase 7) - AI-driven orchestration agent",
+  "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {

@@ -5,9 +5,12 @@
  * Date: December 26, 2025
  */
 
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 console.log('\n' + '='.repeat(80));
 console.log('🏷️ PHASE 5: INTEGRATION TEST SUITE');

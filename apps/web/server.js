@@ -6,7 +6,42 @@
 
 import http from 'http';
 import { URL } from 'url';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { recommendAction } from '../../packages/system-core-agent/lib/index.js';
+import TerminalHandler from '../../packages/web-terminal/lib/index.js';
+import { info as logInfo, warn as logWarn, error as logError } from '../../packages/system-core/lib/logger.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Discover packages dynamically
+function discoverPackages() {
+  const packagesDir = path.join(__dirname, '../../packages');
+  const packages = [];
+  try {
+    const dirs = fs.readdirSync(packagesDir);
+    dirs.forEach((dir) => {
+      const pkgPath = path.join(packagesDir, dir, 'package.json');
+      const srcPath = path.join(packagesDir, dir, 'src');
+      const distPath = path.join(packagesDir, dir, 'dist');
+      let pkg = { name: dir, version: 'N/A', hasSrc: false, hasDist: false, distFiles: [] };
+      try {
+        if (fs.existsSync(pkgPath)) {
+          const data = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+          pkg.version = data.version || 'N/A';
+        }
+        pkg.hasSrc = fs.existsSync(srcPath);
+        pkg.hasDist = fs.existsSync(distPath);
+        if (pkg.hasDist) {
+          pkg.distFiles = fs.readdirSync(distPath).slice(0, 5);
+        }
+      } catch (e) {}
+      packages.push(pkg);
+    });
+  } catch (e) {}
+  return packages;
+}
 
 // Create a simple in-memory system state for demonstration
 const systemState = {
@@ -29,7 +64,7 @@ function getDashboardHTML() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🏥 ZacAi Hospital-Grade System Dashboard</title>
+    <title>ZacAi System Core v0.0.1 | Admin Dashboard</title>
   <style>
     * {
       margin: 0;
@@ -104,47 +139,6 @@ function getDashboardHTML() {
       margin: 10px 0;
       font-variant-numeric: tabular-nums;
     }
-
-    /* Control Panel additions */
-    .control-panel {
-      display: grid;
-      grid-template-columns: 1fr 420px;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    .terminal {
-      background: rgba(0,0,0,0.6);
-      border-radius: 8px;
-      padding: 12px;
-      min-height: 180px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.9em;
-      color: #d6ffd6;
-      overflow: auto;
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .ai-chat {
-      background: rgba(255,255,255,0.04);
-      border-radius: 8px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .ai-chat input[type="text"] {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.2);
-      color: #fff;
-    }
-
-    .toggle-row { display:flex; gap:12px; align-items:center; }
-    .toggle { cursor:pointer; padding:6px 10px; border-radius:6px; background: rgba(255,255,255,0.06); }
     
     .metric-label {
       font-size: 0.95em;
@@ -200,83 +194,33 @@ function getDashboardHTML() {
       margin-bottom: 40px;
     }
     
-          <h1>ZacAi System Core v0.0.1</h1>
-          <p class="subtitle">Enterprise Hybrid AI Platform Dashboard</p>
-          <p style="font-size: 0.9em; opacity: 0.7; margin-top: 10px;">
-            System Administrator: <a href="mailto:zacai.email@gmail.com" style="color: #81C784; text-decoration: underline;">zacai.email@gmail.com</a>
-          </p>
-          <div style="margin-top:12px; display:flex; gap:12px; justify-content:center;">
-            <div class="toggle-row">
-              <div class="toggle" id="themeToggle">Toggle Light/Dark</div>
-              <div class="toggle" id="terminalClear">Clear Terminal</div>
-            </div>
-          </div>
+    .section-title {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
     }
-          <h2 class="section-title">🔐 Compliance & Audit</h2>
+    
     .info-table {
       width: 100%;
-        <!-- Status Overview + Control Panel -->
-        <div class="section">
-          <div class="control-panel">
-            <div>
-              <h2 class="section-title"><span class="live-indicator"></span>System Status</h2>
-              <div class="grid">
-                <div class="card">
-                  <div class="card-header">System Status</div>
-                  <div class="metric-value" id="status">RUNNING</div>
-                  <div class="status-badge status-healthy" id="health-badge">HEALTHY</div>
-                </div>
-            
-                <div class="card">
-                  <div class="card-header">System Mode</div>
-                  <div class="metric-value" id="mode">RUN</div>
-                </div>
-            
-                <div class="card">
-                  <div class="card-header">Uptime</div>
-                  <div class="metric-value" id="uptime">0s</div>
-                </div>
-              </div>
-
-              <h2 class="section-title" style="margin-top:18px">Quick Actions</h2>
-              <div class="grid">
-                <div class="card">
-                  <div class="card-header">Check Health</div>
-                  <button onclick="fetchAndShow('/api/health')">Run</button>
-                </div>
-                <div class="card">
-                  <div class="card-header">Run Diagnostics</div>
-                  <button onclick="appendTerminal('Diagnostics run started...')">Start</button>
-                </div>
-                <div class="card">
-                  <div class="card-header">Compliance Snapshot</div>
-                  <button onclick="fetchAndShow('/api/compliance')">View</button>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div class="ai-chat">
-                <div style="font-weight:600;">AI Assistant</div>
-                <div id="aiOutput" style="min-height:80px; font-family:monospace; font-size:0.9em; color:#eaf7ea;">Ask the AI for suggestions...</div>
-                <input id="aiInput" type="text" placeholder="Type a command or question" />
-                <div style="display:flex; gap:8px; justify-content:space-between; align-items:center;">
-                  <div>
-                    <button onclick="sendAI()">Send</button>
-                    <button onclick="startVoice()">🎤</button>
-                    <button onclick="stopVoice()">🔈</button>
-                  </div>
-                  <div style="font-size:0.85em; opacity:0.7;">Mode: Hybrid AI</div>
-                </div>
-              </div>
-
-              <div style="margin-top:12px;">
-                <div class="terminal" id="terminal">$ Welcome to ZacAi Terminal\n</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- continue existing status overview below -->
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .info-table tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .info-table tr:last-child {
+      border-bottom: none;
+    }
+    
+    .info-table td {
+      padding: 15px 20px;
+    }
+    
     .info-table td:first-child {
       font-weight: 600;
       opacity: 0.8;
@@ -369,6 +313,64 @@ function getDashboardHTML() {
         System Administrator: <a href="mailto:zacai.email@gmail.com" style="color: #81C784; text-decoration: underline;">zacai.email@gmail.com</a>
       </p>
     </header>
+    
+    <!-- Header Controls: Quick Links, Theme, Settings -->
+    <div style="display:flex; gap:15px; margin-bottom:20px; justify-content:flex-end; flex-wrap:wrap;">
+      <div style="position:relative;">
+        <button class="button" onclick="toggleQuickLinksDropdown()" style="padding:10px 16px;">⚡ Quick Links</button>
+        <div id="quickLinksDropdown" class="dropdown" style="display:none; position:absolute; top:50px; right:0; background:rgba(0,0,0,0.8); border:1px solid rgba(255,255,255,0.2); border-radius:8px; min-width:200px; z-index:1000;">
+          <a href="#" onclick="fetchAndShow('/api/status'); return false;" style="display:block; padding:10px 16px; color:#81C784; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.1);">📊 Status</a>
+          <a href="#" onclick="fetchAndShow('/api/health'); return false;" style="display:block; padding:10px 16px; color:#81C784; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.1);">❤️ Health</a>
+          <a href="#" onclick="fetchAndShow('/api/diagnostics'); return false;" style="display:block; padding:10px 16px; color:#81C784; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.1);">⚙️ Diagnostics</a>
+          <a href="#" onclick="fetchAndShow('/api/services'); return false;" style="display:block; padding:10px 16px; color:#81C784; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.1);">🔧 Services</a>
+          <a href="#" onclick="fetchAndShow('/api/metrics'); return false;" style="display:block; padding:10px 16px; color:#81C784; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.1);">📈 Metrics</a>
+          <a href="#" onclick="fetchAndShow('/api/compliance'); return false;" style="display:block; padding:10px 16px; color:#81C784; text-decoration:none;">🔐 Compliance</a>
+        </div>
+      </div>
+      <button class="button" onclick="toggleTheme()" style="padding:10px 16px;" title="Toggle dark/light theme">🌙 Theme</button>
+      <button class="button" onclick="toggleSettings()" style="padding:10px 16px;" title="Admin settings">⚙️ Settings</button>
+    </div>
+    
+    <!-- Settings Panel Modal -->
+    <div class="settings-panel" id="settingsPanel" onclick="if(event.target === event.currentTarget) toggleSettings();" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center;">
+      <div class="settings-content" style="background:rgba(30,60,114,1); border:1px solid rgba(255,255,255,0.2); border-radius:12px; padding:30px; max-width:600px; max-height:80vh; overflow-y:auto;">
+        <span class="settings-close" onclick="toggleSettings()" style="float:right; cursor:pointer; font-size:24px; color:#fff; opacity:0.8;">✕</span>
+        <h2>⚙️ Admin Settings</h2>
+        <div style="margin-bottom:20px;">
+          <label style="display:block; margin-bottom:8px; font-weight:600; color:#81C784;">Admin Email</label>
+          <input type="text" id="adminEmail" value="zacai.email@gmail.com" style="width:100%; padding:8px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px;" />
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="display:block; margin-bottom:8px; font-weight:600; color:#81C784;">Log Level</label>
+          <select id="logLevel" style="width:100%; padding:8px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px;">
+            <option>debug</option><option selected>info</option><option>warn</option><option>error</option>
+          </select>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="display:block; margin-bottom:8px; font-weight:600; color:#81C784;">Compliance Level</label>
+          <select id="complianceLevel" style="width:100%; padding:8px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px;">
+            <option selected>HIPAA</option><option>FDA</option><option>SOC2</option><option>ISO27001</option>
+          </select>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="display:block; margin-bottom:8px; font-weight:600; color:#81C784;">Max Retries</label>
+          <input type="number" id="maxRetries" value="3" style="width:100%; padding:8px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px;" />
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="display:block; margin-bottom:8px; font-weight:600; color:#81C784;">Recovery Mode</label>
+          <select id="recoveryMode" style="width:100%; padding:8px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px;">
+            <option selected>conservative</option><option>aggressive</option>
+          </select>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="display:block; margin-bottom:8px; font-weight:600; color:#81C784;">Enable Voice</label>
+          <select id="enableVoice" style="width:100%; padding:8px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px;">
+            <option selected>true</option><option>false</option>
+          </select>
+        </div>
+        <button class="button" onclick="saveSettings()" style="width:100%; margin-top:20px;">💾 Save Settings</button>
+      </div>
+    </div>
     
     <!-- Status Overview -->
     <div class="section">
@@ -517,14 +519,54 @@ function getDashboardHTML() {
       </table>
     </div>
     
-    <!-- Quick Actions -->
+    <!-- Quick Actions + AI + Terminal -->
     <div class="section">
       <h2 class="section-title">⚡ Quick Actions</h2>
-      <button onclick="fetchAndShow('/api/health')" class="button">Get Health Metrics</button>
-      <button onclick="fetchAndShow('/api/compliance')" class="button">View Audit Trail</button>
-      <button onclick="fetchAndShow('/api/status')" class="button">System Status JSON</button>
-      <button onclick="refreshData()" class="button">Refresh Data</button>
-      <div id="panel" style="margin-top:16px; background:rgba(0,0,0,0.25); padding:12px; border-radius:6px; font-family:monospace; white-space:pre-wrap; max-height:320px; overflow:auto; display:none;"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button onclick="fetchAndShow('/api/health')" class="button">Get Health Metrics</button>
+        <button onclick="fetchAndShow('/api/status')" class="button">System Status</button>
+        <button onclick="fetchAndShow('/api/diagnostics')" class="button">Run Diagnostics</button>
+        <button onclick="fetchAndShow('/api/services')" class="button">Service Status</button>
+        <button onclick="fetchAndShow('/api/metrics')" class="button">View Metrics</button>
+        <button onclick="fetchAndShow('/api/compliance')" class="button">Compliance Trail</button>
+        <button onclick="refreshData()" class="button">Refresh All</button>
+      </div>
+
+      <!-- AI Assistant Section -->
+      <div class="section">
+        <h2 class="section-title">🤖 AI Assistant</h2>
+        <div class="card">
+          <div id="aiOutput" style="min-height:120px; font-family:monospace; color:#eaf7ea; background:rgba(0,0,0,0.2); padding:8px; border-radius:6px;">Ask the AI for suggestions...</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <input id="aiInput" type="text" placeholder="Type a command (health, status, diagnostics) or question" style="flex:1; padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.2); color:#fff;" onkeydown="if(event.key==='Enter') sendAI();" />
+            <button class="button" onclick="sendAI()">Send</button>
+            <button class="button" id="micBtn" onclick="toggleMic()" title="Click to toggle mic input (Web Speech API)">🎤</button>
+            <button class="button" id="speakerBtn" onclick="playAIOutput()" title="Click to speak the response (Text-to-Speech)">🔊</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Results -->
+      <div class="section">
+        <h2 class="section-title">Panel Results</h2>
+        <div class="card">
+          <div id="panel" style="background:rgba(0,0,0,0.25); padding:12px; border-radius:6px; font-family:monospace; white-space:pre-wrap; max-height:240px; overflow:auto; display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Terminal Section -->
+      <div class="section">
+        <h2 class="section-title">⌨️ Dev Terminal</h2>
+        <div class="card">
+          <div id="terminal" class="terminal" tabindex="0" style="min-height:220px; font-family:monospace; color:#d6ffd6; background:rgba(0,0,0,0.6); padding:8px; border-radius:6px; overflow:auto; cursor:text;">$ Welcome to ZacAi Terminal\n</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <input id="terminalInput" type="text" placeholder="Try: status, health, diagnostics, or bash commands" style="flex:1; padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.15); color:#fff;" onkeydown="if(event.key==='Enter') sendTerminal();" tabindex="0" />
+            <button class="button" onclick="sendTerminal()">Send</button>
+            <button class="button" onclick="clearTerminal()">Clear</button>
+          </div>
+          <div style="font-size:0.85em; opacity:0.8; margin-top:8px;">Note: privileged commands require an admin token via Authorization header (demo)</div>
+        </div>
+      </div>
     </div>
     
     <!-- Documentation -->
@@ -550,6 +592,8 @@ function getDashboardHTML() {
     </footer>
   </div>
   
+  <!-- xterm integration loader -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
   <script>
     // Format uptime
     function formatUptime(seconds) {
@@ -589,14 +633,21 @@ function getDashboardHTML() {
     // Initial setup
     document.getElementById('uptime').dataset.startTime = Date.now();
 
-    // fetch and show panel content in-page
+    // fetch and show panel content in-page (JSON or text)
     async function fetchAndShow(path) {
       try {
         const res = await fetch(path);
-        const txt = await res.text();
+        const text = await res.text();
+        let displayText = text;
+        try {
+          const json = JSON.parse(text);
+          displayText = JSON.stringify(json, null, 2);
+        } catch (e) {
+          // already text, keep as is
+        }
         const panel = document.getElementById('panel');
         panel.style.display = 'block';
-        panel.textContent = txt;
+        panel.textContent = displayText;
         panel.scrollTop = 0;
       } catch (err) {
         const panel = document.getElementById('panel');
@@ -605,62 +656,251 @@ function getDashboardHTML() {
       }
     }
 
-    // Append text to in-page terminal
+    // AI: send prompt to /api/ai and display reply
+    async function sendAI() {
+      const input = document.getElementById('aiInput');
+      const prompt = input.value.trim();
+      if (!prompt) return;
+      const out = document.getElementById('aiOutput');
+      out.textContent = '⏳ Thinking...';
+      input.value = '';
+      try {
+        const res = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }) });
+        const j = await res.json();
+        const reply = j.reply || JSON.stringify(j);
+        out.textContent = reply;
+        // show in panel and append to terminal
+        const panel = document.getElementById('panel');
+        panel.style.display = 'block';
+        panel.textContent = reply;
+        appendTerminal('$ ai> ' + prompt);
+        appendTerminal('> ai-reply: ' + reply);
+      } catch (e) {
+        out.textContent = 'Error: ' + e.message;
+        appendTerminal('ai-error> ' + e.message);
+      }
+    }
+
+    // Speech-to-text (Web Speech API) and text-to-speech helpers
+    let recognition = null;
+    let recognizing = false;
+    let speaking = false;
+    
+    (function initSpeech() {
+      try {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+          console.warn('Speech Recognition API not available');
+          return;
+        }
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        recognition.onstart = () => {
+          recognizing = true;
+          document.getElementById('micBtn').textContent = '⏺️';
+          appendTerminal('$ [STT] listening...');
+        };
+        recognition.onresult = (event) => {
+          if (event.results && event.results.length > 0) {
+            const text = event.results[0][0].transcript;
+            document.getElementById('aiInput').value = text;
+            appendTerminal('$ [STT] received: ' + text);
+            sendAI();
+          }
+        };
+        recognition.onerror = (event) => {
+          appendTerminal('$ [STT] error: ' + event.error);
+        };
+        recognition.onend = () => {
+          recognizing = false;
+          document.getElementById('micBtn').textContent = '🎤';
+        };
+      } catch (e) {
+        console.warn('Speech init error:', e);
+      }
+    })();
+
+    function toggleMic() {
+      if (!recognition) {
+        appendTerminal('$ [STT] not available in this browser');
+        return;
+      }
+      if (recognizing) {
+        recognition.stop();
+      } else {
+        try {
+          recognition.start();
+        } catch (e) {
+          appendTerminal('$ [STT] error: ' + e.message);
+        }
+      }
+    }
+
+    function playAIOutput() {
+      const text = document.getElementById('aiOutput').textContent || '';
+      if (!text || text.includes('Ask the AI') || text.includes('Processing')) {
+        appendTerminal('$ [TTS] no text to speak');
+        return;
+      }
+      try {
+        if (speaking) {
+          window.speechSynthesis.cancel();
+          speaking = false;
+          document.getElementById('speakerBtn').textContent = '🔊';
+          return;
+        }
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 0.9;
+        utter.pitch = 1.0;
+        utter.volume = 1.0;
+        utter.onstart = () => { speaking = true; document.getElementById('speakerBtn').textContent = '⏸️'; appendTerminal('$ [TTS] speaking...'); };
+        utter.onend = () => { speaking = false; document.getElementById('speakerBtn').textContent = '🔊'; appendTerminal('$ [TTS] done'); };
+        utter.onerror = (e) => { appendTerminal('$ [TTS] error: ' + e.error); };
+        window.speechSynthesis.speak(utter);
+      } catch (e) {
+        appendTerminal('$ [TTS] error: ' + e.message);
+      }
+    }
+
+    // Terminal functions
     function appendTerminal(txt) {
       const t = document.getElementById('terminal');
       t.textContent += '\n' + txt;
       t.scrollTop = t.scrollHeight;
     }
 
-    // Send a message to AI endpoint (mock)
-    async function sendAI() {
-      const input = document.getElementById('aiInput').value;
-      if (!input) return;
-      appendTerminal('$ ai> ' + input);
+    async function sendTerminal(forcedCmd) {
+      const input = document.getElementById('terminalInput');
+      const cmd = (typeof forcedCmd === 'string' ? forcedCmd : input.value.trim());
+      if (!cmd) return;
+      appendTerminal('$ ' + cmd);
+      if (typeof forcedCmd !== 'string') input.value = '';
       try {
-        const res = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: input }) });
+        // Ask user for token in demo mode if not set
+        let token = localStorage.getItem('ADMIN_TOKEN');
+        if (!token) token = prompt('Enter ADMIN token (demo) to unlock privileged commands, or Cancel to run as guest:');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+        const res = await fetch('/api/terminal', { method: 'POST', headers, body: JSON.stringify({ cmd }) });
         const j = await res.json();
-        document.getElementById('aiOutput').textContent = j.reply;
-        appendTerminal('$ ai-reply> ' + j.reply);
+        appendTerminal('> ' + (j.output ? (typeof j.output === 'object' ? JSON.stringify(j.output) : j.output) : JSON.stringify(j)));
       } catch (e) {
-        appendTerminal('$ ai-error> ' + e.message);
+        appendTerminal('Error: ' + e.message);
       }
     }
 
-    // Theme toggle (simple light/dark switch that preserves palette)
-    document.getElementById('themeToggle').addEventListener('click', () => {
+    function clearTerminal() {
+      document.getElementById('terminal').textContent = '$ Welcome to ZacAi Terminal\n';
+    }
+    
+    // Enable clicking inside the terminal to focus the input (quick CLI-like behavior)
+    (function setupTerminalDirectTyping(){
+      try {
+        const term = document.getElementById('terminal');
+        const input = document.getElementById('terminalInput');
+        if (!term || !input) return;
+        term.addEventListener('click', (e) => {
+          input.focus();
+          const val = input.value;
+          input.value = '';
+          input.value = val;
+        });
+        term.addEventListener('keydown', (e) => {
+          input.focus();
+        });
+      } catch (e) {
+        console.warn('Terminal focus setup failed', e);
+      }
+    })();
+    
+    // Quick Links Dropdown
+    function toggleQuickLinksDropdown() {
+      const dropdown = document.getElementById('quickLinksDropdown');
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('quickLinksDropdown');
+      if (!e.target.closest('button') && !e.target.closest('.dropdown')) {
+        dropdown.style.display = 'none';
+      }
+    });
+    
+    // Theme Toggle (Dark/Light)
+    function toggleTheme() {
       const body = document.body;
-      if (body.classList.contains('light-mode')) {
-        body.classList.remove('light-mode');
+      const isDark = body.style.background.includes('1e3c72');
+      if (isDark) {
+        body.style.background = 'linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%)';
+        body.style.color = '#333';
+        document.querySelectorAll('.card').forEach(c => {
+          c.style.background = 'rgba(255,255,255,0.7)';
+          c.style.borderColor = 'rgba(0,0,0,0.1)';
+        });
+        localStorage.setItem('theme', 'light');
+      } else {
         body.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
         body.style.color = '#fff';
-      } else {
-        body.classList.add('light-mode');
-        body.style.background = 'linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%)';
-        body.style.color = '#111';
+        document.querySelectorAll('.card').forEach(c => {
+          c.style.background = 'rgba(255, 255, 255, 0.1)';
+          c.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        });
+        localStorage.setItem('theme', 'dark');
       }
-    });
-
-    // Clear terminal
-    document.getElementById('terminalClear').addEventListener('click', () => {
-      document.getElementById('terminal').textContent = '$ Welcome to ZacAi Terminal\n';
-    });
-
-    // Voice placeholders
-    function startVoice() {
-      appendTerminal('$ voice> start (placeholder)');
-      // real implementation: navigator.mediaDevices.getUserMedia + STT
     }
-    function stopVoice() {
-      appendTerminal('$ voice> stop (placeholder)');
+    (function initTheme(){
+      const theme = localStorage.getItem('theme') || 'dark';
+      if (theme === 'light') {
+        document.body.style.background = 'linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%)';
+        document.body.style.color = '#333';
+      }
+    })();
+    
+    // Settings Panel
+    function toggleSettings() {
+      const panel = document.getElementById('settingsPanel');
+      panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+    }
+    function saveSettings() {
+      const settings = {
+        adminEmail: document.getElementById('adminEmail').value,
+        logLevel: document.getElementById('logLevel').value,
+        complianceLevel: document.getElementById('complianceLevel').value,
+        maxRetries: document.getElementById('maxRetries').value,
+        recoveryMode: document.getElementById('recoveryMode').value,
+        enableVoice: document.getElementById('enableVoice').value,
+      };
+      localStorage.setItem('adminSettings', JSON.stringify(settings));
+      alert('✅ Settings saved to browser storage');
+    }
+    (function loadSettings(){
+      const saved = localStorage.getItem('adminSettings');
+      if (saved) {
+        try {
+          const settings = JSON.parse(saved);
+          Object.keys(settings).forEach(key => {
+            const el = document.getElementById(key);
+            if (el) el.value = settings[key];
+          });
+        } catch (e) {}
+      }
+    })();
+  </script>
+  <!-- Token storage for privileged commands -->
+  <script>
+    if (!localStorage.getItem('ADMIN_TOKEN')) {
+      const tokenFromPrompt = prompt('(Optional) Enter ADMIN token for privileged commands:');
+      if (tokenFromPrompt) localStorage.setItem('ADMIN_TOKEN', tokenFromPrompt);
     }
   </script>
+  <script src="/static/web-terminal-client.js"></script>
 </body>
 </html>`;
 }
 
 // Create HTTP server
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const url = new URL(req.url || '/', `http://${req.headers.host}`);
   const pathname = url.pathname;
 
@@ -679,6 +919,97 @@ const server = http.createServer((req, res) => {
     systemState.uptime = Date.now() - systemState.startTime;
     systemState.lastUpdate = new Date().toISOString();
     res.end(JSON.stringify(systemState, null, 2));
+  } else if (pathname === '/api/packages') {
+    // Return discovered packages
+    const packages = discoverPackages();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(packages, null, 2));
+  } else if (pathname === '/api/ai' && req.method === 'POST') {
+    // AI endpoint using system-core-agent.recommendAction
+    // Supports system commands: health, status, diagnostics, etc. or natural language
+    let body = '';
+    req.on('data', (chunk) => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const prompt = (data.prompt || '').trim().toLowerCase();
+        logInfo('ai', 'prompt_received', { prompt: prompt.slice(0, 200) });
+        
+        // Check if prompt matches known system commands
+        let reply = '';
+        if (prompt.includes('health')) {
+          reply = JSON.stringify({ health: 'HEALTHY', uptime: Date.now() - systemState.startTime, memory: process.memoryUsage() }, null, 2);
+        } else if (prompt.includes('status')) {
+          reply = JSON.stringify({ status: systemState.status, mode: systemState.mode, successRate: systemState.successRate }, null, 2);
+        } else if (prompt.includes('diagnostics') || prompt.includes('diagnostic')) {
+          reply = JSON.stringify({ diagnostics: { kernel: 'OK', modules: 9, wasm: true, memory: process.memoryUsage() } }, null, 2);
+        } else if (prompt.includes('metrics')) {
+          reply = JSON.stringify({ cycles: systemState.cycles, errors: systemState.errors, uptime: Math.floor((Date.now() - systemState.startTime) / 1000) }, null, 2);
+        } else {
+          // Fall back to agent recommendation for unknown prompts
+          reply = await recommendAction(prompt);
+        }
+        
+        logInfo('ai', 'reply_generated', { prompt: prompt.slice(0, 200), reply: (typeof reply === 'string' ? reply.slice(0, 1000) : JSON.stringify(reply)).slice(0, 1000) });
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ reply }));
+      } catch (e) {
+        logError('ai', 'error', { error: e.message });
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+  } else if (pathname === '/api/terminal' && req.method === 'POST') {
+    // Basic rate limiting by IP for terminal usage and metrics
+    try {
+      const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').toString();
+      const now = Date.now();
+      global.__termRate = global.__termRate || {};
+      const entry = global.__termRate[ip] || { count: 0, ts: now };
+      if (now - entry.ts > 60000) { entry.count = 0; entry.ts = now; }
+      entry.count += 1;
+      global.__termRate[ip] = entry;
+      if (entry.count > 60) { res.writeHead(429, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'rate limit exceeded' })); return; }
+      global.__metrics = global.__metrics || { terminalCommands: 0 };
+      global.__metrics.terminalCommands += 1;
+      await terminalHandler.handleRequest(req, res);
+    } catch (e) {
+      logError('terminal', 'handle_request_error', { error: e.message });
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'internal server error' }));
+    }
+  } else if (pathname === '/api/diagnostics') {
+    // Run system diagnostics
+    const diagnostics = {
+      timestamp: new Date().toISOString(),
+      system: {
+        uptime: Math.floor((Date.now() - systemState.startTime) / 1000),
+        status: systemState.status,
+        mode: systemState.mode,
+        health: systemState.health,
+      },
+      performance: {
+        cycles: systemState.cycles,
+        successRate: systemState.successRate,
+        errors: systemState.errors,
+      },
+      memory: process.memoryUsage(),
+      kernel: { active: true, modules: 9 },
+      wasm: { loaded: true },
+    };
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(diagnostics, null, 2));
+  } else if (pathname === '/api/services') {
+    // Return active services and packages
+    const services = {
+      kernel: { status: 'RUNNING', version: '1.0.0' },
+      agent: { status: 'RUNNING', version: '1.0.0' },
+      model: { status: 'RUNNING', version: 'mock-v0' },
+      terminal: { status: 'RUNNING', handlers: ['POST', 'WS'] },
+      ai: { status: 'RUNNING', backend: 'local-seed-with-openai-fallback' },
+    };
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(services, null, 2));
   } else if (pathname === '/api/health') {
     // Return health metrics
     const health = {
@@ -692,6 +1023,24 @@ const server = http.createServer((req, res) => {
     };
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(health, null, 2));
+  } else if (pathname === '/api/metrics') {
+    // Return Prometheus-style metrics
+    const uptime = Date.now() - systemState.startTime;
+    const metrics = `# HELP zacai_uptime_ms System uptime in milliseconds
+# TYPE zacai_uptime_ms gauge
+zacai_uptime_ms ${uptime}
+# HELP zacai_success_rate Success rate percentage
+# TYPE zacai_success_rate gauge
+zacai_success_rate ${systemState.successRate}
+# HELP zacai_errors Total errors
+# TYPE zacai_errors counter
+zacai_errors ${systemState.errors}
+# HELP zacai_cycles Total cycles executed
+# TYPE zacai_cycles counter
+zacai_cycles ${systemState.cycles}
+`;
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end(metrics);
   } else if (pathname === '/api/compliance') {
     // Return compliance/audit trail
     const compliance = {
@@ -704,71 +1053,29 @@ const server = http.createServer((req, res) => {
     };
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(compliance, null, 2));
-  } else if (pathname === '/api/diagnostics') {
-    // Lightweight diagnostics endpoint (synchronous)
-    const diagnostics = {
-      kernel: { status: 'OK', modules: 9 },
-      wasm: { present: true, path: '/packages/system-kernel-methods/wasm_dist/zk_kernels_bg.wasm' },
-      memory: { rss: process.memoryUsage().rss },
-      uptimeMs: Date.now() - systemState.startTime,
-      timestamp: new Date().toISOString(),
-    };
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(diagnostics, null, 2));
-  } else if (pathname === '/api/ai' && req.method === 'POST') {
-    // AI endpoint: use system-core-agent.recommendAction (safe, local mock)
-    let body = '';
-    req.on('data', (chunk) => { body += chunk; });
-    req.on('end', async () => {
-      try {
-        const data = JSON.parse(body || '{}');
-        const prompt = data.prompt || '';
-        const reply = await recommendAction(prompt);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ reply }));
-      } catch (e) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: e.message }));
-      }
-    });
-  } else if (pathname === '/api/terminal' && req.method === 'POST') {
-    // Secure simulated terminal: requires Authorization header Bearer token to unlock advanced actions
-    const auth = (req.headers['authorization'] || req.headers['Authorization'] || '');
-    const token = (process.env.ADMIN_TOKEN || 'admin-secret');
-    const authorized = auth === `Bearer ${token}`;
-
-    let body = '';
-    req.on('data', (chunk) => { body += chunk; });
-    req.on('end', () => {
-      try {
-        const data = JSON.parse(body || '{}');
-        const cmd = (data.cmd || '').trim();
-
-        // Safe built-in commands
-        if (cmd === 'status') {
-          const out = { status: systemState.status, uptimeMs: Date.now() - systemState.startTime, health: systemState.health };
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ output: out }));
-          return;
-        }
-
-        // If authorized, provide simulated privileged response
-        if (authorized) {
-          const output = `authorized-exec-sim: ${cmd}`;
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ output }));
-          return;
-        }
-
-        // Not authorized: echo only
-        const output = `echo: ${cmd} (unauthorized)`;
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ output }));
-      } catch (e) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: e.message }));
-      }
-    });
+  } else if (pathname === '/metrics') {
+    // Prometheus-style basic metrics
+    const metrics = [];
+    const uptime = Math.floor((Date.now() - systemState.startTime) / 1000);
+    metrics.push(`# HELP zacai_system_uptime_seconds System uptime in seconds`);
+    metrics.push(`# TYPE zacai_system_uptime_seconds counter`);
+    metrics.push(`zacai_system_uptime_seconds ${uptime}`);
+    metrics.push(`# HELP zacai_terminal_commands_total Terminal commands received`);
+    metrics.push(`# TYPE zacai_terminal_commands_total counter`);
+    const cmdCount = (global.__metrics && global.__metrics.terminalCommands) ? global.__metrics.terminalCommands : 0;
+    metrics.push(`zacai_terminal_commands_total ${cmdCount}`);
+    res.writeHead(200, { 'Content-Type': 'text/plain; version=0.0.4' });
+    res.end(metrics.join('\n'));
+  } else if (pathname === '/static/web-terminal-client.js') {
+    // Serve the client-side web terminal module
+    const clientPath = path.join(__dirname, '../../packages/web-terminal/client/terminal.js');
+    if (fs.existsSync(clientPath)) {
+      res.writeHead(200, { 'Content-Type': 'application/javascript' });
+      res.end(fs.readFileSync(clientPath, 'utf8'));
+    } else {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Not Found');
+    }
   } else {
     // 404
     res.writeHead(404, { 'Content-Type': 'text/plain' });
@@ -776,8 +1083,90 @@ const server = http.createServer((req, res) => {
   }
 });
 
+// Serve xterm client script
+// No-op: xterm client is served from /static/web-terminal-client.js
+
 // Start server
 const PORT = 3000;
+// Create and attach terminal handler and WebSocket endpoint
+const terminalHandler = new TerminalHandler({ adminToken: process.env.ADMIN_TOKEN || 'admin-secret', commandWhitelist: ['status', 'health', 'diagnostics'] });
+terminalHandler.attach(server);
+
+// WebSocket PTY bridge: try to use `node-pty` and `ws`, otherwise fallback to safe command-only handler
+server.on('upgrade', async (req, socket, head) => {
+  try {
+    const url = new URL(req.url || '/', `http://${req.headers.host}`);
+    if (url.pathname !== '/ws/terminal') {
+      socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+    // Dynamic import for optional dependencies
+    let WebSocketServer;
+    try {
+      ({ WebSocketServer } = await import('ws'));
+    } catch (e) {
+      socket.write('HTTP/1.1 501 Not Implemented\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+    const wss = new WebSocketServer({ noServer: true });
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      (async () => {
+        let ptyProcess = null;
+        try {
+          const nodePty = await import('node-pty');
+          const shell = process.env.SHELL || (process.platform === 'win32' ? 'powershell.exe' : 'bash');
+          ptyProcess = nodePty.spawn(shell, [], { name: 'xterm-color', cols: 80, rows: 24, cwd: process.cwd(), env: process.env });
+        } catch (e) {
+          // pty not available; remain in fallback mode
+        }
+
+        if (ptyProcess) {
+          ptyProcess.onData((d) => { try { ws.send(d); } catch (e) {} });
+          ws.on('message', (msg) => {
+            const data = (typeof msg === 'string') ? msg : msg.toString();
+            if (data.startsWith('__RESIZE__')) {
+              const parts = data.split(':');
+              const rows = parseInt(parts[1]||24,10);
+              const cols = parseInt(parts[2]||80,10);
+              try { ptyProcess.resize(cols, rows); } catch(e){}
+            } else {
+              try { ptyProcess.write(data); } catch (e) {}
+            }
+          });
+          ws.on('close', () => { try { ptyProcess.kill(); } catch (e) {} });
+        } else {
+          // Fallback: accept only safe commands via internal POST to /api/terminal
+          ws.send('PTY unavailable on this host; using command-only fallback.');
+          ws.on('message', async (msg) => {
+            const data = (typeof msg === 'string') ? msg : msg.toString();
+            if (!data || data.trim() === '') return;
+            if (data.startsWith('__RESIZE__')) return; // ignore
+            // Only allow safe commands
+            const safe = ['status','health','diagnostics'];
+            const cmd = data.trim().split('\n')[0].trim();
+            if (!safe.includes(cmd)) {
+              ws.send('Command not permitted in fallback.');
+              return;
+            }
+            try {
+              const resp = await fetch('http://localhost:'+ (process.env.PORT || 3000) + '/api/terminal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cmd }) });
+              const j = await resp.json();
+              ws.send(JSON.stringify(j));
+            } catch (e) {
+              ws.send('Fallback execution error: '+e.message);
+            }
+          });
+        }
+      })();
+    });
+  } catch (e) {
+    try { socket.write('HTTP/1.1 500 Internal Server Error\r\n\r\n'); } catch(_){}
+    try { socket.destroy(); } catch(_){}
+  }
+});
+
 server.listen(PORT, () => {
   console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
