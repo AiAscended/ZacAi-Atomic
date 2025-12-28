@@ -1,0 +1,11 @@
+{
+  "name": "@zacai/system-enterprise",
+  "version": "0.0.1",
+  "description": "Scaffold for Phase 9: Enterprise features (RBAC, multi-tenant, policy manager)",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "echo 'No build configured'",
+    "test": "echo 'No tests yet'"
+  },
+  "license": "MIT"
+}
